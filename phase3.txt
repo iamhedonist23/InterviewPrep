@@ -1,0 +1,73 @@
+Implement PHASE 3 ONLY.
+
+Goal:
+Add optional free user accounts and a useful dashboard.
+
+Authentication:
+Use Auth.js / NextAuth.
+
+Support:
+
+* Google login
+* Email/password login
+
+Security:
+
+* Proper password hashing
+* Secure sessions
+* Secure cookies
+* Environment variables
+* Proper server-side authorization
+
+Public content must continue working without login.
+
+Create:
+
+* Login page
+* Register page
+* Forgot-password flow if practical
+* Logout
+* Account/profile page
+
+Create dashboard:
+
+/dashboard
+
+Sections:
+
+* Welcome
+* Questions practiced
+* Practice sessions
+* Average score
+* Saved questions
+* Recent activity
+* Recommended practice
+
+Create:
+/dashboard/saved
+
+Saved-question functionality:
+
+* Save
+* Remove save
+* List saved questions
+
+Create database relations for user activity.
+
+Do not expose private user data to other users.
+
+Protect dashboard and account routes server-side.
+
+Add proper loading, error, and empty states.
+
+Run:
+
+* Auth tests
+* Authorization tests
+* TypeScript
+* Lint
+* Production build
+
+Fix all errors.
+
+Do not implement AI or payments.

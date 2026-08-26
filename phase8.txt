@@ -1,0 +1,85 @@
+Implement PHASE 8 ONLY.
+
+Goal:
+Prepare the website for Google AdSense without harming user experience.
+
+IMPORTANT:
+This phase does NOT guarantee Google AdSense approval.
+Build the website to follow Google's policies and best practices.
+
+Create reusable ad components:
+
+* AdBanner
+* AdInArticle
+* AdSidebar
+* AdResponsive
+
+Environment variables:
+
+NEXT_PUBLIC_ADSENSE_CLIENT_ID
+NEXT_PUBLIC_ADSENSE_ENABLED
+
+Development:
+Ads disabled by default.
+
+Production:
+Ads enabled only when configured.
+
+Do not hardcode a real publisher ID.
+
+Ad rules:
+
+1. Never encourage users to click ads.
+2. Never place ads where they can be mistaken for navigation.
+3. Never place ads directly over controls.
+4. Never interfere with practice questions.
+5. Avoid excessive ad density.
+6. Keep ads clearly distinguishable.
+7. Do not show ads on private/admin pages.
+8. Do not create pages purely to show ads.
+
+Suggested placements:
+
+Homepage:
+
+* Between major sections
+
+Question page:
+
+* After useful content sections
+* Near the end
+
+Article:
+
+* After introduction
+* Mid-content where appropriate
+* Near end
+
+Desktop:
+
+* Limited sidebar placement
+
+Mobile:
+
+* Conservative responsive placements
+
+Create AdSense script loading safely.
+
+Do not break rendering if AdSense is unavailable.
+
+Add configuration comments.
+
+Also verify:
+
+* Privacy policy
+* Cookie policy
+* Terms
+* Disclaimer
+* Contact
+* About
+
+Make sure these pages are linked in the footer.
+
+Run production build.
+
+Do not claim AdSense approval.

@@ -1,0 +1,29 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+	--primary: 225 91 67;
+	--secondary: 213 235 224;
+	--background: 250 248 243;
+	--surface: 255 255 255;
+	--text: 27 35 37;
+	--muted: 27 35 37;
+	--border: 27 35 37;
+	--success: 45 125 85;
+	--warning: 190 125 35;
+	--error: 180 50 50;
+	--ink: var(--text);
+	--paper: var(--background);
+	--coral: var(--primary);
+	--mint: var(--secondary);
+	--font-sans: 'DM Sans';
+	--font-display: 'Space Grotesk';
+}
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body { margin: 0; background: rgb(var(--paper)); color: rgb(var(--ink)); font-family: var(--font-sans), sans-serif; }
+a { color: inherit; text-decoration: none; }
+:focus-visible { outline: 3px solid rgb(var(--coral)); outline-offset: 3px; }
+::selection { background: rgb(var(--coral)); color: white; }

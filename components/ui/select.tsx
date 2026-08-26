@@ -1,0 +1,1 @@
+export function Select({ label, options }: { label: string; options: string[] }) { return <label className="block text-sm font-semibold">{label}<select className="mt-2 h-12 w-full rounded-xl border border-ink/15 bg-paper px-4 font-normal">{options.map(option => <option key={option}>{option}</option>)}</select></label>; }
