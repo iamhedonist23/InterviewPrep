@@ -54,6 +54,7 @@ model User {
   savedQuestions   SavedQuestion[]
   accounts         Account[]
   sessions         Session[]
+  resumes          Resume[]
 }
 
 model Account {
@@ -267,4 +268,180 @@ model ContactMessage {
   isRead    Boolean  @default(false)
   createdAt DateTime @default(now())
   @@index([isRead, createdAt])
+}
+
+enum SkillLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  EXPERT
+}
+
+enum LanguageProficiency {
+  BASIC
+  CONVERSATIONAL
+  FLUENT
+  NATIVE
+}
+
+model Resume {
+  id             String                @id @default(cuid())
+  userId         String
+  title          String
+  template       String                @default("classic")
+  isDefault      Boolean               @default(false)
+  sectionOrder   Json                  @default("[\"summary\",\"experience\",\"education\",\"skills\",\"projects\",\"certifications\",\"achievements\",\"languages\"]")
+  lastEditedAt   DateTime              @default(now())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  personalInfo   ResumePersonalInfo?
+  education      ResumeEducation[]
+  experience     ResumeExperience[]
+  projects       ResumeProject[]
+  skills         ResumeSkill[]
+  certifications ResumeCertification[]
+  achievements   ResumeAchievement[]
+  languages      ResumeLanguage[]
+  customSections ResumeCustomSection[]
+  @@index([userId, updatedAt])
+  @@index([userId, isDefault])
+}
+
+model ResumePersonalInfo {
+  id                 String   @id @default(cuid())
+  resumeId           String   @unique
+  fullName           String?
+  professionalTitle  String?
+  email              String?
+  phone              String?
+  location           String?
+  website            String?
+  linkedin           String?
+  github             String?
+  portfolio          String?
+  summary            String?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  resume             Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+}
+
+model ResumeEducation {
+  id            String    @id @default(cuid())
+  resumeId      String
+  institution   String
+  degree        String?
+  fieldOfStudy  String?
+  location      String?
+  startDate     DateTime?
+  endDate       DateTime?
+  isCurrent     Boolean   @default(false)
+  description   String?
+  sortOrder     Int       @default(0)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  resume        Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeExperience {
+  id           String    @id @default(cuid())
+  resumeId     String
+  company      String
+  jobTitle     String
+  location     String?
+  startDate    DateTime?
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
+  description  String?
+  achievements Json?
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeProject {
+  id           String    @id @default(cuid())
+  resumeId     String
+  name         String
+  description  String?
+  technologies Json?
+  projectUrl   String?
+  githubUrl    String?
+  startDate    DateTime?
+  endDate      DateTime?
+  achievements Json?
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeSkill {
+  id        String      @id @default(cuid())
+  resumeId  String
+  name      String
+  category  String?
+  level     SkillLevel?
+  sortOrder Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  resume    Resume      @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeCertification {
+  id             String    @id @default(cuid())
+  resumeId       String
+  name           String
+  organization   String?
+  issueDate      DateTime?
+  expirationDate DateTime?
+  credentialId   String?
+  credentialUrl  String?
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  resume         Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeAchievement {
+  id          String    @id @default(cuid())
+  resumeId    String
+  title       String
+  description String?
+  date        DateTime?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resume      Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeLanguage {
+  id           String              @id @default(cuid())
+  resumeId     String
+  name         String
+  proficiency  LanguageProficiency @default(CONVERSATIONAL)
+  sortOrder    Int                 @default(0)
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @updatedAt
+  resume       Resume              @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeCustomSection {
+  id        String   @id @default(cuid())
+  resumeId  String
+  title     String
+  content   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+  @@index([resumeId, sortOrder])
 }
