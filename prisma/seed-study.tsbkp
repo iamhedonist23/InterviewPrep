@@ -1,0 +1,840 @@
+// Expanded study seed for the /learn feature.
+// Safe to re-run: all records use deterministic IDs/slugs and upserts.
+// This file only manages study content; it does not create interview questions.
+
+import { PrismaClient, StudyLevel, Difficulty } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+type TopicSeed = {
+  slug: string;
+  title: string;
+  shortDescription: string;
+  estimatedMinutes: number;
+  sortOrder: number;
+  seoTitle: string;
+  seoDescription: string;
+  sections: Array<{ slug: string; title: string; content: string }>;
+  examples?: Array<{
+    slug: string;
+    language: string;
+    code: string;
+    explanation: string;
+  }>;
+  exercises?: Array<{
+    slug: string;
+    question: string;
+    difficulty: Difficulty;
+    hint: string;
+    solution: string;
+    explanation: string;
+  }>;
+};
+
+async function main() {
+  // ---------------------------------------------------------------------------
+  // CATEGORY / PATH / MODULE
+  // ---------------------------------------------------------------------------
+  const category = await prisma.studyCategory.upsert({
+    where: { slug: "javascript-fundamentals" },
+    update: {
+      name: "JavaScript Fundamentals",
+      description:
+        "A complete JavaScript learning path that takes you from fundamentals to interview-ready understanding.",
+      icon: "JS",
+      isPublished: true,
+      sortOrder: 0,
+    },
+    create: {
+      name: "JavaScript Fundamentals",
+      slug: "javascript-fundamentals",
+      description:
+        "A complete JavaScript learning path that takes you from fundamentals to interview-ready understanding.",
+      icon: "JS",
+      isPublished: true,
+      sortOrder: 0,
+    },
+  });
+
+  const path = await prisma.studyPath.upsert({
+    where: {
+      categoryId_slug: {
+        categoryId: category.id,
+        slug: "beginner",
+      },
+    },
+    update: {
+      name: "Beginner to Interview Ready",
+      description:
+        "Learn JavaScript concepts in a logical order, understand why they work, practice them, and prepare for interviews.",
+      level: StudyLevel.BEGINNER,
+      isPublished: true,
+      sortOrder: 0,
+    },
+    create: {
+      categoryId: category.id,
+      name: "Beginner to Interview Ready",
+      slug: "beginner",
+      description:
+        "Learn JavaScript concepts in a logical order, understand why they work, practice them, and prepare for interviews.",
+      level: StudyLevel.BEGINNER,
+      isPublished: true,
+      sortOrder: 0,
+    },
+  });
+
+  const learnModule = await prisma.studyModule.upsert({
+    where: {
+      studyPathId_slug: {
+        studyPathId: path.id,
+        slug: "core-concepts",
+      },
+    },
+    update: {
+      title: "Core JavaScript Concepts",
+      description:
+        "The essential building blocks of JavaScript: values, variables, scope, functions, objects, equality, asynchronous execution, and closures.",
+      isPublished: true,
+      sortOrder: 0,
+    },
+    create: {
+      studyPathId: path.id,
+      title: "Core JavaScript Concepts",
+      slug: "core-concepts",
+      description:
+        "The essential building blocks of JavaScript: values, variables, scope, functions, objects, equality, asynchronous execution, and closures.",
+      isPublished: true,
+      sortOrder: 0,
+    },
+  });
+
+  const topics: TopicSeed[] = [
+    {
+      slug: "variables-and-scope",
+      title: "Variables and Scope",
+      shortDescription:
+        "Understand let, const, var, block scope, function scope, hoisting, and how JavaScript decides which variable a name refers to.",
+      estimatedMinutes: 12,
+      sortOrder: 0,
+      seoTitle: "JavaScript Variables and Scope Explained",
+      seoDescription:
+        "Learn let, const, var, scope, hoisting, block scope, and function scope with practical examples.",
+      sections: [
+        {
+          slug: "what",
+          title: "What are variables?",
+          content:
+            "A variable is a named binding that allows a program to keep track of a value. In JavaScript, the most common declarations are let and const. A variable name is not the value itself; it is a name that the JavaScript runtime can resolve to a value during execution.\n\nThink of a variable as a label attached to a piece of information. The label can be used later to read or, when allowed, change that information.",
+        },
+        {
+          slug: "let-const-var",
+          title: "let, const, and var",
+          content:
+            "Use const when the binding should not be reassigned. Use let when the binding needs to be reassigned. var is the older declaration mechanism and is function-scoped rather than block-scoped.\n\nconst does not make an object immutable. It prevents reassignment of the variable binding. The properties of an object stored in a const variable can still be changed.",
+        },
+        {
+          slug: "scope",
+          title: "How scope works",
+          content:
+            "Scope determines where a variable can be accessed. JavaScript has global scope, function scope, and block scope. A variable declared with let or const inside a block is available only inside that block.\n\nWhen JavaScript encounters a variable name, it searches the current lexical environment and then continues outward through enclosing scopes. This outward lookup is one of the foundations of closures.",
+        },
+        {
+          slug: "hoisting",
+          title: "Hoisting and the temporal dead zone",
+          content:
+            "JavaScript processes declarations before executing the statements in their scope, but that does not mean every declaration can be used before its source line. let and const are in the temporal dead zone from the beginning of their scope until execution reaches their declaration. Accessing them before initialization throws a ReferenceError.\n\nvar behaves differently: its declaration is hoisted and initialized with undefined. Function declarations have their own hoisting behavior and can generally be called before their declaration in the same scope.",
+        },
+        {
+          slug: "interview",
+          title: "Interview-ready understanding",
+          content:
+            "A strong interview answer should distinguish declaration, assignment, reassignment, scope, and hoisting. A common trap is saying that const makes a value immutable. It only makes the binding non-reassignable.\n\nAnother common trap is assuming that every declaration is usable before its source line. let and const are not safely accessible before initialization.",
+        },
+      ],
+      examples: [
+        {
+          slug: "scope",
+          language: "javascript",
+          code:
+            "let name = \"Global\";\n\nfunction greet() {\n  let message = \"Hello\";\n  if (true) {\n    const name = \"Block\";\n    console.log(name);   // Block\n    console.log(message); // Hello\n  }\n  console.log(name);     // Global\n}\n\ngreet();",
+          explanation:
+            "The block creates a new lexical scope. The inner name shadows the global name, while message is found by searching the enclosing function scope.",
+        },
+        {
+          slug: "const-object",
+          language: "javascript",
+          code:
+            "const user = { name: \"Asha\" };\nuser.name = \"Ravi\"; // allowed\n\n// user = {}; // TypeError",
+          explanation:
+            "const prevents reassignment of the user binding. It does not freeze the object stored in that binding.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "var-loop",
+          question:
+            "What does this print, and why?\n\nfor (var i = 0; i < 3; i++) {\n  setTimeout(() => console.log(i), 0);\n}",
+          difficulty: Difficulty.MEDIUM,
+          hint:
+            "Ask whether var creates a new binding for each loop iteration.",
+          solution: "3\n3\n3",
+          explanation:
+            "var is function-scoped, so all callbacks close over the same i. The loop finishes before the timers execute, leaving i equal to 3.",
+        },
+      ],
+    },
+
+    {
+      slug: "data-types-and-type-conversion",
+      title: "Data Types and Type Conversion",
+      shortDescription:
+        "Learn primitive values, objects, typeof, null, undefined, truthiness, and how JavaScript converts values between types.",
+      estimatedMinutes: 14,
+      sortOrder: 1,
+      seoTitle: "JavaScript Data Types and Type Conversion",
+      seoDescription:
+        "Understand JavaScript primitive types, objects, typeof, truthy values, falsy values, and type conversion.",
+      sections: [
+        {
+          slug: "primitive-types",
+          title: "Primitive data types",
+          content:
+            "JavaScript has seven commonly taught primitive types: string, number, bigint, boolean, undefined, symbol, and null. Primitives represent single immutable values.\n\nNumbers include integers and floating-point values. BigInt is used for integers outside the safe integer range. Symbols provide unique identifiers. undefined commonly represents an uninitialized or missing value, while null represents an intentional absence of an object value.",
+        },
+        {
+          slug: "objects",
+          title: "Objects are different",
+          content:
+            "Objects are collections of properties and can represent structured data. Arrays and functions are also objects in JavaScript's object model.\n\nA variable holding an object contains a reference to that object rather than behaving like an independent copy of every property. This explains why assigning one object variable to another can make both variables observe the same object.",
+        },
+        {
+          slug: "typeof",
+          title: "Using typeof",
+          content:
+            "typeof is useful for quickly identifying many JavaScript value types. Examples include typeof \"hello\" returning string and typeof 10 returning number.\n\nThere are historical quirks: typeof null returns object, and arrays also return object. When you need to distinguish arrays, Array.isArray(value) is the appropriate check.",
+        },
+        {
+          slug: "truthiness",
+          title: "Truthy and falsy values",
+          content:
+            "JavaScript converts values to boolean in conditions. Common falsy values include false, 0, -0, 0n, an empty string, null, undefined, and NaN. Most other values are truthy, including empty arrays and empty objects.\n\nThis matters because expressions such as if (value) can intentionally or accidentally treat different values as equivalent from a control-flow perspective.",
+        },
+        {
+          slug: "conversion",
+          title: "Explicit and implicit conversion",
+          content:
+            "Explicit conversion happens when you intentionally call functions such as Number(), String(), or Boolean(). Implicit conversion happens when an operator or language rule converts a value automatically.\n\nPrefer explicit conversion when clarity matters. It makes the intended data transformation visible and reduces surprises during maintenance.",
+        },
+      ],
+      examples: [
+        {
+          slug: "reference",
+          language: "javascript",
+          code:
+            "const first = { score: 10 };\nconst second = first;\n\nsecond.score = 20;\nconsole.log(first.score); // 20",
+          explanation:
+            "Both variables refer to the same object. Changing the object through second is therefore visible through first.",
+        },
+        {
+          slug: "truthy",
+          language: "javascript",
+          code:
+            "console.log(Boolean(0));      // false\nconsole.log(Boolean(\"\"));     // false\nconsole.log(Boolean(\"hello\")); // true\nconsole.log(Boolean([]));      // true\nconsole.log(Boolean({}));      // true",
+          explanation:
+            "Arrays and objects are truthy even when they contain no elements or properties.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "array-truthy",
+          question:
+            "What do these expressions return?\n\nBoolean([])\nBoolean({})\nBoolean(\"\")\nBoolean(null)",
+          difficulty: Difficulty.EASY,
+          hint: "Remember that empty objects and arrays are still objects with a truthy value.",
+          solution: "true, true, false, false",
+          explanation:
+            "Only the empty string and null are falsy among these four values.",
+        },
+      ],
+    },
+
+    {
+      slug: "functions-and-parameters",
+      title: "Functions and Parameters",
+      shortDescription:
+        "Understand function declarations, expressions, arrow functions, parameters, return values, callbacks, and first-class functions.",
+      estimatedMinutes: 15,
+      sortOrder: 2,
+      seoTitle: "JavaScript Functions Explained",
+      seoDescription:
+        "Learn JavaScript functions, parameters, return values, arrow functions, callbacks, and first-class functions.",
+      sections: [
+        {
+          slug: "what",
+          title: "What is a function?",
+          content:
+            "A function is a reusable block of behavior. It can receive input through parameters, perform work, and return an output.\n\nFunctions help separate responsibilities into smaller units. A good function normally has a clear purpose and predictable inputs and outputs.",
+        },
+        {
+          slug: "declaration-expression-arrow",
+          title: "Declaration, expression, and arrow function",
+          content:
+            "A function declaration uses the function keyword with a name. A function expression stores a function value in a variable. Arrow functions provide a shorter syntax and have important differences in how this is determined.\n\nThese forms are not simply different spellings. Function declarations have declaration-hoisting behavior, while arrow functions do not have their own this, arguments object, or constructor behavior.",
+        },
+        {
+          slug: "parameters",
+          title: "Parameters and arguments",
+          content:
+            "Parameters are the names defined by the function. Arguments are the actual values supplied during a call. JavaScript allows default parameters, rest parameters, and passing functions as values.\n\nRest parameters collect remaining arguments into an array, which is useful when a function accepts a variable number of inputs.",
+        },
+        {
+          slug: "callbacks",
+          title: "Functions as values and callbacks",
+          content:
+            "JavaScript treats functions as first-class values. A function can be stored in a variable, passed to another function, returned from a function, or stored in an object.\n\nA callback is a function passed to another function so that the receiving code can invoke it at the appropriate time. Array methods such as map and filter are common examples.",
+        },
+        {
+          slug: "interview",
+          title: "Interview-ready understanding",
+          content:
+            "When explaining functions, connect syntax to behavior. Be prepared to explain the difference between a function declaration and an arrow function, what a callback is, how return works, and why passing a function is different from calling it.\n\nFor example, setTimeout(doWork, 1000) passes a function. setTimeout(doWork(), 1000) calls it immediately and passes its return value.",
+        },
+      ],
+      examples: [
+        {
+          slug: "callback",
+          language: "javascript",
+          code:
+            "function calculate(a, b, operation) {\n  return operation(a, b);\n}\n\nconst result = calculate(5, 3, (x, y) => x + y);\nconsole.log(result); // 8",
+          explanation:
+            "The arrow function is passed as a value. calculate invokes it later with the supplied arguments.",
+        },
+        {
+          slug: "rest-default",
+          language: "javascript",
+          code:
+            "function sum(start = 0, ...numbers) {\n  return numbers.reduce((total, value) => total + value, start);\n}\n\nconsole.log(sum(10, 1, 2, 3)); // 16",
+          explanation:
+            "The default parameter supplies a value when start is omitted, while rest syntax collects remaining arguments into numbers.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "callback-vs-call",
+          question:
+            "What is the difference between setTimeout(work, 1000) and setTimeout(work(), 1000)?",
+          difficulty: Difficulty.MEDIUM,
+          hint: "One passes the function itself; the other executes it immediately.",
+          solution:
+            "setTimeout(work, 1000) passes work as a callback. setTimeout(work(), 1000) executes work immediately and passes its return value to setTimeout.",
+          explanation:
+            "Callbacks are values until the receiving code invokes them. Adding parentheses changes the expression from a function reference to a function call.",
+        },
+      ],
+    },
+
+    {
+      slug: "objects-arrays-and-destructuring",
+      title: "Objects, Arrays, and Destructuring",
+      shortDescription:
+        "Learn how JavaScript stores structured data, how arrays differ from objects, and how destructuring and spread syntax work.",
+      estimatedMinutes: 16,
+      sortOrder: 3,
+      seoTitle: "JavaScript Objects Arrays and Destructuring",
+      seoDescription:
+        "Understand JavaScript objects, arrays, destructuring, spread syntax, shallow copies, and common interview patterns.",
+      sections: [
+        {
+          slug: "objects",
+          title: "Objects",
+          content:
+            "Objects store named properties. A property has a key and a value, and that value can itself be another object, array, or function.\n\nProperties can be accessed with dot notation when the property name is known, or bracket notation when the key is dynamic or contains characters that are not convenient in dot notation.",
+        },
+        {
+          slug: "arrays",
+          title: "Arrays",
+          content:
+            "Arrays are ordered collections indexed from zero. They provide methods such as map, filter, reduce, find, some, and every that make common data transformations expressive.\n\nAn array can contain values of different types, although keeping a consistent element shape generally makes application code easier to reason about.",
+        },
+        {
+          slug: "destructuring",
+          title: "Destructuring",
+          content:
+            "Destructuring extracts values from arrays or properties from objects into variables. It reduces repetitive property access and makes function parameters easier to read.\n\nObject destructuring can rename properties and provide defaults. Array destructuring follows position rather than property name.",
+        },
+        {
+          slug: "spread",
+          title: "Spread syntax and shallow copies",
+          content:
+            "The spread operator can create a new array or object containing the enumerable values or properties of an existing one. This is useful for immutable update patterns.\n\nThe copy is shallow. If a nested object is present, both the original and copied structure can still reference the same nested object.",
+        },
+      ],
+      examples: [
+        {
+          slug: "destructure",
+          language: "javascript",
+          code:
+            "const user = {\n  name: \"Maya\",\n  role: \"Developer\",\n};\n\nconst { name, role: jobTitle } = user;\nconsole.log(name);     // Maya\nconsole.log(jobTitle); // Developer",
+          explanation:
+            "The property role is extracted into a variable named jobTitle. Renaming does not change the original object property.",
+        },
+        {
+          slug: "shallow-copy",
+          language: "javascript",
+          code:
+            "const original = {\n  profile: { active: true },\n};\n\nconst copy = { ...original };\ncopy.profile.active = false;\n\nconsole.log(original.profile.active); // false",
+          explanation:
+            "The top-level object was copied, but profile was not deeply cloned. Both objects still reference the same nested profile object.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "map-filter",
+          question:
+            "What is the result of [1, 2, 3, 4].filter(n => n % 2 === 0).map(n => n * 10)?",
+          difficulty: Difficulty.EASY,
+          hint: "filter keeps values; map transforms the values that remain.",
+          solution: "[20, 40]",
+          explanation:
+            "filter keeps 2 and 4. map then multiplies each remaining number by 10.",
+        },
+      ],
+    },
+
+    {
+      slug: "equality-and-type-coercion",
+      title: "Equality and Type Coercion",
+      shortDescription:
+        "Understand ==, ===, coercion rules, null, undefined, truthy values, and why JavaScript equality questions appear so often in interviews.",
+      estimatedMinutes: 12,
+      sortOrder: 4,
+      seoTitle: "JavaScript == vs === Explained",
+      seoDescription:
+        "Learn strict equality, loose equality, type coercion, null, undefined, and common JavaScript equality interview questions.",
+      sections: [
+        {
+          slug: "strict",
+          title: "Strict equality: ===",
+          content:
+            "Strict equality compares values without performing the loose-equality type conversion process. In normal cases, different types do not compare equal.\n\nFor example, 5 === \"5\" is false because one operand is a number and the other is a string.",
+        },
+        {
+          slug: "loose",
+          title: "Loose equality: ==",
+          content:
+            "Loose equality can convert operands before comparing them. This creates results that are surprising until the coercion rules are understood.\n\nFor maintainable application code, === is usually the clearer default because the comparison's type requirements are explicit.",
+        },
+        {
+          slug: "special-cases",
+          title: "Important special cases",
+          content:
+            "null == undefined is true, while null === undefined is false. Arrays and objects can also be converted to primitives during loose equality comparisons.\n\nThese rules explain examples such as [] == false being true, but they are also a reason to avoid relying on implicit coercion unless the behavior is intentional and understood.",
+        },
+        {
+          slug: "interview",
+          title: "Interview approach",
+          content:
+            "When asked an equality question, do not guess from appearance. Identify the operators, determine whether coercion happens, and then evaluate the operands step by step.\n\nA strong answer explains why the result occurs rather than only giving true or false.",
+        },
+      ],
+      examples: [
+        {
+          slug: "comparisons",
+          language: "javascript",
+          code:
+            "0 == false;            // true\n0 === false;           // false\n\"5\" == 5;              // true\n\"5\" === 5;             // false\nnull == undefined;     // true\nnull === undefined;    // false",
+          explanation:
+            "Loose equality can coerce values, while strict equality compares without that loose-equality conversion. null and undefined have a specific loose-equality relationship.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "empty-array",
+          question:
+            "Is [] == false true or false? Explain the conversion steps.",
+          difficulty: Difficulty.MEDIUM,
+          hint:
+            "The array is converted to a primitive before the comparison continues.",
+          solution: "true",
+          explanation:
+            "[] becomes the primitive empty string. The empty string and false are then converted to numeric values for the comparison, resulting in 0 == 0.",
+        },
+      ],
+    },
+
+    {
+      slug: "closures",
+      title: "Closures",
+      shortDescription:
+        "Understand how functions retain access to variables from their creation scope, even after the outer function has returned.",
+      estimatedMinutes: 14,
+      sortOrder: 5,
+      seoTitle: "JavaScript Closures Explained",
+      seoDescription:
+        "Learn JavaScript closures with lexical scope, private state, callbacks, practical examples, and interview questions.",
+      sections: [
+        {
+          slug: "what",
+          title: "What a closure actually is",
+          content:
+            "A closure is created when a function retains access to variables from the lexical environment where that function was created. The outer function can finish executing, yet the inner function can still access the variables it closed over.\n\nThe important idea is not simply that a function is nested. The important idea is that the function keeps the lexical bindings it needs.",
+        },
+        {
+          slug: "lifecycle",
+          title: "Why the variables stay available",
+          content:
+            "Normally, local variables belong to a particular function invocation. If another function still references one of those variables, the JavaScript runtime must keep the relevant environment reachable.\n\nThis makes closures useful for private state, factories, callbacks, memoization, and event handlers.",
+        },
+        {
+          slug: "private-state",
+          title: "Closures as private state",
+          content:
+            "A closure can expose selected operations while keeping internal variables inaccessible directly. This creates a simple form of encapsulation.\n\nA counter factory is a classic example: the caller receives increment and perhaps reset functions, but does not receive direct access to the count variable.",
+        },
+        {
+          slug: "loop-trap",
+          title: "Closures inside loops",
+          content:
+            "Loop closures are a common interview topic. With var, callbacks can share one function-scoped binding. With let, the language creates a distinct lexical binding for each loop iteration in the relevant loop form.\n\nThe difference becomes visible when callbacks execute after the loop has already advanced.",
+        },
+      ],
+      examples: [
+        {
+          slug: "counter",
+          language: "javascript",
+          code:
+            "function makeCounter() {\n  let count = 0;\n\n  return {\n    increment() {\n      count += 1;\n      return count;\n    },\n    getValue() {\n      return count;\n    },\n  };\n}\n\nconst counter = makeCounter();\nconsole.log(counter.increment()); // 1\nconsole.log(counter.increment()); // 2\nconsole.log(counter.getValue());  // 2",
+          explanation:
+            "The returned methods close over count. The variable is not directly accessible from outside, but the methods can read and update it.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "timer-loop",
+          question:
+            "Why does a loop using var often print the final loop value from every callback, while let can produce one value per iteration?",
+          difficulty: Difficulty.MEDIUM,
+          hint:
+            "Compare function-scoped var with block-scoped let and consider when the callbacks actually run.",
+          solution:
+            "var creates one shared function-scoped binding, while let provides a distinct lexical binding for each loop iteration.",
+          explanation:
+            "The callbacks execute later. With var they read the same binding after the loop has finished. With let each callback can retain the iteration-specific binding.",
+        },
+      ],
+    },
+
+    {
+      slug: "this-and-arrow-functions",
+      title: "this and Arrow Functions",
+      shortDescription:
+        "Learn how this is determined by the call site, why object methods behave differently, and why arrow functions do not create their own this.",
+      estimatedMinutes: 15,
+      sortOrder: 6,
+      seoTitle: "JavaScript this Keyword and Arrow Functions",
+      seoDescription:
+        "Understand JavaScript this, method calls, call/apply/bind, arrow functions, and common interview traps.",
+      sections: [
+        {
+          slug: "what-is-this",
+          title: "What is this?",
+          content:
+            "this is a special value available during function execution. For ordinary functions, its value is primarily determined by how the function is called rather than where the function was written.\n\nThat is why the same function can observe different this values when invoked as an object method, as a standalone function, or through call/apply.",
+        },
+        {
+          slug: "method-call",
+          title: "Method calls",
+          content:
+            "When a function is called through an object property such as user.sayHello(), the receiver before the dot is used as the method's this value in the normal non-strict method-call case.\n\nIf you extract the method into a variable and call that variable separately, you no longer have the same method-call form. This is a common source of lost context.",
+        },
+        {
+          slug: "arrow",
+          title: "Arrow functions",
+          content:
+            "Arrow functions do not create their own this. They capture this from the surrounding lexical scope.\n\nThis makes arrow functions especially useful for callbacks that need to keep the surrounding context. It also means an arrow function should not be chosen when you specifically need dynamic this behavior from a method call.",
+        },
+        {
+          slug: "bind-call-apply",
+          title: "call, apply, and bind",
+          content:
+            "call and apply invoke a function immediately with an explicitly supplied this value. call takes arguments separately, while apply takes them as an array-like collection. bind creates a new function with a fixed this value and optionally pre-filled arguments.\n\nThese tools are useful when adapting functions to a particular object or preserving method context.",
+        },
+      ],
+      examples: [
+        {
+          slug: "method-vs-arrow",
+          language: "javascript",
+          code:
+            "const user = {\n  name: \"Riya\",\n  regular() {\n    return this.name;\n  },\n  arrow: () => this.name,\n};\n\nconsole.log(user.regular());\nconsole.log(user.arrow());",
+          explanation:
+            "regular gets this from the method call. arrow captures this from the surrounding lexical scope instead of using user as its this value. The exact arrow result therefore depends on the surrounding execution environment.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "bind",
+          question:
+            "What does bind do when used as user.getName.bind(user)?",
+          difficulty: Difficulty.EASY,
+          hint: "Think about what happens to this for future calls.",
+          solution:
+            "It creates a new function whose this value is bound to user.",
+          explanation:
+            "The returned function can later be called without the original object-method syntax while still using user as its this value.",
+        },
+      ],
+    },
+
+    {
+      slug: "promises-and-async-await",
+      title: "Promises and async/await",
+      shortDescription:
+        "Understand asynchronous JavaScript, promise states, chaining, error handling, and how async/await makes promise-based code easier to read.",
+      estimatedMinutes: 18,
+      sortOrder: 7,
+      seoTitle: "JavaScript Promises and async await Explained",
+      seoDescription:
+        "Learn promises, async/await, promise states, chaining, error handling, Promise.all, and asynchronous JavaScript.",
+      sections: [
+        {
+          slug: "why-async",
+          title: "Why asynchronous code exists",
+          content:
+            "JavaScript applications frequently perform work that completes later: network requests, timers, file operations, and user-driven events. Waiting synchronously for every operation would prevent other useful work from progressing.\n\nAsynchronous APIs let JavaScript start an operation and continue executing other code. A later callback or promise reaction handles the result when it becomes available.",
+        },
+        {
+          slug: "promise",
+          title: "What a Promise represents",
+          content:
+            "A Promise represents the eventual result of an asynchronous operation. It begins pending and can become fulfilled or rejected. Once settled, it does not switch to another state.\n\nPromises let asynchronous operations be composed through then, catch, and finally rather than deeply nested callbacks.",
+        },
+        {
+          slug: "async-await",
+          title: "async and await",
+          content:
+            "An async function always returns a Promise. await pauses execution of that async function until the awaited promise settles; it does not block the entire JavaScript runtime.\n\ntry/catch is commonly used around awaited operations when the caller needs to handle rejection as an exception-like control flow.",
+        },
+        {
+          slug: "parallel-work",
+          title: "Promise.all and parallel work",
+          content:
+            "If several independent asynchronous operations can run at the same time, Promise.all can start them together and wait for all of them to fulfill. If one rejects, Promise.all rejects.\n\nSequential awaits are appropriate when the second operation depends on the first. They are unnecessarily slow when the operations are independent.",
+        },
+        {
+          slug: "common-mistakes",
+          title: "Common mistakes",
+          content:
+            "A frequent mistake is using await inside a loop when all requests are independent and could run concurrently. Another is forgetting to handle rejected promises.\n\nAnother important distinction is between a promise and its resolved value. await promise produces the value after fulfillment; promise itself remains the Promise object.",
+        },
+      ],
+      examples: [
+        {
+          slug: "async-await",
+          language: "javascript",
+          code:
+            "async function loadUser() {\n  try {\n    const response = await fetch(\"/api/user\");\n\n    if (!response.ok) {\n      throw new Error(\"Request failed\");\n    }\n\n    const user = await response.json();\n    return user;\n  } catch (error) {\n    console.error(error);\n    return null;\n  }\n}",
+          explanation:
+            "The function waits for the response, checks the HTTP result, then waits for JSON parsing. A rejection or thrown error is handled by catch.",
+        },
+        {
+          slug: "promise-all",
+          language: "javascript",
+          code:
+            "const [user, settings] = await Promise.all([\n  fetchUser(),\n  fetchSettings(),\n]);",
+          explanation:
+            "Both independent operations can begin without waiting for the other. The function continues once both promises fulfill.",
+        },
+      ],
+      exercises: [
+        {
+          slug: "sequential-vs-parallel",
+          question:
+            "If fetchUser() and fetchSettings() are independent, why can Promise.all be faster than awaiting them one after another?",
+          difficulty: Difficulty.MEDIUM,
+          hint:
+            "Compare when each operation starts.",
+          solution:
+            "Promise.all allows both operations to start concurrently, while sequential await waits for the first operation before starting the second.",
+          explanation:
+            "The total time for independent work can approach the slower operation rather than the sum of both operation times.",
+        },
+      ],
+    },
+  ];
+
+  // ---------------------------------------------------------------------------
+  // UPSERT TOPICS + DEEP CONTENT
+  // ---------------------------------------------------------------------------
+  const seededTopics: Array<{ id: string; slug: string }> = [];
+
+  for (const topicSeed of topics) {
+    const topic = await prisma.studyTopic.upsert({
+      where: {
+        categoryId_slug: {
+          categoryId: category.id,
+          slug: topicSeed.slug,
+        },
+      },
+      update: {
+        moduleId: learnModule.id,
+        title: topicSeed.title,
+        shortDescription: topicSeed.shortDescription,
+        estimatedMinutes: topicSeed.estimatedMinutes,
+        isPublished: true,
+        sortOrder: topicSeed.sortOrder,
+        seoTitle: topicSeed.seoTitle,
+        seoDescription: topicSeed.seoDescription,
+      },
+      create: {
+        moduleId: learnModule.id,
+        categoryId: category.id,
+        title: topicSeed.title,
+        slug: topicSeed.slug,
+        shortDescription: topicSeed.shortDescription,
+        estimatedMinutes: topicSeed.estimatedMinutes,
+        isPublished: true,
+        sortOrder: topicSeed.sortOrder,
+        seoTitle: topicSeed.seoTitle,
+        seoDescription: topicSeed.seoDescription,
+      },
+    });
+
+    seededTopics.push({ id: topic.id, slug: topic.slug });
+
+    for (let index = 0; index < topicSeed.sections.length; index++) {
+      const section = topicSeed.sections[index];
+
+      await prisma.studyTopicSection.upsert({
+        where: {
+          id: `${topic.id}-section-${section.slug}`,
+        },
+        update: {
+          title: section.title,
+          content: section.content,
+          sortOrder: index,
+        },
+        create: {
+          id: `${topic.id}-section-${section.slug}`,
+          topicId: topic.id,
+          title: section.title,
+          content: section.content,
+          sortOrder: index,
+        },
+      });
+    }
+
+    for (let index = 0; index < (topicSeed.examples ?? []).length; index++) {
+      const example = topicSeed.examples![index];
+
+      await prisma.studyExample.upsert({
+        where: {
+          id: `${topic.id}-example-${example.slug}`,
+        },
+        update: {
+          language: example.language,
+          code: example.code,
+          explanation: example.explanation,
+          sortOrder: index,
+        },
+        create: {
+          id: `${topic.id}-example-${example.slug}`,
+          topicId: topic.id,
+          language: example.language,
+          code: example.code,
+          explanation: example.explanation,
+          sortOrder: index,
+        },
+      });
+    }
+
+    for (let index = 0; index < (topicSeed.exercises ?? []).length; index++) {
+      const exercise = topicSeed.exercises![index];
+
+      await prisma.studyExercise.upsert({
+        where: {
+          id: `${topic.id}-exercise-${exercise.slug}`,
+        },
+        update: {
+          question: exercise.question,
+          difficulty: exercise.difficulty,
+          hint: exercise.hint,
+          solution: exercise.solution,
+          explanation: exercise.explanation,
+          sortOrder: index,
+        },
+        create: {
+          id: `${topic.id}-exercise-${exercise.slug}`,
+          topicId: topic.id,
+          question: exercise.question,
+          difficulty: exercise.difficulty,
+          hint: exercise.hint,
+          solution: exercise.solution,
+          explanation: exercise.explanation,
+          sortOrder: index,
+        },
+      });
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // OPTIONAL LINKING TO REAL INTERVIEW QUESTIONS
+  // ---------------------------------------------------------------------------
+  // This never creates or modifies interview questions. It only links existing
+  // published JavaScript-related questions when the main seed has already run.
+  const jsQuestion = await prisma.interviewQuestion.findFirst({
+    where: {
+      isPublished: true,
+      category: {
+        slug: {
+          in: [
+            "javascript-developer",
+            "react-developer",
+            "web-developer",
+          ],
+        },
+      },
+    },
+    select: { id: true },
+  });
+
+  if (jsQuestion) {
+    for (let index = 0; index < seededTopics.length; index++) {
+      const topic = seededTopics[index];
+
+      await prisma.studyTopicQuestionRelation.upsert({
+        where: {
+          topicId_questionId: {
+            topicId: topic.id,
+            questionId: jsQuestion.id,
+          },
+        },
+        update: {
+          sortOrder: index,
+        },
+        create: {
+          topicId: topic.id,
+          questionId: jsQuestion.id,
+          sortOrder: index,
+        },
+      });
+    }
+  }
+
+  console.log("Expanded study content seeded successfully.");
+  console.log({
+    category: category.slug,
+    path: path.slug,
+    module: learnModule.slug,
+    topics: seededTopics.map((topic) => topic.slug),
+    topicCount: seededTopics.length,
+  });
+}
+
+main()
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

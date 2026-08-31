@@ -12,6 +12,7 @@
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:study": "tsx prisma/seed-study.ts",
     "test": "vitest run"
   },
   "dependencies": {

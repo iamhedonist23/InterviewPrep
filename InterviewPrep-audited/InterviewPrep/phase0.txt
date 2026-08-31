@@ -1,0 +1,95 @@
+You are building a production-quality web application called InterviewPrep.
+
+PRODUCT GOAL:
+Create a completely FREE interview preparation platform for job seekers. Users must not need to pay for any feature.
+
+MONETIZATION:
+Primary monetization will be Google AdSense.
+Do not implement subscriptions, premium plans, paywalls, paid credits, or locked content.
+
+TECHNOLOGY:
+
+* Next.js latest stable version compatible with the chosen dependencies
+* TypeScript
+* React
+* Tailwind CSS
+* PostgreSQL
+* Prisma ORM
+* Auth.js / NextAuth
+* Zod
+* React Hook Form where useful
+* Lucide React
+* Vercel-compatible deployment
+
+GENERAL RULES:
+
+1. Build real production functionality, not mockups.
+2. Use clean, modular architecture.
+3. Use reusable components.
+4. Do not create fake statistics, testimonials, users, reviews, or success claims.
+5. Never scrape or copy copyrighted content.
+6. Public interview content must be accessible without login.
+7. User accounts are optional for public reading and basic practice.
+8. Never expose secrets or API keys.
+9. Validate all user input.
+10. Add proper error handling.
+11. Optimize for mobile.
+12. Optimize for SEO.
+13. Keep the site fast.
+14. Follow accessibility best practices.
+15. Do not create thin or spammy SEO pages.
+16. Do not generate thousands of useless AI pages.
+17. Every visible button must work.
+18. Never leave broken routes or fake navigation.
+19. Do not rewrite previously completed phases unnecessarily.
+20. At the end of every phase, run type checking, linting, tests where applicable, and production build.
+21. Fix all errors found before considering the phase complete.
+
+IMPORTANT:
+Do not jump ahead into later phases.
+Only implement the phase requested in each prompt.
+
+PROJECT BRAND:
+Temporary brand name: InterviewPrep
+
+Primary positioning:
+"Prepare Smarter. Interview With Confidence."
+
+Target users:
+
+* Students
+* Freshers
+* Experienced professionals
+* Career changers
+* Technical candidates
+* Non-technical candidates
+
+Architecture must allow future additions such as:
+
+* AI answer evaluation
+* Voice interview
+* Android application
+* Additional content
+* Analytics
+
+But do not implement future features until requested.
+
+At the end of each phase:
+
+1. Summarize what was implemented.
+2. List files created/modified.
+3. Report tests/build results.
+4. Report any remaining issues.
+5. Do not proceed to the next phase automatically.
+
+
+
+
+
+
+
+
+
+
+
+

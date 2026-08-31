@@ -1,0 +1,830 @@
+Implement PHASE 12 ONLY.
+
+This phase extends the existing completed InterviewPrep project.
+
+IMPORTANT:
+Do not regenerate or break previously completed phases.
+Reuse the existing database, authentication, admin panel, question system, SEO system, and AdSense configuration.
+
+The website remains:
+
+**100% FREE for users**
+
+Monetization:
+
+**Google AdSense only**
+
+Do NOT create:
+
+* Premium subscriptions
+* Paid plans
+* Paywalls
+* Paid credits
+* Locked questions
+
+==================================================
+PART 1 — BULK QUESTION IMPORT
+=============================
+
+Add a secure admin-only bulk question import system.
+
+Admin route:
+
+/admin/questions/import
+
+The admin must be able to upload:
+
+* CSV
+* XLSX / Excel
+
+The system should provide a downloadable template.
+
+Template columns should include:
+
+question
+slug
+category
+subcategory
+experienceLevel
+difficulty
+interviewType
+shortDescription
+explanation
+sampleAnswer
+keyPoints
+commonMistakes
+followUpQuestions
+tags
+seoTitle
+seoDescription
+isPublished
+
+==================================================
+IMPORT FLOW
+===========
+
+Step 1:
+Admin opens:
+
+Admin → Questions → Import
+
+Step 2:
+Show:
+
+"Download CSV Template"
+
+"Download Excel Template"
+
+Step 3:
+Admin uploads file.
+
+Step 4:
+Validate the uploaded file before modifying the database.
+
+Step 5:
+Show a preview.
+
+Example:
+
+Rows found: 250
+
+Valid: 238
+
+Warnings: 8
+
+Errors: 4
+
+Do NOT import anything yet.
+
+Step 6:
+Display row-level validation results.
+
+Examples:
+
+Row 14:
+Missing category
+
+Row 38:
+Invalid difficulty
+
+Row 92:
+Duplicate slug
+
+Row 113:
+Missing question
+
+Step 7:
+Allow:
+
+"Import Valid Rows"
+
+or
+
+"Cancel"
+
+==================================================
+IMPORT VALIDATION
+=================
+
+Validate:
+
+* Required fields
+* Maximum field lengths
+* Enum values
+* Valid category
+* Valid subcategory
+* Valid experience level
+* Valid difficulty
+* Valid interview type
+* Unique slug
+* Duplicate question detection where practical
+* SEO field limits
+* Malformed data
+
+Sanitize imported content.
+
+Never execute imported content as code.
+
+Prevent malicious HTML/script injection.
+
+==================================================
+DUPLICATE HANDLING
+==================
+
+If a question already exists, clearly identify it.
+
+Allow admin to choose:
+
+* Skip duplicates
+* Update existing questions
+* Import only new questions
+
+Default:
+
+Skip duplicates.
+
+Do not silently overwrite existing content.
+
+==================================================
+IMPORT SUMMARY
+==============
+
+After import display:
+
+* Rows processed
+* Successfully imported
+* Updated
+* Skipped
+* Failed
+
+Provide downloadable error report if rows failed.
+
+Example:
+
+interview-question-import-errors.csv
+
+==================================================
+LARGE FILE HANDLING
+===================
+
+The system should be designed to safely handle reasonably large imports.
+
+Do not process unlimited rows in one uncontrolled request.
+
+Use:
+
+* Validation
+* Chunking
+* Batching where appropriate
+* Transaction safety
+* Request limits
+
+Do not crash the application if an uploaded file is malformed.
+
+==================================================
+SECURITY
+========
+
+Only ADMIN users may access import functionality.
+
+Do server-side authorization checks.
+
+Do not rely only on hiding the import button.
+
+Validate:
+
+* File type
+* File extension
+* File size
+* File contents
+
+Prevent:
+
+* Malicious files
+* Oversized uploads
+* Script injection
+* Unauthorized imports
+
+==================================================
+PART 2 — AI-ASSISTED QUESTION GENERATOR
+=======================================
+
+Create an optional AI-assisted question generation system inside the admin panel.
+
+Route:
+
+/admin/questions/generate
+
+IMPORTANT:
+
+This feature is for ADMIN CONTENT CREATION ONLY.
+
+Normal users must not have direct access to unrestricted question generation.
+
+AI-generated content must NOT automatically become public.
+
+Required workflow:
+
+AI generates draft
+
+↓
+
+Admin reviews
+
+↓
+
+Admin edits if necessary
+
+↓
+
+Admin approves
+
+↓
+
+Admin publishes
+
+==================================================
+GENERATION FORM
+===============
+
+Create fields:
+
+Category
+
+Subcategory
+
+Experience Level
+
+Difficulty
+
+Interview Type
+
+Number of Questions
+
+Topic
+
+Optional instructions
+
+Example:
+
+Category:
+Android Developer
+
+Subcategory:
+Kotlin
+
+Experience:
+Fresher
+
+Difficulty:
+Medium
+
+Interview Type:
+Technical
+
+Topic:
+Coroutines
+
+Number:
+20
+
+Instructions:
+"Focus on commonly asked practical interview questions."
+
+Button:
+
+"Generate Questions"
+
+==================================================
+AI OUTPUT
+=========
+
+Each generated question should contain:
+
+* Question
+* Short description
+* Explanation
+* Sample answer
+* Key points
+* Common mistakes
+* Follow-up questions
+* Tags
+* Suggested SEO title
+* Suggested SEO description
+
+The AI should return structured JSON.
+
+Validate the JSON using Zod.
+
+Reject malformed AI responses.
+
+Do not trust AI output blindly.
+
+==================================================
+AI DRAFT REVIEW
+===============
+
+After generation:
+
+Show all generated questions in an editable review interface.
+
+Admin must be able to:
+
+* Edit question
+* Edit answer
+* Edit explanation
+* Edit key points
+* Edit mistakes
+* Edit follow-ups
+* Edit SEO fields
+* Delete draft
+* Approve
+* Publish
+
+Provide:
+
+"Save as Draft"
+
+"Publish Selected"
+
+"Delete Selected"
+
+Do not auto-publish.
+
+==================================================
+AI COST PROTECTION
+==================
+
+Implement safeguards to prevent excessive API usage.
+
+Admin-only generation.
+
+Validate maximum number of questions.
+
+Example maximum:
+
+50 questions per generation request.
+
+Prevent accidental repeated submissions.
+
+Show generation status.
+
+Handle API failures gracefully.
+
+Never expose API keys to the browser.
+
+Use server-side AI calls only.
+
+Use environment variables.
+
+Example:
+
+AI_API_KEY
+
+AI_MODEL
+
+AI_ENABLED
+
+If AI is disabled or unavailable:
+
+Show a clear error.
+
+The rest of the website must continue functioning normally.
+
+==================================================
+AI SERVICE ARCHITECTURE
+=======================
+
+Do not tightly couple the application to a single AI vendor.
+
+Create an abstraction such as:
+
+QuestionGenerationService
+
+The implementation should be replaceable.
+
+Example architecture:
+
+services/
+ai/
+question-generation-service.ts
+provider.ts
+
+The frontend should not directly call the AI provider.
+
+==================================================
+CONTENT QUALITY CONTROLS
+========================
+
+The system must warn the admin:
+
+"AI-generated content must be reviewed before publishing."
+
+The system must not:
+
+* Create fake statistics
+* Make guaranteed employment claims
+* Copy competitor content
+* Produce obvious duplicate questions
+* Automatically create thousands of pages
+* Automatically publish AI content
+
+Add duplicate detection where practical.
+
+==================================================
+PART 3 — QUESTION CONTENT MANAGEMENT IMPROVEMENTS
+=================================================
+
+Update the admin question management system to include:
+
+* Bulk select
+* Bulk publish
+* Bulk unpublish
+* Bulk delete with confirmation
+* Bulk category change where practical
+* Bulk difficulty change where practical
+
+Add filters:
+
+Category
+
+Experience
+
+Difficulty
+
+Interview Type
+
+Published status
+
+Created date
+
+Updated date
+
+Search.
+
+==================================================
+PART 4 — QUESTION VERSION SAFETY
+================================
+
+Do not destroy existing question content accidentally.
+
+Before bulk update or delete:
+
+Require confirmation.
+
+For bulk delete:
+
+Show:
+
+"You are about to delete 25 questions. This action cannot be undone."
+
+Require explicit confirmation.
+
+==================================================
+PART 5 — PRODUCTION DEPLOYMENT
+==============================
+
+Prepare the application for production deployment.
+
+Target:
+
+Vercel + PostgreSQL
+
+Document:
+
+1. Database creation
+2. DATABASE_URL
+3. Authentication configuration
+4. Google OAuth
+5. AUTH_SECRET
+6. Site URL
+7. AI configuration
+8. AdSense configuration
+9. Environment variables
+10. Production migrations
+11. Domain configuration
+12. HTTPS
+13. Search Console
+14. Sitemap submission
+15. AdSense setup
+
+==================================================
+ENVIRONMENT VARIABLES
+=====================
+
+Update .env.example.
+
+Include appropriate variables such as:
+
+DATABASE_URL=
+
+AUTH_SECRET=
+
+GOOGLE_CLIENT_ID=
+
+GOOGLE_CLIENT_SECRET=
+
+NEXT_PUBLIC_SITE_URL=
+
+NEXT_PUBLIC_ADSENSE_CLIENT_ID=
+
+NEXT_PUBLIC_ADSENSE_ENABLED=false
+
+AI_ENABLED=false
+
+AI_API_KEY=
+
+AI_MODEL=
+
+Do not include real values.
+
+Never commit secrets.
+
+==================================================
+PART 6 — PRODUCTION DATABASE
+============================
+
+Document safe production migration.
+
+Use:
+
+prisma migrate deploy
+
+Do not recommend resetting the production database.
+
+Explain the difference between:
+
+Development
+
+Staging
+
+Production
+
+==================================================
+PART 7 — DEPLOYMENT SAFETY
+==========================
+
+Before production deployment verify:
+
+* Production environment variables
+* Database connectivity
+* Authentication
+* HTTPS
+* Cookies
+* Canonical domain
+* Sitemap
+* robots.txt
+* AdSense configuration
+* AI disabled unless configured
+
+Do not enable AI by default if the API key is absent.
+
+==================================================
+PART 8 — FINAL QUALITY CHECK
+============================
+
+Run complete verification.
+
+Check:
+
+TypeScript
+
+ESLint
+
+Unit tests
+
+Integration tests
+
+Production build
+
+Database migration
+
+Database seed
+
+Authentication
+
+Admin authorization
+
+Question CRUD
+
+CSV import
+
+Excel import
+
+Bulk operations
+
+AI generation
+
+AI validation
+
+Draft review
+
+Question publishing
+
+Search
+
+Filters
+
+Practice mode
+
+Bookmarks
+
+Dashboard
+
+Articles
+
+SEO
+
+Sitemap
+
+robots.txt
+
+AdSense configuration
+
+Responsive layout
+
+Accessibility
+
+Error handling
+
+Security
+
+==================================================
+PART 9 — TEST BULK IMPORT
+=========================
+
+Create test files:
+
+test-questions.csv
+
+test-questions.xlsx
+
+Include:
+
+* Valid rows
+* Missing fields
+* Invalid categories
+* Duplicate questions
+* Duplicate slugs
+* Invalid difficulty
+* Invalid experience levels
+
+Verify that validation works correctly.
+
+Do not leave test files publicly accessible in production.
+
+==================================================
+PART 10 — TEST AI GENERATION
+============================
+
+Create tests for:
+
+* Valid AI response
+* Invalid JSON
+* Missing fields
+* Duplicate questions
+* API failure
+* Timeout
+* AI disabled
+* Rate limiting
+* Admin authorization
+
+The system must fail safely.
+
+==================================================
+PART 11 — FINAL ADMIN WORKFLOW
+==============================
+
+The final administrator workflow should be:
+
+OPTION A — Manual
+
+Admin
+→ Questions
+→ Add Question
+→ Review
+→ Publish
+
+OPTION B — Bulk Import
+
+Admin
+→ Questions
+→ Import CSV/Excel
+→ Validate
+→ Preview
+→ Import
+→ Review
+→ Publish
+
+OPTION C — AI Assisted
+
+Admin
+→ Questions
+→ AI Generate
+→ Generate drafts
+→ Review
+→ Edit
+→ Save Draft / Publish
+
+All three methods must use the same question database.
+
+==================================================
+PART 12 — FINAL CONTENT ARCHITECTURE
+====================================
+
+The finished system should therefore support:
+
+1. Seeded initial questions
+2. Manual admin questions
+3. CSV bulk import
+4. Excel bulk import
+5. AI-assisted question generation
+6. Admin review
+7. Publishing
+8. Search
+9. Filters
+10. Related questions
+11. SEO pages
+12. Practice sessions
+13. Saved questions
+
+All public questions remain completely FREE.
+
+==================================================
+PART 13 — DEPLOYMENT DOCUMENTATION
+==================================
+
+Update README with:
+
+* Local development
+* Environment setup
+* Database setup
+* Prisma migration
+* Seed
+* Admin setup
+* CSV import instructions
+* Excel import instructions
+* AI configuration
+* AdSense configuration
+* Vercel deployment
+* PostgreSQL production setup
+* Search Console
+* Sitemap
+* Production checklist
+
+Explain clearly how an administrator can add 100, 500, 1,000, or more questions using bulk import.
+
+==================================================
+FINAL REQUIREMENT
+=================
+
+Do not claim:
+
+"AdSense approved"
+
+unless Google has actually approved the site.
+
+Do not claim:
+
+"AI answers are always correct."
+
+Do not claim:
+
+"Interview success guaranteed."
+
+Build a reliable, safe, production-quality system.
+
+At the end provide:
+
+1. Files created/modified
+2. Database changes
+3. New admin features
+4. Import format documentation
+5. AI generation workflow
+6. Test results
+7. Build result
+8. Environment variable list
+9. Production deployment checklist
+10. Remaining warnings/issues
+
+Do not proceed to another phase automatically.

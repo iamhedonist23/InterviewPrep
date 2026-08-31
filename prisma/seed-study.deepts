@@ -1,0 +1,234 @@
+// Deep Learn content enhancer for InstantInterviewPrep.
+// It upgrades EVERY existing study category/topic already present in the database.
+// IMPORTANT: It NEVER creates a category, including JavaScript Fundamentals.
+// It does not assume a fixed list of categories, so Java, JavaScript, React, SQL,
+// Python, Android, Kotlin, Spring Boot, TypeScript, Next.js, System Design,
+// Web Development, and any future seeded category are handled automatically.
+//
+// It preserves existing examples and exercises, while replacing the short
+// StudyTopicSection content with a structured, deeper reading experience.
+// ASCII-only text is intentional because the project previously encountered
+// PostgreSQL WIN1252 encoding errors with emoji characters.
+
+import { PrismaClient, Difficulty, StudyLevel } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+function levelFocus(level: StudyLevel) {
+  switch (level) {
+    case "BEGINNER":
+      return "Start with the vocabulary, the simplest mental model, basic syntax, and a small example. The goal is to understand what the concept means and when it is useful.";
+    case "INTERMEDIATE":
+      return "Move from definition to application. Compare alternatives, trace behavior step by step, identify common mistakes, and explain practical trade-offs.";
+    case "ADVANCED":
+      return "Focus on internals, performance, reliability, edge cases, concurrency, failure modes, and design trade-offs. Explain why the technology behaves the way it does.";
+    case "INTERVIEW_PREP":
+      return "Prepare to explain the concept clearly in an interview. Start with a short definition, give a concrete example, explain one trade-off, and connect the idea to production usage.";
+  }
+}
+
+function topicFamily(category: string, title: string) {
+  const text = `${category} ${title}`.toLowerCase();
+
+  if (/sql|database|jpa|repository|query|transaction|index|join/.test(text)) {
+    return "data and persistence";
+  }
+  if (/react|android|compose|ui|component|frontend|css|html|next/.test(text)) {
+    return "user interface and application development";
+  }
+  if (/test|testing|selenium|api testing|qa/.test(text)) {
+    return "quality engineering and testing";
+  }
+  if (/system design|architecture|cache|queue|replication|partition|distributed/.test(text)) {
+    return "system architecture and distributed systems";
+  }
+  if (/security|auth|jwt|password|permission/.test(text)) {
+    return "application security";
+  }
+  if (/spring|java|kotlin|python|javascript|typescript/.test(text)) {
+    return "programming and application development";
+  }
+
+  return "software engineering";
+}
+
+function makeSections(
+  category: string,
+  title: string,
+  description: string,
+  level: StudyLevel
+) {
+  const focus = levelFocus(level);
+  const family = topicFamily(category, title);
+
+  return [
+    {
+      title: "1. What is " + title + "?",
+      content:
+        `${title} is a concept within ${category} that belongs to the broader area of ${family}.\n\n` +
+        `${description}\n\n` +
+        `The first goal is to understand the problem this concept solves. Do not start by memorizing syntax. First identify the input, the expected behavior, the output, and the reason a developer would choose this concept.\n\n` +
+        focus,
+    },
+    {
+      title: "2. Why do we need it?",
+      content:
+        `Before learning ${title}, imagine the problem without it. Good technology exists because developers repeatedly face a problem involving correctness, organization, data flow, performance, reliability, readability, testing, or maintainability.\n\n` +
+        `Ask three questions: What problem does ${title} remove? What would the code or system look like without it? What new trade-off does it introduce?\n\n` +
+        `A strong understanding comes from knowing both the benefit and the cost. A feature is not automatically the right choice simply because it is available.`,
+    },
+    {
+      title: "3. Core concepts you must understand",
+      content:
+        `Break ${title} into smaller ideas before trying advanced examples. Learn the important terminology, inputs, outputs, lifecycle, ownership, state changes, boundaries, and failure behavior.\n\n` +
+        `For interview preparation, define each important term in your own words. Then connect the terms together. A definition becomes much easier to remember when you understand how the pieces interact.\n\n` +
+        `If the topic has multiple approaches, compare them by behavior, complexity, readability, safety, performance, and appropriate use cases.`,
+    },
+    {
+      title: "4. How it works step by step",
+      content:
+        `To understand ${title}, trace one small operation from beginning to end. Identify what starts the operation, what data enters it, which component performs the important work, and what result is produced.\n\n` +
+        `When debugging, separate guaranteed behavior from assumptions. Ask what the language, framework, database, browser, runtime, or library actually guarantees. Then inspect the values at each boundary instead of guessing.\n\n` +
+        `This mental model is more valuable than memorizing a code snippet because it lets you solve unfamiliar variations of the same problem.`,
+    },
+    {
+      title: "5. Practical example",
+      content:
+        `Start with a very small example of ${title}. Change only one thing at a time and predict the result before running the program.\n\n` +
+        `For a good practice cycle, first read the example, then explain every important line, then modify an input, then predict the new output, and finally run it. If the result differs from your prediction, investigate the exact rule you misunderstood.\n\n` +
+        `After the small example works, think about how the same concept would appear in a real ${family} application.`,
+    },
+    {
+      title: "6. Common mistakes and edge cases",
+      content:
+        `Common mistakes with ${title} usually happen when developers understand the happy path but not the boundaries.\n\n` +
+        `Check empty or missing values, invalid input, repeated operations, unexpected ordering, concurrent work, resource cleanup, error propagation, large data sets, and changes in application state. Also check whether a seemingly harmless operation has side effects.\n\n` +
+        `A production fix should address the underlying rule rather than only hiding the visible symptom. Reproduce the smallest failing case, inspect the actual state, and verify the behavior after the fix.`,
+    },
+    {
+      title: "7. Real-world usage and design decisions",
+      content:
+        `${title} should be evaluated in the context of a real application rather than as an isolated feature.\n\n` +
+        `Consider where it belongs in the architecture, which component owns the responsibility, what other components depend on it, and how failure should be handled. Think about performance, security, observability, testing, maintainability, and operational cost.\n\n` +
+        `When alternatives exist, choose based on the actual requirements. Explain why the selected approach is appropriate and what you would change if scale, reliability, latency, or team constraints changed.`,
+    },
+    {
+      title: "8. Interview preparation",
+      content:
+        `A strong interview answer for ${title} should have four layers. First, give a short definition. Second, explain the problem it solves. Third, demonstrate it with a small example. Fourth, mention a limitation, trade-off, or common mistake.\n\n` +
+        `If the interviewer asks "why", explain the reasoning. If they ask "how", describe the execution or data flow. If they ask for a comparison, use consistent criteria such as performance, memory, complexity, safety, maintainability, and use case.\n\n` +
+        `Avoid answers that are only textbook definitions. Interviewers usually learn more from your ability to reason through a practical situation.`,
+    },
+    {
+      title: "9. Quick revision and self-check",
+      content:
+        `Before finishing ${title}, answer these questions without looking at the previous sections:\n\n` +
+        `1. What problem does ${title} solve?\n` +
+        `2. What are its most important concepts?\n` +
+        `3. How does it work at a high level?\n` +
+        `4. When would you use it?\n` +
+        `5. What is one common mistake?\n` +
+        `6. What is one important trade-off?\n` +
+        `7. Can you explain a small example line by line?\n` +
+        `8. Can you explain it to another developer without reading a definition?\n\n` +
+        `If you cannot answer one of these, return to that part of the lesson and create a smaller example. The goal of Learn is understanding, not simply completing a page.`,
+    },
+  ];
+}
+
+async function main() {
+  console.log("Starting deep Learn content upgrade...");
+
+  const topics = await prisma.studyTopic.findMany({
+    where: {
+      isPublished: true,
+      category: {
+        isPublished: true,
+      },
+    },
+    include: {
+      category: {
+        select: {
+          name: true,
+        },
+      },
+      module: {
+        include: {
+          studyPath: {
+            select: {
+              level: true,
+            },
+          },
+        },
+      },
+    },
+    orderBy: [
+      { categoryId: "asc" },
+      { sortOrder: "asc" },
+    ],
+  });
+
+  let sectionCount = 0;
+  let topicCount = 0;
+  let categoryCount = new Set<string>();
+
+  for (const topic of topics) {
+    const level = topic.module.studyPath.level;
+    const categoryName = topic.category.name;
+
+    categoryCount.add(categoryName);
+
+    await prisma.studyTopicSection.deleteMany({
+      where: {
+        topicId: topic.id,
+      },
+    });
+
+    const sections = makeSections(
+      categoryName,
+      topic.title.replace(/\s+-\s+(Beginner|Intermediate|Advanced|Interview Prep)$/i, ""),
+      topic.shortDescription,
+      level
+    );
+
+    await prisma.studyTopicSection.createMany({
+      data: sections.map((section, index) => ({
+        topicId: topic.id,
+        title: section.title,
+        content: section.content,
+        sortOrder: index,
+      })),
+    });
+
+    sectionCount += sections.length;
+    topicCount += 1;
+
+    await prisma.studyTopic.update({
+      where: {
+        id: topic.id,
+      },
+      data: {
+        estimatedMinutes: Math.max(topic.estimatedMinutes ?? 30, 30),
+        isPublished: true,
+      },
+    });
+  }
+
+  console.log("SUCCESS: Deep Learn content upgrade complete.");
+  console.log({
+    categories: categoryCount.size,
+    topics: topicCount,
+    sections: sectionCount,
+    sectionsPerTopic: 9,
+    note: "Existing examples and exercises were preserved.",
+  });
+}
+
+main()
+  .catch((error) => {
+    console.error("ERROR: Deep Learn upgrade failed:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

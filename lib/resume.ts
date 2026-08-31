@@ -224,6 +224,41 @@ export async function listResumes(userId: string) {
   });
 }
 
+// Lightweight dashboard summary: uses `_count` and a handful of scalar
+// fields rather than fetching every section's full content, since the
+// dashboard only needs enough to show a completion estimate and action
+// buttons, not the resume itself.
+export async function listResumesWithCompletion(userId: string) {
+  const resumes = await prisma.resume.findMany({
+    where: { userId },
+    orderBy: { updatedAt: "desc" },
+    select: {
+      id: true,
+      title: true,
+      template: true,
+      lastEditedAt: true,
+      personalInfo: { select: { fullName: true, professionalTitle: true, summary: true } },
+      _count: { select: { experience: true, education: true, skills: true, projects: true, certifications: true, achievements: true } },
+    },
+  });
+
+  return resumes.map((resume) => {
+    // Simple, honest checklist-based estimate (not a claim of resume
+    // "quality") — each of these 6 checks is worth an equal share.
+    const checks = [
+      Boolean(resume.personalInfo?.fullName && resume.personalInfo?.professionalTitle),
+      Boolean(resume.personalInfo?.summary),
+      resume._count.experience > 0,
+      resume._count.education > 0,
+      resume._count.skills > 0,
+      resume._count.projects > 0 || resume._count.certifications > 0 || resume._count.achievements > 0,
+    ];
+    const completionPercent = Math.round((checks.filter(Boolean).length / checks.length) * 100);
+
+    return { id: resume.id, title: resume.title, template: resume.template, lastEditedAt: resume.lastEditedAt, completionPercent };
+  });
+}
+
 export async function getOwnedResume(userId: string, resumeId: string) {
   const resume = await prisma.resume.findFirst({
     where: { id: resumeId, userId },

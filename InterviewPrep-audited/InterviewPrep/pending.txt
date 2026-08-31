@@ -1,0 +1,1066 @@
+You are working on an EXISTING production-style Next.js project called InterviewPrep.
+
+IMPORTANT:
+DO NOT rebuild the project from scratch.
+DO NOT regenerate completed features.
+DO NOT change the architecture unnecessarily.
+
+You must inspect the existing repository first, understand the current implementation, and then FIX ONLY the problems identified below.
+
+The goal is to make the existing InterviewPrep website production-ready, SEO-ready, content-quality-ready, and AdSense-ready.
+
+The website remains:
+
+100% FREE FOR USERS
+
+Monetization:
+
+GOOGLE ADSENSE
+
+Do not add:
+
+* subscriptions
+* premium plans
+* paywalls
+* paid credits
+* paid content
+
+==================================================
+CURRENT PROJECT
+===============
+
+Existing stack:
+
+* Next.js
+* TypeScript
+* React
+* Tailwind CSS
+* PostgreSQL
+* Prisma
+* Authentication
+* Admin panel
+* Interview question system
+* Practice system
+* Blog
+* CSV/XLSX import
+* AI-assisted question generation
+* AdSense infrastructure
+
+IMPORTANT:
+Preserve all working functionality.
+
+==================================================
+TASK 1 — FIRST AUDIT THE EXISTING CODE
+======================================
+
+Before changing code:
+
+1. Inspect the repository structure.
+2. Inspect package.json.
+3. Inspect Prisma schema.
+4. Inspect seed.ts.
+5. Inspect question API/routes.
+6. Inspect admin question management.
+7. Inspect CSV/XLSX import.
+8. Inspect AI generation.
+9. Inspect public question pages.
+10. Inspect category pages.
+11. Inspect sitemap.ts.
+12. Inspect robots.ts.
+13. Inspect metadata implementation.
+14. Inspect AdSense implementation.
+15. Inspect authentication/authorization.
+16. Inspect tests.
+17. Inspect README and environment configuration.
+
+Do NOT assume the code is correct.
+
+Create a short internal checklist of what is already working and what needs modification.
+
+Then implement the fixes below.
+
+==================================================
+TASK 2 — FIX QUESTION SEED DATA
+===============================
+
+CURRENT ISSUE:
+
+The seed system currently produces approximately 230 rows using combinations of topics and answer angles rather than a genuinely diverse 300+ question dataset.
+
+FIX THIS.
+
+Create at least:
+
+500 genuinely distinct, high-quality interview questions.
+
+Do NOT create 500 variations of the same question.
+
+Questions should be meaningfully different.
+
+Distribute questions across multiple categories.
+
+Suggested distribution:
+
+Java Developer
+50
+
+Android Developer
+50
+
+Kotlin
+30
+
+Python
+40
+
+JavaScript
+40
+
+React
+30
+
+Web Development
+30
+
+SQL
+40
+
+QA / Testing
+25
+
+Data Analyst
+25
+
+HR
+40
+
+Fresher
+40
+
+Sales
+20
+
+Customer Support
+20
+
+Accountant
+20
+
+Banking
+20
+
+Behavioral
+20
+
+Situational
+20
+
+Adjust totals so the final count is at least 500.
+
+==================================================
+QUESTION QUALITY
+================
+
+Every question should contain genuinely useful content.
+
+Required:
+
+question
+slug
+category
+subcategory
+experienceLevel
+difficulty
+interviewType
+shortDescription
+explanation
+sampleAnswer
+keyPoints
+commonMistakes
+followUpQuestions
+tags
+seoTitle
+seoDescription
+isPublished
+
+Questions must:
+
+* Be original
+* Be useful
+* Be understandable
+* Match the selected category
+* Match experience level
+* Match difficulty
+* Match interview type
+
+Do not use:
+
+* Sample Question 1
+* Placeholder Answer
+* Lorem ipsum
+* Repeated boilerplate
+* Fake statistics
+* Fake claims
+
+==================================================
+TASK 3 — ADD QUESTION QUALITY VALIDATION
+========================================
+
+Before publishing a question, validate:
+
+* Question is non-empty
+* Minimum useful length
+* Explanation is meaningful
+* Sample answer is meaningful
+* Category exists
+* Subcategory exists where required
+* Experience is valid
+* Difficulty is valid
+* Interview type is valid
+* Slug is unique
+* SEO title exists
+* SEO description exists
+
+For admin-created questions, show clear validation errors.
+
+Do not silently publish invalid content.
+
+==================================================
+TASK 4 — IMPROVE DUPLICATE DETECTION
+====================================
+
+Improve duplicate detection.
+
+Detect:
+
+* Exact question duplicates
+* Duplicate slug
+* Highly similar questions where practical
+
+When importing CSV/XLSX:
+
+Show:
+
+Existing
+Potential duplicate
+New
+
+Do not overwrite existing questions automatically.
+
+Default behavior:
+
+SKIP DUPLICATES
+
+Allow admin to explicitly choose:
+
+* Skip
+* Update
+* Import as new
+
+==================================================
+TASK 5 — FIX DYNAMIC SITEMAP
+============================
+
+CURRENT ISSUE:
+
+The sitemap only includes a limited set of static pages.
+
+FIX THIS.
+
+The sitemap must dynamically include ALL published public content.
+
+Include:
+
+/
+
+/interview-questions
+
+/interview-questions/[category]
+
+/questions/[slug]
+
+/blog
+
+/blog/[slug]
+
+Any other important public SEO landing pages.
+
+DO NOT include:
+
+/admin/*
+/dashboard/*
+/login
+/register
+/private routes
+/API routes
+
+Query PostgreSQL through Prisma for published questions and articles.
+
+Only include:
+
+isPublished = true
+
+Use the production site URL from:
+
+NEXT_PUBLIC_SITE_URL
+
+Do not generate localhost URLs in production.
+
+Make sure sitemap output contains absolute URLs.
+
+==================================================
+TASK 6 — FIX ROBOTS.TXT
+=======================
+
+Verify robots.ts.
+
+Allow crawling of all useful public content.
+
+Disallow:
+
+/admin
+/dashboard
+/api
+/auth/private routes
+
+Ensure sitemap points to:
+
+${NEXT_PUBLIC_SITE_URL}/sitemap.xml
+
+Do not accidentally block:
+
+/questions
+/interview-questions
+/blog
+
+==================================================
+TASK 7 — SEO FOR QUESTION PAGES
+===============================
+
+Audit:
+
+/questions/[slug]
+
+Every question page must generate dynamic metadata.
+
+Title example:
+
+"Java Inheritance Interview Question | InterviewPrep"
+
+Description must be unique and relevant.
+
+Implement:
+
+* title
+* description
+* canonical URL
+* Open Graph
+* Twitter metadata
+* robots index/follow
+
+Do not generate duplicate metadata.
+
+Canonical URL must use:
+
+NEXT_PUBLIC_SITE_URL
+
+==================================================
+TASK 8 — SEO FOR CATEGORY PAGES
+===============================
+
+Audit:
+
+/interview-questions/[category]
+
+Each category must have:
+
+* Unique title
+* Unique description
+* Introduction
+* Question count
+* Subcategories
+* Popular questions
+* Related categories
+* Practice CTA
+* FAQ where appropriate
+
+Do not create thin doorway pages.
+
+Category pages should provide real value.
+
+==================================================
+TASK 9 — STRUCTURED DATA
+========================
+
+Implement appropriate JSON-LD.
+
+Use where valid:
+
+WebSite
+Organization
+BreadcrumbList
+Article
+FAQPage
+
+Do not add fake structured data.
+
+Do not add FAQ schema if the page does not contain the corresponding visible FAQ content.
+
+Validate structured data implementation.
+
+==================================================
+TASK 10 — INTERNAL LINKING
+==========================
+
+Improve internal linking.
+
+Question pages should link to:
+
+* Parent category
+* Related questions
+* Related subcategory
+* Practice page
+* Related articles
+
+Category pages should link to:
+
+* Questions
+* Subcategories
+* Related categories
+* Articles
+* Practice
+
+Articles should link to relevant interview questions.
+
+Avoid orphan pages.
+
+==================================================
+TASK 11 — CONTENT QUALITY AUDIT
+===============================
+
+Audit the public content.
+
+Remove or rewrite:
+
+* Repetitive generated text
+* Low-value question variations
+* Placeholder content
+* Empty sections
+* Fake statistics
+* Fake testimonials
+* Unsupported claims
+* Thin pages
+
+Every public page should provide meaningful value.
+
+Do not generate thousands of thin pages.
+
+The website must look like a real educational/career platform.
+
+==================================================
+TASK 12 — PRACTICE SYSTEM AUDIT
+===============================
+
+Verify:
+
+/practice
+
+Users must be able to:
+
+* Select category
+* Select experience
+* Select difficulty
+* Select interview type
+* Start session
+* Answer questions
+* Skip questions
+* Continue
+* Finish
+* See results
+
+Ensure:
+
+* No broken buttons
+* No data loss
+* No invalid questions
+* Correct session state
+* Correct score calculations
+* Correct database persistence for logged-in users
+
+For unauthenticated users:
+
+Allow basic practice without permanent private history.
+
+==================================================
+TASK 13 — AUTHORIZATION SECURITY
+================================
+
+Audit authentication and authorization.
+
+IMPORTANT:
+
+Hiding admin buttons is NOT security.
+
+All admin API routes must verify:
+
+Authenticated user
+AND
+ADMIN role
+
+Verify:
+
+* Question CRUD
+* Bulk import
+* Bulk operations
+* AI generation
+* Article management
+* User management
+* Contact management
+
+Normal users must never be able to call admin APIs directly.
+
+==================================================
+TASK 14 — CSV/XLSX IMPORT AUDIT
+===============================
+
+Audit:
+
+/admin/questions/import
+
+Verify:
+
+* CSV upload
+* XLSX upload
+* Template download
+* Preview
+* Validation
+* Error reporting
+* Duplicate detection
+* Import valid rows
+* Skip invalid rows
+* Large-file protection
+
+Validate:
+
+question
+slug
+category
+subcategory
+experienceLevel
+difficulty
+interviewType
+explanation
+sampleAnswer
+etc.
+
+Show row numbers for errors.
+
+Example:
+
+Row 17:
+Invalid difficulty
+
+Row 28:
+Unknown category
+
+Row 31:
+Duplicate slug
+
+Do NOT write invalid rows to the database.
+
+Do NOT silently skip errors.
+
+Do NOT silently overwrite records.
+
+==================================================
+TASK 15 — CSV/XLSX SECURITY
+===========================
+
+Protect imports against:
+
+* Oversized uploads
+* Malicious file types
+* Script injection
+* HTML injection
+* Invalid spreadsheet content
+* Unauthorized access
+
+Set a reasonable maximum file size.
+
+Sanitize imported strings.
+
+Use server-side validation.
+
+==================================================
+TASK 16 — AI QUESTION GENERATOR AUDIT
+=====================================
+
+Audit:
+
+/admin/questions/generate
+
+Requirements:
+
+AI generation must be ADMIN ONLY.
+
+Maximum generated questions per request:
+
+50
+
+Validate AI response with Zod.
+
+If AI response is invalid:
+
+* Do not save bad data
+* Show a useful error
+* Allow retry
+
+Generated questions must be saved as:
+
+DRAFT
+
+Never automatically publish.
+
+Admin workflow:
+
+Generate
+→ Review
+→ Edit
+→ Save Draft
+OR
+→ Publish
+
+==================================================
+TASK 17 — AI COST PROTECTION
+============================
+
+Add:
+
+* Request validation
+* Maximum question count
+* Rate limiting
+* Duplicate submission prevention
+* Timeout handling
+* Error handling
+
+AI API key must never be exposed to the browser.
+
+All AI provider calls must happen server-side.
+
+Use environment variables.
+
+If AI is disabled:
+
+Show a clear message.
+
+The main website must still function without AI.
+
+==================================================
+TASK 18 — ADSENSE AUDIT
+=======================
+
+Audit all AdSense code.
+
+Verify:
+
+* Publisher ID comes from environment configuration
+* No hardcoded secret values
+* Development mode does not require real AdSense
+* Ads are not displayed on admin pages
+* Ads are not displayed on private dashboard pages
+* Ads do not cover content
+* Ads do not look like navigation buttons
+* Ads do not appear immediately beside misleading controls
+* Ads are not excessive
+* Ads do not interfere with practice
+
+Create clean reusable components.
+
+Do not encourage ad clicks.
+
+Do not write text such as:
+
+"Please support us by clicking ads."
+
+Remove anything that could violate AdSense policies.
+
+==================================================
+TASK 19 — LEGAL/TRUST PAGES
+===========================
+
+Verify these pages exist and are accessible:
+
+/about
+/contact
+/privacy-policy
+/terms-and-conditions
+/disclaimer
+/cookie-policy
+/faq
+
+Make sure they are linked from the footer.
+
+Use clear, readable content.
+
+Do not copy legal text from another website.
+
+==================================================
+TASK 20 — PAGE INDEXABILITY
+===========================
+
+Audit:
+
+Public question pages:
+INDEX
+
+Public category pages:
+INDEX
+
+Public blog pages:
+INDEX
+
+Admin:
+NOINDEX
+
+Dashboard:
+NOINDEX
+
+Login:
+NOINDEX
+
+Register:
+NOINDEX
+
+Private pages:
+NOINDEX
+
+Do not accidentally set noindex on public content.
+
+==================================================
+TASK 21 — ERROR HANDLING
+========================
+
+Verify:
+
+404 page
+
+Error page
+
+Loading states
+
+Empty states
+
+Database errors
+
+Authentication errors
+
+Import errors
+
+AI errors
+
+Search errors
+
+Never expose:
+
+* stack traces
+* database connection strings
+* secrets
+* internal API information
+
+==================================================
+TASK 22 — TEST COVERAGE
+=======================
+
+Current test coverage is insufficient.
+
+Add meaningful automated tests.
+
+At minimum:
+
+Authentication
+
+Admin authorization
+
+Question CRUD
+
+Question retrieval
+
+Search
+
+Filtering
+
+Saved questions
+
+Practice session creation
+
+Practice completion
+
+CSV import validation
+
+XLSX import validation
+
+Duplicate detection
+
+AI response validation
+
+Sitemap generation
+
+Public question metadata
+
+Admin route protection
+
+Do not create fake tests that simply assert true.
+
+Tests must actually verify behavior.
+
+==================================================
+TASK 23 — PACKAGE AND BUILD VERIFICATION
+========================================
+
+Run:
+
+npm install
+
+npm run typecheck
+
+npm run lint
+
+npm test
+
+npm run build
+
+If the project uses different commands, inspect package.json and use the correct commands.
+
+Fix ALL errors.
+
+Do not ignore TypeScript errors.
+
+Do not ignore lint errors related to actual functionality.
+
+Do not bypass validation just to make the build pass.
+
+==================================================
+TASK 24 — DATABASE VERIFICATION
+===============================
+
+Verify Prisma:
+
+* Schema
+* Relations
+* Indexes
+* Unique constraints
+* Migrations
+* Seed
+
+Make sure production migration uses:
+
+prisma migrate deploy
+
+Do NOT use:
+
+prisma migrate reset
+
+for production.
+
+Verify:
+
+DATABASE_URL
+
+is never exposed to client-side code.
+
+==================================================
+TASK 25 — PERFORMANCE
+=====================
+
+Audit public pages for performance.
+
+Optimize:
+
+* Images
+* Fonts
+* Database queries
+* Server rendering
+* Client JavaScript
+* Question list pagination
+* Blog pagination
+
+Avoid:
+
+* Loading 500+ questions at once
+* N+1 database queries
+* Unnecessary client components
+* Unnecessary JavaScript
+
+Ensure pagination is used.
+
+==================================================
+TASK 26 — MOBILE AUDIT
+======================
+
+Test:
+
+320px
+375px
+414px
+768px
+1024px
+1280px
+1440px
+
+Verify:
+
+* No horizontal scrolling
+* Buttons usable
+* Forms usable
+* Navigation usable
+* Ads responsive
+* Question pages readable
+* Practice page usable
+* Tables don't break layout
+
+==================================================
+TASK 27 — ACCESSIBILITY
+=======================
+
+Verify:
+
+* Semantic HTML
+* Heading hierarchy
+* Form labels
+* Keyboard navigation
+* Visible focus states
+* Accessible buttons
+* Accessible dialogs
+* Color contrast
+* Error announcements where needed
+* Alt text for images
+
+==================================================
+TASK 28 — PUBLIC CONTENT COUNT
+==============================
+
+Add an admin or development diagnostic that reports:
+
+Total questions
+Published questions
+Draft questions
+Questions per category
+Questions per experience level
+Questions per difficulty
+Questions per interview type
+Articles
+Published articles
+
+Do not expose internal diagnostics publicly.
+
+==================================================
+TASK 29 — CREATE A PRODUCTION AUDIT REPORT
+==========================================
+
+Create:
+
+docs/PRODUCTION-AUDIT.md
+
+Include:
+
+1. Architecture summary
+2. Database summary
+3. Route summary
+4. Question count
+5. Published content count
+6. SEO status
+7. AdSense status
+8. Security status
+9. Test status
+10. Performance status
+11. Remaining warnings
+12. Deployment checklist
+
+==================================================
+TASK 30 — FINAL PRODUCTION CHECK
+================================
+
+After implementing the fixes:
+
+Run:
+
+TypeScript
+Lint
+Tests
+Production build
+
+Verify:
+
+* Homepage
+* Interview question listing
+* Category pages
+* Question pages
+* Practice
+* Login
+* Register
+* Dashboard
+* Saved questions
+* Admin
+* Question CRUD
+* CSV import
+* XLSX import
+* AI generator
+* Blog
+* Search
+* Contact
+* FAQ
+* Legal pages
+* Sitemap
+* Robots
+
+Verify all links.
+
+Verify all important buttons.
+
+Verify no runtime errors.
+
+==================================================
+IMPORTANT CONTENT RULE
+======================
+
+Do not claim the website is "AdSense approved".
+
+Only say:
+
+"AdSense-ready"
+
+unless Google has actually approved the site.
+
+Do not claim:
+
+* Guaranteed employment
+* Guaranteed interview success
+* Guaranteed salary
+* Guaranteed job placement
+
+==================================================
+FINAL RESPONSE FROM CODING AGENT
+================================
+
+After completing all fixes, report:
+
+1. Number of questions in database
+2. Number of genuinely unique questions
+3. Number of published questions
+4. Number of categories
+5. Sitemap URL
+6. Robots URL
+7. Test result
+8. TypeScript result
+9. Lint result
+10. Production build result
+11. Security issues found/fixed
+12. SEO issues found/fixed
+13. AdSense issues found/fixed
+14. Remaining issues, if any
+
+IMPORTANT:
+Do not say "everything is perfect" unless it was actually tested.
+
+Do not proceed to unrelated feature development.
+Focus only on production fixes and readiness.

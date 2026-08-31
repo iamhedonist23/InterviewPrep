@@ -1,0 +1,64 @@
+Implement PHASE 5 ONLY.
+
+Goal:
+Make finding interview content fast and useful.
+
+Create global search.
+
+Search:
+
+* Questions
+* Categories
+* Articles
+
+Search should support:
+
+* Partial text
+* Relevant ranking
+* Pagination
+* Empty state
+
+Create:
+/search?q=
+
+Search UI:
+
+* Search input
+* Results count
+* Filters
+* Sort/relevance
+* Pagination
+
+Filters:
+
+* Category
+* Experience
+* Difficulty
+* Interview type
+
+Create reusable filter components.
+
+Improve category pages with:
+
+* Subcategories
+* Popular questions
+* Related categories
+* Practice CTA
+
+Add internal recommendations:
+
+* Related questions
+* Related categories
+* Related articles
+
+Build internal linking intentionally.
+
+Do not keyword stuff.
+
+Optimize database queries.
+
+Add indexes where necessary.
+
+Run tests, lint, TypeScript, and production build.
+
+Fix all errors.

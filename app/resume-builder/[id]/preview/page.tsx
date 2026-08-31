@@ -3,7 +3,7 @@ import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getOwnedResume, ResumeNotFoundError } from "@/lib/resume";
-import { ClassicResumeTemplate } from "@/components/resume/templates/classic-template";
+import { getResumeTemplateComponent } from "@/components/resume/templates";
 import { DownloadPdfButton } from "@/components/resume/download-pdf-button";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +16,7 @@ export default async function ResumePreviewPage({ params }: { params: Promise<{ 
 
   try {
     const resume = await getOwnedResume(session.user.id, id);
+    const ResumeTemplate = getResumeTemplateComponent(resume.template);
     return (
       <div className="min-h-screen bg-paper/60 py-10 print:bg-white print:py-0">
         <div className="mx-auto mb-6 flex max-w-[8.5in] items-center justify-between px-4 print:hidden">
@@ -25,7 +26,7 @@ export default async function ResumePreviewPage({ params }: { params: Promise<{ 
           <DownloadPdfButton />
         </div>
 
-        <ClassicResumeTemplate
+        <ResumeTemplate
           title={resume.title}
           personalInfo={resume.personalInfo}
           education={resume.education}

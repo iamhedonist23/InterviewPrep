@@ -32,7 +32,7 @@ export default async function ResumeEditorPage({ params }: { params: Promise<{ i
           <Link href="/resume-builder" className="text-sm font-bold text-coral">
             ← Back to your resumes
           </Link>
-          <h1 className="mt-3 font-display text-4xl font-bold">{resume.title}</h1>
+          <h1 className="mt-3 font-display text-4xl font-bold">{resume.title || "Untitled resume"}</h1>
           <ResumeEditorForm
             resumeId={resume.id}
             initialTitle={resume.title}

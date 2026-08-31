@@ -18,14 +18,14 @@ beforeEach(() => {
 });
 
 describe("requireAdmin (page guard)", () => {
-  it("redirects to login when there is no session", async () => {
+  it("redirects to the dedicated admin login when there is no session", async () => {
     getServerSession.mockResolvedValue(null);
-    await expect(requireAdmin()).rejects.toThrow("REDIRECT:/login?callbackUrl=/admin");
+    await expect(requireAdmin()).rejects.toThrow("REDIRECT:/admin/login");
   });
 
-  it("redirects to home when the user is not an admin", async () => {
+  it("redirects to the dedicated admin login when the user is not an admin", async () => {
     getServerSession.mockResolvedValue({ user: { id: "u1", role: "USER" } });
-    await expect(requireAdmin()).rejects.toThrow("REDIRECT:/");
+    await expect(requireAdmin()).rejects.toThrow("REDIRECT:/admin/login");
   });
 
   it("returns the session when the user is an admin", async () => {

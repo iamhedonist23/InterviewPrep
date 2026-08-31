@@ -40,21 +40,29 @@ enum UserRole {
 }
 
 model User {
-  id               String            @id @default(cuid())
-  email            String            @unique
-  name             String?
-  passwordHash     String?
-  role             UserRole          @default(USER)
-  image            String?
-  isDisabled       Boolean           @default(false)
-  createdAt        DateTime          @default(now())
-  updatedAt        DateTime          @updatedAt
+  id                    String            @id @default(cuid())
+  email                 String            @unique
+  name                  String?
+  passwordHash          String?
+  role                  UserRole          @default(USER)
+  image                 String?
+  isDisabled            Boolean           @default(false)
+  targetRole            String?
+  experienceLevel       ExperienceLevel?
+  dailyGoalMinutes      Int?
+  preferredTechnologies String[]          @default([])
+  onboardingCompleted   Boolean           @default(false)
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
   answers          InterviewAnswer[]
   practiceSessions PracticeSession[]
   savedQuestions   SavedQuestion[]
   accounts         Account[]
   sessions         Session[]
   resumes          Resume[]
+  studyProgress    StudyProgress[]
+  savedStudyTopics SavedStudyTopic[]
+  dailyChallenges  DailyChallenge[]
 }
 
 model Account {
@@ -144,6 +152,7 @@ model InterviewQuestion {
   answers          InterviewAnswer[]
   practiceResponses PracticeResponse[]
   savedBy          SavedQuestion[]
+  studyTopicRelations StudyTopicQuestionRelation[]
   @@index([categoryId, isPublished])
   @@index([subcategoryId])
   @@index([experienceLevel, difficulty, interviewType])
@@ -444,4 +453,195 @@ model ResumeCustomSection {
   updatedAt DateTime @updatedAt
   resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
   @@index([resumeId, sortOrder])
+}
+
+enum StudyLevel {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  INTERVIEW_PREP
+}
+
+enum StudyProgressStatus {
+  STARTED
+  COMPLETED
+}
+
+model StudyCategory {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique
+  description String?
+  icon        String?
+  isPublished Boolean     @default(false)
+  sortOrder   Int         @default(0)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  paths       StudyPath[]
+  topics      StudyTopic[]
+  @@index([isPublished, sortOrder])
+}
+
+model StudyPath {
+  id          String        @id @default(cuid())
+  categoryId  String
+  name        String
+  slug        String
+  description String?
+  level       StudyLevel
+  sortOrder   Int           @default(0)
+  isPublished Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  category    StudyCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  modules     StudyModule[]
+  @@unique([categoryId, slug])
+  @@unique([categoryId, level])
+  @@index([categoryId, isPublished, sortOrder])
+}
+
+model StudyModule {
+  id          String       @id @default(cuid())
+  studyPathId String
+  title       String
+  slug        String
+  description String?
+  sortOrder   Int          @default(0)
+  isPublished Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  studyPath   StudyPath    @relation(fields: [studyPathId], references: [id], onDelete: Cascade)
+  topics      StudyTopic[]
+  @@unique([studyPathId, slug])
+  @@index([studyPathId, isPublished, sortOrder])
+}
+
+model StudyTopic {
+  id                String                       @id @default(cuid())
+  moduleId          String
+  categoryId        String
+  title             String
+  slug              String
+  shortDescription  String?
+  estimatedMinutes  Int?
+  sortOrder         Int                          @default(0)
+  isPublished       Boolean                      @default(false)
+  seoTitle          String?
+  seoDescription    String?
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+  module            StudyModule                  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  category          StudyCategory                @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  sections          StudyTopicSection[]
+  examples          StudyExample[]
+  exercises         StudyExercise[]
+  questionRelations StudyTopicQuestionRelation[]
+  progress          StudyProgress[]
+  savedBy           SavedStudyTopic[]
+  @@unique([categoryId, slug])
+  @@index([moduleId, isPublished, sortOrder])
+}
+
+model StudyTopicSection {
+  id        String     @id @default(cuid())
+  topicId   String
+  title     String
+  content   String
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  topic     StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  @@index([topicId, sortOrder])
+}
+
+model StudyExample {
+  id          String     @id @default(cuid())
+  topicId     String
+  language    String
+  code        String
+  explanation String?
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  topic       StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  @@index([topicId, sortOrder])
+}
+
+model StudyExercise {
+  id          String     @id @default(cuid())
+  topicId     String
+  question    String
+  difficulty  Difficulty @default(EASY)
+  hint        String?
+  solution    String?
+  explanation String?
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  topic       StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  @@index([topicId, sortOrder])
+}
+
+model StudyTopicQuestionRelation {
+  id         String            @id @default(cuid())
+  topicId    String
+  questionId String
+  sortOrder  Int               @default(0)
+  createdAt  DateTime          @default(now())
+  topic      StudyTopic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  @@unique([topicId, questionId])
+  @@index([topicId, sortOrder])
+  @@index([questionId])
+}
+
+model StudyProgress {
+  id          String              @id @default(cuid())
+  userId      String
+  topicId     String
+  status      StudyProgressStatus @default(STARTED)
+  startedAt   DateTime            @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime            @updatedAt
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic       StudyTopic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  @@unique([userId, topicId])
+  @@index([userId, status])
+  @@index([topicId])
+}
+
+// ---------------------------------------------------------------------------
+// Phase B: bookmarks extension (study topics) and daily challenge.
+// Deliberately NOT a generic polymorphic "Bookmark" table — SavedQuestion
+// already exists and works; this only adds the one new content type the
+// product spec asks to be bookmarkable (study topics). There is no
+// "coding problem" content type anywhere in this schema, so no bookmark
+// tab or model was invented for one.
+// ---------------------------------------------------------------------------
+
+model SavedStudyTopic {
+  id        String     @id @default(cuid())
+  userId    String
+  topicId   String
+  createdAt DateTime   @default(now())
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic     StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  @@unique([userId, topicId])
+  @@index([userId, createdAt])
+}
+
+// One row per user per calendar day (UTC — see lib/date.ts for the app's
+// single, consistent day-boundary rule). questionIds is fixed at creation
+// time so refreshing the page never reshuffles the day's questions.
+model DailyChallenge {
+  id            String    @id @default(cuid())
+  userId        String
+  challengeDate DateTime
+  questionIds   Json
+  completedAt   DateTime?
+  score         Int?
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  @@unique([userId, challengeDate])
+  @@index([userId, challengeDate])
 }

@@ -4,6 +4,8 @@ export type PracticeQuestion = {
   explanation: string;
   keyPoints: string[];
   category: { name: string; slug: string };
+  difficulty?: string;
+  interviewType?: string;
 };
 
 export function simpleScore(answer: string, keyPoints: string[]) {

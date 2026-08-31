@@ -334,16 +334,17 @@ describe("sectionOrderSchema", () => {
 // Per-section schema validation
 // ---------------------------------------------------------------------------
 describe("educationSchema", () => {
-  it("accepts a minimal valid entry (only institution required)", () => {
+  it("accepts a minimal valid entry with institution provided", () => {
     expect(educationSchema.safeParse({ institution: "MIT" }).success).toBe(true);
   });
 
-  it("rejects a missing institution", () => {
-    expect(educationSchema.safeParse({ degree: "B.Tech" }).success).toBe(false);
+  it("accepts an entry with no fields at all — no resume field is mandatory", () => {
+    expect(educationSchema.safeParse({}).success).toBe(true);
+    expect(educationSchema.safeParse({ degree: "B.Tech" }).success).toBe(true);
   });
 
-  it("rejects an empty institution string", () => {
-    expect(educationSchema.safeParse({ institution: "" }).success).toBe(false);
+  it("accepts an empty institution string", () => {
+    expect(educationSchema.safeParse({ institution: "" }).success).toBe(true);
   });
 
   it("coerces valid date strings", () => {
@@ -371,9 +372,10 @@ describe("educationSchema", () => {
 });
 
 describe("experienceSchema", () => {
-  it("requires both company and jobTitle", () => {
-    expect(experienceSchema.safeParse({ company: "Acme" }).success).toBe(false);
-    expect(experienceSchema.safeParse({ jobTitle: "Engineer" }).success).toBe(false);
+  it("does not require company or jobTitle — no resume field is mandatory", () => {
+    expect(experienceSchema.safeParse({ company: "Acme" }).success).toBe(true);
+    expect(experienceSchema.safeParse({ jobTitle: "Engineer" }).success).toBe(true);
+    expect(experienceSchema.safeParse({}).success).toBe(true);
     expect(experienceSchema.safeParse({ company: "Acme", jobTitle: "Engineer" }).success).toBe(true);
   });
 
@@ -403,8 +405,8 @@ describe("experienceSchema", () => {
 });
 
 describe("projectSchema", () => {
-  it("requires a project name", () => {
-    expect(projectSchema.safeParse({}).success).toBe(false);
+  it("does not require a project name — no resume field is mandatory", () => {
+    expect(projectSchema.safeParse({}).success).toBe(true);
     expect(projectSchema.safeParse({ name: "Portfolio Site" }).success).toBe(true);
   });
 
@@ -425,8 +427,8 @@ describe("projectSchema", () => {
 });
 
 describe("skillSchema", () => {
-  it("requires a name", () => {
-    expect(skillSchema.safeParse({}).success).toBe(false);
+  it("does not require a name — no resume field is mandatory", () => {
+    expect(skillSchema.safeParse({}).success).toBe(true);
     expect(skillSchema.safeParse({ name: "React" }).success).toBe(true);
   });
 
@@ -444,8 +446,8 @@ describe("skillSchema", () => {
 });
 
 describe("certificationSchema", () => {
-  it("requires a name", () => {
-    expect(certificationSchema.safeParse({}).success).toBe(false);
+  it("does not require a name — no resume field is mandatory", () => {
+    expect(certificationSchema.safeParse({}).success).toBe(true);
     expect(certificationSchema.safeParse({ name: "AWS Certified" }).success).toBe(true);
   });
 
@@ -457,8 +459,8 @@ describe("certificationSchema", () => {
 });
 
 describe("achievementSchema", () => {
-  it("requires a title", () => {
-    expect(achievementSchema.safeParse({}).success).toBe(false);
+  it("does not require a title — no resume field is mandatory", () => {
+    expect(achievementSchema.safeParse({}).success).toBe(true);
     expect(achievementSchema.safeParse({ title: "Employee of the Month" }).success).toBe(true);
   });
 
@@ -468,10 +470,11 @@ describe("achievementSchema", () => {
 });
 
 describe("languageSchema", () => {
-  it("requires a name and defaults proficiency to CONVERSATIONAL", () => {
+  it("does not require a name, and defaults proficiency to CONVERSATIONAL", () => {
     const result = languageSchema.safeParse({ name: "Spanish" });
     expect(result.success).toBe(true);
     if (result.success) expect(result.data.proficiency).toBe("CONVERSATIONAL");
+    expect(languageSchema.safeParse({}).success).toBe(true);
   });
 
   it("rejects an invalid proficiency value", () => {
@@ -480,8 +483,8 @@ describe("languageSchema", () => {
 });
 
 describe("customSectionSchema", () => {
-  it("requires a title", () => {
-    expect(customSectionSchema.safeParse({}).success).toBe(false);
+  it("does not require a title — no resume field is mandatory", () => {
+    expect(customSectionSchema.safeParse({}).success).toBe(true);
     expect(customSectionSchema.safeParse({ title: "Volunteer Work" }).success).toBe(true);
   });
 

@@ -36,7 +36,7 @@ export default async function ResumeBuilderPage() {
               <div key={resume.id} className="rounded-2xl border border-ink/10 bg-white/70 p-5">
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <p className="font-display text-lg font-bold">{resume.title}</p>
+                    <p className="font-display text-lg font-bold">{resume.title || "Untitled resume"}</p>
                     <p className="mt-1 text-xs uppercase tracking-wide text-ink/50">{resume.template} template</p>
                   </div>
                   {resume.isDefault && (

@@ -1,0 +1,2022 @@
+You are working on an EXISTING production-style Next.js project called:
+
+InstantInterviewPrep
+
+Repository:
+
+https://github.com/iamhedonist23/InterviewPrep
+
+IMPORTANT:
+
+The existing website is already developed.
+
+DO NOT rebuild the project.
+
+DO NOT regenerate the existing application.
+
+DO NOT replace the existing architecture.
+
+DO NOT remove existing features.
+
+DO NOT create a second database.
+
+DO NOT create a separate application.
+
+Reuse the existing:
+
+* Next.js
+* TypeScript
+* PostgreSQL
+* Prisma
+* Authentication
+* User system
+* Admin system
+* Interview questions
+* Practice engine
+* Resume Builder
+* Blog
+* SEO
+* AdSense
+
+The website remains:
+
+100% FREE FOR USERS
+
+Monetization:
+
+Google AdSense
+
+Do NOT add:
+
+* Premium subscription
+* Paid courses
+* Paywalls
+* Paid credits
+* Locked study material
+
+==================================================
+OVERALL GOAL
+============
+
+Transform InstantInterviewPrep from:
+
+Interview Questions + Practice + Resume Builder
+
+into:
+
+FREE CAREER PREPARATION PLATFORM
+
+The new learning system should provide:
+
+Learn
+→ Understand concepts
+→ Practice
+→ Answer interview questions
+→ Track progress
+→ Prepare resume
+→ Prepare for interview
+
+==================================================
+PHASE 20 — STUDY MATERIAL DATABASE
+==================================
+
+Implement PHASE 20 ONLY.
+
+First inspect the existing Prisma schema.
+
+DO NOT duplicate existing models.
+
+Create a database structure for educational study material.
+
+Suggested models:
+
+StudyCategory
+
+StudyPath
+
+StudyModule
+
+StudyTopic
+
+StudyTopicSection
+
+StudyExample
+
+StudyExercise
+
+StudyTopicQuestionRelation
+
+StudyProgress
+
+==================================================
+STUDY CATEGORY
+==============
+
+Examples:
+
+Java
+
+Python
+
+JavaScript
+
+Kotlin
+
+Android
+
+SQL
+
+React
+
+Web Development
+
+QA / Testing
+
+Data Structures
+
+Data Analyst
+
+etc.
+
+Fields:
+
+id
+name
+slug
+description
+icon
+isPublished
+sortOrder
+createdAt
+updatedAt
+
+==================================================
+STUDY PATH
+==========
+
+A category should have learning levels:
+
+Beginner
+
+Intermediate
+
+Advanced
+
+Interview Preparation
+
+Fields:
+
+id
+categoryId
+name
+slug
+description
+level
+sortOrder
+isPublished
+
+==================================================
+STUDY MODULE
+============
+
+Example:
+
+Java Beginner
+
+Modules:
+
+1. Java Introduction
+2. Variables
+3. Data Types
+4. Operators
+5. Conditions
+6. Loops
+7. Arrays
+8. Methods
+9. Strings
+
+Fields:
+
+id
+studyPathId
+title
+slug
+description
+sortOrder
+isPublished
+
+==================================================
+STUDY TOPIC
+===========
+
+Each module contains topics.
+
+Example:
+
+Java → Beginner → OOP
+
+Topics:
+
+Classes
+Objects
+Inheritance
+Polymorphism
+Encapsulation
+Abstraction
+
+Fields:
+
+id
+moduleId
+title
+slug
+shortDescription
+estimatedMinutes
+sortOrder
+isPublished
+seoTitle
+seoDescription
+createdAt
+updatedAt
+
+Unique URL:
+
+/learn/[category]/[topic]
+
+or an equivalent clean route based on the existing architecture.
+
+==================================================
+TOPIC SECTIONS
+==============
+
+Each topic should support multiple sections.
+
+Examples:
+
+Introduction
+
+What is it?
+
+Why is it important?
+
+How it works
+
+Syntax
+
+Example
+
+Real-world usage
+
+Advantages
+
+Disadvantages
+
+Common mistakes
+
+Interview tips
+
+Summary
+
+Each section should have:
+
+id
+topicId
+title
+content
+sortOrder
+
+Content must support safe formatted text.
+
+Do not allow unsafe HTML injection.
+
+==================================================
+CODE EXAMPLES
+=============
+
+Study topics should support code examples.
+
+Fields:
+
+language
+code
+explanation
+sortOrder
+
+Examples:
+
+Java
+
+Python
+
+JavaScript
+
+SQL
+
+Kotlin
+
+etc.
+
+Use syntax highlighting on the frontend later.
+
+==================================================
+EXERCISES
+=========
+
+Each topic can have exercises.
+
+Fields:
+
+question
+difficulty
+hint
+solution
+sortOrder
+
+Exercises must be optional.
+
+==================================================
+QUESTION RELATION
+=================
+
+Connect study topics to existing interview questions.
+
+Example:
+
+Java HashMap study topic
+
+↓
+
+Existing HashMap interview questions
+
+Do NOT create duplicate interview questions.
+
+Use the existing Question model.
+
+==================================================
+STUDY PROGRESS
+==============
+
+Logged-in users should eventually be able to track:
+
+Topic started
+
+Topic completed
+
+Exercise completed
+
+Questions practiced
+
+Completion percentage
+
+Store progress per user.
+
+A user must only see their own progress.
+
+==================================================
+DATABASE SECURITY
+=================
+
+Private progress data must be protected.
+
+Public study content should be readable.
+
+Admin content management requires ADMIN role.
+
+Never trust userId from the browser.
+
+==================================================
+MIGRATION
+=========
+
+Create Prisma migrations.
+
+DO NOT reset database.
+
+Existing data must remain intact.
+
+Run:
+
+npx prisma migrate deploy
+
+for production migration.
+
+STOP after Phase 20.
+
+==================================================
+PHASE 21 — LEARNING PATH STRUCTURE
+==================================
+
+Implement PHASE 21 ONLY.
+
+Create a public learning-path system.
+
+==================================================
+PUBLIC ROUTES
+=============
+
+Create:
+
+/learn
+
+/learn/[category]
+
+/learn/[category]/[level]
+
+/learn/[category]/[topic]
+
+Use the existing routing architecture if equivalent routes already exist.
+
+==================================================
+LEARN LANDING PAGE
+==================
+
+Create:
+
+/learn
+
+Headline:
+
+"Learn. Practice. Prepare."
+
+Explain that users can learn technical concepts from beginner to advanced level and then practice interview questions.
+
+Display categories.
+
+Example:
+
+Java
+
+Python
+
+JavaScript
+
+Kotlin
+
+Android
+
+SQL
+
+React
+
+etc.
+
+==================================================
+CATEGORY PAGE
+=============
+
+Example:
+
+/learn/java
+
+Display:
+
+Java Learning Path
+
+Beginner
+Intermediate
+Advanced
+Interview Preparation
+
+Show:
+
+Modules
+
+Topic count
+
+Estimated learning time
+
+Progress for logged-in users
+
+==================================================
+LEVEL PAGE
+==========
+
+Example:
+
+/learn/java/beginner
+
+Display:
+
+Java Beginner Roadmap
+
+Modules:
+
+1. Introduction
+2. Variables
+3. Control Flow
+4. Arrays
+5. Strings
+6. Methods
+7. OOP Basics
+
+Each module displays:
+
+Topic count
+
+Estimated time
+
+Completion percentage
+
+==================================================
+TOPIC PAGE
+==========
+
+Example:
+
+/learn/java/inheritance
+
+Display:
+
+Breadcrumb
+
+Title
+
+Short introduction
+
+Table of contents
+
+Study content
+
+Code examples
+
+Examples
+
+Common mistakes
+
+Interview tips
+
+Related questions
+
+Practice CTA
+
+Next topic
+
+Previous topic
+
+==================================================
+LEARNING NAVIGATION
+===================
+
+Users should easily navigate:
+
+Previous Topic
+
+Next Topic
+
+Back to Module
+
+Back to Learning Path
+
+Related Topic
+
+Interview Questions
+
+Practice
+
+==================================================
+PHASE 22 — STUDY MATERIAL UI
+============================
+
+Implement PHASE 22 ONLY.
+
+Create a professional educational reading experience.
+
+==================================================
+DESIGN
+======
+
+Desktop:
+
+Left:
+Learning navigation
+
+Center:
+Study content
+
+Right:
+Table of contents / progress
+
+Mobile:
+
+Top:
+
+Breadcrumb
+
+Progress
+
+Table of contents
+
+Content
+
+Navigation buttons
+
+==================================================
+READABILITY
+===========
+
+Optimize for learning.
+
+Use:
+
+Readable typography
+
+Good line height
+
+Proper spacing
+
+Code blocks
+
+Callout boxes
+
+Tables where useful
+
+Lists
+
+Examples
+
+Do not overload pages with advertisements.
+
+==================================================
+CODE BLOCKS
+===========
+
+Add syntax highlighting.
+
+Support at minimum:
+
+Java
+
+Python
+
+JavaScript
+
+TypeScript
+
+Kotlin
+
+SQL
+
+HTML
+
+CSS
+
+JSON
+
+==================================================
+COPY CODE
+=========
+
+Every code block should have:
+
+Copy
+
+button.
+
+Show:
+
+Copied
+
+after successful copy.
+
+==================================================
+CONTENT SECTIONS
+================
+
+Support:
+
+Definition
+
+Explanation
+
+Example
+
+Syntax
+
+Output
+
+Use case
+
+Common mistake
+
+Interview tip
+
+Summary
+
+==================================================
+RELATED INTERVIEW QUESTIONS
+===========================
+
+At the bottom of each topic:
+
+"Test Your Knowledge"
+
+Display relevant existing interview questions.
+
+Button:
+
+Start Practice
+
+Use existing practice engine.
+
+Do not create a second practice system.
+
+==================================================
+PHASE 23 — BEGINNER → ADVANCED LEARNING SYSTEM
+==============================================
+
+Implement PHASE 23 ONLY.
+
+Create structured learning paths.
+
+The goal is:
+
+Beginner
+→ Intermediate
+→ Advanced
+→ Interview Preparation
+
+==================================================
+JAVA ROADMAP
+============
+
+Create a complete Java roadmap.
+
+BEGINNER:
+
+Java introduction
+
+JDK / JRE / JVM
+
+Installation
+
+Variables
+
+Data types
+
+Operators
+
+Input/output
+
+Conditions
+
+Loops
+
+Arrays
+
+Strings
+
+Methods
+
+Basic debugging
+
+INTERMEDIATE:
+
+OOP
+
+Classes
+
+Objects
+
+Constructors
+
+Inheritance
+
+Polymorphism
+
+Encapsulation
+
+Abstraction
+
+Interfaces
+
+Exception handling
+
+Collections
+
+List
+
+Set
+
+Map
+
+Generics
+
+File handling
+
+Java 8+
+
+Lambda
+
+Functional interfaces
+
+Stream API
+
+Optional
+
+ADVANCED:
+
+JVM architecture
+
+Memory management
+
+Heap
+
+Stack
+
+Garbage collection
+
+Class loading
+
+Multithreading
+
+Concurrency
+
+Synchronization
+
+volatile
+
+Executors
+
+CompletableFuture
+
+Performance
+
+JDBC
+
+Reflection
+
+Serialization
+
+Design patterns
+
+Advanced collections
+
+INTERVIEW:
+
+Core Java interview
+
+OOP interview
+
+Collections interview
+
+Java 8+ interview
+
+Multithreading interview
+
+JVM interview
+
+Scenario questions
+
+Coding questions
+
+==================================================
+PYTHON ROADMAP
+==============
+
+BEGINNER:
+
+Python introduction
+
+Installation
+
+Variables
+
+Data types
+
+Operators
+
+Conditions
+
+Loops
+
+Lists
+
+Tuples
+
+Sets
+
+Dictionaries
+
+Functions
+
+Strings
+
+File handling
+
+INTERMEDIATE:
+
+OOP
+
+Modules
+
+Packages
+
+Exceptions
+
+Comprehensions
+
+Iterators
+
+Generators
+
+Decorators
+
+Context managers
+
+Virtual environments
+
+pip
+
+Testing
+
+Type hints
+
+ADVANCED:
+
+Python memory management
+
+Garbage collection
+
+GIL
+
+Multithreading
+
+Multiprocessing
+
+Asyncio
+
+Coroutines
+
+Performance
+
+Advanced OOP
+
+Descriptors
+
+Metaclasses
+
+REST APIs
+
+FastAPI
+
+Django
+
+INTERVIEW:
+
+Python interview
+
+Python coding
+
+Python OOP
+
+Python advanced
+
+Scenario questions
+
+==================================================
+JAVASCRIPT ROADMAP
+==================
+
+BEGINNER:
+
+Syntax
+
+Variables
+
+Data types
+
+Operators
+
+Conditions
+
+Loops
+
+Functions
+
+Arrays
+
+Objects
+
+DOM basics
+
+INTERMEDIATE:
+
+ES6+
+
+Destructuring
+
+Spread/rest
+
+Modules
+
+Promises
+
+Async/await
+
+Fetch
+
+Events
+
+Closures
+
+Scope
+
+this
+
+ADVANCED:
+
+Prototype chain
+
+Event loop
+
+Microtasks
+
+Memory management
+
+Performance
+
+Debouncing
+
+Throttling
+
+Web APIs
+
+CORS
+
+Advanced asynchronous programming
+
+INTERVIEW:
+
+JavaScript interview
+
+Coding questions
+
+Scenario questions
+
+==================================================
+SQL ROADMAP
+===========
+
+BEGINNER:
+
+Database basics
+
+Tables
+
+SELECT
+
+WHERE
+
+ORDER BY
+
+GROUP BY
+
+Aggregate functions
+
+INTERMEDIATE:
+
+JOINs
+
+Subqueries
+
+CTEs
+
+Constraints
+
+Keys
+
+Normalization
+
+Views
+
+ADVANCED:
+
+Indexes
+
+Execution plans
+
+Transactions
+
+ACID
+
+Isolation levels
+
+Deadlocks
+
+Window functions
+
+Query optimization
+
+INTERVIEW:
+
+SQL interview
+
+Query questions
+
+Scenario questions
+
+Optimization questions
+
+==================================================
+ANDROID ROADMAP
+===============
+
+Include:
+
+Android basics
+
+Kotlin
+
+Activities
+
+Fragments
+
+Lifecycle
+
+Views
+
+RecyclerView
+
+Jetpack
+
+ViewModel
+
+LiveData
+
+StateFlow
+
+Compose
+
+Navigation
+
+Room
+
+Retrofit
+
+OkHttp
+
+Coroutines
+
+WorkManager
+
+Hilt
+
+MVVM
+
+Clean Architecture
+
+Performance
+
+Memory leaks
+
+Testing
+
+Advanced Android
+
+Interview preparation
+
+==================================================
+KOTLIN ROADMAP
+==============
+
+Include:
+
+Kotlin basics
+
+Variables
+
+Null safety
+
+Functions
+
+Classes
+
+Data classes
+
+Sealed classes
+
+Objects
+
+Extensions
+
+Scope functions
+
+Lambdas
+
+Generics
+
+Collections
+
+Coroutines
+
+Flow
+
+Advanced Kotlin
+
+Kotlin-Java interoperability
+
+Interview preparation
+
+==================================================
+CONTENT REQUIREMENT
+===================
+
+Do not create empty modules.
+
+Every published topic must contain meaningful content.
+
+Do not publish placeholder text.
+
+Do not publish:
+
+Lorem ipsum
+
+Coming soon
+
+Sample text
+
+Generic AI filler
+
+==================================================
+PHASE 24 — STUDY → INTERVIEW INTEGRATION
+========================================
+
+Implement PHASE 24 ONLY.
+
+This is a critical feature.
+
+Every study topic should connect to relevant existing interview questions.
+
+Example:
+
+/learn/java/hashmap
+
+contains:
+
+Learn HashMap
+
+↓
+
+Examples
+
+↓
+
+Common mistakes
+
+↓
+
+Interview Questions
+
+↓
+
+Practice
+
+==================================================
+QUESTION LINKING
+================
+
+Use existing Question records.
+
+Create topic-to-question relationships.
+
+Admin should be able to associate:
+
+Topic → Questions
+
+Do not duplicate question data.
+
+==================================================
+PRACTICE CTA
+============
+
+Buttons:
+
+Practice This Topic
+
+Practice This Module
+
+Practice This Level
+
+Practice This Category
+
+Use the existing practice engine.
+
+==================================================
+AFTER LEARNING
+==============
+
+When a user finishes a topic:
+
+Show:
+
+"Ready to test your knowledge?"
+
+Then:
+
+5–20 relevant questions
+
+depending on available questions.
+
+==================================================
+PHASE 25 — EXERCISES AND CODING PRACTICE
+========================================
+
+Implement PHASE 25 ONLY.
+
+Add optional coding exercises.
+
+Each exercise:
+
+Title
+
+Problem
+
+Difficulty
+
+Input
+
+Output
+
+Example
+
+Hint
+
+Solution
+
+Explanation
+
+Supported languages where appropriate.
+
+Do not build an online code execution system in this phase.
+
+No remote code execution.
+
+==================================================
+CODING SECURITY
+===============
+
+Do not execute user-submitted code on the application server.
+
+For now:
+
+Display code solutions only.
+
+==================================================
+PHASE 26 — USER LEARNING PROGRESS
+=================================
+
+Implement PHASE 26 ONLY.
+
+Logged-in users can track learning progress.
+
+==================================================
+PROGRESS
+========
+
+Track:
+
+Topic started
+
+Topic completed
+
+Module completed
+
+Level completion
+
+Category completion
+
+Exercise completion
+
+Interview practice
+
+==================================================
+DASHBOARD
+=========
+
+Add:
+
+Learning Progress
+
+Example:
+
+Java
+
+Beginner
+75%
+
+Intermediate
+30%
+
+Advanced
+0%
+
+==================================================
+CONTINUE LEARNING
+=================
+
+Show:
+
+"Continue Learning"
+
+Example:
+
+Continue:
+
+Java → Collections → HashMap
+
+Button:
+
+Continue
+
+==================================================
+COMPLETION
+==========
+
+When a topic is completed:
+
+Mark it complete.
+
+Show progress.
+
+Do not force users to complete topics in strict order unless the existing UX requires it.
+
+Allow free navigation.
+
+==================================================
+PHASE 27 — SEO FOR STUDY MATERIAL
+=================================
+
+Implement PHASE 27 ONLY.
+
+SEO is extremely important.
+
+Every public learning page should have:
+
+Unique title
+
+Unique description
+
+Canonical URL
+
+OpenGraph
+
+Twitter metadata
+
+Breadcrumbs
+
+Structured data where appropriate
+
+==================================================
+LEARNING URL STRUCTURE
+======================
+
+Use clean URLs.
+
+Examples:
+
+/learn/java
+
+/learn/java/beginner
+
+/learn/java/oop
+
+/learn/java/collections
+
+/learn/java/hashmap
+
+/learn/python
+
+/learn/python/oop
+
+/learn/python/decorators
+
+/learn/sql
+
+/learn/sql/joins
+
+==================================================
+DYNAMIC SITEMAP
+===============
+
+Add all published study pages to sitemap.
+
+Include:
+
+Study categories
+
+Learning paths
+
+Modules
+
+Published topics
+
+Do NOT include:
+
+Admin
+
+Dashboard
+
+Private progress
+
+Draft topics
+
+Unpublished content
+
+==================================================
+INDEXING
+========
+
+Public study pages:
+
+INDEX
+
+Private learning progress:
+
+NOINDEX
+
+Admin:
+
+NOINDEX
+
+==================================================
+STRUCTURED DATA
+===============
+
+Use appropriate structured data.
+
+Potential:
+
+BreadcrumbList
+
+Article
+
+Course where genuinely appropriate
+
+Do not use fake course ratings.
+
+Do not use fake reviews.
+
+Do not create misleading structured data.
+
+==================================================
+INTERNAL LINKING
+================
+
+Study pages should link to:
+
+Previous topic
+
+Next topic
+
+Parent module
+
+Parent category
+
+Related topics
+
+Interview questions
+
+Practice
+
+Relevant blog articles
+
+Resume builder where appropriate
+
+Interview preparation
+
+==================================================
+PHASE 28 — CONTENT, ADSENSE AND FINAL QUALITY AUDIT
+===================================================
+
+Implement PHASE 28 ONLY.
+
+This is the final learning-system audit.
+
+==================================================
+CONTENT QUALITY
+===============
+
+Audit all published study material.
+
+Every topic must have:
+
+Useful explanation
+
+Examples
+
+Relevant code where applicable
+
+Practical usage
+
+Common mistakes
+
+Interview connection
+
+Related topics
+
+Do not publish thin pages.
+
+Do not create hundreds of near-identical pages.
+
+Do not use AI-generated filler.
+
+AI may assist content creation, but content must be reviewed.
+
+==================================================
+ADSENSE
+=======
+
+Study material is public content and may contain AdSense placements.
+
+However:
+
+Do NOT put ads:
+
+Inside code blocks
+
+Between code and output where it harms learning
+
+Over navigation
+
+Over buttons
+
+Inside practice controls
+
+Inside resume content
+
+Inside PDFs
+
+Do not encourage ad clicks.
+
+Do not say:
+
+"Click the ad to support us."
+
+Keep ads reasonable.
+
+==================================================
+LEGAL / PRIVACY
+===============
+
+Study material should not collect unnecessary personal information.
+
+Progress is private.
+
+User-specific progress must not be publicly indexed.
+
+==================================================
+PERFORMANCE
+===========
+
+Study pages must load efficiently.
+
+Avoid:
+
+Huge JavaScript bundles
+
+Loading every topic at once
+
+Loading all questions at once
+
+Unnecessary client components
+
+Use server rendering where appropriate.
+
+==================================================
+MOBILE
+======
+
+Test:
+
+320px
+
+375px
+
+414px
+
+768px
+
+1024px
+
+1280px
+
+Verify:
+
+Reading
+
+Navigation
+
+Code blocks
+
+Tables
+
+Practice CTA
+
+Progress
+
+Mobile menu
+
+No horizontal overflow.
+
+==================================================
+ACCESSIBILITY
+=============
+
+Verify:
+
+Heading hierarchy
+
+Keyboard navigation
+
+Code block accessibility
+
+Buttons
+
+Links
+
+Focus states
+
+Contrast
+
+Alt text
+
+ARIA where required
+
+==================================================
+TESTING
+=======
+
+Add automated tests for:
+
+Study category retrieval
+
+Study path retrieval
+
+Topic retrieval
+
+Published/unpublished behavior
+
+Topic authorization
+
+Progress creation
+
+Progress update
+
+Progress ownership
+
+Question relationships
+
+SEO metadata
+
+Sitemap
+
+Admin CRUD
+
+==================================================
+ADMIN CONTENT MANAGEMENT
+========================
+
+Verify admins can manage:
+
+Categories
+
+Learning paths
+
+Modules
+
+Topics
+
+Sections
+
+Code examples
+
+Exercises
+
+Question relationships
+
+Publish/unpublish
+
+SEO fields
+
+Sort order
+
+==================================================
+ADMIN SECURITY
+==============
+
+All admin APIs/actions must verify:
+
+Authenticated user
+
+AND
+
+ADMIN role
+
+Do not rely on UI visibility.
+
+==================================================
+FINAL BUILD
+===========
+
+Run:
+
+npm run typecheck
+
+npm run lint
+
+npm test
+
+npm run build
+
+npm run start
+
+Fix all real errors.
+
+Do not disable checks just to pass the build.
+
+==================================================
+FINAL REPORT
+============
+
+Create:
+
+docs/STUDY-MATERIAL-AUDIT.md
+
+Include:
+
+1. Categories created
+2. Learning paths created
+3. Modules created
+4. Topics created
+5. Published topics
+6. Interview-question relationships
+7. User progress implementation
+8. SEO implementation
+9. Sitemap implementation
+10. Admin implementation
+11. Security
+12. Performance
+13. Accessibility
+14. Tests
+15. Build status
+16. Remaining issues
+
+==================================================
+FINAL PRODUCT STRUCTURE
+=======================
+
+The final website should provide:
+
+HOME
+
+INTERVIEW QUESTIONS
+
+PRACTICE
+
+LEARN
+
+RESUME BUILDER
+
+BLOG
+
+DASHBOARD
+
+==================================================
+LEARNING EXPERIENCE
+===================
+
+Example user journey:
+
+User visits:
+
+/learn/java
+
+↓
+
+Chooses:
+
+Beginner
+
+↓
+
+Studies:
+
+Variables
+
+↓
+
+Studies:
+
+OOP
+
+↓
+
+Studies:
+
+Collections
+
+↓
+
+Studies:
+
+HashMap
+
+↓
+
+Clicks:
+
+Practice HashMap Questions
+
+↓
+
+Existing practice engine starts
+
+↓
+
+User completes practice
+
+↓
+
+Progress updates
+
+↓
+
+User continues:
+
+Advanced Java
+
+↓
+
+Eventually:
+
+Java Interview Preparation
+
+==================================================
+IMPORTANT PRODUCT PRINCIPLE
+===========================
+
+The website should not simply contain large amounts of text.
+
+The purpose is:
+
+LEARN
+
+↓
+
+UNDERSTAND
+
+↓
+
+PRACTICE
+
+↓
+
+TEST
+
+↓
+
+IMPROVE
+
+↓
+
+INTERVIEW READY
+
+==================================================
+FINAL REQUIREMENT
+=================
+
+Do not claim that SEO traffic is guaranteed.
+
+Do not claim AdSense approval is guaranteed.
+
+Do not claim Google will index every page.
+
+Do not claim users will get jobs.
+
+Do not fabricate test results.
+
+Do not fabricate content counts.
+
+Do not fabricate successful deployment.
+
+If something cannot be verified, report it as:
+
+NOT VERIFIED
+
+==================================================
+STOP CONDITION
+==============
+
+Complete only the requested phase.
+
+Do not automatically continue to another phase.
+
+After each phase:
+
+1. Show files changed
+2. Show database changes
+3. Show tests
+4. Show build result
+5. Show remaining issues
+
+Then STOP.

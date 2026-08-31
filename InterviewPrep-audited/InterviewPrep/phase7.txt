@@ -1,0 +1,86 @@
+Implement PHASE 7 ONLY.
+
+Goal:
+Create a secure admin management system.
+
+Create:
+/admin
+
+Protect all admin routes server-side.
+
+Roles:
+
+* USER
+* ADMIN
+
+Admin dashboard:
+
+* Questions
+* Categories
+* Articles
+* FAQs
+* Users
+* Contact messages
+* Basic statistics
+
+Question management:
+
+* Create
+* Edit
+* Delete
+* Publish/unpublish
+* Search
+* Filter
+
+Article management:
+
+* Create
+* Edit
+* Delete
+* Publish/unpublish
+
+Category management:
+
+* Create
+* Edit
+* Delete
+* Sort/order
+
+FAQ management.
+
+Contact message management:
+
+* View
+* Mark read
+* Delete
+
+User management:
+
+* View
+* Search
+* Disable where appropriate
+
+Never allow normal users to access admin operations.
+
+Authorization must be checked on the server, not just the client.
+
+Add confirmation dialogs for destructive operations.
+
+Validate all admin input.
+
+Protect against:
+
+* Unauthorized access
+* Invalid IDs
+* Malicious input
+* Bulk abuse
+
+Run authorization tests.
+
+Run:
+TypeScript
+Lint
+Tests
+Production build
+
+Fix all errors.

@@ -61,7 +61,7 @@ export function ClassicResumeTemplate({
   return (
     <div className="mx-auto max-w-[8.5in] bg-white p-10 text-[#1d1d1d] shadow-sm print:m-0 print:shadow-none print:p-8">
       <header className="border-b-2 border-ink pb-4">
-        <h1 className="font-display text-3xl font-bold">{personalInfo?.fullName || title}</h1>
+        <h1 className="font-display text-3xl font-bold">{personalInfo?.fullName || title || "Your Name"}</h1>
         {personalInfo?.professionalTitle && <p className="mt-1 text-lg text-ink/70">{personalInfo.professionalTitle}</p>}
         {contactLine && <p className="mt-2 text-sm text-ink/60">{contactLine}</p>}
         {linkLine && <p className="text-sm text-ink/60">{linkLine}</p>}

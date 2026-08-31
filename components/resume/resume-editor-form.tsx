@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { RESUME_TEMPLATES } from "@/components/resume/templates";
 import {
   ExperienceEditor,
   EducationEditor,
@@ -53,8 +54,6 @@ type Props = {
   initialLanguages: LanguageItem[];
   initialCustomSections: CustomSectionItem[];
 };
-
-const TEMPLATES = ["classic", "modern", "minimal"];
 
 const PERSONAL_FIELDS: Array<{ key: keyof PersonalInfo; label: string; placeholder: string }> = [
   { key: "fullName", label: "Full name", placeholder: "Jane Doe" },
@@ -173,10 +172,10 @@ export function ResumeEditorForm(props: Props) {
               </label>
               <label className="block text-sm font-semibold text-ink/70">
                 Template
-                <select className="mt-2 w-full rounded-xl border border-ink/15 px-4 py-3 text-sm capitalize" value={template} onChange={(e) => setTemplate(e.target.value)}>
-                  {TEMPLATES.map((option) => (
-                    <option key={option} value={option}>
-                      {option}
+                <select className="mt-2 w-full rounded-xl border border-ink/15 px-4 py-3 text-sm" value={template} onChange={(e) => setTemplate(e.target.value)}>
+                  {Object.entries(RESUME_TEMPLATES).map(([key, { label }]) => (
+                    <option key={key} value={key}>
+                      {label}
                     </option>
                   ))}
                 </select>

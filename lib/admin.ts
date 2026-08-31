@@ -4,8 +4,8 @@ import { authOptions } from "@/lib/auth";
 
 export async function requireAdmin() {
   const session = await getServerSession(authOptions);
-  if (!session?.user?.id) redirect("/login?callbackUrl=/admin");
-  if (session.user.role !== "ADMIN") redirect("/");
+  if (!session?.user?.id) redirect("/admin/login");
+  if (session.user.role !== "ADMIN") redirect("/admin/login");
   return session;
 }
 
