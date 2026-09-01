@@ -7,6 +7,613 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id                    String            @id @default(cuid())
+  email                 String            @unique
+  name                  String?
+  passwordHash          String?
+  role                  UserRole          @default(USER)
+  image                 String?
+  createdAt             DateTime          @default(now())
+  updatedAt             DateTime          @updatedAt
+  isDisabled            Boolean           @default(false)
+  targetRole            String?
+  experienceLevel       ExperienceLevel?
+  dailyGoalMinutes      Int?
+  preferredTechnologies String[]          @default([])
+  onboardingCompleted   Boolean           @default(false)
+  accounts              Account[]
+  dailyChallenges       DailyChallenge[]
+  answers               InterviewAnswer[]
+  practiceSessions      PracticeSession[]
+  resumes               Resume[]
+  savedQuestions        SavedQuestion[]
+  savedStudyTopics      SavedStudyTopic[]
+  sessions              Session[]
+  studyProgress         StudyProgress[]
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Category {
+  id            String              @id @default(cuid())
+  name          String              @unique
+  slug          String              @unique
+  group         String
+  description   String?
+  createdAt     DateTime            @default(now())
+  updatedAt     DateTime            @updatedAt
+  sortOrder     Int                 @default(0)
+  aiDrafts      AiQuestionDraft[]
+  articles      Article[]
+  questions     InterviewQuestion[]
+  subcategories Subcategory[]
+
+  @@index([group, sortOrder])
+}
+
+model Subcategory {
+  id         String              @id @default(cuid())
+  name       String
+  slug       String
+  categoryId String
+  questions  InterviewQuestion[]
+  category   Category            @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, slug])
+  @@index([categoryId])
+}
+
+model InterviewQuestion {
+  id                  String                       @id @default(cuid())
+  question            String
+  slug                String                       @unique
+  categoryId          String
+  subcategoryId       String?
+  experienceLevel     ExperienceLevel
+  difficulty          Difficulty
+  interviewType       InterviewType
+  shortDescription    String
+  explanation         String
+  sampleAnswer        String
+  keyPoints           Json
+  commonMistakes      Json
+  followUpQuestions   Json
+  tags                Json
+  isPublished         Boolean                      @default(false)
+  seoTitle            String?
+  seoDescription      String?
+  createdAt           DateTime                     @default(now())
+  updatedAt           DateTime                     @updatedAt
+  detailedAnswer      String?
+  answers             InterviewAnswer[]
+  category            Category                     @relation(fields: [categoryId], references: [id])
+  subcategory         Subcategory?                 @relation(fields: [subcategoryId], references: [id])
+  practiceResponses   PracticeResponse[]
+  savedBy             SavedQuestion[]
+  studyTopicRelations StudyTopicQuestionRelation[]
+
+  @@index([categoryId, isPublished])
+  @@index([subcategoryId])
+  @@index([experienceLevel, difficulty, interviewType])
+  @@index([isPublished, createdAt])
+  @@index([difficulty, experienceLevel, interviewType, isPublished])
+}
+
+model AiQuestionDraft {
+  id                String          @id @default(cuid())
+  question          String
+  slug              String
+  categoryId        String
+  subcategoryId     String?
+  experienceLevel   ExperienceLevel
+  difficulty        Difficulty
+  interviewType     InterviewType
+  shortDescription  String
+  explanation       String
+  sampleAnswer      String
+  keyPoints         Json
+  commonMistakes    Json
+  followUpQuestions Json
+  tags              Json
+  seoTitle          String?
+  seoDescription    String?
+  isApproved        Boolean         @default(false)
+  isPublished       Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+  detailedAnswer    String?
+  category          Category        @relation(fields: [categoryId], references: [id])
+
+  @@index([isPublished, isApproved, createdAt])
+  @@index([categoryId])
+}
+
+model InterviewAnswer {
+  id         String            @id @default(cuid())
+  answer     String
+  questionId String
+  userId     String
+  createdAt  DateTime          @default(now())
+  updatedAt  DateTime          @updatedAt
+  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId, createdAt])
+}
+
+model PracticeSession {
+  id          String             @id @default(cuid())
+  userId      String
+  status      SessionStatus      @default(IN_PROGRESS)
+  score       Int?
+  startedAt   DateTime           @default(now())
+  completedAt DateTime?
+  responses   PracticeResponse[]
+  user        User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, startedAt])
+}
+
+model PracticeResponse {
+  id         String            @id @default(cuid())
+  sessionId  String
+  questionId String
+  answer     String?
+  score      Int?
+  skipped    Boolean           @default(false)
+  createdAt  DateTime          @default(now())
+  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  session    PracticeSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, questionId])
+  @@index([questionId])
+}
+
+model SavedQuestion {
+  id         String            @id @default(cuid())
+  userId     String
+  questionId String
+  createdAt  DateTime          @default(now())
+  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, questionId])
+  @@index([userId, createdAt])
+}
+
+model Article {
+  id             String    @id @default(cuid())
+  title          String
+  slug           String    @unique
+  excerpt        String
+  content        String
+  categoryId     String?
+  author         String?
+  featuredImage  String?
+  seoTitle       String?
+  seoDescription String?
+  isPublished    Boolean   @default(false)
+  publishedAt    DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  category       Category? @relation(fields: [categoryId], references: [id])
+
+  @@index([isPublished, publishedAt])
+  @@index([categoryId])
+}
+
+model FAQ {
+  id          String   @id @default(cuid())
+  question    String
+  answer      String
+  sortOrder   Int      @default(0)
+  isPublished Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isPublished, sortOrder])
+}
+
+model ContactMessage {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  subject   String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([isRead, createdAt])
+}
+
+model Resume {
+  id             String                @id @default(cuid())
+  userId         String
+  title          String
+  template       String                @default("classic")
+  isDefault      Boolean               @default(false)
+  sectionOrder   Json                  @default("[\"summary\", \"experience\", \"education\", \"skills\", \"projects\", \"certifications\", \"achievements\", \"languages\"]")
+  lastEditedAt   DateTime              @default(now())
+  createdAt      DateTime              @default(now())
+  updatedAt      DateTime              @updatedAt
+  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievements   ResumeAchievement[]
+  certifications ResumeCertification[]
+  customSections ResumeCustomSection[]
+  education      ResumeEducation[]
+  experience     ResumeExperience[]
+  languages      ResumeLanguage[]
+  personalInfo   ResumePersonalInfo?
+  projects       ResumeProject[]
+  skills         ResumeSkill[]
+
+  @@index([userId, updatedAt])
+  @@index([userId, isDefault])
+}
+
+model ResumePersonalInfo {
+  id                String   @id @default(cuid())
+  resumeId          String   @unique
+  fullName          String?
+  professionalTitle String?
+  email             String?
+  phone             String?
+  location          String?
+  website           String?
+  linkedin          String?
+  github            String?
+  portfolio         String?
+  summary           String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  resume            Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+}
+
+model ResumeEducation {
+  id           String    @id @default(cuid())
+  resumeId     String
+  institution  String
+  degree       String?
+  fieldOfStudy String?
+  location     String?
+  startDate    DateTime?
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
+  description  String?
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeExperience {
+  id           String    @id @default(cuid())
+  resumeId     String
+  company      String
+  jobTitle     String
+  location     String?
+  startDate    DateTime?
+  endDate      DateTime?
+  isCurrent    Boolean   @default(false)
+  description  String?
+  achievements Json?
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeProject {
+  id           String    @id @default(cuid())
+  resumeId     String
+  name         String
+  description  String?
+  technologies Json?
+  projectUrl   String?
+  githubUrl    String?
+  startDate    DateTime?
+  endDate      DateTime?
+  achievements Json?
+  sortOrder    Int       @default(0)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeSkill {
+  id        String      @id @default(cuid())
+  resumeId  String
+  name      String
+  category  String?
+  level     SkillLevel?
+  sortOrder Int         @default(0)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  resume    Resume      @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeCertification {
+  id             String    @id @default(cuid())
+  resumeId       String
+  name           String
+  organization   String?
+  issueDate      DateTime?
+  expirationDate DateTime?
+  credentialId   String?
+  credentialUrl  String?
+  sortOrder      Int       @default(0)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  resume         Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeAchievement {
+  id          String    @id @default(cuid())
+  resumeId    String
+  title       String
+  description String?
+  date        DateTime?
+  sortOrder   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  resume      Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeLanguage {
+  id          String              @id @default(cuid())
+  resumeId    String
+  name        String
+  proficiency LanguageProficiency @default(CONVERSATIONAL)
+  sortOrder   Int                 @default(0)
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  resume      Resume              @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model ResumeCustomSection {
+  id        String   @id @default(cuid())
+  resumeId  String
+  title     String
+  content   String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
+
+  @@index([resumeId, sortOrder])
+}
+
+model StudyCategory {
+  id          String       @id @default(cuid())
+  name        String       @unique
+  slug        String       @unique
+  description String?
+  icon        String?
+  isPublished Boolean      @default(false)
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  paths       StudyPath[]
+  topics      StudyTopic[]
+
+  @@index([isPublished, sortOrder])
+}
+
+model StudyPath {
+  id          String        @id @default(cuid())
+  categoryId  String
+  name        String
+  slug        String
+  description String?
+  level       StudyLevel
+  sortOrder   Int           @default(0)
+  isPublished Boolean       @default(false)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  modules     StudyModule[]
+  category    StudyCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@unique([categoryId, slug])
+  @@unique([categoryId, level])
+  @@index([categoryId, isPublished, sortOrder])
+}
+
+model StudyModule {
+  id          String       @id @default(cuid())
+  studyPathId String
+  title       String
+  slug        String
+  description String?
+  sortOrder   Int          @default(0)
+  isPublished Boolean      @default(false)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  studyPath   StudyPath    @relation(fields: [studyPathId], references: [id], onDelete: Cascade)
+  topics      StudyTopic[]
+
+  @@unique([studyPathId, slug])
+  @@index([studyPathId, isPublished, sortOrder])
+}
+
+model StudyTopic {
+  id                String                       @id @default(cuid())
+  moduleId          String
+  categoryId        String
+  title             String
+  slug              String
+  shortDescription  String?
+  estimatedMinutes  Int?
+  sortOrder         Int                          @default(0)
+  isPublished       Boolean                      @default(false)
+  seoTitle          String?
+  seoDescription    String?
+  createdAt         DateTime                     @default(now())
+  updatedAt         DateTime                     @updatedAt
+  prerequisiteIds   Json                         @default("[]")
+  relatedTopicIds   Json                         @default("[]")
+  savedBy           SavedStudyTopic[]
+  examples          StudyExample[]
+  exercises         StudyExercise[]
+  progress          StudyProgress[]
+  category          StudyCategory                @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  module            StudyModule                  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questionRelations StudyTopicQuestionRelation[]
+  sections          StudyTopicSection[]
+
+  @@unique([categoryId, slug])
+  @@index([moduleId, isPublished, sortOrder])
+}
+
+model StudyTopicSection {
+  id        String     @id @default(cuid())
+  topicId   String
+  title     String
+  content   String
+  sortOrder Int        @default(0)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  topic     StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([topicId, sortOrder])
+}
+
+model StudyExample {
+  id          String     @id @default(cuid())
+  topicId     String
+  language    String
+  code        String
+  explanation String?
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  topic       StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([topicId, sortOrder])
+}
+
+model StudyExercise {
+  id          String     @id @default(cuid())
+  topicId     String
+  question    String
+  difficulty  Difficulty @default(EASY)
+  hint        String?
+  solution    String?
+  explanation String?
+  sortOrder   Int        @default(0)
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  topic       StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@index([topicId, sortOrder])
+}
+
+model StudyTopicQuestionRelation {
+  id         String            @id @default(cuid())
+  topicId    String
+  questionId String
+  sortOrder  Int               @default(0)
+  createdAt  DateTime          @default(now())
+  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  topic      StudyTopic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([topicId, questionId])
+  @@index([topicId, sortOrder])
+  @@index([questionId])
+}
+
+model StudyProgress {
+  id          String              @id @default(cuid())
+  userId      String
+  topicId     String
+  status      StudyProgressStatus @default(STARTED)
+  startedAt   DateTime            @default(now())
+  completedAt DateTime?
+  updatedAt   DateTime            @updatedAt
+  topic       StudyTopic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId, status])
+  @@index([topicId])
+}
+
+model SavedStudyTopic {
+  id        String     @id @default(cuid())
+  userId    String
+  topicId   String
+  createdAt DateTime   @default(now())
+  topic     StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, topicId])
+  @@index([userId, createdAt])
+}
+
+model DailyChallenge {
+  id            String    @id @default(cuid())
+  userId        String
+  challengeDate DateTime
+  questionIds   Json
+  completedAt   DateTime?
+  score         Int?
+  createdAt     DateTime  @default(now())
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, challengeDate])
+  @@index([userId, challengeDate])
+}
+
 enum ExperienceLevel {
   FRESHER
   INTERNSHIP
@@ -39,246 +646,6 @@ enum UserRole {
   ADMIN
 }
 
-model User {
-  id                    String            @id @default(cuid())
-  email                 String            @unique
-  name                  String?
-  passwordHash          String?
-  role                  UserRole          @default(USER)
-  image                 String?
-  isDisabled            Boolean           @default(false)
-  targetRole            String?
-  experienceLevel       ExperienceLevel?
-  dailyGoalMinutes      Int?
-  preferredTechnologies String[]          @default([])
-  onboardingCompleted   Boolean           @default(false)
-  createdAt             DateTime          @default(now())
-  updatedAt             DateTime          @updatedAt
-  answers          InterviewAnswer[]
-  practiceSessions PracticeSession[]
-  savedQuestions   SavedQuestion[]
-  accounts         Account[]
-  sessions         Session[]
-  resumes          Resume[]
-  studyProgress    StudyProgress[]
-  savedStudyTopics SavedStudyTopic[]
-  dailyChallenges  DailyChallenge[]
-}
-
-model Account {
-  id                String  @id @default(cuid())
-  userId            String
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String? @db.Text
-  access_token      String? @db.Text
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String? @db.Text
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([provider, providerAccountId])
-  @@index([userId])
-}
-
-model Session {
-  id           String   @id @default(cuid())
-  sessionToken String   @unique
-  userId       String
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId])
-}
-
-model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
-  @@unique([identifier, token])
-}
-
-model Category {
-  id          String             @id @default(cuid())
-  name        String             @unique
-  slug        String             @unique
-  group       String
-  description String?
-  createdAt   DateTime           @default(now())
-  updatedAt   DateTime           @updatedAt
-  sortOrder   Int                @default(0)
-  subcategories Subcategory[]
-  questions   InterviewQuestion[]
-  articles    Article[]
-  aiDrafts    AiQuestionDraft[]
-  @@index([group, sortOrder])
-}
-
-model Subcategory {
-  id        String             @id @default(cuid())
-  name      String
-  slug      String
-  categoryId String
-  category  Category           @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  questions InterviewQuestion[]
-  @@unique([categoryId, slug])
-  @@index([categoryId])
-}
-
-model InterviewQuestion {
-  id               String          @id @default(cuid())
-  question         String
-  slug             String          @unique
-  categoryId       String
-  subcategoryId    String?
-  experienceLevel  ExperienceLevel
-  difficulty       Difficulty
-  interviewType    InterviewType
-  shortDescription String
-  explanation      String
-  sampleAnswer     String
-  keyPoints        Json
-  commonMistakes   Json
-  followUpQuestions Json
-  tags             Json
-  isPublished      Boolean         @default(false)
-  seoTitle         String?
-  seoDescription   String?
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
-  category         Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  subcategory      Subcategory?    @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
-  answers          InterviewAnswer[]
-  practiceResponses PracticeResponse[]
-  savedBy          SavedQuestion[]
-  studyTopicRelations StudyTopicQuestionRelation[]
-  @@index([categoryId, isPublished])
-  @@index([subcategoryId])
-  @@index([experienceLevel, difficulty, interviewType])
-  @@index([isPublished, createdAt])
-  @@index([difficulty, experienceLevel, interviewType, isPublished])
-}
-
-model AiQuestionDraft {
-  id                String          @id @default(cuid())
-  question          String
-  slug              String
-  categoryId        String
-  subcategoryId     String?
-  experienceLevel   ExperienceLevel
-  difficulty        Difficulty
-  interviewType     InterviewType
-  shortDescription  String
-  explanation       String
-  sampleAnswer      String
-  keyPoints         Json
-  commonMistakes    Json
-  followUpQuestions Json
-  tags              Json
-  seoTitle          String?
-  seoDescription    String?
-  isApproved        Boolean         @default(false)
-  isPublished       Boolean         @default(false)
-  createdAt         DateTime        @default(now())
-  updatedAt         DateTime        @updatedAt
-  category          Category        @relation(fields: [categoryId], references: [id], onDelete: Restrict)
-  @@index([isPublished, isApproved, createdAt])
-  @@index([categoryId])
-}
-
-model InterviewAnswer {
-  id         String             @id @default(cuid())
-  answer     String
-  questionId String
-  userId     String
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  question   InterviewQuestion  @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  user       User               @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@index([userId, createdAt])
-  @@unique([userId, questionId])
-}
-
-model PracticeSession {
-  id                String           @id @default(cuid())
-  userId            String
-  status            SessionStatus    @default(IN_PROGRESS)
-  score             Int?
-  startedAt         DateTime         @default(now())
-  completedAt       DateTime?
-  user              User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  responses         PracticeResponse[]
-  @@index([userId, startedAt])
-}
-
-model PracticeResponse {
-  id         String            @id @default(cuid())
-  sessionId  String
-  questionId String
-  answer     String?
-  score      Int?
-  skipped    Boolean           @default(false)
-  createdAt  DateTime          @default(now())
-  session    PracticeSession   @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  @@unique([sessionId, questionId])
-  @@index([questionId])
-}
-
-model SavedQuestion {
-  id         String            @id @default(cuid())
-  userId     String
-  questionId String
-  createdAt  DateTime          @default(now())
-  user       User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  @@unique([userId, questionId])
-  @@index([userId, createdAt])
-}
-
-model Article {
-  id          String    @id @default(cuid())
-  title       String
-  slug        String    @unique
-  excerpt     String
-  content     String
-  categoryId  String?
-  author      String?
-  featuredImage String?
-  seoTitle    String?
-  seoDescription String?
-  isPublished Boolean   @default(false)
-  publishedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
-  @@index([isPublished, publishedAt])
-  @@index([categoryId])
-}
-
-model FAQ {
-  id         String   @id @default(cuid())
-  question   String
-  answer     String
-  sortOrder  Int      @default(0)
-  isPublished Boolean @default(true)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime @updatedAt
-  @@index([isPublished, sortOrder])
-}
-
-model ContactMessage {
-  id        String   @id @default(cuid())
-  name      String
-  email     String
-  subject   String
-  message   String
-  isRead    Boolean  @default(false)
-  createdAt DateTime @default(now())
-  @@index([isRead, createdAt])
-}
-
 enum SkillLevel {
   BEGINNER
   INTERMEDIATE
@@ -293,168 +660,6 @@ enum LanguageProficiency {
   NATIVE
 }
 
-model Resume {
-  id             String                @id @default(cuid())
-  userId         String
-  title          String
-  template       String                @default("classic")
-  isDefault      Boolean               @default(false)
-  sectionOrder   Json                  @default("[\"summary\",\"experience\",\"education\",\"skills\",\"projects\",\"certifications\",\"achievements\",\"languages\"]")
-  lastEditedAt   DateTime              @default(now())
-  createdAt      DateTime              @default(now())
-  updatedAt      DateTime              @updatedAt
-  user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  personalInfo   ResumePersonalInfo?
-  education      ResumeEducation[]
-  experience     ResumeExperience[]
-  projects       ResumeProject[]
-  skills         ResumeSkill[]
-  certifications ResumeCertification[]
-  achievements   ResumeAchievement[]
-  languages      ResumeLanguage[]
-  customSections ResumeCustomSection[]
-  @@index([userId, updatedAt])
-  @@index([userId, isDefault])
-}
-
-model ResumePersonalInfo {
-  id                 String   @id @default(cuid())
-  resumeId           String   @unique
-  fullName           String?
-  professionalTitle  String?
-  email              String?
-  phone              String?
-  location           String?
-  website            String?
-  linkedin           String?
-  github             String?
-  portfolio          String?
-  summary            String?
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  resume             Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-}
-
-model ResumeEducation {
-  id            String    @id @default(cuid())
-  resumeId      String
-  institution   String
-  degree        String?
-  fieldOfStudy  String?
-  location      String?
-  startDate     DateTime?
-  endDate       DateTime?
-  isCurrent     Boolean   @default(false)
-  description   String?
-  sortOrder     Int       @default(0)
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
-  resume        Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeExperience {
-  id           String    @id @default(cuid())
-  resumeId     String
-  company      String
-  jobTitle     String
-  location     String?
-  startDate    DateTime?
-  endDate      DateTime?
-  isCurrent    Boolean   @default(false)
-  description  String?
-  achievements Json?
-  sortOrder    Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeProject {
-  id           String    @id @default(cuid())
-  resumeId     String
-  name         String
-  description  String?
-  technologies Json?
-  projectUrl   String?
-  githubUrl    String?
-  startDate    DateTime?
-  endDate      DateTime?
-  achievements Json?
-  sortOrder    Int       @default(0)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  resume       Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeSkill {
-  id        String      @id @default(cuid())
-  resumeId  String
-  name      String
-  category  String?
-  level     SkillLevel?
-  sortOrder Int         @default(0)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  resume    Resume      @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeCertification {
-  id             String    @id @default(cuid())
-  resumeId       String
-  name           String
-  organization   String?
-  issueDate      DateTime?
-  expirationDate DateTime?
-  credentialId   String?
-  credentialUrl  String?
-  sortOrder      Int       @default(0)
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  resume         Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeAchievement {
-  id          String    @id @default(cuid())
-  resumeId    String
-  title       String
-  description String?
-  date        DateTime?
-  sortOrder   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  resume      Resume    @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeLanguage {
-  id           String              @id @default(cuid())
-  resumeId     String
-  name         String
-  proficiency  LanguageProficiency @default(CONVERSATIONAL)
-  sortOrder    Int                 @default(0)
-  createdAt    DateTime            @default(now())
-  updatedAt    DateTime            @updatedAt
-  resume       Resume              @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
-model ResumeCustomSection {
-  id        String   @id @default(cuid())
-  resumeId  String
-  title     String
-  content   String?
-  sortOrder Int      @default(0)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  resume    Resume   @relation(fields: [resumeId], references: [id], onDelete: Cascade)
-  @@index([resumeId, sortOrder])
-}
-
 enum StudyLevel {
   BEGINNER
   INTERMEDIATE
@@ -465,183 +670,4 @@ enum StudyLevel {
 enum StudyProgressStatus {
   STARTED
   COMPLETED
-}
-
-model StudyCategory {
-  id          String      @id @default(cuid())
-  name        String      @unique
-  slug        String      @unique
-  description String?
-  icon        String?
-  isPublished Boolean     @default(false)
-  sortOrder   Int         @default(0)
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  paths       StudyPath[]
-  topics      StudyTopic[]
-  @@index([isPublished, sortOrder])
-}
-
-model StudyPath {
-  id          String        @id @default(cuid())
-  categoryId  String
-  name        String
-  slug        String
-  description String?
-  level       StudyLevel
-  sortOrder   Int           @default(0)
-  isPublished Boolean       @default(false)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  category    StudyCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  modules     StudyModule[]
-  @@unique([categoryId, slug])
-  @@unique([categoryId, level])
-  @@index([categoryId, isPublished, sortOrder])
-}
-
-model StudyModule {
-  id          String       @id @default(cuid())
-  studyPathId String
-  title       String
-  slug        String
-  description String?
-  sortOrder   Int          @default(0)
-  isPublished Boolean      @default(false)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  studyPath   StudyPath    @relation(fields: [studyPathId], references: [id], onDelete: Cascade)
-  topics      StudyTopic[]
-  @@unique([studyPathId, slug])
-  @@index([studyPathId, isPublished, sortOrder])
-}
-
-model StudyTopic {
-  id                String                       @id @default(cuid())
-  moduleId          String
-  categoryId        String
-  title             String
-  slug              String
-  shortDescription  String?
-  estimatedMinutes  Int?
-  sortOrder         Int                          @default(0)
-  isPublished       Boolean                      @default(false)
-  seoTitle          String?
-  seoDescription    String?
-  createdAt         DateTime                     @default(now())
-  updatedAt         DateTime                     @updatedAt
-  module            StudyModule                  @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  category          StudyCategory                @relation(fields: [categoryId], references: [id], onDelete: Cascade)
-  sections          StudyTopicSection[]
-  examples          StudyExample[]
-  exercises         StudyExercise[]
-  questionRelations StudyTopicQuestionRelation[]
-  progress          StudyProgress[]
-  savedBy           SavedStudyTopic[]
-  @@unique([categoryId, slug])
-  @@index([moduleId, isPublished, sortOrder])
-}
-
-model StudyTopicSection {
-  id        String     @id @default(cuid())
-  topicId   String
-  title     String
-  content   String
-  sortOrder Int        @default(0)
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  topic     StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  @@index([topicId, sortOrder])
-}
-
-model StudyExample {
-  id          String     @id @default(cuid())
-  topicId     String
-  language    String
-  code        String
-  explanation String?
-  sortOrder   Int        @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  topic       StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  @@index([topicId, sortOrder])
-}
-
-model StudyExercise {
-  id          String     @id @default(cuid())
-  topicId     String
-  question    String
-  difficulty  Difficulty @default(EASY)
-  hint        String?
-  solution    String?
-  explanation String?
-  sortOrder   Int        @default(0)
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  topic       StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  @@index([topicId, sortOrder])
-}
-
-model StudyTopicQuestionRelation {
-  id         String            @id @default(cuid())
-  topicId    String
-  questionId String
-  sortOrder  Int               @default(0)
-  createdAt  DateTime          @default(now())
-  topic      StudyTopic        @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  question   InterviewQuestion @relation(fields: [questionId], references: [id], onDelete: Cascade)
-  @@unique([topicId, questionId])
-  @@index([topicId, sortOrder])
-  @@index([questionId])
-}
-
-model StudyProgress {
-  id          String              @id @default(cuid())
-  userId      String
-  topicId     String
-  status      StudyProgressStatus @default(STARTED)
-  startedAt   DateTime            @default(now())
-  completedAt DateTime?
-  updatedAt   DateTime            @updatedAt
-  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  topic       StudyTopic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  @@unique([userId, topicId])
-  @@index([userId, status])
-  @@index([topicId])
-}
-
-// ---------------------------------------------------------------------------
-// Phase B: bookmarks extension (study topics) and daily challenge.
-// Deliberately NOT a generic polymorphic "Bookmark" table — SavedQuestion
-// already exists and works; this only adds the one new content type the
-// product spec asks to be bookmarkable (study topics). There is no
-// "coding problem" content type anywhere in this schema, so no bookmark
-// tab or model was invented for one.
-// ---------------------------------------------------------------------------
-
-model SavedStudyTopic {
-  id        String     @id @default(cuid())
-  userId    String
-  topicId   String
-  createdAt DateTime   @default(now())
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  topic     StudyTopic @relation(fields: [topicId], references: [id], onDelete: Cascade)
-  @@unique([userId, topicId])
-  @@index([userId, createdAt])
-}
-
-// One row per user per calendar day (UTC — see lib/date.ts for the app's
-// single, consistent day-boundary rule). questionIds is fixed at creation
-// time so refreshing the page never reshuffles the day's questions.
-model DailyChallenge {
-  id            String    @id @default(cuid())
-  userId        String
-  challengeDate DateTime
-  questionIds   Json
-  completedAt   DateTime?
-  score         Int?
-  createdAt     DateTime  @default(now())
-  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  @@unique([userId, challengeDate])
-  @@index([userId, challengeDate])
 }
