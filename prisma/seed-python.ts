@@ -7,14 +7,14 @@ type TopicSeed = {
   slug: string;
   shortDescription: string;
   estimatedMinutes: number;
-  sections: Array<{ title: string; content: string }>;
+  sections?: Array<{ title: string; content: string }>;
 };
 
 type ModuleSeed = {
   title: string;
   slug: string;
   description: string;
-  topics: TopicSeed[];
+  topics?: TopicSeed[];
 };
 
 type PathSeed = {
@@ -25,14 +25,16 @@ type PathSeed = {
   modules: ModuleSeed[];
 };
 
-async function ensureCategory(category: {
+type CategorySeed = {
   name: string;
   slug: string;
   description: string;
   icon: string;
   sortOrder: number;
   paths: PathSeed[];
-}) {
+};
+
+async function ensureCategory(category: CategorySeed) {
   const createdCategory = await prisma.studyCategory.upsert({
     where: { slug: category.slug },
     update: { name: category.name, description: category.description, icon: category.icon, isPublished: true, sortOrder: category.sortOrder },
@@ -75,7 +77,8 @@ async function ensureCategory(category: {
         },
       });
 
-      for (const topicSeed of moduleSeed.topics) {
+      const topics = moduleSeed.topics ?? [];
+      for (const topicSeed of topics) {
         const topic = await prisma.studyTopic.upsert({
           where: { categoryId_slug: { categoryId: createdCategory.id, slug: topicSeed.slug } },
           update: {
@@ -100,8 +103,9 @@ async function ensureCategory(category: {
           },
         });
 
-        for (let index = 0; index < topicSeed.sections.length; index += 1) {
-          const section = topicSeed.sections[index];
+        const sections = topicSeed.sections ?? [];
+        for (let index = 0; index < sections.length; index += 1) {
+          const section = sections[index];
           await prisma.studyTopicSection.upsert({
             where: { id: `${topic.id}-section-${index}` },
             update: { title: section.title, content: section.content, sortOrder: index },
@@ -120,7 +124,7 @@ async function ensureCategory(category: {
 }
 
 async function seedPythonCategory() {
-  const pythonCategory = {
+  const pythonCategory: CategorySeed = {
     name: "Python Fundamentals",
     slug: "python-fundamentals",
     description: "Understand Python syntax, collection types, functions, and common interview-ready patterns.",
@@ -135,64 +139,64 @@ async function seedPythonCategory() {
         level: StudyLevel.BEGINNER,
         modules: [
           {
-            title: "Python Basics",
+            title: "Python Basics – The Foundation",
             slug: "python-basics",
             description: "Core Python concepts and mental models.",
             topics: [
               {
-                title: "Variables and Functions",
+                title: "Variables and Functions – Dynamic and Expressive",
                 slug: "python-variables-functions",
                 shortDescription: "Define values and reusable logic in Python.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "Variables", content: "Python variables are dynamic references to values. The same variable can point to a different object later; the language keeps the data model simple and expressive.\n\nExample:\nx = 5\nx = \"now a string\"" },
-                  { title: "Functions", content: "Functions let you group reusable instructions. Python supports positional, keyword, default, and variable arguments, making functions highly expressive.\n\nExample:\ndef greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\"" },
-                  { title: "*args and **kwargs", content: "*args collects extra positional arguments into a tuple; **kwargs collects extra keyword arguments into a dict, enabling flexible function signatures.\n\nExample:\ndef total(*numbers, **options):\n    result = sum(numbers)\n    return -result if options.get('negate') else result" },
-                  { title: "Scope and closures", content: "Python uses LEGB scoping (Local, Enclosing, Global, Built-in). Nested functions can 'close over' variables from an enclosing scope, forming closures." },
-                  { title: "Lambda expressions", content: "Lambdas define small anonymous functions inline, often used with sorted(), map(), and filter().\n\nExample:\nsorted(people, key=lambda p: p['age'])" },
-                  { title: "Common gotchas", content: "Mutable default arguments (def f(items=[])) are created once and shared across calls, causing surprising bugs — use None and initialize inside the function instead." }
-                ]
+                  { title: "Variables – Dynamic References", content: "Python variables are dynamic references to objects. The same variable can point to a different type of object at different times. This flexibility makes Python easy to use but requires careful type awareness. Example: `x = 5; x = \"now a string\"` – `x` now references a string, not the integer." },
+                  { title: "Functions – Reusable Logic", content: "Functions are defined with `def`. They support positional, keyword, default, and variable arguments. Example:\n```python\ndef greet(name, greeting=\"Hello\"):\n    return f\"{greeting}, {name}!\"\n```\nFunctions can return any value, and `None` is the default return." },
+                  { title: "*args and **kwargs – Flexible Signatures", content: "`*args` collects extra positional arguments into a tuple. `**kwargs` collects extra keyword arguments into a dict. This allows functions to handle variable numbers of arguments.\n```python\ndef total(*numbers, **options):\n    result = sum(numbers)\n    return -result if options.get('negate') else result\n```" },
+                  { title: "Scope – LEGB Rule", content: "Python resolves names in this order: **L**ocal (inside function), **E**nclosing (outer functions), **G**lobal (module), **B**uilt‑in. Nested functions can access enclosing scope variables (closures)." },
+                  { title: "Lambda Expressions – Anonymous Functions", content: "Lambdas are one‑line anonymous functions. Used with `sorted`, `map`, `filter`.\n```python\nsorted(people, key=lambda p: p['age'])\n```" },
+                  { title: "Common Gotchas – Mutable Defaults", content: "Default arguments are evaluated once at definition, not per call. So `def f(items=[]):` will share the same list across calls. Use `None` and initialise inside:\n```python\ndef f(items=None):\n    items = items or []\n```" },
+                ],
               },
               {
-                title: "Collections and Iteration",
+                title: "Collections and Iteration – Working with Data",
                 slug: "python-collections-iteration",
                 shortDescription: "Work with lists, tuples, dicts, and sets.",
-                estimatedMinutes: 22,
+                estimatedMinutes: 26,
                 sections: [
-                  { title: "Lists vs tuples", content: "Lists are mutable sequences for ordered data. Tuples are immutable, suitable as dictionary keys and for protection against modification.\n\nExample:\npoint = (3, 4)  # tuple\nnums = [1, 2, 3]  # list, mutable" },
-                  { title: "Dictionaries and sets", content: "Dictionaries map keys to values. Sets store unique elements. Both are built on hash tables for fast average O(1) lookups.\n\nExample:\nages = {\"alice\": 30, \"bob\": 25}\nunique_ids = {1, 2, 2, 3}  # {1, 2, 3}" },
-                  { title: "Iterating collections", content: "for loops iterate directly over items; enumerate() adds an index; zip() pairs elements from multiple iterables together.\n\nExample:\nfor i, name in enumerate([\"a\", \"b\"]):\n    print(i, name)" },
-                  { title: "Slicing", content: "Slicing (sequence[start:stop:step]) extracts sub-sequences from lists, tuples, and strings without mutating the original.\n\nExample:\nnums[1:4]     # elements at index 1,2,3\nnums[::-1]    # reversed copy" },
-                  { title: "Dictionary methods", content: ".get() avoids KeyError by returning a default, .items()/.keys()/.values() give iterable views, and dict comprehensions build dictionaries concisely." },
-                  { title: "Choosing the right collection", content: "Use a list for ordered, mutable sequences; a tuple for fixed, hashable groupings; a set for uniqueness and fast membership tests; a dict for key-based lookups." }
-                ]
+                  { title: "Lists vs Tuples – Mutable vs Immutable", content: "Lists are mutable (`[1, 2, 3]`). Tuples are immutable (`(1, 2, 3)`). Use tuples for fixed, hashable groupings (e.g., dictionary keys)." },
+                  { title: "Dictionaries and Sets – Hash‑Based", content: "Dictionaries map keys to values (`{\"alice\": 30}`). Sets store unique elements (`{1, 2, 3}`). Both are O(1) average for lookups. Keys must be hashable (immutable)." },
+                  { title: "Iterating Collections", content: "`for` loops iterate directly. `enumerate()` adds an index. `zip()` pairs elements from multiple iterables.\n```python\nfor i, name in enumerate([\"a\", \"b\"]):\n    print(i, name)\n```" },
+                  { title: "Slicing – Sub‑Sequences", content: "`sequence[start:stop:step]` extracts sub‑sequences. `nums[::-1]` reverses. Works on lists, tuples, strings." },
+                  { title: "Dictionary Methods", content: "`.get(key, default)` avoids `KeyError`. `.items()`, `.keys()`, `.values()` return iterable views. Dict comprehensions: `{x: x*x for x in range(5)}`." },
+                  { title: "Choosing the Right Collection", content: "List: ordered, mutable. Tuple: fixed, hashable. Set: uniqueness, fast membership. Dict: key‑value lookups." },
+                ],
               },
               {
-                title: "List Comprehensions",
+                title: "List Comprehensions – Concise Transformations",
                 slug: "python-list-comprehensions",
                 shortDescription: "Create and filter collections with concise syntax.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 18,
                 sections: [
-                  { title: "Basic comprehensions", content: "Comprehensions apply an expression to each element. They are faster and more readable than an equivalent for-loop with append.\n\nExample:\nsquares = [x * x for x in range(10)]" },
-                  { title: "Nested and filtered", content: "Comprehensions can include conditions and nested loops, handling complex transformations in one line.\n\nExample:\nevens = [x for x in range(20) if x % 2 == 0]\npairs = [(x, y) for x in range(3) for y in range(3)]" },
-                  { title: "Dict and set comprehensions", content: "The same syntax extends to dictionaries and sets using {} instead of [].\n\nExample:\nsquare_map = {x: x*x for x in range(5)}\nunique_lengths = {len(w) for w in words}" },
-                  { title: "Generator expressions", content: "Wrapping a comprehension in () instead of [] creates a generator expression, which produces values lazily instead of building the whole list in memory at once." },
-                  { title: "Readability limits", content: "Comprehensions are best for simple transformations. Once logic requires multiple conditions or side effects, a regular loop is usually clearer." }
-                ]
+                  { title: "Basic Comprehensions", content: "`[expr for item in iterable]` – faster and more readable than loops. Example: `[x*x for x in range(10)]`." },
+                  { title: "Nested and Filtered", content: "`[expr for item in iterable if condition]`. Nested loops: `[(x, y) for x in range(3) for y in range(3)]`." },
+                  { title: "Dict and Set Comprehensions", content: "`{x: x*x for x in range(5)}` and `{len(w) for w in words}`." },
+                  { title: "Generator Expressions", content: "Use `()` instead of `[]` – lazy evaluation, memory‑efficient for large data." },
+                  { title: "Readability Limits", content: "Keep comprehensions simple. Use loops for complex logic." },
+                ],
               },
               {
-                title: "String Operations",
+                title: "String Operations – Text Manipulation",
                 slug: "python-string-operations",
                 shortDescription: "Manipulate and format text effectively.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "String methods", content: "Python strings have many built-in methods: split, join, replace, find, strip, and more.\n\nExample:\n\"a,b,c\".split(\",\")       # ['a', 'b', 'c']\n\", \".join([\"a\", \"b\"])   # 'a, b'" },
-                  { title: "Formatting", content: "f-strings, .format(), and % formatting each have their use. f-strings are modern and expressive.\n\nExample:\nname = \"Ada\"\nf\"Hello, {name}! {2 + 2=}\"" },
-                  { title: "Immutability", content: "Strings are immutable — every method that appears to modify a string actually returns a new one, leaving the original unchanged." },
-                  { title: "String vs bytes", content: "str represents Unicode text; bytes represents raw binary data. Encode a str to bytes and decode bytes back to str when working with files or networks." },
-                  { title: "Common interview patterns", content: "Reversing a string (s[::-1]), checking palindromes, and counting character frequency with collections.Counter are frequent building blocks in coding interview questions." }
-                ]
-              }
+                  { title: "String Methods", content: "`split()`, `join()`, `replace()`, `find()`, `strip()`, `lower()`, `upper()`. Example: `\", \".join([\"a\", \"b\"])` → `'a, b'`." },
+                  { title: "F‑strings – Modern Formatting", content: "`f\"Hello, {name}! {2 + 2=}\"` – evaluated at runtime. Also `.format()` and `%`." },
+                  { title: "Immutability", content: "Strings are immutable; every method returns a new string." },
+                  { title: "String vs Bytes", content: "`str` is Unicode; `bytes` is raw binary. Use `.encode()` and `.decode()`." },
+                  { title: "Common Interview Patterns", content: "Reversing: `s[::-1]`. Palindromes: `s == s[::-1]`. Character frequency: `collections.Counter(s)`." },
+                ],
+              },
             ],
           },
           {
@@ -201,46 +205,46 @@ async function seedPythonCategory() {
             description: "Essential features: decorators, generators, and basic classes.",
             topics: [
               {
-                title: "Decorators",
+                title: "Decorators – Wrapping Functions",
                 slug: "python-decorators",
                 shortDescription: "Modify function behavior without changing the function.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "How decorators work", content: "A decorator is a function that takes a function as input and returns a modified version. They enable elegant cross-cutting concerns.\n\nExample:\ndef shout(fn):\n    def wrapper(*args, **kwargs):\n        return fn(*args, **kwargs).upper()\n    return wrapper\n\n@shout\ndef greet():\n    return \"hello\"" },
-                  { title: "functools.wraps", content: "Wrapping a function loses its original name and docstring unless you apply functools.wraps to the wrapper, which preserves that metadata for debugging and introspection." },
-                  { title: "Decorators with arguments", content: "A decorator factory is a function that returns a decorator, allowing you to parameterize behavior.\n\nExample:\ndef repeat(times):\n    def decorator(fn):\n        def wrapper(*a, **k):\n            for _ in range(times):\n                fn(*a, **k)\n        return wrapper\n    return decorator" },
-                  { title: "Common patterns", content: "Caching (functools.lru_cache), timing, logging, retries, and authentication checks are typical use cases for decorators." },
-                  { title: "Class-based decorators", content: "A class implementing __call__ can also act as a decorator, useful when the decorator needs to maintain state across calls." }
-                ]
+                  { title: "How Decorators Work", content: "A decorator is a function that takes a function and returns a wrapped version. `@shout` is syntactic sugar for `greet = shout(greet)`." },
+                  { title: "`functools.wraps` – Preserving Metadata", content: "Without `wraps`, the wrapper loses the original function's name and docstring. Use `@wraps` to preserve them." },
+                  { title: "Decorators with Arguments", content: "A decorator factory returns a decorator: `@repeat(3)`." },
+                  { title: "Common Patterns", content: "Caching (`@lru_cache`), timing, logging, retries, authentication." },
+                  { title: "Class‑based Decorators", content: "A class with `__call__` can act as a decorator, useful for stateful decorators." },
+                ],
               },
               {
-                title: "Generators and Iterators",
+                title: "Generators and Iterators – Lazy Evaluation",
                 slug: "python-generators-iterators",
                 shortDescription: "Produce values lazily for memory-efficient iteration.",
-                estimatedMinutes: 18,
-                sections: [
-                  { title: "The yield keyword", content: "A function containing yield becomes a generator function; calling it returns a generator object that produces values one at a time, pausing state between calls.\n\nExample:\ndef countdown(n):\n    while n > 0:\n        yield n\n        n -= 1" },
-                  { title: "Iterators protocol", content: "An iterable implements __iter__; an iterator implements __next__ and raises StopIteration when exhausted. Generators automatically satisfy this protocol." },
-                  { title: "Memory efficiency", content: "Generators produce values on demand instead of building an entire collection in memory, making them ideal for large or infinite sequences." },
-                  { title: "yield from", content: "yield from delegates iteration to a sub-generator or iterable, simplifying generator composition." },
-                  { title: "When to use generators", content: "Reach for generators when processing streams of data, large files, or pipelines where you don't need every value in memory simultaneously." }
-                ]
-              },
-              {
-                title: "Classes Basics",
-                slug: "python-classes-basics",
-                shortDescription: "Define and use classes, methods, and simple inheritance.",
                 estimatedMinutes: 20,
                 sections: [
-                  { title: "Class definition", content: "Use the class keyword, __init__ as constructor, self as instance reference.\n\nExample:\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        return f\"{self.name} says woof!\"" },
-                  { title: "Instance methods", content: "Methods that operate on an instance, receive self." },
-                  { title: "Class and static methods", content: "@classmethod and @staticmethod for class-level or utility functions." },
-                  { title: "Inheritance", content: "Subclass with class Child(Parent), use super() to call parent methods." },
-                  { title: "The __str__ and __repr__ methods", content: "Control string representation of objects." }
-                ]
-              }
-            ]
-          }
+                  { title: "The `yield` Keyword", content: "A function with `yield` becomes a generator. It yields values one at a time, pausing execution between calls." },
+                  { title: "Iterator Protocol", content: "Iterable objects implement `__iter__`; iterators implement `__next__`. Generators satisfy both." },
+                  { title: "Memory Efficiency", content: "Generators don't build full collections; they compute on the fly. Great for large files or infinite sequences." },
+                  { title: "`yield from` – Delegation", content: "Delegates iteration to another generator or iterable." },
+                  { title: "When to Use Generators", content: "Use for processing large data streams, pipelines, or when you don't need all values at once." },
+                ],
+              },
+              {
+                title: "Classes Basics – OOP in Python",
+                slug: "python-classes-basics",
+                shortDescription: "Define and use classes, methods, and simple inheritance.",
+                estimatedMinutes: 22,
+                sections: [
+                  { title: "Class Definition", content: "`class Dog:` – `__init__` is the constructor, `self` refers to the instance.\n```python\nclass Dog:\n    def __init__(self, name):\n        self.name = name\n    def bark(self):\n        return f\"{self.name} says woof!\"\n```" },
+                  { title: "Instance Methods", content: "Methods receive `self` (the instance) as the first argument." },
+                  { title: "Class and Static Methods", content: "`@classmethod` receives the class (`cls`). `@staticmethod` receives neither (like a normal function)." },
+                  { title: "Inheritance", content: "`class Child(Parent):` – use `super()` to call parent methods." },
+                  { title: "`__str__` and `__repr__`", content: "`__str__` for user‑friendly output; `__repr__` for debugging." },
+                ],
+              },
+            ],
+          },
         ],
       },
 
@@ -252,43 +256,43 @@ async function seedPythonCategory() {
         level: StudyLevel.INTERMEDIATE,
         modules: [
           {
-            title: "Object‑Oriented Python",
+            title: "Object‑Oriented Python – Advanced",
             slug: "python-oop",
-            description: "Advanced OOP: inheritance, polymorphism, magic methods.",
+            description: "Advanced OOP: inheritance, polymorphism, magic methods, and dataclasses.",
             topics: [
               {
                 title: "Inheritance and Polymorphism",
                 slug: "python-inheritance-polymorphism",
                 shortDescription: "Build class hierarchies and use polymorphism.",
-                estimatedMinutes: 22,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "Inheritance syntax", content: "class Child(Parent):" },
-                  { title: "Overriding methods", content: "Redefine parent methods." },
-                  { title: "super()", content: "Call parent methods." },
-                  { title: "Multiple inheritance", content: "Order resolution (MRO)." },
-                  { title: "Polymorphism", content: "Unified interface via abstract classes." },
+                  { title: "Inheritance Syntax", content: "`class Child(Parent):` – child inherits all methods and attributes." },
+                  { title: "Overriding Methods", content: "Redefine parent methods in the child." },
+                  { title: "`super()` – Call Parent Methods", content: "`super().__init__(...)` calls the parent constructor." },
+                  { title: "Multiple Inheritance", content: "Python supports multiple inheritance. Method Resolution Order (MRO) determines the lookup order. Use `ClassName.__mro__` to inspect." },
+                  { title: "Abstract Classes", content: "Use `ABC` and `@abstractmethod` from the `abc` module to define interfaces." },
                 ],
               },
               {
-                title: "Magic Methods (Dunder)",
+                title: "Magic Methods (Dunder) – Customizing Objects",
                 slug: "python-magic-methods",
                 shortDescription: "Control object behavior with __init__, __add__, __len__, etc.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Common magic methods", content: "__str__, __repr__, __len__, __getitem__." },
-                  { title: "Operator overloading", content: "__add__, __sub__, __eq__." },
-                  { title: "Context managers with __enter__ and __exit__", content: "Manage resources." },
+                  { title: "Common Magic Methods", content: "`__str__`, `__repr__`, `__len__`, `__getitem__`, `__setitem__`." },
+                  { title: "Operator Overloading", content: "`__add__`, `__sub__`, `__eq__` – define behavior for `+`, `-`, `==`." },
+                  { title: "Context Managers with `__enter__` and `__exit__`", content: "Enable `with` statements for resource management." },
                 ],
               },
               {
-                title: "Properties and Descriptors",
-                slug: "python-properties-descriptors",
-                shortDescription: "Use @property and descriptors for controlled attribute access.",
+                title: "Dataclasses – Less Boilerplate",
+                slug: "python-dataclasses",
+                shortDescription: "Simplify class definitions with `@dataclass`.",
                 estimatedMinutes: 18,
                 sections: [
-                  { title: "@property", content: "Getters/setters without explicit methods." },
-                  { title: "Property setters and deleters", content: "@name.setter, @name.deleter." },
-                  { title: "What is a descriptor", content: "Object with __get__, __set__, __delete__." },
+                  { title: "What are Dataclasses?", content: "`@dataclass` automatically generates `__init__`, `__repr__`, `__eq__`, and `__hash__`." },
+                  { title: "Usage", content: "```python\nfrom dataclasses import dataclass\n\n@dataclass\nclass User:\n    name: str\n    age: int\n```" },
+                  { title: "Frozen Dataclasses", content: "`@dataclass(frozen=True)` makes instances immutable." },
                 ],
               },
             ],
@@ -304,34 +308,31 @@ async function seedPythonCategory() {
                 shortDescription: "Import, create, and use modules.",
                 estimatedMinutes: 18,
                 sections: [
-                  { title: "Import statements", content: "import, from ... import, as." },
-                  { title: "Creating modules", content: "Just a .py file." },
-                  { title: "__name__ == '__main__'", content: "Guard for execution." },
-                  { title: "Packages", content: "__init__.py to indicate a directory is a package." },
+                  { title: "Import Statements", content: "`import module`, `from module import name`, `import module as alias`." },
+                  { title: "Creating Modules", content: "Any `.py` file is a module. `__name__ == '__main__'` guards execution when run directly." },
+                  { title: "Packages", content: "A directory with `__init__.py` is a package. `__all__` defines what is imported with `from package import *`." },
                 ],
               },
               {
                 title: "File Operations",
                 slug: "python-file-io",
                 shortDescription: "Read and write text and binary files.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Opening files", content: "open() modes: r, w, a, b, +." },
-                  { title: "Reading", content: "read, readline, readlines." },
-                  { title: "Writing", content: "write, writelines." },
-                  { title: "Context managers", content: "with open(...) as f: ..." },
-                  { title: "Binary files", content: "rb, wb modes." },
+                  { title: "Opening Files", content: "`open()` with modes: `'r'` (read), `'w'` (write), `'a'` (append), `'b'` (binary), `'+'` (update)." },
+                  { title: "Reading", content: "`read()`, `readline()`, `readlines()`. Use `with` for automatic closing." },
+                  { title: "Writing", content: "`write()`, `writelines()`." },
+                  { title: "Context Managers", content: "`with open(...) as f:` ensures the file is closed even if an error occurs." },
                 ],
               },
               {
                 title: "Working with JSON and CSV",
                 slug: "python-json-csv",
                 shortDescription: "Parse and generate common data formats.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 18,
                 sections: [
-                  { title: "JSON module", content: "json.dump, json.load, json.dumps, json.loads." },
-                  { title: "CSV module", content: "csv.reader, csv.writer, DictReader, DictWriter." },
-                  { title: "Pandas alternative", content: "For larger datasets." },
+                  { title: "JSON Module", content: "`json.dump()` (to file), `json.load()` (from file), `json.dumps()` (to string), `json.loads()` (from string)." },
+                  { title: "CSV Module", content: "`csv.reader`, `csv.writer`, `DictReader`, `DictWriter` for dictionary‑based access." },
                 ],
               },
             ],
@@ -345,24 +346,23 @@ async function seedPythonCategory() {
                 title: "Exception Handling",
                 slug: "python-exception-handling",
                 shortDescription: "try, except, else, finally, and raise.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Try/except", content: "Catch specific exceptions." },
-                  { title: "Multiple excepts", content: "Catch different types." },
-                  { title: "else and finally", content: "Execute when no exception / always." },
-                  { title: "Raising exceptions", content: "raise Exception(\"message\")." },
-                  { title: "Custom exceptions", content: "Extend Exception." },
+                  { title: "`try`/`except`", content: "Catch specific exceptions. Multiple `except` blocks handle different types." },
+                  { title: "`else` and `finally`", content: "`else` runs if no exception; `finally` always runs." },
+                  { title: "Raising Exceptions", content: "`raise ValueError(\"message\")`." },
+                  { title: "Custom Exceptions", content: "Subclass `Exception` to create domain‑specific errors." },
                 ],
               },
               {
-                title: "Context Managers",
+                title: "Context Managers – `with` Statement",
                 slug: "python-context-managers",
                 shortDescription: "Use with statement and create custom context managers.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 18,
                 sections: [
-                  { title: "The with statement", content: "Simplifies resource management." },
-                  { title: "Using contextlib", content: "@contextmanager decorator." },
-                  { title: "Class-based with __enter__ and __exit__", content: "Full control." },
+                  { title: "The `with` Statement", content: "Simplifies resource management (files, locks)." },
+                  { title: "`contextlib` – `@contextmanager`", content: "A decorator that turns a generator into a context manager." },
+                  { title: "Class‑based with `__enter__` and `__exit__`", content: "Full control over setup and teardown." },
                 ],
               },
             ],
@@ -374,7 +374,7 @@ async function seedPythonCategory() {
       {
         name: "Advanced",
         slug: "advanced",
-        description: "Concurrency, metaprogramming, performance, and advanced features.",
+        description: "Concurrency, metaprogramming, performance, modern Python, and packaging.",
         level: StudyLevel.ADVANCED,
         modules: [
           {
@@ -386,78 +386,131 @@ async function seedPythonCategory() {
                 title: "Threading and Multiprocessing",
                 slug: "python-threading-multiprocessing",
                 shortDescription: "Parallelism and concurrency models.",
-                estimatedMinutes: 24,
+                estimatedMinutes: 28,
                 sections: [
-                  { title: "The GIL", content: "Global Interpreter Lock – impact." },
-                  { title: "threading module", content: "Threads for I/O tasks." },
-                  { title: "multiprocessing", content: "True parallelism for CPU-heavy tasks." },
-                  { title: "Queues and pools", content: "Worker patterns." },
-                  { title: "Synchronisation", content: "Locks, semaphores, events." },
+                  { title: "The GIL – Global Interpreter Lock", content: "The GIL prevents multiple Python threads from executing simultaneously in CPU‑bound code. Use `multiprocessing` for CPU‑bound tasks." },
+                  { title: "`threading` – I/O‑Bound Tasks", content: "Threads are lightweight and useful for I/O‑bound operations (network, disk). Use `threading.Thread` and `Queue`." },
+                  { title: "`multiprocessing` – True Parallelism", content: "Creates separate processes, each with its own GIL. Use `Process`, `Pool`, `Queue`." },
+                  { title: "Synchronization", content: "Use `Lock`, `Semaphore`, `Event` to coordinate threads/processes." },
                 ],
               },
               {
-                title: "asyncio",
+                title: "`asyncio` – Async I/O",
                 slug: "python-asyncio",
                 shortDescription: "Async/await and event loop.",
-                estimatedMinutes: 24,
+                estimatedMinutes: 26,
                 sections: [
-                  { title: "async and await", content: "Coroutines." },
-                  { title: "Event loop", content: "Running coroutines." },
-                  { title: "Tasks and futures", content: "Concurrent tasks." },
-                  { title: "Async context managers", content: "async with." },
-                  { title: "Common libraries", content: "aiohttp, asyncpg." },
+                  { title: "`async` and `await`", content: "`async def` defines a coroutine. `await` suspends until the awaited coroutine finishes." },
+                  { title: "Event Loop", content: "The event loop runs coroutines. Use `asyncio.run()` to start." },
+                  { title: "Tasks and Futures", content: "`asyncio.create_task()` schedules a coroutine for concurrent execution." },
+                  { title: "Async Context Managers", content: "`async with` for resources that need async setup/teardown." },
+                  { title: "Common Libraries", content: "`aiohttp` (HTTP), `asyncpg` (PostgreSQL)." },
                 ],
               },
             ],
           },
           {
-            title: "Metaprogramming and Performance",
-            slug: "python-metaprogramming-perf",
-            description: "Descriptors, metaclasses, type hints, profiling.",
+            title: "Modern Python Features (3.8+)",
+            slug: "modern-python",
+            description: "Pattern matching, walrus operator, f‑strings, and more.",
             topics: [
               {
-                title: "Descriptors Deep Dive",
-                slug: "python-descriptors-deep",
-                shortDescription: "Custom descriptors and their uses.",
-                estimatedMinutes: 18,
+                title: "Pattern Matching – `match`/`case`",
+                slug: "pattern-matching",
+                shortDescription: "Structural pattern matching similar to switch.",
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Descriptor protocol", content: "__get__, __set__, __delete__." },
-                  { title: "Data vs non-data descriptors", content: "Difference." },
-                  { title: "Examples", content: "Type checking, lazy properties." },
+                  { title: "What is Pattern Matching?", content: "Introduced in Python 3.10, `match`/`case` allows matching against patterns (literals, sequences, mappings, classes)." },
+                  { title: "Basic Usage", content: "```python\nmatch command:\n    case \"quit\":\n        print(\"Goodbye\")\n    case [\"move\", x, y]:\n        print(f\"Move to {x}, {y}\")\n```" },
+                  { title: "Matching with Classes", content: "`case Point(x, y):` matches instances of `Point` and extracts attributes." },
                 ],
               },
               {
-                title: "Metaclasses",
+                title: "Walrus Operator – `:=`",
+                slug: "walrus",
+                shortDescription: "Assignment expressions.",
+                estimatedMinutes: 16,
+                sections: [
+                  { title: "What is the Walrus Operator?", content: "`:=` assigns a value and returns it. Useful in `if` statements and list comprehensions." },
+                  { title: "Example", content: "```python\nif (n := len(data)) > 10:\n    print(f\"Data is long: {n}\")\n```" },
+                ],
+              },
+              {
+                title: "Enums – Named Constants",
+                slug: "python-enums",
+                shortDescription: "Define enumerated constants.",
+                estimatedMinutes: 16,
+                sections: [
+                  { title: "What are Enums?", content: "`from enum import Enum` – defines a set of named values. Example: `class Color(Enum): RED = 1; GREEN = 2`." },
+                  { title: "Benefits", content: "Type‑safe, self‑documenting, iterable." },
+                ],
+              },
+            ],
+          },
+          {
+            title: "Metaprogramming and Type Hints",
+            slug: "python-metaprogramming",
+            description: "Descriptors, metaclasses, type hints, and static analysis.",
+            topics: [
+              {
+                title: "Descriptors – Controlling Attribute Access",
+                slug: "python-descriptors-deep",
+                shortDescription: "Custom descriptors and their uses.",
+                estimatedMinutes: 20,
+                sections: [
+                  { title: "Descriptor Protocol", content: "`__get__`, `__set__`, `__delete__` – allows custom attribute access." },
+                  { title: "Data vs Non‑data Descriptors", content: "Data descriptors (with `__set__`) take precedence over instance attributes." },
+                  { title: "Examples", content: "Type checking, lazy properties, and ORM field definitions." },
+                ],
+              },
+              {
+                title: "Metaclasses – Class Factories",
                 slug: "python-metaclasses",
                 shortDescription: "Customise class creation.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "What are metaclasses", content: "Class of a class." },
-                  { title: "Using type", content: "Create classes dynamically." },
-                  { title: "__metaclass__", content: "Python 3: class Meta." },
-                  { title: "Use cases", content: "Singletons, ORMs, registries." },
+                  { title: "What are Metaclasses?", content: "A metaclass is the class of a class. It controls how classes are created." },
+                  { title: "Using `type`", content: "Create classes dynamically: `type('MyClass', (object,), {'attr': 42})`." },
+                  { title: "Use Cases", content: "Singletons, ORMs (like SQLAlchemy), registries." },
                 ],
               },
               {
                 title: "Type Hints and Static Analysis",
                 slug: "python-type-hints",
                 shortDescription: "Use typing module and mypy.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Type annotations", content: "def f(x: int) -> str:" },
-                  { title: "Typing module", content: "List, Dict, Optional, Union." },
-                  { title: "mypy", content: "Catch type errors before runtime." },
+                  { title: "Type Annotations", content: "`def f(x: int) -> str:` – type hints are optional but improve readability and enable static analysis." },
+                  { title: "`typing` Module", content: "`List`, `Dict`, `Optional`, `Union`, `Tuple`, `Any`, `TypeVar`, `Protocol`, `TypedDict`." },
+                  { title: "`mypy` – Static Type Checker", content: "Run `mypy` to catch type errors before runtime." },
+                ],
+              },
+            ],
+          },
+          {
+            title: "Packaging and Distribution",
+            slug: "python-packaging",
+            description: "Create and distribute Python packages.",
+            topics: [
+              {
+                title: "`pyproject.toml` – The Modern Way",
+                slug: "pyproject-toml",
+                shortDescription: "Define project metadata and dependencies.",
+                estimatedMinutes: 18,
+                sections: [
+                  { title: "What is `pyproject.toml`?", content: "The standard format for packaging metadata (replaces `setup.py` and `setup.cfg`)." },
+                  { title: "Example", content: "```toml\n[project]\nname = \"my-package\"\nversion = \"0.1.0\"\ndependencies = [\"requests\", \"numpy\"]\n```" },
+                  { title: "Build Backends", content: "`setuptools`, `hatch`, `poetry`, `pdm`." },
                 ],
               },
               {
-                title: "Performance Profiling",
-                slug: "python-profiling",
-                shortDescription: "Measure and optimise code performance.",
+                title: "Publishing to PyPI",
+                slug: "pypi-publish",
+                shortDescription: "Upload packages to the Python Package Index.",
                 estimatedMinutes: 16,
                 sections: [
-                  { title: "cProfile and profile", content: "Built‑in profilers." },
-                  { title: "line_profiler", content: "Line‑by‑line profiling." },
-                  { title: "Optimization tips", content: "Use built‑ins, avoid loops, use numpy." },
+                  { title: "Building", content: "`python -m build` creates `dist/` with `.tar.gz` and `.whl`." },
+                  { title: "Uploading", content: "`twine upload dist/*` – requires a PyPI token." },
                 ],
               },
             ],
@@ -481,33 +534,32 @@ async function seedPythonCategory() {
                 title: "Lists, Tuples, and Dicts",
                 slug: "python-interview-collections",
                 shortDescription: "When to use each, common operations.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "List comprehensions vs loops", content: "Speed and readability." },
-                  { title: "Dict tricks", content: "get, setdefault, defaultdict, Counter." },
-                  { title: "Tuple unpacking", content: "a, b = b, a." },
+                  { title: "List Comprehensions vs Loops", content: "Comprehensions are faster and more readable for simple transformations." },
+                  { title: "Dict Tricks", content: "`.get()`, `.setdefault()`, `collections.defaultdict`, `Counter`." },
+                  { title: "Tuple Unpacking", content: "`a, b = b, a` – clean variable swapping." },
                 ],
               },
               {
                 title: "Two‑Pointer and Sliding Window",
                 slug: "python-two-pointer-sliding",
                 shortDescription: "Common algorithmic patterns.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Two‑pointer", content: "For sorted arrays, palindrome checks." },
-                  { title: "Sliding window", content: "Subarrays, substrings." },
-                  { title: "Examples", content: "Max sum subarray, longest substring without repeating characters." },
+                  { title: "Two‑pointer", content: "For sorted arrays, palindrome checks, and pair sums." },
+                  { title: "Sliding Window", content: "Subarrays, substrings. Example: max sum subarray, longest substring without repeating." },
                 ],
               },
               {
                 title: "Recursion and Memoization",
                 slug: "python-recursion-memo",
                 shortDescription: "Recursive solutions with caching.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Recursive functions", content: "Base case, recursive call." },
-                  { title: "Memoization with lru_cache", content: "functools.lru_cache." },
-                  { title: "Common problems", content: "Fibonacci, factorial, tree traversal." },
+                  { title: "Recursive Functions", content: "Base case and recursive call." },
+                  { title: "Memoization with `lru_cache`", content: "`@lru_cache` from `functools` – caches results automatically." },
+                  { title: "Common Problems", content: "Fibonacci, factorial, tree traversal." },
                 ],
               },
             ],
@@ -521,33 +573,33 @@ async function seedPythonCategory() {
                 title: "Mutable vs Immutable",
                 slug: "python-mutable-immutable",
                 shortDescription: "Understand object mutability and implications.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 18,
                 sections: [
-                  { title: "Immutable types", content: "int, str, tuple, frozenset." },
-                  { title: "Mutable types", content: "list, dict, set." },
-                  { title: "Pass by assignment", content: "References to objects." },
+                  { title: "Immutable Types", content: "`int`, `str`, `tuple`, `frozenset` – cannot be changed." },
+                  { title: "Mutable Types", content: "`list`, `dict`, `set` – can be modified." },
+                  { title: "Pass by Assignment", content: "All variables are references. Mutability determines if changes affect the original object." },
                 ],
               },
               {
                 title: "Scope and Closures",
                 slug: "python-scope-closures",
                 shortDescription: "LEGB, closures, and nonlocal.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 18,
                 sections: [
-                  { title: "LEGB rule", content: "Local, Enclosing, Global, Built‑in." },
-                  { title: "Closures", content: "Inner function capturing outer variable." },
-                  { title: "nonlocal and global", content: "Modify outer scope." },
+                  { title: "LEGB Rule", content: "Local, Enclosing, Global, Built‑in." },
+                  { title: "Closures", content: "Inner functions that capture outer variables." },
+                  { title: "`nonlocal` and `global`", content: "Use to modify variables in outer scopes." },
                 ],
               },
               {
                 title: "Decorators and Context Managers",
                 slug: "python-decorators-context-interview",
                 shortDescription: "How they work and when to use.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Decorator internals", content: "Function wrapper." },
-                  { title: "Common built‑in decorators", content: "@staticmethod, @classmethod, @property." },
-                  { title: "Context manager implementation", content: "With statement, __enter__/__exit__." },
+                  { title: "Decorator Internals", content: "Function that returns a function wrapper." },
+                  { title: "Common Built‑in Decorators", content: "`@staticmethod`, `@classmethod`, `@property`." },
+                  { title: "Context Manager Implementation", content: "`with` statement, `__enter__`/`__exit__`." },
                 ],
               },
             ],
@@ -561,34 +613,33 @@ async function seedPythonCategory() {
                 title: "String and Array Problems",
                 slug: "python-string-array-problems",
                 shortDescription: "Reverse, anagram, palindrome, two‑sum.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Reverse string", content: "s[::-1]." },
-                  { title: "Check palindrome", content: "s == s[::-1]." },
-                  { title: "Anagram", content: "Counter(s1) == Counter(s2)." },
-                  { title: "Two‑sum", content: "Use dict for O(n)." },
+                  { title: "Reverse String", content: "`s[::-1]`." },
+                  { title: "Palindrome Check", content: "`s == s[::-1]`." },
+                  { title: "Anagram", content: "`Counter(s1) == Counter(s2)`." },
+                  { title: "Two‑sum", content: "Use a dict for O(n)." },
                 ],
               },
               {
                 title: "Object‑Oriented Design",
                 slug: "python-ood-problems",
                 shortDescription: "Design classes for parking lot, elevator, etc.",
-                estimatedMinutes: 22,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "Design a parking lot", content: "Multiple levels, spots, vehicles." },
-                  { title: "Design an elevator system", content: "Request handling, scheduling." },
-                  { title: "Design a library system", content: "Books, users, borrowing." },
+                  { title: "Design a Parking Lot", content: "Multiple levels, spots, vehicles. Use classes for `ParkingLot`, `Level`, `Spot`, `Vehicle`." },
+                  { title: "Design an Elevator System", content: "Requests, scheduling, floors." },
                 ],
               },
               {
                 title: "System‑Level Questions",
                 slug: "python-system-level",
                 shortDescription: "Handling large data, concurrency, and scaling.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Processing large files", content: "Generator, chunking." },
-                  { title: "Parallel processing", content: "multiprocessing, concurrent.futures." },
-                  { title: "Caching with lru_cache", content: "Memoize expensive calls." },
+                  { title: "Processing Large Files", content: "Use generators and chunking." },
+                  { title: "Parallel Processing", content: "`multiprocessing`, `concurrent.futures`." },
+                  { title: "Caching", content: "`lru_cache` for expensive calls." },
                 ],
               },
             ],
@@ -599,7 +650,7 @@ async function seedPythonCategory() {
   };
 
   await ensureCategory(pythonCategory);
-  console.log("✓ Python Fundamentals category seeded (all levels)");
+  console.log("✅ Python Fundamentals category seeded (ultra‑detailed)");
 }
 
 async function main() {

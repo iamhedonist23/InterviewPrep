@@ -44,9 +44,44 @@ export async function getQuestion(slug: string) {
       slug,
       isPublished: true,
     },
-    include: {
-      category: true,
-      subcategory: true,
+    select: {
+      id: true,
+      question: true,
+      slug: true,
+      categoryId: true,
+      subcategoryId: true,
+      experienceLevel: true,
+      difficulty: true,
+      interviewType: true,
+      shortDescription: true,
+      explanation: true,
+      sampleAnswer: true,
+      detailedAnswer: true,
+      keyPoints: true,
+      commonMistakes: true,
+      followUpQuestions: true,
+      tags: true,
+      isPublished: true,
+      seoTitle: true,
+      seoDescription: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          group: true,
+          description: true,
+        },
+      },
+      subcategory: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 }

@@ -38,6 +38,24 @@ export default async function LearnTopicPage({ params }: Props) {
   ]);
   const progressStatus = progress?.status ?? "NOT_STARTED";
 
+  // Fetch prerequisites
+  const prerequisiteIds = (item.prerequisiteIds as string[]) || [];
+  const prerequisites = prerequisiteIds.length > 0 
+    ? await prisma.studyTopic.findMany({
+        where: { id: { in: prerequisiteIds }, isPublished: true },
+        select: { id: true, title: true, slug: true, category: { select: { slug: true } } },
+      })
+    : [];
+
+  // Fetch related topics
+  const relatedTopicIds = (item.relatedTopicIds as string[]) || [];
+  const relatedTopics = relatedTopicIds.length > 0
+    ? await prisma.studyTopic.findMany({
+        where: { id: { in: relatedTopicIds }, isPublished: true },
+        select: { id: true, title: true, slug: true, category: { select: { slug: true } } },
+      })
+    : [];
+
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const breadcrumb = {
     "@context": "https://schema.org",
@@ -84,27 +102,56 @@ export default async function LearnTopicPage({ params }: Props) {
           )}
         </div>
 
-        <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_280px]">
+        {/* Prerequisites */}
+        {prerequisites.length > 0 && (
+          <div className="mt-12 max-w-3xl rounded-2xl border border-amber-200 bg-amber-50 p-6">
+            <h2 className="flex items-center gap-2 font-display text-lg font-bold text-amber-900">
+              <span>📚</span> Prerequisites
+            </h2>
+            <p className="mt-2 text-sm text-amber-800">Make sure you understand these concepts before continuing:</p>
+            <ul className="mt-4 space-y-2">
+              {prerequisites.map(prereq => (
+                <li key={prereq.id}>
+                  <Link
+                    href={`/learn/${prereq.category.slug}/${prereq.slug}`}
+                    className="text-sm font-semibold text-amber-900 hover:text-coral"
+                  >
+                    → {prereq.title}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_300px]">
           <article className="max-w-3xl space-y-12">
             {item.sections.map(section => (
-              <div key={section.id}>
+              <div key={section.id} id={section.id}>
                 <h2 className="font-display text-2xl font-bold">{section.title}</h2>
-                <div className="prose prose-ink mt-4 max-w-none leading-8">
+                <div className="mt-4 space-y-4 leading-8 text-ink/70">
                   {section.content.split(/\n\n+/).map((paragraph, index) => (
-                    <p key={`${section.id}-${index}`} className="text-ink/70">{paragraph}</p>
+                    <p key={`${section.id}-${index}`} className="text-base sm:text-lg">
+                      {paragraph}
+                    </p>
                   ))}
                 </div>
               </div>
             ))}
 
             {item.examples.length > 0 && (
-              <div>
-                <h2 className="font-display text-2xl font-bold">Examples</h2>
+              <div id="examples">
+                <h2 className="font-display text-2xl font-bold">Code examples</h2>
                 <div className="mt-5 space-y-6">
-                  {item.examples.map(example => (
+                  {item.examples.map((example, idx) => (
                     <div key={example.id}>
-                      {example.explanation && <p className="mb-3 text-sm leading-6 text-ink/60">{example.explanation}</p>}
-                      <pre className="overflow-x-auto rounded-xl bg-ink p-4 text-sm leading-6 text-paper">
+                      <div className="mb-3 flex items-center justify-between">
+                        {example.explanation && <p className="text-sm leading-6 text-ink/60">{example.explanation}</p>}
+                        <span className="rounded-md bg-ink/5 px-2 py-1 text-xs font-bold uppercase text-ink/60">
+                          {example.language}
+                        </span>
+                      </div>
+                      <pre className="overflow-x-auto rounded-xl border border-ink/10 bg-ink p-4 text-sm leading-6 text-paper">
                         <code>{example.code}</code>
                       </pre>
                     </div>
@@ -114,34 +161,135 @@ export default async function LearnTopicPage({ params }: Props) {
             )}
 
             {item.exercises.length > 0 && (
-              <div>
-                <h2 className="font-display text-2xl font-bold">Practice exercises</h2>
+              <div id="exercises">
+                <h2 className="font-display text-2xl font-bold">Knowledge check</h2>
+                <p className="mt-2 text-ink/60">Test your understanding with these practice exercises:</p>
                 <div className="mt-5 space-y-4">
                   {item.exercises.map(exercise => <StudyExercise key={exercise.id} exercise={exercise} />)}
                 </div>
               </div>
             )}
+
+            {relatedQuestions.length > 0 && (
+              <div className="rounded-2xl border-2 border-coral/30 bg-coral/5 p-6 sm:p-8">
+                <h2 className="font-display text-2xl font-bold text-coral">Ready to practice?</h2>
+                <p className="mt-2 text-ink/70">
+                  You've learned the fundamentals. Now test yourself with real interview questions on this topic.
+                </p>
+                <div className="mt-6 space-y-3">
+                  {relatedQuestions.slice(0, 5).map(question => (
+                    <Link
+                      key={question.id}
+                      href={`/questions/${question.slug}`}
+                      className="block rounded-lg border border-coral/20 bg-white p-3 hover:border-coral hover:bg-coral/5 sm:p-4"
+                    >
+                      <p className="font-semibold text-ink">{question.question}</p>
+                    </Link>
+                  ))}
+                </div>
+                {relatedQuestions.length > 5 && (
+                  <Link
+                    href={`/questions?search=${encodeURIComponent(item.title)}`}
+                    className="mt-4 inline-block rounded-full bg-coral px-5 py-2 text-sm font-bold text-white hover:bg-coral/90"
+                  >
+                    View all {relatedQuestions.length} questions
+                  </Link>
+                )}
+              </div>
+            )}
+
+            {/* Related topics */}
+            {relatedTopics.length > 0 && (
+              <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
+                <h2 className="font-display text-2xl font-bold">Related topics</h2>
+                <p className="mt-2 text-ink/60">Deepen your knowledge with these related subjects:</p>
+                <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                  {relatedTopics.map(related => (
+                    <Link
+                      key={related.id}
+                      href={`/learn/${related.category.slug}/${related.slug}`}
+                      className="rounded-lg border border-ink/10 p-4 hover:border-coral hover:bg-coral/5"
+                    >
+                      <p className="font-semibold text-ink">{related.title}</p>
+                      <p className="text-xs text-ink/50">→ Continue learning</p>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            )}
           </article>
 
-          <aside className="h-fit rounded-2xl bg-ink p-6 text-paper lg:sticky lg:top-6">
-            <h2 className="font-display text-xl font-bold">In this guide</h2>
-            <ul className="mt-4 space-y-2 text-sm text-paper/70">
-              {item.sections.map(section => <li key={section.id}>{section.title}</li>)}
-            </ul>
-            {relatedQuestions.length > 0 && (
-              <>
-                <h2 className="mt-8 font-display text-xl font-bold">Practice this next</h2>
-                <ul className="mt-4 space-y-3">
-                  {relatedQuestions.map(question => (
-                    <li key={question.id}>
-                      <Link href={`/questions/${question.slug}`} className="text-sm leading-5 text-paper/80 hover:text-coral">
-                        {question.question}
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
-              </>
+          <aside className="space-y-6">
+            {/* Table of contents */}
+            <div className="h-fit rounded-2xl bg-ink p-6 text-paper lg:sticky lg:top-6">
+              <h2 className="font-display text-lg font-bold">Contents</h2>
+              <ul className="mt-4 space-y-2 text-sm text-paper/70">
+                {item.sections.map(section => (
+                  <li key={section.id} className="hover:text-coral">
+                    <a href={`#${section.id}`} className="block">
+                      {section.title}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+
+              {item.examples.length > 0 && (
+                <div className="mt-4 border-t border-paper/20 pt-4">
+                  <a href="#examples" className="block text-sm text-paper/80 hover:text-coral">
+                    Code examples
+                  </a>
+                </div>
+              )}
+
+              {item.exercises.length > 0 && (
+                <div className="mt-2">
+                  <a href="#exercises" className="block text-sm text-paper/80 hover:text-coral">
+                    Knowledge check
+                  </a>
+                </div>
+              )}
+            </div>
+
+            {/* Learning progress */}
+            {session?.user?.id && (
+              <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
+                <h3 className="font-semibold text-ink">Your progress</h3>
+                <div className="mt-4">
+                  <div className="text-sm text-ink/60">
+                    {progressStatus === "COMPLETED" ? (
+                      <p className="font-bold text-mint">✓ Completed</p>
+                    ) : progressStatus === "STARTED" ? (
+                      <p className="font-bold text-coral">In progress</p>
+                    ) : (
+                      <p>Not started</p>
+                    )}
+                  </div>
+                </div>
+              </div>
             )}
+
+            {/* Info card */}
+            <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
+              <h3 className="text-xs font-bold uppercase tracking-widest text-ink/60">About this lesson</h3>
+              <dl className="mt-4 space-y-3 text-sm">
+                <div>
+                  <dt className="font-semibold text-ink/60">Difficulty</dt>
+                  <dd className="mt-1 font-bold capitalize text-ink">
+                    {item.module.studyPath.level.toLowerCase().replace(/_/g, ' ')}
+                  </dd>
+                </div>
+                {item.estimatedMinutes && (
+                  <div>
+                    <dt className="font-semibold text-ink/60">Reading time</dt>
+                    <dd className="mt-1 font-bold text-ink">{item.estimatedMinutes} minutes</dd>
+                  </div>
+                )}
+                <div>
+                  <dt className="font-semibold text-ink/60">Content sections</dt>
+                  <dd className="mt-1 font-bold text-ink">{item.sections.length}</dd>
+                </div>
+              </dl>
+            </div>
           </aside>
         </div>
 

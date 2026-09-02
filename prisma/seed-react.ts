@@ -7,14 +7,14 @@ type TopicSeed = {
   slug: string;
   shortDescription: string;
   estimatedMinutes: number;
-  sections: Array<{ title: string; content: string }>;
+  sections?: Array<{ title: string; content: string }>;
 };
 
 type ModuleSeed = {
   title: string;
   slug: string;
   description: string;
-  topics: TopicSeed[];
+  topics?: TopicSeed[];
 };
 
 type PathSeed = {
@@ -25,14 +25,16 @@ type PathSeed = {
   modules: ModuleSeed[];
 };
 
-async function ensureCategory(category: {
+type CategorySeed = {
   name: string;
   slug: string;
   description: string;
   icon: string;
   sortOrder: number;
   paths: PathSeed[];
-}) {
+};
+
+async function ensureCategory(category: CategorySeed) {
   const createdCategory = await prisma.studyCategory.upsert({
     where: { slug: category.slug },
     update: { name: category.name, description: category.description, icon: category.icon, isPublished: true, sortOrder: category.sortOrder },
@@ -75,7 +77,8 @@ async function ensureCategory(category: {
         },
       });
 
-      for (const topicSeed of moduleSeed.topics) {
+      const topics = moduleSeed.topics ?? [];
+      for (const topicSeed of topics) {
         const topic = await prisma.studyTopic.upsert({
           where: { categoryId_slug: { categoryId: createdCategory.id, slug: topicSeed.slug } },
           update: {
@@ -100,8 +103,9 @@ async function ensureCategory(category: {
           },
         });
 
-        for (let index = 0; index < topicSeed.sections.length; index += 1) {
-          const section = topicSeed.sections[index];
+        const sections = topicSeed.sections ?? [];
+        for (let index = 0; index < sections.length; index += 1) {
+          const section = sections[index];
           await prisma.studyTopicSection.upsert({
             where: { id: `${topic.id}-section-${index}` },
             update: { title: section.title, content: section.content, sortOrder: index },
@@ -120,13 +124,14 @@ async function ensureCategory(category: {
 }
 
 async function seedReactCategory() {
-  const reactCategory = {
+  const reactCategory: CategorySeed = {
     name: "React Fundamentals",
     slug: "react-fundamentals",
     description: "Learn the component model, state, props, hooks, and rendering behavior in React.",
     icon: "REACT",
     sortOrder: 2,
     paths: [
+      // -------------------- BEGINNER --------------------
       {
         name: "Beginner",
         slug: "beginner",
@@ -134,52 +139,52 @@ async function seedReactCategory() {
         level: StudyLevel.BEGINNER,
         modules: [
           {
-            title: "React Basics",
+            title: "React Basics – The Building Blocks",
             slug: "react-basics",
             description: "The building blocks of React components and rendering.",
             topics: [
               {
-                title: "Components and Props",
+                title: "Components and Props – Reusable UI Pieces",
                 slug: "components-props",
                 shortDescription: "Break the UI into reusable functions and pass data via props.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 26,
                 sections: [
-                  { title: "What a component is", content: "A React component is a reusable renderable unit." },
-                  { title: "Props are read-only", content: "Props should be treated as inputs." },
-                  { title: "Composing components", content: "Nesting components via children." },
-                  { title: "Default and typed props", content: "Using TypeScript for props." },
-                  { title: "Lists and keys", content: "Stable keys for lists." },
-                  { title: "Common mistakes", content: "Using index as key, mutating props." }
-                ]
+                  { title: "What is a React Component?", content: "A React component is a function or class that returns a piece of UI. It takes inputs (props) and returns React elements. Components can be nested, reused, and composed to build complex UIs." },
+                  { title: "Props are Read‑Only – One‑Way Data Flow", content: "Props are immutable inputs from a parent component. A child must never modify props – it should treat them as read‑only. To communicate back, the parent passes callback functions as props." },
+                  { title: "Composing Components", content: "Components can be composed by nesting them. The `children` prop allows passing arbitrary content:\n```jsx\nfunction Card({ children }) {\n  return <div className=\"card\">{children}</div>;\n}\n<Card><p>Inside the card</p></Card>\n```" },
+                  { title: "Default and Typed Props", content: "Use default values: `function Button({ label = 'Click me' })` or `Button.defaultProps`. In TypeScript, define a props interface for type safety." },
+                  { title: "Lists and Keys – Stable Identifiers", content: "When rendering lists, assign a unique `key` prop to each element. Keys help React track which items changed, were added, or removed. Avoid using array index as key if the list can reorder." },
+                  { title: "Common Mistakes", content: "Using `index` as key (causes issues with reordering), mutating props, and forgetting that props are read‑only." },
+                ],
               },
               {
-                title: "State and Re-rendering",
+                title: "State and Re‑rendering – Reactivity in Action",
                 slug: "state-rerendering",
                 shortDescription: "Learn how state changes trigger UI updates.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "State lifecycle", content: "State updates trigger re-renders." },
-                  { title: "Immutability", content: "Create new objects/arrays." },
-                  { title: "Batched updates", content: "React batches state updates." },
-                  { title: "Lifting state up", content: "Shared state to parent." },
-                  { title: "Derived vs stored state", content: "Compute values when possible." },
-                  { title: "Common pitfalls", content: "State asynchrony, infinite loops." }
-                ]
+                  { title: "State Lifecycle", content: "State is data that changes over time and affects rendering. Updating state schedules React to re‑render the component. React batches multiple state updates for performance." },
+                  { title: "Immutability – Why It Matters", content: "React relies on reference changes to detect updates. Always create new objects/arrays when updating state:\n```jsx\nsetItems(prev => [...prev, newItem]); // correct\n// items.push(newItem); setItems(items); // wrong – mutates\n```" },
+                  { title: "Batched Updates", content: "React batches state updates within the same event handler. Functional updates (`setCount(prev => prev + 1)`) guarantee you're working from the latest value." },
+                  { title: "Lifting State Up", content: "When multiple sibling components share state, move that state to their closest common parent and pass it down via props with callback functions to update it." },
+                  { title: "Derived State – Compute, Don't Store", content: "Avoid storing values in state that can be derived from existing props or state during render. This reduces sync bugs." },
+                  { title: "Common Pitfalls", content: "Reading state immediately after setting it (it's asynchronous), and updating state in the render body causing infinite loops." },
+                ],
               },
               {
-                title: "JSX and Rendering",
+                title: "JSX and Rendering – The Magic of JSX",
                 slug: "jsx-rendering",
                 shortDescription: "Write UI declaratively with JSX syntax.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "JSX is not HTML", content: "JSX compiles to React.createElement." },
-                  { title: "Embedding expressions", content: "{} for JavaScript expressions." },
-                  { title: "Conditional rendering", content: "Ternary, &&." },
-                  { title: "Fragments", content: "Group elements without extra nodes." },
-                  { title: "Styling approaches", content: "Inline styles, CSS modules." },
-                  { title: "How rendering works", content: "Virtual DOM and reconciliation." }
-                ]
-              }
+                  { title: "JSX is Not HTML", content: "JSX is syntactic sugar for `React.createElement` calls. Use `className` instead of `class`, `htmlFor` instead of `for`. It's JavaScript – embed expressions with `{}`." },
+                  { title: "Embedding Expressions", content: "Any JavaScript expression can be embedded in JSX using `{}`: `{user.name}`, `{2 + 2}`, `{isLoggedIn ? <Dashboard /> : <Login />}`." },
+                  { title: "Conditional Rendering", content: "Use `&&` for short‑circuit, ternary for if‑else, and `switch` statements outside JSX. Also use `null` to render nothing." },
+                  { title: "Fragments – Group Without Extra Nodes", content: "`<></>` or `<React.Fragment>` lets you group elements without adding an extra DOM node." },
+                  { title: "Styling Approaches", content: "Inline styles (style attribute), CSS modules, styled‑components, or Tailwind. Choose based on project scale." },
+                  { title: "How Rendering Works – Virtual DOM", content: "React builds a virtual DOM tree, diffs it against the previous tree (reconciliation), and applies the minimal DOM updates needed." },
+                ],
+              },
             ],
           },
           {
@@ -188,41 +193,43 @@ async function seedReactCategory() {
             description: "Master React's functional component model.",
             topics: [
               {
-                title: "useState Hook",
+                title: "useState – The State Hook",
                 slug: "usestate-hook",
                 shortDescription: "Add state to function components.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "useState basics", content: "Returns state and setter." },
-                  { title: "Multiple states", content: "Call useState multiple times." },
-                  { title: "Functional updates", content: "Update based on previous value." },
-                  { title: "Lazy initial state", content: "Pass function for expensive computation." },
-                  { title: "State with objects and arrays", content: "Immutable updates." },
-                  { title: "Common mistakes", content: "Asynchronous updates, no merge." }
-                ]
+                  { title: "useState Basics", content: "Returns `[state, setState]`. Call it at the top level of your component. Example: `const [count, setCount] = useState(0)`." },
+                  { title: "Multiple States", content: "Use separate `useState` calls for separate concerns. This keeps state predictable." },
+                  { title: "Functional Updates", content: "When the new state depends on the previous, use the function form: `setCount(prev => prev + 1)`. This is safer with batching." },
+                  { title: "Lazy Initial State", content: "If the initial state is expensive to compute, pass a function: `useState(() => computeInitialValue())`. This runs only once." },
+                  { title: "State with Objects and Arrays", content: "Always create new objects/arrays (using spread or `Immer`) to trigger re‑renders." },
+                  { title: "Common Mistakes", content: "Reading state immediately after setting (it's asynchronous), and mutating state directly." },
+                ],
               },
               {
-                title: "useEffect Hook",
+                title: "useEffect – Synchronising with the Outside",
                 slug: "useeffect-hook",
                 shortDescription: "Synchronize side effects with component lifecycle.",
-                estimatedMinutes: 22,
+                estimatedMinutes: 26,
                 sections: [
-                  { title: "What useEffect does", content: "Runs after render for side effects." },
-                  { title: "Dependency array", content: "Controls when effect runs." },
-                  { title: "Cleanup functions", content: "Return function for cleanup." },
-                  { title: "Data fetching pattern", content: "Fetch in effect with cleanup." },
-                  { title: "Effects vs event handlers", content: "Event handlers for user actions." },
-                  { title: "Common pitfalls", content: "Missing dependencies, stale closures." }
-                ]
-              }
-            ]
-          }
+                  { title: "What useEffect Does", content: "`useEffect` runs after render for side effects like data fetching, subscriptions, timers, and manual DOM changes." },
+                  { title: "Dependency Array – Control Execution", content: "`[]` – runs once after mount. `[dep]` – runs when `dep` changes. Omitting it runs after every render. Always list all reactive values used in the effect." },
+                  { title: "Cleanup Functions", content: "Return a function to clean up subscriptions, timers, etc. Runs before the next effect and on unmount." },
+                  { title: "Data Fetching Pattern", content: "Use an `async` function inside the effect, track loading/error states, and handle cancellation with an AbortController." },
+                  { title: "Effects vs Event Handlers", content: "Effects are for synchronisation; user actions (clicks) should use event handlers. Don't use effects for derived state." },
+                  { title: "Common Pitfalls", content: "Missing dependencies cause stale closures. Use the `exhaustive‑deps` ESLint rule to catch them." },
+                ],
+              },
+            ],
+          },
         ],
       },
+
+      // -------------------- INTERMEDIATE --------------------
       {
         name: "Intermediate",
         slug: "intermediate",
-        description: "React performance, context, and custom hooks.",
+        description: "React performance, context, state management, and React 18 features.",
         level: StudyLevel.INTERMEDIATE,
         modules: [
           {
@@ -231,31 +238,31 @@ async function seedReactCategory() {
             description: "Sharing state across components.",
             topics: [
               {
-                title: "Context API",
+                title: "Context API – Avoiding Prop Drilling",
                 slug: "react-context",
                 shortDescription: "Prop drilling alternative.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "Creating Context", content: "React.createContext." },
-                  { title: "Provider and Consumer", content: "Wrap components." },
-                  { title: "useContext hook", content: "Consume context in function components." },
-                  { title: "When to use Context", content: "Themes, user auth." },
-                  { title: "Optimizing Context", content: "Split contexts to avoid re-renders." }
-                ]
+                  { title: "Creating Context", content: "`const ThemeContext = React.createContext('light')`" },
+                  { title: "Provider and Consumer", content: "Wrap components with `ThemeContext.Provider` to provide a value. Use `useContext` to consume." },
+                  { title: "useContext Hook", content: "`const theme = useContext(ThemeContext)` – simpler than `Consumer`." },
+                  { title: "When to Use Context", content: "Themes, user authentication, language, etc. Not for every piece of state – use composition where possible." },
+                  { title: "Optimizing Context", content: "Split context by domain to avoid unnecessary re‑renders. Memoize context values with `useMemo`." },
+                ],
               },
               {
-                title: "useReducer and Redux",
+                title: "useReducer and Redux – Predictable State",
                 slug: "react-usereducer-redux",
                 shortDescription: "Predictable state updates.",
-                estimatedMinutes: 22,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "useReducer", content: "Reducer function for complex state logic." },
-                  { title: "Redux basics", content: "Actions, reducers, store." },
-                  { title: "Redux Toolkit", content: "Simpler Redux setup." },
-                  { title: "Middleware", content: "Thunk for async actions." }
-                ]
-              }
-            ]
+                  { title: "useReducer", content: "A hook for complex state logic with actions and a reducer function. Works like Redux but local." },
+                  { title: "Redux Basics", content: "Global store, actions, reducers, dispatch. Centralised state management." },
+                  { title: "Redux Toolkit", content: "Simplifies Redux setup with slices and built‑in middleware (Thunk)." },
+                  { title: "Middleware", content: "Thunk for async actions, logger for debugging." },
+                ],
+              },
+            ],
           },
           {
             title: "Performance Optimization",
@@ -263,68 +270,195 @@ async function seedReactCategory() {
             description: "Memoization and rendering optimization.",
             topics: [
               {
-                title: "React.memo and useMemo",
+                title: "React.memo and useMemo – Memoization",
                 slug: "react-memo-usememo",
                 shortDescription: "Prevent unnecessary re-renders.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "React.memo", content: "Memoize component." },
-                  { title: "useMemo", content: "Memoize expensive calculations." },
-                  { title: "useCallback", content: "Memoize callbacks." },
-                  { title: "When to use", content: "Don't over-optimize." }
-                ]
+                  { title: "React.memo", content: "Wrap a component to memoize render output based on prop changes." },
+                  { title: "useMemo", content: "Memoize expensive calculations to avoid recomputation on every render." },
+                  { title: "useCallback", content: "Memoize callbacks so they don't change on every render (useful for child memoized components)." },
+                  { title: "When to Use", content: "Don't over‑optimise – measure first. Use only for expensive computations or large lists." },
+                ],
               },
               {
                 title: "Virtualization and Code Splitting",
                 slug: "react-virtualization-splitting",
                 shortDescription: "Lazy load components and large lists.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 18,
                 sections: [
-                  { title: "React.lazy", content: "Dynamic import." },
-                  { title: "Suspense", content: "Fallback UI." },
-                  { title: "Windowed lists", content: "react-window." }
-                ]
-              }
-            ]
-          }
+                  { title: "React.lazy", content: "Dynamically import components to reduce initial bundle size." },
+                  { title: "Suspense", content: "Show a fallback UI while lazy components load." },
+                  { title: "Windowed Lists", content: "Use `react‑window` or `react‑virtualized` to render only visible rows." },
+                ],
+              },
+            ],
+          },
+          {
+            title: "React 18 and Concurrent Features",
+            slug: "react-18",
+            description: "Concurrent rendering, transitions, and streaming.",
+            topics: [
+              {
+                title: "Concurrent Rendering – The New Paradigm",
+                slug: "concurrent-rendering",
+                shortDescription: "Interruptible rendering for better UX.",
+                estimatedMinutes: 22,
+                sections: [
+                  { title: "What is Concurrent Rendering?", content: "React 18 introduced concurrent rendering, which allows rendering to be interrupted and resumed. This enables new features like transitions and suspense for data fetching." },
+                  { title: "startTransition – Non‑Urgent Updates", content: "Mark updates as non‑urgent with `startTransition`. React will pause rendering these to keep the UI responsive." },
+                  { title: "useTransition – Track Pending State", content: "Returns a pending flag and a transition function. Useful for loading indicators during transitions." },
+                  { title: "useDeferredValue – Defer Updates", content: "Similar to debouncing, but built‑in. Returns a deferred value that may be stale during rapid updates." },
+                ],
+              },
+              {
+                title: "Suspense for Data Fetching",
+                slug: "suspense-data",
+                shortDescription: "Declarative data fetching with Suspense.",
+                estimatedMinutes: 20,
+                sections: [
+                  { title: "What is Suspense?", content: "A component that suspends rendering while data is loading. It shows a fallback UI." },
+                  { title: "Using Suspense", content: "Wrap components in `<Suspense fallback={<Loading />}>`. Works with React Server Components and data fetching libraries." },
+                  { title: "Error Boundaries with Suspense", content: "Combine with `ErrorBoundary` for graceful failure handling." },
+                ],
+              },
+            ],
+          },
         ],
       },
+
+      // -------------------- ADVANCED --------------------
       {
         name: "Advanced",
         slug: "advanced",
-        description: "Server-side rendering, hooks patterns, and more.",
+        description: "Server components, advanced patterns, and modern React.",
         level: StudyLevel.ADVANCED,
         modules: [
           {
             title: "Advanced React Patterns",
             slug: "react-advanced-patterns",
-            description: "Compound components, render props, HOCs.",
+            description: "Compound components, render props, HOCs, and hooks.",
             topics: [
               {
-                title: "Compound Components",
+                title: "Compound Components – Flexible APIs",
                 slug: "react-compound-components",
                 shortDescription: "Share state between components.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Pattern", content: "Parent component manages state." },
-                  { title: "Context in compound components", content: "Use Context to share implicitly." }
-                ]
+                  { title: "Pattern", content: "A parent component manages state and passes it to children via context or `cloneElement`." },
+                  { title: "Context in Compound Components", content: "Use Context to share state implicitly without prop drilling." },
+                  { title: "Example", content: "Tabs, Accordion, Dropdown – where parent manages which child is active." },
+                ],
               },
               {
                 title: "Render Props and HOCs",
                 slug: "react-render-props-hoc",
                 shortDescription: "Code reuse patterns.",
+                estimatedMinutes: 20,
+                sections: [
+                  { title: "Render Props", content: "A component that takes a function as a prop to render its content." },
+                  { title: "Higher‑Order Components (HOCs)", content: "A function that takes a component and returns an enhanced component." },
+                  { title: "Custom Hooks", content: "The modern alternative – simpler and more composable." },
+                ],
+              },
+              {
+                title: "Forward Refs and Imperative Handles",
+                slug: "forward-ref",
+                shortDescription: "Pass refs to child components and expose methods.",
                 estimatedMinutes: 18,
                 sections: [
-                  { title: "Render props", content: "Function as child." },
-                  { title: "Higher-order components", content: "Enhance components." },
-                  { title: "Custom hooks", content: "Modern alternative." }
-                ]
-              }
-            ]
-          }
+                  { title: "forwardRef", content: "`const MyInput = React.forwardRef((props, ref) => <input ref={ref} ... />)` – passes a ref to a child component." },
+                  { title: "useImperativeHandle", content: "Customise the ref object exposed to parent: `useImperativeHandle(ref, () => ({ focus: () => ... }))`." },
+                ],
+              },
+            ],
+          },
+          {
+            title: "React Server Components (RSC)",
+            slug: "rsc",
+            description: "Server‑side rendering with streaming and zero‑bundle components.",
+            topics: [
+              {
+                title: "What are Server Components?",
+                slug: "server-components",
+                shortDescription: "Components that run on the server and send no JavaScript to the client.",
+                estimatedMinutes: 24,
+                sections: [
+                  { title: "The Server Components Model", content: "RSC allows components to run exclusively on the server, reducing bundle size. They can fetch data and access server resources directly." },
+                  { title: "Client vs Server Components", content: "Server components cannot use hooks or state. Client components use `'use client'` directive. The boundary is defined by the developer." },
+                  { title: "Streaming SSR", content: "Server components can stream HTML to the client, improving perceived performance." },
+                  { title: "Data Fetching in RSC", content: "Use `async/await` directly in server components to fetch data." },
+                ],
+              },
+            ],
+          },
+          {
+            title: "Advanced Hooks and APIs",
+            slug: "advanced-hooks",
+            description: "useSyncExternalStore, useInsertionEffect, and more.",
+            topics: [
+              {
+                title: "useSyncExternalStore",
+                slug: "use-sync-external-store",
+                shortDescription: "Subscribe to external stores (Redux, Zustand).",
+                estimatedMinutes: 16,
+                sections: [
+                  { title: "What it Does", content: "Safely reads from external stores and forces re‑renders when the store changes." },
+                  { title: "When to Use", content: "When integrating with non‑React state management libraries." },
+                ],
+              },
+              {
+                title: "useInsertionEffect",
+                slug: "use-insertion-effect",
+                shortDescription: "For inserting styles before DOM mutation.",
+                estimatedMinutes: 14,
+                sections: [
+                  { title: "When to Use", content: "Primarily for CSS‑in‑JS libraries to insert styles without layout shifts." },
+                ],
+              },
+            ],
+          },
+          {
+            title: "Error Boundaries, Portals, and Strict Mode",
+            slug: "boundaries-portals",
+            description: "Graceful error handling, rendering outside the DOM tree, and debugging.",
+            topics: [
+              {
+                title: "Error Boundaries – Catch JavaScript Errors",
+                slug: "error-boundaries",
+                shortDescription: "Catch errors in component trees.",
+                estimatedMinutes: 18,
+                sections: [
+                  { title: "What are Error Boundaries?", content: "Class components that implement `static getDerivedStateFromError` and `componentDidCatch`." },
+                  { title: "Usage", content: "Wrap components with `<ErrorBoundary>` to show a fallback UI instead of crashing the whole app." },
+                ],
+              },
+              {
+                title: "Portals – Render Outside the Parent",
+                slug: "portals",
+                shortDescription: "Render components in a different DOM node.",
+                estimatedMinutes: 16,
+                sections: [
+                  { title: "What are Portals?", content: "`ReactDOM.createPortal(child, container)` – renders a component in a DOM node outside the parent hierarchy." },
+                  { title: "Use Cases", content: "Modals, tooltips, dropdowns – escape CSS overflow and stacking contexts." },
+                ],
+              },
+              {
+                title: "Strict Mode – Development Helper",
+                slug: "strict-mode",
+                shortDescription: "Identify potential issues in development.",
+                estimatedMinutes: 14,
+                sections: [
+                  { title: "What is Strict Mode?", content: "`<React.StrictMode>` runs additional checks to detect unsafe lifecycles, deprecated APIs, and side‑effects." },
+                  { title: "Double‑Rendering", content: "In strict mode, components are rendered twice in development to detect side effects." },
+                ],
+              },
+            ],
+          },
         ],
       },
+
+      // -------------------- INTERVIEW PREP --------------------
       {
         name: "Interview Prep",
         slug: "interview-prep",
@@ -332,39 +466,90 @@ async function seedReactCategory() {
         level: StudyLevel.INTERVIEW_PREP,
         modules: [
           {
-            title: "React Interview Topics",
-            slug: "react-interview",
-            description: "Frequently asked React topics.",
+            title: "Core React Concepts",
+            slug: "react-core-interview",
+            description: "Components, state, props, hooks, and lifecycle.",
             topics: [
               {
-                title: "Hooks",
+                title: "Hooks – Rules and Usage",
                 slug: "react-interview-hooks",
-                shortDescription: "useState, useEffect, useContext.",
-                estimatedMinutes: 18,
+                shortDescription: "useState, useEffect, useContext, useReducer.",
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "Rules of Hooks", content: "Only call at top level." },
-                  { title: "Custom Hooks", content: "Reusable logic." }
-                ]
+                  { title: "Rules of Hooks", content: "Only call hooks at the top level (not inside conditionals/loops). Only call hooks from React functions or custom hooks." },
+                  { title: "Custom Hooks", content: "Reusable logic – e.g., `useFetch`, `useLocalStorage`. They can compose other hooks." },
+                  { title: "useState vs useReducer", content: "useState for simple state; useReducer for complex state logic with multiple sub‑values." },
+                ],
               },
               {
-                title: "Virtual DOM",
+                title: "Virtual DOM and Reconciliation",
                 slug: "react-interview-virtual-dom",
                 shortDescription: "How React updates the DOM.",
-                estimatedMinutes: 16,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Reconciliation", content: "Diffing algorithm." },
-                  { title: "Keys", content: "Importance in lists." }
-                ]
-              }
+                  { title: "Virtual DOM", content: "A lightweight JavaScript representation of the real DOM. React uses it to calculate the minimal changes needed." },
+                  { title: "Reconciliation", content: "The diffing algorithm compares the old and new virtual DOM trees. Keys help identify moved elements." },
+                  { title: "Fiber Architecture", content: "React's new reconciliation engine that enables concurrent rendering and suspense." },
+                ],
+              },
+              {
+                title: "Rendering and Performance",
+                slug: "react-interview-performance",
+                shortDescription: "Re‑renders, memoization, and optimization.",
+                estimatedMinutes: 22,
+                sections: [
+                  { title: "What Triggers a Re‑render?", content: "State change, prop change, context change, parent re‑render." },
+                  { title: "React.memo and useMemo", content: "Prevent unnecessary re‑renders. `React.memo` for components, `useMemo` for values." },
+                  { title: "useCallback", content: "Stable function references to prevent child re‑renders." },
+                ],
+              },
             ],
-          }
+          },
+          {
+            title: "Advanced Topics",
+            slug: "react-interview-advanced",
+            description: "Context, Redux, Server Components, and performance.",
+            topics: [
+              {
+                title: "Context vs Redux",
+                slug: "react-interview-context-redux",
+                shortDescription: "When to use each.",
+                estimatedMinutes: 20,
+                sections: [
+                  { title: "Context", content: "Good for low‑frequency updates (themes, auth). Not for high‑frequency updates." },
+                  { title: "Redux", content: "Predictable state management, better for complex state and frequent updates." },
+                ],
+              },
+              {
+                title: "React 18 Features",
+                slug: "react-interview-18",
+                shortDescription: "Concurrent features, Suspense, and Server Components.",
+                estimatedMinutes: 22,
+                sections: [
+                  { title: "Concurrent Rendering", content: "Interruptible rendering for better UX." },
+                  { title: "Suspense", content: "Declarative data fetching." },
+                  { title: "Server Components", content: "Zero‑bundle components that run on the server." },
+                ],
+              },
+              {
+                title: "Common Pitfalls",
+                slug: "react-interview-pitfalls",
+                shortDescription: "Stale closures, missing keys, and side effects.",
+                estimatedMinutes: 18,
+                sections: [
+                  { title: "Stale Closures in useEffect", content: "Effects close over values from the render. Missing dependencies cause stale closures." },
+                  { title: "Keys in Lists", content: "Always use stable, unique keys. Avoid using array index." },
+                ],
+              },
+            ],
+          },
         ],
       },
     ],
   };
 
   await ensureCategory(reactCategory);
-  console.log("✓ React Fundamentals category seeded");
+  console.log("✅ React Fundamentals category seeded (ultra‑detailed)");
 }
 
 async function main() {

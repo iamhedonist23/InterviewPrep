@@ -7,14 +7,14 @@ type TopicSeed = {
   slug: string;
   shortDescription: string;
   estimatedMinutes: number;
-  sections: Array<{ title: string; content: string }>;
+  sections?: Array<{ title: string; content: string }>;
 };
 
 type ModuleSeed = {
   title: string;
   slug: string;
   description: string;
-  topics: TopicSeed[];
+  topics?: TopicSeed[];
 };
 
 type PathSeed = {
@@ -25,14 +25,16 @@ type PathSeed = {
   modules: ModuleSeed[];
 };
 
-async function ensureCategory(category: {
+type CategorySeed = {
   name: string;
   slug: string;
   description: string;
   icon: string;
   sortOrder: number;
   paths: PathSeed[];
-}) {
+};
+
+async function ensureCategory(category: CategorySeed) {
   const createdCategory = await prisma.studyCategory.upsert({
     where: { slug: category.slug },
     update: { name: category.name, description: category.description, icon: category.icon, isPublished: true, sortOrder: category.sortOrder },
@@ -75,7 +77,8 @@ async function ensureCategory(category: {
         },
       });
 
-      for (const topicSeed of moduleSeed.topics) {
+      const topics = moduleSeed.topics ?? [];
+      for (const topicSeed of topics) {
         const topic = await prisma.studyTopic.upsert({
           where: { categoryId_slug: { categoryId: createdCategory.id, slug: topicSeed.slug } },
           update: {
@@ -100,8 +103,9 @@ async function ensureCategory(category: {
           },
         });
 
-        for (let index = 0; index < topicSeed.sections.length; index += 1) {
-          const section = topicSeed.sections[index];
+        const sections = topicSeed.sections ?? [];
+        for (let index = 0; index < sections.length; index += 1) {
+          const section = sections[index];
           await prisma.studyTopicSection.upsert({
             where: { id: `${topic.id}-section-${index}` },
             update: { title: section.title, content: section.content, sortOrder: index },
@@ -120,13 +124,14 @@ async function ensureCategory(category: {
 }
 
 async function seedKotlinCategory() {
-  const kotlinCategory = {
+  const kotlinCategory: CategorySeed = {
     name: "Kotlin Fundamentals",
     slug: "kotlin-fundamentals",
     description: "Learn Kotlin syntax, null safety, data classes, and common JVM language patterns.",
     icon: "KT",
     sortOrder: 11,
     paths: [
+      // -------------------- BEGINNER --------------------
       {
         name: "Beginner",
         slug: "beginner",
@@ -134,57 +139,72 @@ async function seedKotlinCategory() {
         level: StudyLevel.BEGINNER,
         modules: [
           {
-            title: "Kotlin Basics",
+            title: "Kotlin Basics – The Essentials",
             slug: "kotlin-basics",
             description: "The most important Kotlin concepts for interviews and development.",
             topics: [
               {
-                title: "Null Safety and Data Classes",
+                title: "Null Safety and Data Classes – Safer Code",
                 slug: "kotlin-null-safety-data-classes",
                 shortDescription: "Handle nullable values and model data cleanly.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 24,
                 sections: [
-                  { title: "Null safety", content: "Kotlin tracks nullability in the type system: a type like String cannot hold null, while String? explicitly allows it. This catches null pointer issues at compile time instead of runtime." },
-                  { title: "Safe calls and Elvis operator", content: "The safe call operator ?. returns null instead of throwing if the receiver is null; the Elvis operator ?: supplies a default value in that case.\n\nExample:\nval length = name?.length ?: 0" },
-                  { title: "The !! operator", content: "!! forcibly asserts a nullable value is non-null, throwing a NullPointerException if it's actually null — use sparingly, only when you're certain the value can't be null." },
-                  { title: "Data classes", content: "Data classes reduce boilerplate when creating simple value objects, automatically generating equals(), hashCode(), toString(), and copy().\n\nExample:\ndata class User(val name: String, val age: Int)\nval older = user.copy(age = user.age + 1)" },
-                  { title: "Destructuring declarations", content: "Data classes support destructuring, letting you unpack their properties into separate variables in one line.\n\nExample:\nval (name, age) = user" },
+                  { title: "Null Safety – The Type System Guards You", content: "Kotlin's type system distinguishes between nullable (`String?`) and non‑null (`String`) types. This design eliminates most `NullPointerException` errors at compile time. The compiler forces you to handle nullable values explicitly." },
+                  { title: "Safe Call (`?.`) and Elvis (`?:`)", content: "`?.` returns `null` if the receiver is `null`, otherwise it proceeds. The Elvis operator `?:` provides a default value when the left‑hand side is `null`. Example: `val length = name?.length ?: 0`." },
+                  { title: "The `!!` Operator – Use with Caution", content: "`!!` asserts that a nullable value is non‑null. If it's `null`, it throws a `NullPointerException`. Use it only when you're absolutely sure the value won't be `null`." },
+                  { title: "Data Classes – Value Objects Made Easy", content: "Data classes automatically generate `equals()`, `hashCode()`, `toString()`, `copy()`, and destructuring. Example: `data class User(val name: String, val age: Int)`. `copy()` creates a new instance with updated fields." },
+                  { title: "Destructuring Declarations", content: "Data classes let you unpack their properties into variables: `val (name, age) = user`. This works for any type that defines `componentN()` functions." },
                 ],
               },
               {
-                title: "Functions and Extension Functions",
+                title: "Functions and Extension Functions – Reusable Logic",
                 slug: "kotlin-functions",
                 shortDescription: "First-class functions and functional programming patterns.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Function types", content: "Kotlin treats functions as first-class values. Higher-order functions take or return functions, enabling functional patterns like map and filter." },
-                  { title: "Lambda expressions", content: "Example:\nval doubled = listOf(1, 2, 3).map { it * 2 }\nval sum: (Int, Int) -> Int = { a, b -> a + b }" },
-                  { title: "Default and named arguments", content: "Parameters can have default values, and calls can name arguments explicitly, reducing the need for method overloading.\n\nExample:\nfun greet(name: String, greeting: String = \"Hello\") = \"$greeting, $name!\"\ngreet(name = \"Ana\")" },
-                  { title: "Extension functions", content: "Extension functions let you add methods to existing classes (even ones you don't own) without inheritance, keeping code clean and organized.\n\nExample:\nfun String.shout() = this.uppercase() + \"!\"\n\"hi\".shout() // \"HI!\"" },
-                  { title: "Infix functions", content: "A function marked infix can be called without a dot or parentheses, useful for building readable DSL-like syntax (e.g. 1 to 2 creates a Pair)." },
+                  { title: "Function Types – Functions as Values", content: "Kotlin treats functions as first‑class citizens. You can assign functions to variables, pass them as arguments, and return them from functions. Example: `val sum: (Int, Int) -> Int = { a, b -> a + b }`." },
+                  { title: "Lambda Expressions", content: "Lambdas are concise anonymous functions. `list.map { it * 2 }` uses a lambda. When there's a single parameter, you can refer to it as `it`." },
+                  { title: "Default and Named Arguments", content: "Define default parameter values: `fun greet(name: String, greeting: String = \"Hello\") = \"$greeting, $name!\"`. Calls can use named arguments: `greet(name = \"Ana\")`." },
+                  { title: "Extension Functions – Add Functions to Existing Types", content: "You can add new functions to a class without inheritance. Example: `fun String.shout() = this.uppercase() + \"!\"`. This is extremely powerful for building DSLs and utilities." },
+                  { title: "Infix Functions – Readable Syntax", content: "Mark a function with `infix` to call it without a dot or parentheses. Example: `1 to 2` creates a `Pair`. Common in domain‑specific languages." },
                 ],
               },
               {
-                title: "Coroutines Basics",
+                title: "Coroutines Basics – Lightweight Concurrency",
                 slug: "kotlin-coroutines",
                 shortDescription: "Lightweight concurrency for async operations.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 26,
                 sections: [
-                  { title: "What coroutines are", content: "Coroutines are lightweight threads that can be suspended and resumed without blocking the underlying OS thread. They simplify async code compared to nested callbacks." },
-                  { title: "suspend functions", content: "A function marked suspend can pause execution without blocking the thread, and can only be called from another suspend function or a coroutine.\n\nExample:\nsuspend fun fetchUser(id: Int): User {\n    delay(1000) // non-blocking\n    return api.getUser(id)\n}" },
-                  { title: "Launching coroutines", content: "launch starts a coroutine that doesn't return a result (fire-and-forget); async starts one that returns a Deferred<T> result you can await later.\n\nExample:\nCoroutineScope(Dispatchers.Main).launch {\n    val user = fetchUser(1)\n    updateUi(user)\n}" },
-                  { title: "Dispatchers", content: "Dispatchers.Main runs on the UI thread, Dispatchers.IO is optimized for blocking I/O work (network, disk), and Dispatchers.Default is optimized for CPU-intensive work." },
-                  { title: "Structured concurrency", content: "Coroutines launched within a CoroutineScope are automatically canceled together when that scope is canceled (e.g. when a screen is destroyed), preventing leaked background work." },
+                  { title: "What are Coroutines?", content: "Coroutines are lightweight threads that can be suspended and resumed without blocking the underlying OS thread. They simplify asynchronous code, making it look sequential." },
+                  { title: "Suspend Functions", content: "A `suspend` function can pause execution without blocking a thread. It can be called only from another suspend function or a coroutine. Example: `suspend fun fetchUser(id: Int): User { delay(1000); return api.getUser(id) }`." },
+                  { title: "Launch and Async", content: "`launch` starts a coroutine that doesn't return a result (fire‑and‑forget). `async` starts a coroutine that returns a `Deferred<T>` result, which you can `await` later. Use `launch` for background tasks, `async` for parallel computation." },
+                  { title: "Dispatchers – Thread Pools", content: "`Dispatchers.Main` (UI thread), `Dispatchers.IO` (optimised for I/O), `Dispatchers.Default` (CPU‑intensive work). Choose the right dispatcher for the task." },
+                  { title: "Structured Concurrency", content: "Coroutines launched within a `CoroutineScope` are automatically cancelled when the scope is cancelled. This prevents background leaks and ensures parent‑child cancellation propagation." },
+                ],
+              },
+              // New: Sealed Classes and When
+              {
+                title: "Sealed Classes and `when` – Exhaustive Matching",
+                slug: "sealed-when",
+                shortDescription: "Define restricted class hierarchies and use exhaustive `when`.",
+                estimatedMinutes: 22,
+                sections: [
+                  { title: "Sealed Classes – Limited Subtypes", content: "A sealed class defines a closed set of subclasses. All subclasses must be declared in the same file. This enables exhaustive `when` expressions." },
+                  { title: "Sealed Interfaces", content: "Sealed interfaces are also available, allowing multiple inheritance of sealed types." },
+                  { title: "Exhaustive `when`", content: "When you use `when` on a sealed class, the compiler forces you to cover all subclasses, making your code safer." },
+                  { title: "Example: `sealed class Result { data class Success(val data: String) : Result(); data class Error(val message: String) : Result() }`", content: "Then in a `when`, you handle both `Success` and `Error`." },
                 ],
               },
             ],
-          }
+          },
         ],
       },
+
+      // -------------------- INTERMEDIATE --------------------
       {
         name: "Intermediate",
         slug: "intermediate",
-        description: "Deeper Kotlin: generics, delegation, and more.",
+        description: "Deeper Kotlin: generics, delegation, collections, and scope functions.",
         level: StudyLevel.INTERMEDIATE,
         modules: [
           {
@@ -193,61 +213,116 @@ async function seedKotlinCategory() {
             description: "Generics, delegation, and type system.",
             topics: [
               {
-                title: "Generics and Variance",
+                title: "Generics and Variance – Type Parameters",
                 slug: "kotlin-generics-variance",
                 shortDescription: "Type parameters, in/out projections.",
-                estimatedMinutes: 22,
+                estimatedMinutes: 26,
                 sections: [
-                  { title: "Generic classes and functions", content: "Kotlin supports generics just like Java, but with additional variance annotations.\n\nExample:\nclass Box<T>(val item: T)" },
-                  { title: "Declaration-site variance", content: "The 'in' and 'out' annotations on type parameters define variance at declaration site: out for producer (covariant), in for consumer (contravariant).\n\nExample:\ninterface Producer<out T> { fun produce(): T }" },
-                  { title: "Type projections", content: "Using star projections (Box<*>) or explicit bounds when you don't know the exact type." },
-                  { title: "reified types", content: "With inline functions and reified type parameters, you can access the actual type at runtime, e.g. for type checks and casting.\n\nExample:\ninline fun <reified T> isType(value: Any) = value is T" },
-                  { title: "Type-safe builders", content: "Kotlin's DSL capabilities rely on higher-order functions with receivers, enabling type-safe HTML or SQL builders." },
+                  { title: "Generic Classes and Functions", content: "`class Box<T>(val item: T)` – generic types are erased at runtime, like Java." },
+                  { title: "Declaration‑site Variance – `out` and `in`", content: "`out` marks a type as covariant (producer): you can read, but not write. `in` marks contravariant (consumer): you can write, but not read. This provides type safety." },
+                  { title: "Type Projections", content: "`Box<*>` is a star projection – you don't know the exact type, but you can still read from it safely." },
+                  { title: "Reified Types with `inline`", content: "`inline fun <reified T> isType(value: Any) = value is T` – reified allows you to access the actual type at runtime, which is otherwise erased." },
+                  { title: "Type‑Safe Builders", content: "Using lambda with receiver (`fun buildString(builder: StringBuilder.() -> Unit)`) lets you create DSLs like HTML or SQL builders." },
                 ],
               },
               {
-                title: "Delegation",
+                title: "Delegation – Composition by Default",
                 slug: "kotlin-delegation",
                 shortDescription: "Class delegation and property delegation.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Class delegation", content: "The 'by' keyword lets you delegate implementation of an interface to another object, reducing boilerplate.\n\nExample:\nclass CountingSet<T>(val inner: MutableSet<T>) : MutableSet<T> by inner" },
-                  { title: "Property delegation", content: "Property delegates (lazy, observable, vetoable) allow you to reuse access logic for properties.\n\nExample:\nval lazyValue: String by lazy { compute() }" },
-                  { title: "Custom delegates", content: "You can create your own property delegates by implementing getValue and setValue, useful for shared preferences or database fields." },
-                  { title: "Delegation vs inheritance", content: "Delegation offers composition over inheritance, making code more flexible and easier to test." },
+                  { title: "Class Delegation (`by`)", content: "`class CountingSet<T>(val inner: MutableSet<T>) : MutableSet<T> by inner` – the `by` keyword delegates all methods to `inner`. You can then override specific methods." },
+                  { title: "Property Delegation", content: "`val lazyValue: String by lazy { compute() }` – lazy initialisation. Other built‑in delegates: `observable`, `vetoable`. You can also create custom delegates." },
+                  { title: "Custom Delegates", content: "Implement `getValue` and `setValue` to create custom property delegates, useful for preferences or database fields." },
+                  { title: "Delegation vs Inheritance", content: "Delegation favours composition over inheritance, making your code more flexible and easier to test." },
+                ],
+              },
+              // New: Collections and Sequences
+              {
+                title: "Collections and Sequences – Efficient Data Processing",
+                slug: "kotlin-collections",
+                shortDescription: "List, Set, Map, and the power of sequences.",
+                estimatedMinutes: 26,
+                sections: [
+                  { title: "Immutable vs Mutable Collections", content: "Kotlin distinguishes between read‑only (`List<T>`) and mutable (`MutableList<T>`). Prefer immutable by default." },
+                  { title: "Common Operations", content: "`filter`, `map`, `flatMap`, `groupBy`, `associate`, `partition`, `sorted`, `distinct`. These are extensions on collections." },
+                  { title: "Sequences – Lazy Collections", content: "Sequences (`asSequence()`) process elements lazily – operations are deferred until a terminal operation (e.g., `toList()`, `sum()`) is called. This can improve performance for large data." },
+                  { title: "Sequence vs List", content: "Use sequences when you have a large chain of operations (avoid intermediate collections). Lists are eager; sequences are lazy." },
+                ],
+              },
+              // New: Scope Functions
+              {
+                title: "Scope Functions – `let`, `apply`, `run`, `with`, `also`",
+                slug: "scope-functions",
+                shortDescription: "Understand the five scope functions and when to use each.",
+                estimatedMinutes: 24,
+                sections: [
+                  { title: "`let` – Execute a block on a non‑null object", content: "`val result = obj?.let { it.doSomething() }` – commonly used for null‑safe calls." },
+                  { title: "`apply` – Configure an object", content: "`val user = User().apply { name = \"Alice\"; age = 30 }` – returns the receiver." },
+                  { title: "`run` – Execute a block and return a result", content: "`val result = user.run { name.length }` – works with the receiver as `this`." },
+                  { title: "`with` – Run block with receiver, but not an extension", content: "`with(user) { println(name) }` – takes the receiver as a parameter." },
+                  { title: "`also` – Perform additional actions", content: "`user.also { log(it) }` – returns the receiver, useful for side effects." },
                 ],
               },
             ],
-          }
+          },
         ],
       },
+
+      // -------------------- ADVANCED --------------------
       {
         name: "Advanced",
         slug: "advanced",
-        description: "Kotlin for functional programming and DSLs.",
+        description: "Kotlin for functional programming, DSLs, flows, and metaprogramming.",
         level: StudyLevel.ADVANCED,
         modules: [
           {
-            title: "Functional Patterns",
-            slug: "functional-patterns",
-            description: "Higher-order functions, monads, and effect handling.",
+            title: "Functional Patterns and DSLs",
+            slug: "functional-dsls",
+            description: "Higher‑order functions, monads, and domain‑specific languages.",
             topics: [
               {
                 title: "Functional Programming in Kotlin",
                 slug: "kotlin-functional",
-                shortDescription: "Immutable data, higher-order functions, and monads.",
+                shortDescription: "Immutable data, higher‑order functions, and monads.",
                 estimatedMinutes: 24,
                 sections: [
-                  { title: "Immutability", content: "Prefer val over var and use immutable collections (listOf, mapOf) to avoid side effects." },
-                  { title: "Higher-order functions", content: "Kotlin's standard library uses higher-order functions extensively: filter, map, fold, etc." },
-                  { title: "Monads and Arrow", content: "Libraries like Arrow bring functional constructs like Either, Option, and IO to Kotlin, enabling pure functional programming." },
-                  { title: "Tail recursion", content: "The tailrec modifier optimizes recursive functions into loops, avoiding stack overflow." },
+                  { title: "Immutability", content: "Prefer `val` over `var`. Use immutable collections (`listOf`, `mapOf`). This leads to safer, more predictable code." },
+                  { title: "Higher‑order Functions", content: "Kotlin's standard library is built on them: `filter`, `map`, `fold`, `takeWhile`, etc." },
+                  { title: "Monads and Arrow", content: "Arrow is a functional library that provides `Either`, `Option`, `IO`, and other functional constructs, enabling pure functional programming." },
+                  { title: "Tail Recursion (`tailrec`)", content: "Use `tailrec` on recursive functions to optimise them into loops, avoiding stack overflow." },
+                ],
+              },
+              {
+                title: "Flows and Channels – Reactive Streams",
+                slug: "kotlin-flows",
+                shortDescription: "Cold streams, flow operators, and channels.",
+                estimatedMinutes: 26,
+                sections: [
+                  { title: "Flows – Cold Asynchronous Streams", content: "`Flow` is a cold stream that emits values asynchronously. Like sequences, they are lazy and only start producing when collected." },
+                  { title: "Flow Operators", content: "`map`, `filter`, `transform`, `buffer`, `conflate`, `catch`, `retry`. These are similar to collection operators." },
+                  { title: "StateFlow and SharedFlow", content: "`StateFlow` is a hot stream that holds a state and emits current state to new collectors. `SharedFlow` is a broadcast stream." },
+                  { title: "Channels – Hot Communication", content: "`Channel<T>` is a hot stream for producer‑consumer patterns, similar to blocking queues, but with suspend functions." },
+                ],
+              },
+              // New: Type Aliases and Annotations
+              {
+                title: "Type Aliases and Annotations",
+                slug: "type-aliases-annotations",
+                shortDescription: "Create shorter names and add metadata.",
+                estimatedMinutes: 18,
+                sections: [
+                  { title: "Type Aliases – Shorthand for Complex Types", content: "`typealias UserMap = Map<String, User>` – makes code more readable." },
+                  { title: "Annotations – Metadata", content: "`@Target`, `@Retention` define where annotations can be used. Custom annotations: `annotation class MyAnnotation`." },
+                  { title: "Reflection", content: "Kotlin reflection (`KClass`, `KFunction`) allows inspecting classes and functions at runtime, similar to Java reflection." },
                 ],
               },
             ],
-          }
+          },
         ],
       },
+
+      // -------------------- INTERVIEW PREP --------------------
       {
         name: "Interview Prep",
         slug: "interview-prep",
@@ -263,22 +338,42 @@ async function seedKotlinCategory() {
                 title: "Null Safety and Type System",
                 slug: "kotlin-interview-null",
                 shortDescription: "How Kotlin avoids NullPointerException.",
-                estimatedMinutes: 18,
+                estimatedMinutes: 20,
                 sections: [
-                  { title: "Safe calls and Elvis", content: "Explain with examples how ?. and ?: handle null safely." },
-                  { title: "Lateinit and lazy", content: "Difference between lateinit var and lazy initialization." },
-                  { title: "Type inference and smart casts", content: "Kotlin's smart casts automatically cast after a type check." },
+                  { title: "Safe calls and Elvis", content: "Explain with examples how `?.` and `?:` handle null safely." },
+                  { title: "Lateinit and lazy", content: "`lateinit var` for mutable properties initialised later; `lazy` for read‑only properties initialised on first access." },
+                  { title: "Smart Casts", content: "After a type check, Kotlin automatically casts the variable, eliminating explicit casting." },
                 ],
               },
               {
                 title: "Coroutines in Practice",
                 slug: "kotlin-interview-coroutines",
                 shortDescription: "Structured concurrency, cancellation, and error handling.",
-                estimatedMinutes: 20,
+                estimatedMinutes: 22,
                 sections: [
-                  { title: "Structured concurrency", content: "How scopes ensure coroutines are cancelled properly." },
-                  { title: "Exception handling", content: "Using CoroutineExceptionHandler and try-catch." },
-                  { title: "Flows", content: "Cold streams, flow operators, and state flows." },
+                  { title: "Structured Concurrency", content: "How scopes (`coroutineScope`, `supervisorScope`) ensure coroutines are cancelled properly." },
+                  { title: "Exception Handling", content: "Using `CoroutineExceptionHandler` and `try/catch` inside coroutines." },
+                  { title: "Flows", content: "Cold streams, flow operators, and StateFlow/SharedFlow for UI state management." },
+                ],
+              },
+              {
+                title: "Collections and Scope Functions",
+                slug: "kotlin-interview-collections",
+                shortDescription: "Common collection operations and scope functions.",
+                estimatedMinutes: 18,
+                sections: [
+                  { title: "Collection Operators", content: "`filter`, `map`, `groupBy`, `associate` – be able to explain and give examples." },
+                  { title: "Scope Functions", content: "When to use `let`, `apply`, `run`, `with`, `also` – explain their differences and typical use cases." },
+                ],
+              },
+              {
+                title: "Sealed Classes and When",
+                slug: "kotlin-interview-sealed",
+                shortDescription: "Exhaustive `when` and sealed hierarchies.",
+                estimatedMinutes: 18,
+                sections: [
+                  { title: "Sealed Classes", content: "How they restrict inheritance and enable exhaustive `when`." },
+                  { title: "When to Use Sealed Classes", content: "For modelling states (loading, success, error) or result types." },
                 ],
               },
             ],
@@ -289,7 +384,7 @@ async function seedKotlinCategory() {
   };
 
   await ensureCategory(kotlinCategory);
-  console.log("✓ Kotlin Fundamentals category seeded");
+  console.log("✅ Kotlin Fundamentals category seeded (ultra‑detailed)");
 }
 
 async function main() {
