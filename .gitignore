@@ -5,3 +5,4 @@ node_modules/
 .env.*.local
 !.env.example
 npm-debug.log*
+Interview_Website_full.zip

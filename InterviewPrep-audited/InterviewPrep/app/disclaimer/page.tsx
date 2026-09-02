@@ -1,4 +1,0 @@
-import type { Metadata } from "next";
-import { LegalPage } from "@/components/legal/legal-page";
-export const metadata: Metadata = { title: "Disclaimer", description: "InterviewPrep provides general interview preparation information and tools; read our disclaimer before relying on it." };
-export default function DisclaimerPage() { return <LegalPage title="Disclaimer" intro="InterviewPrep provides general interview preparation information and tools." ><h2>No guarantees</h2><p>Examples and guidance are educational. They are not professional legal, financial, recruiting, or career advice, and results vary by person and situation.</p><h2>External services</h2><p>Links or advertisements from third parties are separate from InterviewPrep. Review their policies before using those services.</p></LegalPage>; }

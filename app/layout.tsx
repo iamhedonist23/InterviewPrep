@@ -3,7 +3,7 @@ import "./globals.css";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { AdsenseScript } from "@/components/ads/adsense-script";
-import { PublicAdSlot } from "@/components/ads/public-ad-slot";
+import { PublicBottomAd, PublicSidebarAd, PublicTopAd } from "@/components/ads/public-ad-slot";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { siteConfig } from "@/lib/site";
 
@@ -22,5 +22,24 @@ const structuredData = [
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
-  return <html lang="en"><body suppressHydrationWarning><script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} /><AdsenseScript /><SessionProvider><Header /><main>{children}</main><PublicAdSlot /><Footer /></SessionProvider></body></html>;
+  return (
+    <html lang="en">
+      <body suppressHydrationWarning>
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+        <AdsenseScript />
+        <SessionProvider>
+          <Header />
+          <PublicTopAd />
+          <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-4 sm:px-6 xl:px-8">
+            <main className="min-w-0 flex-1">{children}</main>
+            <aside className="hidden w-[220px] shrink-0 xl:block">
+              <PublicSidebarAd />
+            </aside>
+          </div>
+          <PublicBottomAd />
+          <Footer />
+        </SessionProvider>
+      </body>
+    </html>
+  );
 }

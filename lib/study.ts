@@ -59,6 +59,8 @@ export const studyTopicSchema = z.object({
   slug,
   shortDescription: optionalText(300),
   estimatedMinutes: z.number().int().min(1).max(600).optional(),
+  prerequisiteIds: z.array(z.string()).optional(),
+  relatedTopicIds: z.array(z.string()).optional(),
   isPublished,
   sortOrder,
   seoTitle: optionalText(70),
