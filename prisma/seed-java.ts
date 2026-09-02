@@ -34,6 +34,33 @@ type CategorySeed = {
   paths: PathSeed[];
 };
 
+function buildUltraExplanation(topic: TopicSeed, module: ModuleSeed, path: PathSeed) {
+  const title = topic.title;
+  const subject = topic.description;
+  const lowerTitle = title.toLowerCase();
+  let deepDive = `Study ${title} as a practical Java skill, not as an isolated definition. Begin with the problem this topic solves: ${subject} The important question is what trade-off the feature makes, what guarantees it provides, and when another approach is more appropriate.`;
+
+  if (lowerTitle.includes("collection") || lowerTitle.includes("list") || lowerTitle.includes("set") || lowerTitle.includes("map") || lowerTitle.includes("comparator")) {
+    deepDive += " Compare ordering, uniqueness, lookup cost, memory use, null handling, and thread safety. Always connect the chosen implementation to the operations the application performs most often rather than choosing a collection by habit.";
+  } else if (lowerTitle.includes("exception") || lowerTitle.includes("error")) {
+    deepDive += " Separate expected failures from programming defects. Preserve the original cause, catch exceptions at a boundary where recovery is possible, and avoid empty catches or using exceptions for ordinary control flow.";
+  } else if (lowerTitle.includes("thread") || lowerTitle.includes("concurr") || lowerTitle.includes("synchron") || lowerTitle.includes("memory model")) {
+    deepDive += " Reason about shared state, atomicity, visibility, ordering, and ownership. A solution is correct only when every possible interleaving remains safe; making a variable volatile does not make a compound read-modify-write operation atomic.";
+  } else if (lowerTitle.includes("stream") || lowerTitle.includes("lambda") || lowerTitle.includes("functional")) {
+    deepDive += " Separate the data pipeline from its terminal side effect. Intermediate stream operations are lazy, pipelines should be readable, and parallel execution should be justified by workload size and measurement rather than assumed to be faster.";
+  } else if (lowerTitle.includes("generic") || lowerTitle.includes("wildcard") || lowerTitle.includes("type erasure")) {
+    deepDive += " Focus on compile-time type safety and the boundary between the generic API and runtime execution. Remember PECS: use extends for producers and super for consumers, and do not assume generic type arguments are available through ordinary runtime reflection.";
+  } else if (lowerTitle.includes("jdbc") || lowerTitle.includes("servlet") || lowerTitle.includes("database")) {
+    deepDive += " Treat resource ownership, input validation, transaction boundaries, connection reuse, and request concurrency as first-class concerns. The happy-path example is only the beginning of production-quality Java code.";
+  } else if (lowerTitle.includes("memory") || lowerTitle.includes("garbage") || lowerTitle.includes("heap") || lowerTitle.includes("stack")) {
+    deepDive += " Distinguish allocation from reachability: garbage collection reclaims objects that are no longer reachable, but it cannot repair an application that accidentally retains references. Diagnose memory issues with measurements, heap dumps, and GC logs.";
+  } else if (lowerTitle.includes("pattern") || lowerTitle.includes("singleton") || lowerTitle.includes("factory") || lowerTitle.includes("observer")) {
+    deepDive += " Treat the pattern as a vocabulary for a recurring design pressure, not as a mandatory template. Explain the coupling it removes, the coupling it introduces, and whether a simpler composition or dependency injection approach is clearer.";
+  }
+
+  return `## Ultra explanation\n\n${deepDive}\n\n### How to learn it\n1. Define the guarantee in one sentence.\n2. Build the smallest example that demonstrates the normal path.\n3. Test an edge case, failure path, and incorrect usage.\n4. Compare it with the closest alternative and explain the trade-off.\n\n### Interview-ready checklist\n- Explain the concept without relying on memorised wording.\n- Describe the relevant runtime, performance, safety, and maintainability implications.\n- Give a short code example and explain each important line.\n- Name one common production mistake and how you would prevent it.\n- State how you would test or measure the behaviour.\n\n### Practice task\nCreate a small example for **${title}** inside the **${module.title}** module of the **${path.name}** path. Include a normal case, an edge case, and a deliberately incorrect version. Write down the observed result, the reason for it, and the improvement you would make in production.`;
+}
+
 async function ensureCategory(category: CategorySeed) {
   const createdCategory = await prisma.studyCategory.upsert({
     where: { slug: category.slug },
@@ -103,7 +130,10 @@ async function ensureCategory(category: CategorySeed) {
           },
         });
 
-        const sections = topicSeed.sections ?? [];
+        const sections = [
+          ...(topicSeed.sections ?? []),
+          { title: "Ultra Explanation and Interview Guide", content: buildUltraExplanation(topicSeed, moduleSeed, pathSeed) },
+        ];
         for (let index = 0; index < sections.length; index += 1) {
           const section = sections[index];
           await prisma.studyTopicSection.upsert({

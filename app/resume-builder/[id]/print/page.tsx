@@ -1,14 +1,13 @@
 import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
-import Link from "next/link";
 import { authOptions } from "@/lib/auth";
 import { getOwnedResume, ResumeNotFoundError } from "@/lib/resume";
 import { getResumeTemplateComponent } from "@/components/resume/templates";
-import { DownloadPdfButton } from "@/components/resume/download-pdf-button";
+import { ResumePrintView } from "@/components/resume/resume-print-view";
 
 export const dynamic = "force-dynamic";
 
-export default async function ResumePreviewPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function ResumePrintPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);
   if (!session?.user?.id) redirect("/login?callbackUrl=/resume-builder");
 
@@ -17,16 +16,28 @@ export default async function ResumePreviewPage({ params }: { params: Promise<{ 
   try {
     const resume = await getOwnedResume(session.user.id, id);
     const ResumeTemplate = getResumeTemplateComponent(resume.template);
-    return (
-      <div className="min-h-screen bg-paper/60 py-10 print:bg-white print:py-0">
-        <div className="mx-auto mb-6 flex max-w-[8.5in] items-center justify-between px-4 print:hidden">
-          <Link href={`/resume-builder/${resume.id}`} className="text-sm font-bold text-coral">
-            ← Back to editor
-          </Link>
-          <DownloadPdfButton resumeId={resume.id} />
-        </div>
+    const returnUrl = `/resume-builder/${resume.id}/preview`;
 
-        <div className="resume-export-shell">
+    return (
+      <ResumePrintView resumeId={resume.id} returnUrl={returnUrl}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              if (typeof window !== "undefined") {
+                window.addEventListener("load", () => {
+                  window.setTimeout(() => {
+                    try {
+                      window.print();
+                    } catch (error) {
+                      // Browsers may block auto print without a user gesture.
+                    }
+                  }, 500);
+                });
+              }
+            `,
+          }}
+        />
+        <div className="min-h-screen bg-white p-0 print:bg-white print:p-0">
           <div id="resume-print-root">
             <ResumeTemplate
               title={resume.title}
@@ -42,7 +53,7 @@ export default async function ResumePreviewPage({ params }: { params: Promise<{ 
             />
           </div>
         </div>
-      </div>
+      </ResumePrintView>
     );
   } catch (error) {
     if (error instanceof ResumeNotFoundError) notFound();

@@ -73,11 +73,16 @@ export default async function LearnCategoryPage({ params }: Props) {
                         <li key={topic.id}>
                           <Link
                             href={`/learn/${item.slug}/${topic.slug}`}
-                            className="block rounded-xl border border-ink/10 p-4 leading-6 transition-colors hover:border-coral"
+                            className="group flex flex-col rounded-xl border border-ink/10 p-4 leading-6 transition-colors hover:border-coral hover:bg-coral/5"
                           >
-                            <span className="font-semibold text-ink">{topic.title}</span>
-                            {topic.shortDescription && <span className="mt-1 block text-sm text-ink/55">{topic.shortDescription}</span>}
-                            {topic.estimatedMinutes && <span className="mt-2 block text-xs font-bold uppercase tracking-widest text-ink/40">{topic.estimatedMinutes} min</span>}
+                            <div>
+                              <span className="font-semibold text-ink">{topic.title}</span>
+                              {topic.shortDescription && <span className="mt-1 block text-sm text-ink/55">{topic.shortDescription}</span>}
+                              {topic.estimatedMinutes && <span className="mt-2 block text-xs font-bold uppercase tracking-widest text-ink/40">{topic.estimatedMinutes} min</span>}
+                            </div>
+                            <span className="mt-4 inline-flex items-center text-sm font-semibold text-coral">
+                              Learn in Detail <span className="ml-1 transition-transform group-hover:translate-x-1">→</span>
+                            </span>
                           </Link>
                         </li>
                       ))}

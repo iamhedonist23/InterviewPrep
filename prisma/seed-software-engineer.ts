@@ -1,4 +1,5 @@
 import { PrismaClient, StudyLevel } from "@prisma/client";
+import { ultraExplanationSection } from "./seed-topic-enrichment";
 
 const prisma = new PrismaClient();
 
@@ -103,7 +104,7 @@ async function ensureCategory(category: CategorySeed) {
           },
         });
 
-        const sections = topicSeed.sections ?? [];
+        const sections = [...(topicSeed.sections ?? []), ultraExplanationSection(topicSeed, moduleSeed.title, pathSeed.name)];
         for (let index = 0; index < sections.length; index += 1) {
           const section = sections[index];
           await prisma.studyTopicSection.upsert({

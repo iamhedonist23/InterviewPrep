@@ -176,9 +176,9 @@ export default async function QuestionPage({ params }: Props) {
               </div>
             </article>
 
-            <aside className="h-fit rounded-2xl bg-ink p-5 text-paper sm:p-6">
-              <h2 className="text-lg font-bold">Ready to practice?</h2>
-              <p className="mt-3 text-sm leading-6 text-paper/65">
+            <aside className="h-fit self-start rounded-2xl bg-ink p-5 text-paper sm:p-6 lg:sticky lg:top-24 lg:max-w-[280px] lg:justify-self-end">
+              <h2 className="text-lg font-bold sm:text-xl">Ready to practice?</h2>
+              <p className="mt-3 text-sm leading-6 text-paper/65 sm:text-[15px]">
                 Turn this guide into a clear answer in your own voice.
               </p>
               <Button

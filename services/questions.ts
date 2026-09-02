@@ -2,7 +2,7 @@ import { Difficulty, ExperienceLevel, InterviewType, Prisma } from "@prisma/clie
 import { prisma } from "@/lib/prisma";
 
 export type QuestionFilters = {
-  query?: string; category?: string; experience?: ExperienceLevel; difficulty?: Difficulty; interviewType?: InterviewType; page?: number;
+  query?: string; category?: string; subcategory?: string; experience?: ExperienceLevel; difficulty?: Difficulty; interviewType?: InterviewType; page?: number;
 };
 export const PAGE_SIZE = 12;
 export const SEARCH_PAGE_SIZE = 10;
@@ -28,6 +28,7 @@ export async function listQuestions(filters: QuestionFilters) {
   const safe = validEnumFilters(filters);
   const where: Prisma.InterviewQuestionWhereInput = { isPublished: true };
   if (filters.category) where.category = { slug: filters.category };
+  if (filters.subcategory) where.subcategory = { slug: filters.subcategory };
   if (safe.experience) where.experienceLevel = safe.experience;
   if (safe.difficulty) where.difficulty = safe.difficulty;
   if (safe.interviewType) where.interviewType = safe.interviewType;
