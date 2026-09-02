@@ -1,1 +1,0 @@
-export function Input({ label, placeholder }: { label: string; placeholder?: string }) { return <label className="block text-sm font-semibold">{label}<input className="mt-2 h-12 w-full rounded-xl border border-ink/15 bg-paper px-4 font-normal placeholder:text-ink/45" placeholder={placeholder} /></label>; }
