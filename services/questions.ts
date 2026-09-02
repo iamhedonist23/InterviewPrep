@@ -1,4 +1,5 @@
 import { Difficulty, ExperienceLevel, InterviewType, Prisma } from "@prisma/client";
+import { unstable_cache } from "next/cache";
 import { prisma } from "@/lib/prisma";
 
 export type QuestionFilters = {
@@ -6,6 +7,7 @@ export type QuestionFilters = {
 };
 export const PAGE_SIZE = 12;
 export const SEARCH_PAGE_SIZE = 10;
+const PUBLIC_CONTENT_CACHE_TAG = "public:content";
 
 // URL query params arrive as arbitrary, unvalidated strings. Prisma throws a
 // PrismaClientValidationError (crashing the page's render) if an enum-typed
@@ -23,7 +25,7 @@ function validEnumFilters(filters: QuestionFilters) {
   };
 }
 
-export async function listQuestions(filters: QuestionFilters) {
+async function queryQuestions(filters: QuestionFilters) {
   const page = Math.max(1, filters.page ?? 1);
   const safe = validEnumFilters(filters);
   const where: Prisma.InterviewQuestionWhereInput = { isPublished: true };
@@ -39,7 +41,11 @@ export async function listQuestions(filters: QuestionFilters) {
   ]);
   return { questions, total, page, pageCount: Math.ceil(total / PAGE_SIZE) };
 }
-export async function getQuestion(slug: string) {
+export async function listQuestions(filters: QuestionFilters) {
+  const key = JSON.stringify({ ...filters, query: filters.query?.trim() ?? "" });
+  return unstable_cache(queryQuestions, ["public-questions", key], { revalidate: 1800, tags: [PUBLIC_CONTENT_CACHE_TAG] })(filters);
+}
+async function queryQuestion(slug: string) {
   return prisma.interviewQuestion.findFirst({
     where: {
       slug,
@@ -86,7 +92,9 @@ export async function getQuestion(slug: string) {
     },
   });
 }
-export async function relatedQuestions(question: { id: string; categoryId: string; tags: Prisma.JsonValue }) { return prisma.interviewQuestion.findMany({ where: { isPublished: true, categoryId: question.categoryId, id: { not: question.id } }, include: { category: true }, take: 4, orderBy: { createdAt: "desc" } }); }
+export async function getQuestion(slug: string) { return unstable_cache(queryQuestion, ["public-question", slug], { revalidate: 3600, tags: [PUBLIC_CONTENT_CACHE_TAG] })(slug); }
+async function queryRelatedQuestions(question: { id: string; categoryId: string; tags: Prisma.JsonValue }) { return prisma.interviewQuestion.findMany({ where: { isPublished: true, categoryId: question.categoryId, id: { not: question.id } }, include: { category: true }, take: 4, orderBy: { createdAt: "desc" } }); }
+export async function relatedQuestions(question: { id: string; categoryId: string; tags: Prisma.JsonValue }) { return unstable_cache(queryRelatedQuestions, ["public-related-questions", question.id, question.categoryId], { revalidate: 3600, tags: [PUBLIC_CONTENT_CACHE_TAG] })(question); }
 export async function searchContent(filters: QuestionFilters & { sort?: "relevance" | "newest" }) {
   const page = Math.max(1, filters.page ?? 1);
   const query = filters.query?.trim() ?? "";

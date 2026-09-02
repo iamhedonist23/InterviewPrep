@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { QuestionCard } from "@/components/questions/question-card";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { prisma } from "@/lib/prisma";
+import { getCachedPublicQuestionCategory } from "@/lib/public-content";
 
 export const dynamic = "force-dynamic";
 type Props = {
@@ -13,7 +13,8 @@ type Props = {
 };
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { category } = await params;
-  const item = await prisma.category.findUnique({ where: { slug: category } });
+  const result = await getCachedPublicQuestionCategory(category, 1);
+  const item = result?.item;
   return item
     ? {
         title: `${item.name} interview questions`,
@@ -28,37 +29,9 @@ export default async function CategoryPage({ params, searchParams }: Props) {
   const { category } = await params;
   const { page: pageParam } = await searchParams;
   const page = Math.max(1, Number(pageParam) || 1);
-  const pageSize = 12;
-  const item = await prisma.category.findUnique({
-    where: { slug: category },
-    include: {
-      subcategories: true,
-      questions: {
-        where: { isPublished: true },
-        include: { category: true, subcategory: true },
-        take: pageSize,
-        skip: (page - 1) * pageSize,
-        orderBy: { createdAt: "desc" },
-      },
-    },
-  });
-  if (!item) notFound();
-  const [totalQuestions, relatedCategories, relatedArticles] = await Promise.all([
-    prisma.interviewQuestion.count({
-      where: { categoryId: item.id, isPublished: true },
-    }),
-    prisma.category.findMany({
-      where: { group: item.group, id: { not: item.id } },
-      orderBy: { name: "asc" },
-      take: 5,
-    }),
-    prisma.article.findMany({
-      where: { isPublished: true, categoryId: item.id },
-      orderBy: { publishedAt: "desc" },
-      take: 3,
-    }),
-  ]);
-  const pageCount = Math.ceil(totalQuestions / pageSize);
+  const result = await getCachedPublicQuestionCategory(category, page);
+  if (!result) notFound();
+  const { item, totalQuestions, relatedCategories, relatedArticles, pageCount } = result;
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const breadcrumb = {
     "@context": "https://schema.org",

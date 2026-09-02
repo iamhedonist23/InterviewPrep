@@ -13,7 +13,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     prisma.interviewQuestion.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.article.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.studyCategory.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
-    prisma.studyTopic.findMany({ where: { isPublished: true, category: { isPublished: true } }, select: { slug: true, updatedAt: true, category: { select: { slug: true } } } }),
+    prisma.studyTopic.findMany({ where: { isPublished: true, category: { isPublished: true }, module: { isPublished: true, studyPath: { isPublished: true } } }, select: { slug: true, updatedAt: true, category: { select: { slug: true } } } }),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(path => ({

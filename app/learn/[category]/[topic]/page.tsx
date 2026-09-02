@@ -9,7 +9,8 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StudyExercise } from "@/components/study/study-exercise";
 import { TopicProgressActions } from "@/components/study/topic-progress-actions";
 import { SaveTopicButton } from "@/components/study/save-topic-button";
-import { getPublishedTopic, getOwnedTopicProgress, getAdjacentTopics } from "@/lib/study";
+import { getOwnedTopicProgress } from "@/lib/study";
+import { getPublishedTopic, getAdjacentTopics, getPublishedTopicLinks } from "@/lib/study-public";
 import { prisma } from "@/lib/prisma";
 
 export const dynamic = "force-dynamic";
@@ -32,30 +33,18 @@ export default async function LearnTopicPage({ params }: Props) {
   if (!item) notFound();
 
   const session = await getServerSession(authOptions);
-  const [progress, savedTopic, adjacent] = await Promise.all([
+  const prerequisiteIds = Array.isArray(item.prerequisiteIds) ? item.prerequisiteIds.filter((id): id is string => typeof id === "string") : [];
+  const relatedTopicIds = Array.isArray(item.relatedTopicIds) ? item.relatedTopicIds.filter((id): id is string => typeof id === "string") : [];
+  const [progress, savedTopic, adjacent, prerequisiteLinks, relatedTopicLinks] = await Promise.all([
     session?.user?.id ? getOwnedTopicProgress(session.user.id, item.id) : Promise.resolve(null),
     session?.user?.id ? prisma.savedStudyTopic.findUnique({ where: { userId_topicId: { userId: session.user.id, topicId: item.id } } }) : Promise.resolve(null),
     getAdjacentTopics(item.category.slug, item.id),
+    getPublishedTopicLinks(prerequisiteIds),
+    getPublishedTopicLinks(relatedTopicIds),
   ]);
+  const prerequisites = prerequisiteLinks.sort((left, right) => prerequisiteIds.indexOf(left.id) - prerequisiteIds.indexOf(right.id));
+  const relatedTopics = relatedTopicLinks.sort((left, right) => relatedTopicIds.indexOf(left.id) - relatedTopicIds.indexOf(right.id));
   const progressStatus = progress?.status ?? "NOT_STARTED";
-
-  // Fetch prerequisites
-  const prerequisiteIds = (item.prerequisiteIds as string[]) || [];
-  const prerequisites = prerequisiteIds.length > 0 
-    ? await prisma.studyTopic.findMany({
-        where: { id: { in: prerequisiteIds }, isPublished: true },
-        select: { id: true, title: true, slug: true, category: { select: { slug: true } } },
-      })
-    : [];
-
-  // Fetch related topics
-  const relatedTopicIds = (item.relatedTopicIds as string[]) || [];
-  const relatedTopics = relatedTopicIds.length > 0
-    ? await prisma.studyTopic.findMany({
-        where: { id: { in: relatedTopicIds }, isPublished: true },
-        select: { id: true, title: true, slug: true, category: { select: { slug: true } } },
-      })
-    : [];
 
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
   const breadcrumb = {
@@ -69,9 +58,7 @@ export default async function LearnTopicPage({ params }: Props) {
     ],
   };
 
-  const relatedQuestions = item.questionRelations
-    .map(relation => relation.question)
-    .filter(question => question.isPublished);
+  const relatedQuestions = item.questionRelations.map(relation => relation.question);
 
   return (
     <section className="py-16 sm:py-20">

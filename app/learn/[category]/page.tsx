@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
-import { getPublishedStudyCategoryTree } from "@/lib/study";
+import { getPublishedStudyCategoryTree } from "@/lib/study-public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 type Props = { params: Promise<{ category: string }> };
 
 const LEVEL_LABEL: Record<string, string> = { BEGINNER: "Beginner", INTERMEDIATE: "Intermediate", ADVANCED: "Advanced", INTERVIEW_PREP: "Interview prep" };

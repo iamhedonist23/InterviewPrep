@@ -3,9 +3,9 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
-import { listPublishedStudyCategoriesForLearn } from "@/lib/study";
+import { listPublishedStudyCategoriesForLearn } from "@/lib/study-public";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 export const metadata: Metadata = { title: "Learn", description: "Free, structured study guides to build the fundamentals behind your interview answers.", alternates: { canonical: "/learn" } };
 
 const LEVEL_LABEL: Record<string, string> = { BEGINNER: "Beginner", INTERMEDIATE: "Intermediate", ADVANCED: "Advanced", INTERVIEW_PREP: "Interview prep" };

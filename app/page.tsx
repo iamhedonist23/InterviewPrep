@@ -6,8 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Section } from "@/components/ui/section";
 import { CategoryCarousel } from "@/components/home/category-carousel";
-import { prisma } from "@/lib/prisma";
-import { listPublishedStudyCategoriesForLearn } from "@/lib/study";
+import { getCachedHomepagePublicContent } from "@/lib/public-content";
 
 export const dynamic = "force-dynamic";
 
@@ -25,28 +24,8 @@ const interviewTypes = [
 ] as const;
 
 export default async function Home() {
-  const [categoriesWithCounts, popularQuestions, resources, learnCategories, faqs] = await Promise.all([
-    prisma.category.findMany({
-      where: { questions: { some: { isPublished: true } } },
-      include: { _count: { select: { questions: { where: { isPublished: true } } } } },
-      orderBy: { questions: { _count: "desc" } },
-      take: 8,
-    }),
-    prisma.interviewQuestion.findMany({
-      where: { isPublished: true },
-      select: { id: true, slug: true, question: true, shortDescription: true, category: { select: { name: true, slug: true } } },
-      orderBy: { createdAt: "desc" },
-      take: 6,
-    }),
-    prisma.article.findMany({
-      where: { isPublished: true },
-      select: { id: true, title: true, slug: true, excerpt: true, publishedAt: true, category: { select: { name: true } } },
-      orderBy: { publishedAt: "desc" },
-      take: 3,
-    }),
-    listPublishedStudyCategoriesForLearn(),
-    prisma.fAQ.findMany({ where: { isPublished: true }, orderBy: { sortOrder: "asc" }, take: 3 }),
-  ]);
+  const { categoriesWithCounts, popularQuestions, resources: cachedResources, learnCategories, faqs } = await getCachedHomepagePublicContent();
+  const resources = cachedResources.map((article) => ({ ...article, publishedAt: article.publishedAt ? new Date(String(article.publishedAt)) : null }));
   const categories = categoriesWithCounts
     .map((category) => ({ id: category.id, name: category.name, slug: category.slug, description: category.description, questionCount: category._count.questions }));
 

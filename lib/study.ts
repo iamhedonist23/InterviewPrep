@@ -119,12 +119,14 @@ export async function listStudyCategories(options: { includeUnpublished?: boolea
 }
 
 export async function createStudyCategory(input: z.infer<typeof studyCategorySchema>) {
-  return prisma.studyCategory.create({ data: input });
+  const result = await prisma.studyCategory.create({ data: input });
+  return result;
 }
 
 export async function updateStudyCategory(id: string, input: Partial<z.infer<typeof studyCategorySchema>>) {
   try {
-    return await prisma.studyCategory.update({ where: { id }, data: input });
+    const result = await prisma.studyCategory.update({ where: { id }, data: input });
+    return result;
   } catch {
     throw new StudyNotFoundError();
   }
@@ -139,12 +141,14 @@ export async function deleteStudyCategory(id: string) {
 }
 
 export async function createStudyPath(input: z.infer<typeof studyPathSchema>) {
-  return prisma.studyPath.create({ data: input });
+  const result = await prisma.studyPath.create({ data: input });
+  return result;
 }
 
 export async function updateStudyPath(id: string, input: Partial<z.infer<typeof studyPathSchema>>) {
   try {
-    return await prisma.studyPath.update({ where: { id }, data: input });
+    const result = await prisma.studyPath.update({ where: { id }, data: input });
+    return result;
   } catch {
     throw new StudyNotFoundError();
   }
@@ -159,12 +163,14 @@ export async function deleteStudyPath(id: string) {
 }
 
 export async function createStudyModule(input: z.infer<typeof studyModuleSchema>) {
-  return prisma.studyModule.create({ data: input });
+  const result = await prisma.studyModule.create({ data: input });
+  return result;
 }
 
 export async function updateStudyModule(id: string, input: Partial<z.infer<typeof studyModuleSchema>>) {
   try {
-    return await prisma.studyModule.update({ where: { id }, data: input });
+    const result = await prisma.studyModule.update({ where: { id }, data: input });
+    return result;
   } catch {
     throw new StudyNotFoundError();
   }
@@ -179,12 +185,14 @@ export async function deleteStudyModule(id: string) {
 }
 
 export async function createStudyTopic(input: z.infer<typeof studyTopicSchema>) {
-  return prisma.studyTopic.create({ data: input });
+  const result = await prisma.studyTopic.create({ data: input });
+  return result;
 }
 
 export async function updateStudyTopic(id: string, input: Partial<z.infer<typeof studyTopicSchema>>) {
   try {
-    return await prisma.studyTopic.update({ where: { id }, data: input });
+    const result = await prisma.studyTopic.update({ where: { id }, data: input });
+    return result;
   } catch {
     throw new StudyNotFoundError();
   }
@@ -199,15 +207,18 @@ export async function deleteStudyTopic(id: string) {
 }
 
 export async function createStudyTopicSection(input: z.infer<typeof studyTopicSectionSchema>) {
-  return prisma.studyTopicSection.create({ data: input });
+  const result = await prisma.studyTopicSection.create({ data: input });
+  return result;
 }
 
 export async function createStudyExample(input: z.infer<typeof studyExampleSchema>) {
-  return prisma.studyExample.create({ data: input });
+  const result = await prisma.studyExample.create({ data: input });
+  return result;
 }
 
 export async function createStudyExercise(input: z.infer<typeof studyExerciseSchema>) {
-  return prisma.studyExercise.create({ data: input });
+  const result = await prisma.studyExercise.create({ data: input });
+  return result;
 }
 
 // Links an existing InterviewQuestion to a study topic. Never creates a new
@@ -216,11 +227,12 @@ export async function createStudyExercise(input: z.infer<typeof studyExerciseSch
 export async function linkStudyTopicQuestion(input: z.infer<typeof studyTopicQuestionRelationSchema>) {
   const question = await prisma.interviewQuestion.findUnique({ where: { id: input.questionId }, select: { id: true } });
   if (!question) throw new StudyNotFoundError("That interview question does not exist.");
-  return prisma.studyTopicQuestionRelation.upsert({
+  const result = await prisma.studyTopicQuestionRelation.upsert({
     where: { topicId_questionId: { topicId: input.topicId, questionId: input.questionId } },
     create: input,
     update: { sortOrder: input.sortOrder },
   });
+  return result;
 }
 
 export async function unlinkStudyTopicQuestion(topicId: string, questionId: string) {
@@ -231,25 +243,27 @@ export async function unlinkStudyTopicQuestion(topicId: string, questionId: stri
 // Public reads (published content only — used by /learn pages in Phase 21+)
 // ---------------------------------------------------------------------------
 
-export async function getPublishedTopic(categorySlug: string, topicSlug: string) {
+export async function getPublishedTopicData(categorySlug: string, topicSlug: string) {
   return prisma.studyTopic.findFirst({
     where: {
       slug: topicSlug,
       isPublished: true,
       category: { slug: categorySlug, isPublished: true },
-      // A topic being published isn't enough on its own — its parent module
-      // and path must also still be published, or unpublishing a whole
-      // module/level would silently fail to hide its topics from direct URL
-      // access (and from the sitemap, which reuses this same filter shape).
       module: { isPublished: true, studyPath: { isPublished: true } },
     },
-    include: {
-      category: true,
-      module: { include: { studyPath: true } },
-      sections: { orderBy: { sortOrder: "asc" } },
-      examples: { orderBy: { sortOrder: "asc" } },
-      exercises: { orderBy: { sortOrder: "asc" } },
-      questionRelations: { include: { question: { select: { id: true, question: true, slug: true, isPublished: true } } }, orderBy: { sortOrder: "asc" } },
+    select: {
+      id: true, title: true, slug: true, shortDescription: true, estimatedMinutes: true,
+      seoTitle: true, seoDescription: true, prerequisiteIds: true, relatedTopicIds: true,
+      category: { select: { id: true, name: true, slug: true } },
+      module: { select: { studyPath: { select: { name: true, level: true } } } },
+      sections: { orderBy: { sortOrder: "asc" }, select: { id: true, title: true, content: true, sortOrder: true } },
+      examples: { orderBy: { sortOrder: "asc" }, select: { id: true, language: true, code: true, explanation: true, sortOrder: true } },
+      exercises: { orderBy: { sortOrder: "asc" }, select: { id: true, question: true, difficulty: true, hint: true, solution: true, explanation: true, sortOrder: true } },
+      questionRelations: {
+        where: { question: { isPublished: true } },
+        orderBy: { sortOrder: "asc" },
+        select: { question: { select: { id: true, question: true, slug: true } } },
+      },
     },
   });
 }
@@ -259,18 +273,18 @@ export async function getPublishedTopic(categorySlug: string, topicSlug: string)
 // same order shown on the category page), not just siblings within one
 // module, so finishing the last topic in a module continues straight into
 // the next module/path rather than dead-ending.
-export async function getAdjacentTopics(categorySlug: string, currentTopicId: string) {
+export async function getAdjacentTopicsData(categorySlug: string, currentTopicId: string) {
   const category = await prisma.studyCategory.findFirst({
     where: { slug: categorySlug, isPublished: true },
-    include: {
+    select: {
       paths: {
         where: { isPublished: true },
         orderBy: { sortOrder: "asc" },
-        include: {
+        select: {
           modules: {
             where: { isPublished: true },
             orderBy: { sortOrder: "asc" },
-            include: { topics: { where: { isPublished: true }, orderBy: { sortOrder: "asc" }, select: { id: true, slug: true, title: true } } },
+            select: { topics: { where: { isPublished: true }, orderBy: { sortOrder: "asc" }, select: { id: true, slug: true, title: true } } },
           },
         },
       },
@@ -288,25 +302,32 @@ export async function getAdjacentTopics(categorySlug: string, currentTopicId: st
   };
 }
 
+export const getAdjacentTopics = getAdjacentTopicsData;
+
 
 // published-topic count per path so /learn can show real progress markers
 // (e.g. "12 topics") without a separate query per card.
-export async function listPublishedStudyCategoriesForLearn() {
+export async function listPublishedStudyCategoriesForLearnData() {
   return prisma.studyCategory.findMany({
     where: { isPublished: true },
     orderBy: { sortOrder: "asc" },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
+      icon: true,
       paths: {
         where: { isPublished: true },
         orderBy: { sortOrder: "asc" },
-        include: { _count: { select: { modules: true } } },
+        select: { id: true, level: true, _count: { select: { modules: { where: { isPublished: true } } } } },
       },
       _count: { select: { topics: { where: { isPublished: true, module: { isPublished: true, studyPath: { isPublished: true } } } } } },
     },
   });
 }
 
-export async function searchPublishedStudyTopics(query: string) {
+export async function searchPublishedStudyTopicsData(query: string) {
   const trimmedQuery = query.trim();
   if (!trimmedQuery) return [];
 
@@ -335,18 +356,29 @@ export async function searchPublishedStudyTopics(query: string) {
 
 // Public category page: the category plus its full published path -> module
 // -> topic tree, so /learn/[category] can render one nested outline.
-export async function getPublishedStudyCategoryTree(categorySlug: string) {
+export async function getPublishedStudyCategoryTreeData(categorySlug: string) {
   return prisma.studyCategory.findFirst({
     where: { slug: categorySlug, isPublished: true },
-    include: {
+    select: {
+      id: true,
+      name: true,
+      slug: true,
+      description: true,
       paths: {
         where: { isPublished: true },
         orderBy: { sortOrder: "asc" },
-        include: {
+        select: {
+          id: true,
+          name: true,
+          description: true,
+          level: true,
           modules: {
             where: { isPublished: true },
             orderBy: { sortOrder: "asc" },
-            include: {
+            select: {
+              id: true,
+              title: true,
+              description: true,
               topics: {
                 where: { isPublished: true },
                 orderBy: { sortOrder: "asc" },
@@ -357,6 +389,18 @@ export async function getPublishedStudyCategoryTree(categorySlug: string) {
         },
       },
     },
+  });
+}
+
+export async function getPublishedTopicLinksData(topicIds: string[]) {
+  return prisma.studyTopic.findMany({
+    where: {
+      id: { in: topicIds },
+      isPublished: true,
+      category: { isPublished: true },
+      module: { isPublished: true, studyPath: { isPublished: true } },
+    },
+    select: { id: true, title: true, slug: true, category: { select: { slug: true } } },
   });
 }
 

@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { requireAdminApi } from "@/lib/admin";
 import { studyCategorySchema } from "@/lib/study";
+import { invalidateLearnCache } from "@/lib/study-public";
 import { createStudyCategory } from "@/lib/study";
 import { prisma } from "@/lib/prisma";
 
@@ -24,6 +25,7 @@ export async function POST(request: Request) {
   try {
     const data = studyCategorySchema.parse(body);
     const result = await createStudyCategory(data);
+    invalidateLearnCache();
     return Response.json(result, { status: 201 });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -57,6 +59,7 @@ export async function PATCH(request: Request) {
         sortOrder: typeof data.sortOrder === "number" ? data.sortOrder : undefined,
       },
     });
+    invalidateLearnCache();
     return Response.json(result);
   } catch (error) {
     return Response.json({ error: "Record not found or update failed." }, { status: 404 });
@@ -77,6 +80,7 @@ export async function DELETE(request: Request) {
 
   try {
     await prisma.studyCategory.delete({ where: { id } });
+    invalidateLearnCache();
     return Response.json({ deleted: true });
   } catch (error) {
     return Response.json({ error: "Record not found or delete failed." }, { status: 404 });
