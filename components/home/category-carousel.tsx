@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 
 const CATEGORY_ICONS = [Code2, Sparkles, BriefcaseBusiness, Target, Users, Video, BookOpen, MessageCircle];
 
-type CategoryItem = { id: string; name: string; slug: string; questionCount: number };
+type CategoryItem = { id: string; name: string; slug: string; description?: string | null; questionCount: number };
 
 export function CategoryCarousel({ categories }: { categories: CategoryItem[] }) {
   const scrollerRef = useRef<HTMLDivElement>(null);
@@ -34,7 +34,8 @@ export function CategoryCarousel({ categories }: { categories: CategoryItem[] })
               <Card className="h-full transition-transform hover:-translate-y-1">
                 <Icon className="text-coral" size={25} />
                 <h3 className="mt-8 font-display text-lg font-bold">{category.name}</h3>
-                <p className="mt-2 text-sm text-ink/55">{category.questionCount} interview questions</p>
+                {category.description && <p className="mt-2 line-clamp-2 text-sm leading-6 text-ink/60">{category.description}</p>}
+                <p className="mt-3 text-sm text-ink/55">{category.questionCount} interview questions</p>
                 <ArrowRight className="mt-6 text-ink/35 transition group-hover:text-coral" size={19} />
               </Card>
             </Link>
