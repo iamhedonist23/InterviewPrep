@@ -29,6 +29,57 @@ a { color: inherit; text-decoration: none; }
 ::selection { background: rgb(var(--coral)); color: white; }
 
 @media print {
-	header, footer { display: none !important; }
-	[data-ad-slot], [data-adsense], ins.adsbygoogle { display: none !important; }
+	body > header,
+	body > footer,
+	body > nav,
+	[aria-label="Advertisement"],
+	[data-ad-slot],
+	[data-adsense],
+	ins.adsbygoogle,
+	aside[aria-label="Advertisement"] {
+		display: none !important;
+	}
+
+	body {
+		background: #ffffff !important;
+		color: #111111 !important;
+	}
+
+	main > *:not(.resume-export-shell) {
+		display: none !important;
+	}
+
+	.resume-export-shell {
+		display: block !important;
+		width: 100% !important;
+		max-width: none !important;
+	}
+
+	#resume-print-root {
+		display: block !important;
+		margin: 0 auto !important;
+		width: 100% !important;
+		max-width: 8.5in !important;
+	}
+
+	#resume-print-root > * {
+		overflow: visible !important;
+	}
+
+	#resume-print-root .break-inside-avoid,
+	#resume-print-root section {
+		break-inside: auto !important;
+		page-break-inside: auto !important;
+	}
+
+	* {
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+	}
+}
+
+@page {
+	margin: 0.35in 0.45in 0.45in 0.45in;
+	orphans: 3;
+	widows: 3;
 }

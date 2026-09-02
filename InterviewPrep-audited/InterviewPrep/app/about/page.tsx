@@ -1,4 +1,0 @@
-import type { Metadata } from "next";
-import { LegalPage } from "@/components/legal/legal-page";
-export const metadata: Metadata = { title: "About", description: "InterviewPrep is a free, practical place to prepare for the conversations that move your career forward." };
-export default function AboutPage() { return <LegalPage title="About InterviewPrep" intro="InterviewPrep is a free, practical place to prepare for the conversations that move your career forward."><h2>What we are building</h2><p>We organize useful prompts, answer guidance, and focused practice for students, freshers, experienced professionals, and career changers.</p><h2>Our approach</h2><p>Good preparation should be accessible. We focus on clear explanations, honest examples, and tools that help you develop your own voice rather than memorize a script.</p></LegalPage>; }

@@ -1,1 +1,0 @@
-export function ArticleContent({ content }: { content: string }) { return <div className="prose prose-lg prose-ink max-w-none prose-headings:font-display prose-headings:tracking-tight prose-p:leading-8 prose-li:leading-8">{content.split(/\n\n+/).map((paragraph, index) => <p key={`${index}-${paragraph.slice(0, 12)}`}>{paragraph}</p>)}</div>; }

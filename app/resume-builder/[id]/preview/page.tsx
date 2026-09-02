@@ -23,21 +23,25 @@ export default async function ResumePreviewPage({ params }: { params: Promise<{ 
           <Link href={`/resume-builder/${resume.id}`} className="text-sm font-bold text-coral">
             ← Back to editor
           </Link>
-          <DownloadPdfButton />
+          <DownloadPdfButton resumeId={resume.id} />
         </div>
 
-        <ResumeTemplate
-          title={resume.title}
-          personalInfo={resume.personalInfo}
-          education={resume.education}
-          experience={resume.experience}
-          projects={resume.projects}
-          skills={resume.skills}
-          certifications={resume.certifications}
-          achievements={resume.achievements}
-          languages={resume.languages}
-          customSections={resume.customSections}
-        />
+        <div className="resume-export-shell">
+          <div id="resume-print-root">
+            <ResumeTemplate
+              title={resume.title}
+              personalInfo={resume.personalInfo}
+              education={resume.education}
+              experience={resume.experience}
+              projects={resume.projects}
+              skills={resume.skills}
+              certifications={resume.certifications}
+              achievements={resume.achievements}
+              languages={resume.languages}
+              customSections={resume.customSections}
+            />
+          </div>
+        </div>
       </div>
     );
   } catch (error) {

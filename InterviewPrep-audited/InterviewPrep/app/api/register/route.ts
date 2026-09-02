@@ -1,7 +1,0 @@
-import { hash } from "bcryptjs";
-import { z } from "zod";
-import { prisma } from "@/lib/prisma";
-import { rateLimit, requestSizeLimit, tooManyRequests } from "@/lib/request-security";
-
-const schema = z.object({ name: z.string().trim().min(2).max(80), email: z.string().trim().email().max(160), password: z.string().min(8).max(128) });
-export async function POST(request: Request) { const limiter = rateLimit(request, "register", 5, 15 * 60 * 1000); if (!limiter.allowed) return tooManyRequests(limiter.retryAfter); if (!requestSizeLimit(request)) return Response.json({ error: "Request is too large." }, { status: 413 }); try { const parsed = schema.safeParse(await request.json()); if (!parsed.success) return Response.json({ error: "Please provide a valid name, email, and password of at least 8 characters." }, { status: 400 }); const data = parsed.data; const email = data.email.toLowerCase(); const existing = await prisma.user.findUnique({ where: { email } }); if (existing) return Response.json({ error: "An account with that email already exists." }, { status: 409 }); const user = await prisma.user.create({ data: { name: data.name, email, passwordHash: await hash(data.password, 12) }, select: { id: true, email: true, name: true } }); return Response.json({ user }, { status: 201 }); } catch { return Response.json({ error: "Unable to create your account right now." }, { status: 500 }); } }

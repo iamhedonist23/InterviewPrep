@@ -2,7 +2,7 @@ import { Difficulty, ExperienceLevel, InterviewType, Prisma } from "@prisma/clie
 import { prisma } from "@/lib/prisma";
 
 export type QuestionFilters = {
-  query?: string; category?: string; experience?: ExperienceLevel; difficulty?: Difficulty; interviewType?: InterviewType; page?: number;
+  query?: string; category?: string; subcategory?: string; experience?: ExperienceLevel; difficulty?: Difficulty; interviewType?: InterviewType; page?: number;
 };
 export const PAGE_SIZE = 12;
 export const SEARCH_PAGE_SIZE = 10;
@@ -28,6 +28,7 @@ export async function listQuestions(filters: QuestionFilters) {
   const safe = validEnumFilters(filters);
   const where: Prisma.InterviewQuestionWhereInput = { isPublished: true };
   if (filters.category) where.category = { slug: filters.category };
+  if (filters.subcategory) where.subcategory = { slug: filters.subcategory };
   if (safe.experience) where.experienceLevel = safe.experience;
   if (safe.difficulty) where.difficulty = safe.difficulty;
   if (safe.interviewType) where.interviewType = safe.interviewType;
@@ -44,9 +45,44 @@ export async function getQuestion(slug: string) {
       slug,
       isPublished: true,
     },
-    include: {
-      category: true,
-      subcategory: true,
+    select: {
+      id: true,
+      question: true,
+      slug: true,
+      categoryId: true,
+      subcategoryId: true,
+      experienceLevel: true,
+      difficulty: true,
+      interviewType: true,
+      shortDescription: true,
+      explanation: true,
+      sampleAnswer: true,
+      detailedAnswer: true,
+      keyPoints: true,
+      commonMistakes: true,
+      followUpQuestions: true,
+      tags: true,
+      isPublished: true,
+      seoTitle: true,
+      seoDescription: true,
+      createdAt: true,
+      updatedAt: true,
+      category: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          group: true,
+          description: true,
+        },
+      },
+      subcategory: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+        },
+      },
     },
   });
 }
