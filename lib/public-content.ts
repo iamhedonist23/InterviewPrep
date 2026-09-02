@@ -60,7 +60,14 @@ async function queryPublicQuestionCategory(categorySlug: string, page: number) {
       subcategories: { select: { id: true, name: true, slug: true } },
       questions: {
         where: { isPublished: true },
-        include: { category: true, subcategory: true },
+        select: {
+          id: true,
+          slug: true,
+          question: true,
+          shortDescription: true,
+          difficulty: true,
+          category: { select: { name: true } },
+        },
         take: pageSize,
         skip: (page - 1) * pageSize,
         orderBy: { createdAt: "desc" },
