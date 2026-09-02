@@ -306,6 +306,33 @@ export async function listPublishedStudyCategoriesForLearn() {
   });
 }
 
+export async function searchPublishedStudyTopics(query: string) {
+  const trimmedQuery = query.trim();
+  if (!trimmedQuery) return [];
+
+  return prisma.studyTopic.findMany({
+    where: {
+      isPublished: true,
+      category: { isPublished: true },
+      module: { isPublished: true, studyPath: { isPublished: true } },
+      OR: [
+        { title: { contains: trimmedQuery, mode: "insensitive" } },
+        { shortDescription: { contains: trimmedQuery, mode: "insensitive" } },
+      ],
+    },
+    orderBy: { title: "asc" },
+    take: 30,
+    select: {
+      id: true,
+      title: true,
+      slug: true,
+      shortDescription: true,
+      estimatedMinutes: true,
+      category: { select: { name: true, slug: true } },
+    },
+  });
+}
+
 // Public category page: the category plus its full published path -> module
 // -> topic tree, so /learn/[category] can render one nested outline.
 export async function getPublishedStudyCategoryTree(categorySlug: string) {

@@ -31,7 +31,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <Header />
           <PublicTopAd />
           <div className="mx-auto flex w-full max-w-[1600px] gap-6 px-4 sm:px-6 xl:px-8">
-            <main className="min-w-0 flex-1">{children}</main>
+            <main className="app-main min-w-0 flex-1">{children}</main>
             <aside className="hidden w-[220px] shrink-0 xl:block">
               <PublicSidebarAd />
             </aside>

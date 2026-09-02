@@ -17,9 +17,9 @@ export function ModernResumeTemplate({
   ) as string[];
 
   return (
-    <div className="mx-auto grid max-w-[8.5in] grid-cols-[2.3in_1fr] bg-white text-[#1d1d1d] shadow-sm print:m-0 print:shadow-none print:[print-color-adjust:exact] print:[-webkit-print-color-adjust:exact]">
+    <div className="mx-auto grid max-w-[8.5in] grid-cols-[2.3in_1fr] bg-white text-[#1d1d1d] shadow-sm print:m-0 print:flex print:items-start print:shadow-none print:[print-color-adjust:exact] print:[-webkit-print-color-adjust:exact]">
       {/* Sidebar */}
-      <aside className="bg-ink px-6 py-10 text-paper print:break-inside-avoid">
+      <aside className="bg-ink px-6 py-10 text-paper print:w-[2.3in] print:shrink-0 print:break-inside-avoid">
         <h1 className="font-display text-2xl font-bold leading-tight">{personalInfo?.fullName || title}</h1>
         {personalInfo?.professionalTitle && <p className="mt-1 text-sm text-paper/70">{personalInfo.professionalTitle}</p>}
 
@@ -72,7 +72,7 @@ export function ModernResumeTemplate({
       </aside>
 
       {/* Main column */}
-      <main className="px-8 py-10 print:p-8">
+      <main className="min-w-0 px-8 py-10 print:w-auto print:min-w-0 print:flex-1 print:p-8">
         {personalInfo?.summary && (
           <MainSection title="Summary">
             <p className="text-sm leading-relaxed text-ink/80">{personalInfo.summary}</p>

@@ -45,7 +45,7 @@ a { color: inherit; text-decoration: none; }
 		color: #111111 !important;
 	}
 
-	main > *:not(.resume-export-shell) {
+	.app-main > *:not(.resume-export-shell) {
 		display: none !important;
 	}
 
