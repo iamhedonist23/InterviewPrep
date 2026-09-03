@@ -5,5 +5,8 @@ tsconfig.tsbuildinfo
 .env.local
 .env.*.local
 !.env.example
+question-duplicate-report.json
+question-duplicate-report.csv
+question-duplicate-backup.json
 npm-debug.log*
 Interview_Website_full.zip

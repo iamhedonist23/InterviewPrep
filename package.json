@@ -29,6 +29,7 @@
     "db:seed:advance-java": "tsx prisma/seed-advance-java.ts",
     "db:seed:api-web-services": "tsx prisma/seed-api-web-services.ts",
     "db:seed:cs-fundamentals": "tsx prisma/seed-cs-fundamentals.ts",
+    "audit:questions": "tsx prisma/audit-questions.ts",
     "db:seed:data-science": "tsx prisma/seed-data-science.ts",
     "db:seed:devops": "tsx prisma/seed-devops.ts",
     "db:seed:digital-marketing": "tsx prisma/seed-digital-marketing.ts",
