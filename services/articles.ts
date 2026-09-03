@@ -18,7 +18,10 @@ function reviveArticleDates<
 async function queryArticles(page = 1, category?: string) {
   const safePage = Math.max(1, page);
   const where: Prisma.ArticleWhereInput = { isPublished: true };
-  if (category) where.category = { slug: category };
+  if (category) {
+    const group = category.toLowerCase() === "technology" ? "Technology" : category.toLowerCase() === "general" ? "General" : undefined;
+    where.category = group ? { group } : { slug: category };
+  }
   const [articles, total] = await prisma.$transaction([
     prisma.article.findMany({
       where,
@@ -39,7 +42,7 @@ async function queryArticles(page = 1, category?: string) {
 export async function listArticles(page = 1, category?: string) {
   const result = await unstable_cache(
     queryArticles,
-    ["public-articles", String(page), category?.trim().toLowerCase() || "all"],
+    ["public-articles-v2", String(page), category?.trim().toLowerCase() || "all"],
     { revalidate: 1800, tags: [PUBLIC_CONTENT_CACHE_TAG] },
   )(page, category);
   return { ...result, articles: result.articles.map(reviveArticleDates) };

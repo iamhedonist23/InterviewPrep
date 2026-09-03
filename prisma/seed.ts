@@ -1,7 +1,8 @@
 import { PrismaClient, Difficulty, ExperienceLevel, InterviewType } from "@prisma/client";
-import { articleSeeds } from "./article-seed";
-import { categories, originalTopics, topics, situationalContexts, slugify } from "./question-data";
+import { articleSeeds } from "../generated-article-seed";
+import { categories, topics, situationalContexts, slugify } from "./question-data";
 const prisma = new PrismaClient();
+const technologyResourceTerms = ["java", "python", "javascript", "typescript", "react", "angular", "vue", "nodejs", "spring-boot", "kotlin", "android", "ios", "swift", "docker", "kubernetes", "aws", "azure", "gcp", "devops", "cicd", "microservices", "system-design", "data-structures", "algorithms", "sql", "nosql", "mongodb", "postgresql", "graphql", "rest-api", "security", "artificial-intelligence", "machine-learning", "data-science", "blockchain", "git", "linux", "networking", "cloud-native", "serverless", "testing", "qa"];
 
 // ---- UPDATED CATEGORIES (added 11 new) ----
 // (categories, originalTopics, topics, situationalContexts, slugify now live
@@ -621,11 +622,7 @@ async function main() {
     const question = baseQuestion;
     const slug = slugify(baseQuestion);
 
-    // Bias difficulty toward HARD for the advanced topic pools.
-    const isAdvancedPool = topicIndex >= originalTopics.length;
-    const difficulty: Difficulty = isAdvancedPool
-      ? [Difficulty.MEDIUM, Difficulty.HARD, Difficulty.HARD][topicIndex % 3]
-      : [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][topicIndex % 3];
+    const difficulty: Difficulty = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][topicIndex % 3];
 
     const experienceLevel = [ExperienceLevel.FRESHER, ExperienceLevel.INTERNSHIP, ExperienceLevel.MID_LEVEL, ExperienceLevel.EXPERIENCED][topicIndex % 4];
     const interviewType = categoryName === "Behavioral" || categoryName === "HR" ? InterviewType.BEHAVIORAL : categoryName === "Situational" ? InterviewType.SITUATIONAL : InterviewType.TECHNICAL;
@@ -689,7 +686,8 @@ async function main() {
   }
 
   for (const article of articleSeeds) {
-    const category = article.slug.includes("technical") ? categoryMap.get("Software Developer") : categoryMap.get("General");
+    const isTechnologyResource = technologyResourceTerms.some((term) => article.slug.includes(term));
+    const category = isTechnologyResource ? categoryMap.get("Software Developer") : categoryMap.get("Fresher");
     await prisma.article.upsert({
       where: { slug: article.slug },
       update: { ...article, categoryId: category, isPublished: true, publishedAt: new Date() },
