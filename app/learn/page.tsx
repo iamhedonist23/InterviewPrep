@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { Button } from "@/components/ui/button";
+import { paginateItems } from "@/lib/learn-pagination";
 import { listPublishedStudyCategoriesForLearn } from "@/lib/study-public";
 
 export const revalidate = 86400;
@@ -13,20 +14,6 @@ const PAGE_SIZE = 9;
 
 type Props = { searchParams: Promise<{ q?: string | string[]; page?: string | string[] }> };
 const one = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
-
-export function paginateItems<T>(items: T[], currentPage: number, pageSize: number) {
-  const safePage = Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1;
-  const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
-  const boundedPage = Math.min(safePage, pageCount);
-  const start = (boundedPage - 1) * pageSize;
-  const end = start + pageSize;
-
-  return {
-    currentPage: boundedPage,
-    pageCount,
-    items: items.slice(start, end),
-  };
-}
 
 export default async function LearnPage({ searchParams }: Props) {
   const params = await searchParams;

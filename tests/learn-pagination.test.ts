@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { paginateItems } from "@/app/learn/page";
+import { paginateItems } from "@/lib/learn-pagination";
 
 describe("paginateItems", () => {
   it("returns the requested page slice and total pages", () => {
