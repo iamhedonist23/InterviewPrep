@@ -1,12 +1,11 @@
-import { PrismaClient, Difficulty, ExperienceLevel, InterviewType } from "@prisma/client";
-import { articleSeeds } from "./article-seed";
-import { categories, originalTopics, topics, situationalContexts, slugify } from "./question-data";
-const prisma = new PrismaClient();
+// Shared question/category data used by both prisma/seed.ts (writes to the
+// database) and prisma/cleanup-old-questions.ts (deletes stale rows). This
+// file has NO Prisma client and NO top-level execution, so importing it
+// never has side effects - safe to import from either script.
 
-// ---- UPDATED CATEGORIES (added 11 new) ----
-// (categories, originalTopics, topics, situationalContexts, slugify now live
-// in ./question-data.ts - shared with prisma/cleanup-old-questions.ts)
-/* const categories = [
+// ---- Categories ----
+export const categories = [
+const categories = [
   // Existing categories
   ["Software Developer", "Technology"], ["Android Developer", "Technology"], ["Java Developer", "Technology"], ["Kotlin Developer", "Technology"], ["Python Developer", "Technology"], ["JavaScript Developer", "Technology"], ["React Developer", "Technology"], ["Web Developer", "Technology"], ["SQL", "Technology"], ["QA Tester", "Technology"], ["Data Analyst", "Technology"], ["Sales", "Business"], ["Marketing", "Business"], ["Human Resources", "Business"], ["Customer Support", "Business"], ["Accountant", "Finance"], ["Banking", "Finance"], ["Finance", "Finance"], ["Fresher", "General"], ["Internship", "General"], ["HR", "General"], ["Behavioral", "General"], ["Situational", "General"],
   // ---- NEW CATEGORIES ----
@@ -22,9 +21,9 @@ const prisma = new PrismaClient();
   ["Software Engineer", "Technology"],
   ["Machine Learning", "Technology"],
 ] as const;
+] as const;
 
-// ---- Original 24 topics (kept intact) ----
-const originalTopics = [
+export const originalTopics = [
   ["Software Developer", "How would you design a reliable service that processes customer requests?", "architecture", "Describe the trade-offs behind your design and how you would keep it observable.", "A strong answer starts with clear requirements, separated responsibilities, and failure handling...", "I would start by clarifying the functional and non-functional requirements..."],
   ["Android Developer", "How would you make an Android screen load quickly on a slow connection?", "performance", "Explain the measurements and improvements you would make before release.", "I would measure the current load time under throttled network conditions...", "I would first measure the screen load time and identify the bottlenecks..."],
   ["Java Developer", "What makes a Java application maintainable as its team grows?", "maintainability", "Connect design choices to testing and team communication.", "Maintainability comes from clean boundaries, clear conventions, and automated confidence...", "A maintainable Java application is built around clear boundaries..."],
@@ -58,7 +57,7 @@ const originalTopics = [
 ];
 
 // ---- Existing advanced topics (36) ----
-const existingAdvancedTopics = [
+export const existingAdvancedTopics = [
   // Software Developer
   ["Software Developer", "How would you design a microservices architecture with eventual consistency?", "microservices", "Discuss trade-offs between consistency, availability, and latency.", "I would use event-driven communication and CQRS to handle eventual consistency...", "I would start by identifying bounded contexts and defining clear service boundaries..."],
   ["Software Developer", "How would you implement a circuit breaker pattern in a distributed system?", "resilience", "Explain how it prevents cascading failures.", "I would use a circuit breaker to stop calls to a failing service after a threshold...", "I would implement the circuit breaker using a library like Resilience4j or Hystrix..."],
@@ -118,7 +117,7 @@ const existingAdvancedTopics = [
 ];
 
 // ---- NEW TOPICS FOR NEW CATEGORIES (43 topics) ----
-const newCategoryTopics = [
+export const newCategoryTopics = [
   // ---- Presales (5) ----
   ["Presales", "How would you qualify a lead during a discovery call?", "qualification", "Explain BANT and other qualification frameworks.", "I would use BANT (Budget, Authority, Need, Timeline) to assess if the prospect is a good fit...", "I would ask open-ended questions to understand pain points and decision-making process..."],
   ["Presales", "How would you handle a technical objection from a prospect?", "objection-handling", "Describe how you would respond to a 'it doesn't do X' objection.", "I would acknowledge the concern, clarify the requirement, and either show a workaround or explain the roadmap...", "I would focus on the business outcome and align with the prospect's needs..."],
@@ -188,7 +187,7 @@ const newCategoryTopics = [
 ];
 
 // ---- Additional advanced topics for existing categories (20 more) ----
-const extraAdvancedTopics = [
+export const extraAdvancedTopics = [
   // Advance Java (Java EE) - adding under Java Developer
   ["Java Developer", "How would you implement a distributed transaction using the Saga pattern in Java?", "saga", "Explain choreography vs orchestration.", "I would use the Saga pattern with choreography: each service publishes events and listens for events to trigger compensating actions...", "In orchestration, a central coordinator would manage the sequence and compensation..."],
   ["Java Developer", "How would you design a REST API with Spring Boot and JWT authentication?", "spring-boot-jwt", "Explain filters and security config.", "I would use Spring Security with a filter to validate JWT tokens, configure stateless session management, and use @PreAuthorize for method‑level security...", "I would also implement custom authentication entry points and exception handling..."],
@@ -231,7 +230,7 @@ export const topics = [...originalTopics, ...existingAdvancedTopics, ...newCateg
 // Instead, each topic now gets exactly ONE page, and two of these contexts
 // are surfaced as genuine follow-up questions on that single page - real
 // depth without duplicate, thin URLs.
-const situationalContexts = [
+export const situationalContexts = [
   "for a small team",
   "when requirements are unclear",
   "under a tight deadline",
@@ -248,463 +247,4 @@ const situationalContexts = [
   "for a global team with distributed members",
 ] as const;
 
-export const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); */
-
-// ---- Clear, ultra-detailed interview answer builder ----
-// Creates a learner-friendly answer with explanation, example, trade-offs,
-// testing, and an interview-ready response. The supplied seed explanation
-// and sample answer remain the core source for the question.
-const buildUltraDetailedAnswer = (
-  categoryName: string,
-  baseQuestion: string,
-  tag: string,
-  explanation: string,
-  sampleAnswer: string,
-) => {
-  const normalized = baseQuestion.toLowerCase();
-
-  // Java maintainability question: provide the concrete, easy-to-understand
-  // answer expected for this topic rather than a generic template.
-  if (
-    normalized.includes("what makes a java application maintainable") &&
-    categoryName === "Java Developer"
-  ) {
-    return `**What makes a Java application maintainable as its team grows?**
-
-A Java application remains maintainable as the development team grows when the codebase has **clear architecture, well-defined responsibilities, consistent coding standards, automated tests, good documentation, manageable dependencies, and effective code-review practices**.
-
-As more developers work on the same application, the challenge is not simply writing more code. The team needs to make sure developers can understand existing code, make changes safely, avoid regressions, and work on different parts of the application without constantly affecting each other.
-
-### 1. Use a clear architecture
-
-The application should have clearly separated responsibilities.
-
-For example:
-
-\`\`\`
-Controller
-    ↓
-Service
-    ↓
-Repository
-    ↓
-Database
-\`\`\`
-
-A controller should mainly handle request-related concerns. Business logic should belong in the service layer, while database access should be handled by the repository/data-access layer.
-
-For example:
-
-\`\`\`java
-@RestController
-public class UserController {
-
-    private final UserService userService;
-
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
-    @GetMapping("/users/{id}")
-    public User getUser(@PathVariable Long id) {
-        return userService.getUser(id);
-    }
-}
-\`\`\`
-
-The controller should not contain complex business rules or direct database logic.
-
-This separation makes the application easier to understand, test, and modify.
-
-### 2. Follow SOLID principles
-
-SOLID principles help prevent classes from becoming too large and difficult to change.
-
-For example, the **Single Responsibility Principle** means a class should have one primary responsibility.
-
-Instead of putting user business logic, email sending, reporting, database operations, and file processing into one class, separate those responsibilities:
-
-\`\`\`
-UserService
-EmailService
-ReportService
-UserRepository
-FileService
-\`\`\`
-
-This allows different developers to work on different components with less risk of creating conflicts.
-
-### 3. Keep classes and methods focused
-
-Large classes and methods become difficult for new developers to understand.
-
-Instead of having one method with hundreds of lines, break the work into meaningful methods:
-
-\`\`\`java
-public void processUser(User user) {
-    validateUser(user);
-    saveUser(user);
-    sendWelcomeEmail(user);
-}
-\`\`\`
-
-A developer joining the team can understand the high-level flow quickly and inspect individual methods when necessary.
-
-### 4. Use meaningful naming conventions
-
-Names should communicate intent.
-
-Prefer:
-
-\`\`\`java
-calculateOrderTotal()
-findActiveUsers()
-validatePayment()
-\`\`\`
-
-rather than vague names such as:
-
-\`\`\`java
-doProcess()
-handleData()
-execute()
-\`\`\`
-
-The team should also agree on consistent conventions for:
-- **Classes**
-- **Methods**
-- **Variables**
-- **Packages**
-- **Exceptions**
-- **Constants**
-- **APIs**
-
-### 5. Maintain automated tests
-
-Automated tests become increasingly important as the team grows.
-
-A useful test strategy can include:
-
-\`\`\`
-Unit Tests
-    ↓
-Integration Tests
-    ↓
-API Tests
-    ↓
-End-to-End Tests
-\`\`\`
-
-Tests should cover valid input, invalid input, business rules, exceptions, and important boundary conditions.
-
-Good test coverage gives developers confidence that changes will not unexpectedly break existing functionality.
-
-### 6. Use code reviews
-
-Important changes should go through code review.
-
-Reviewers can check:
-
-- **Correctness**
-- **Business logic**
-- **Security**
-- **Performance**
-- **Test coverage**
-- **Error handling**
-- **Maintainability**
-- **Naming and readability**
-
-The goal is not to criticize the developer. The goal is to keep the codebase consistent, reliable, and easy for the whole team to maintain.
-
-### 7. Manage dependencies carefully
-
-A growing Java application can become difficult to maintain if it contains unnecessary or outdated dependencies.
-
-The team should:
-
-- Remove unused libraries.
-- Keep dependencies updated.
-- Avoid unnecessary third-party libraries.
-- Monitor security vulnerabilities.
-- Keep versions consistent.
-- Use Maven or Gradle dependency management properly.
-
-### 8. Use consistent exception handling
-
-The application should have a predictable approach to errors.
-
-For example, define clear handling for:
-- **Validation errors**
-- **Business exceptions**
-- **Database errors**
-- **External API failures**
-- **Unexpected system errors**
-
-In Spring Boot, centralized exception handling can be implemented using \`@ControllerAdvice\`.
-
-This makes API behavior more predictable and easier to troubleshoot.
-
-### 9. Use logging and monitoring
-
-As the application grows, developers need to understand what happens in production.
-
-Useful observability includes:
-
-- **Structured logging**
-- **Error tracking**
-- **Metrics**
-- **Health checks**
-- **Performance monitoring**
-- **Distributed tracing when required**
-
-Logs should provide enough context to diagnose problems without exposing sensitive information.
-
-### 10. Maintain useful documentation
-
-Documentation becomes especially important when new developers join the team.
-
-Useful documentation includes:
-
-\`\`\`
-README
-Architecture documentation
-API documentation
-Database documentation
-Development setup
-Deployment process
-Coding standards
-Troubleshooting guide
-\`\`\`
-
-Good documentation reduces onboarding time and prevents developers from repeatedly having to discover how the system works.
-
-### 11. Use CI/CD
-
-A growing team benefits from automated quality checks.
-
-A typical pipeline can look like:
-
-\`\`\`
-Developer creates PR
-        ↓
-Code Review
-        ↓
-Build
-        ↓
-Unit Tests
-        ↓
-Integration Tests
-        ↓
-Security / Quality Checks
-        ↓
-Deployment
-\`\`\`
-
-This provides fast feedback and reduces the chance of broken code reaching production.
-
-### 12. Avoid unnecessary complexity
-
-Maintainability does not mean creating the most complicated architecture possible.
-
-For example, a team should not introduce microservices simply because the team is getting larger.
-
-If a well-structured modular monolith satisfies the requirements, it may be easier and cheaper to maintain.
-
-Architecture should evolve based on actual requirements such as scale, deployment needs, reliability, performance, and team ownership.
-
-## Example of a maintainable Java project
-
-A Spring Boot application could use a structure such as:
-
-\`\`\`
-src/main/java/com/example/app/
-
-├── controller/
-│   └── UserController.java
-├── service/
-│   └── UserService.java
-├── repository/
-│   └── UserRepository.java
-├── model/
-│   └── User.java
-├── dto/
-│   └── UserResponse.java
-├── exception/
-│   └── UserNotFoundException.java
-├── config/
-│   └── SecurityConfig.java
-└── util/
-    └── DateUtils.java
-\`\`\`
-
-The exact structure can vary, but the important principle is that responsibilities and boundaries are clear.
-
-## Trade-offs
-
-There is no single technique that makes an application maintainable. More abstraction, documentation, testing, and automation can improve safety, but they also require time and effort.
-
-The goal is to find the right balance for the team's size, product complexity, risk, and expected growth.
-
-## Interview-ready answer
-
-> "As the team grows, I focus on making the Java application easy to understand and safe to change. I would establish clear architectural boundaries, follow SOLID principles, keep classes focused, use consistent coding standards, and maintain strong automated test coverage. I would also use code reviews, centralized exception handling, proper logging and monitoring, dependency management, CI/CD, and useful documentation. Most importantly, I would avoid unnecessary complexity and evolve the architecture based on actual business and technical requirements."
-
-**Key takeaway**
-
-**Maintainability is not one specific Java feature.** It comes from combining good architecture, clean code, testing, documentation, consistent engineering practices, and clear team ownership.`;
-  }
-
-  return `**Detailed Answer**
-
-This is a ${categoryName} interview question about **${tag}**. The key is to understand the actual requirement and constraints before choosing a technology or implementation, and to be able to explain the reasoning behind that choice out loud.
-
-**What the interviewer is looking for**
-
-The interviewer wants to see whether you can explain your reasoning clearly, make practical decisions, identify risks, and connect your technical choice to the expected business or user outcome.
-
-**Explanation**
-
-${explanation}
-
-**Practical approach**
-
-${sampleAnswer}
-
-I would start by clarifying the requirements, constraints, expected scale, dependencies, and success criteria. Then I would choose the simplest approach that satisfies those requirements and explain why.
-
-**Important considerations**
-
-I would consider correctness, maintainability, performance, scalability, security, reliability, testing, and operational impact. I would also identify edge cases and define how the application should behave when dependencies fail or unexpected input is received.
-
-**Testing and validation**
-
-I would validate the implementation with appropriate unit, integration, API, and end-to-end tests. For performance-sensitive functionality, I would establish a baseline and measure the effect of any optimization rather than relying on assumptions.
-
-**Trade-offs**
-
-There is rarely one perfect solution. I would explain the advantages and disadvantages of the chosen approach and compare reasonable alternatives. I would avoid unnecessary complexity and evolve the solution when actual requirements justify it.
-
-**Interview-ready answer**
-
-${sampleAnswer}
-
-**Key takeaway**
-
-A strong interview answer should explain **what you would do, why you would do it, how you would validate it, and what trade-offs you considered**.`;
-};
-
-async function main() {
-  const categoryMap = new Map<string, string>();
-  for (const [name, group] of categories) {
-    const category = await prisma.category.upsert({
-      where: { slug: slugify(name) },
-      update: {},
-      create: { name, slug: slugify(name), group, description: `Focused ${name} interview preparation.` }
-    });
-    categoryMap.set(name, category.id);
-    await prisma.subcategory.upsert({
-      where: { categoryId_slug: { categoryId: category.id, slug: slugify(name) } },
-      update: {},
-      create: { name, slug: slugify(name), categoryId: category.id }
-    });
-  }
-
-  // One published page per real, distinct question - no angle multiplication.
-  // This replaces the previous 141 x 14 = 1,974 near-duplicate pages with
-  // 141 pages, each with unique, specific content and no grammar bug from
-  // concatenating a second "?" onto a question that already ends in one.
-  for (let topicIndex = 0; topicIndex < topics.length; topicIndex++) {
-    const [categoryName, baseQuestion, tag, explanation, sampleAnswer] = topics[topicIndex];
-    const categoryId = categoryMap.get(categoryName)!;
-    const subcategory = await prisma.subcategory.findFirst({ where: { categoryId } });
-
-    const question = baseQuestion;
-    const slug = slugify(baseQuestion);
-
-    // Bias difficulty toward HARD for the advanced topic pools.
-    const isAdvancedPool = topicIndex >= originalTopics.length;
-    const difficulty: Difficulty = isAdvancedPool
-      ? [Difficulty.MEDIUM, Difficulty.HARD, Difficulty.HARD][topicIndex % 3]
-      : [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][topicIndex % 3];
-
-    const experienceLevel = [ExperienceLevel.FRESHER, ExperienceLevel.INTERNSHIP, ExperienceLevel.MID_LEVEL, ExperienceLevel.EXPERIENCED][topicIndex % 4];
-    const interviewType = categoryName === "Behavioral" || categoryName === "HR" ? InterviewType.BEHAVIORAL : categoryName === "Situational" ? InterviewType.SITUATIONAL : InterviewType.TECHNICAL;
-
-    // Pick two distinct situational contexts deterministically per topic so
-    // every page gets real, varied follow-up questions instead of the same
-    // two generic lines repeated on every page.
-    const contextA = situationalContexts[topicIndex % situationalContexts.length];
-    const contextB = situationalContexts[(topicIndex + 5) % situationalContexts.length];
-
-    await prisma.interviewQuestion.upsert({
-      where: { slug },
-      update: {
-        question,
-        categoryId,
-        subcategoryId: subcategory?.id,
-        experienceLevel,
-        difficulty,
-        interviewType,
-        shortDescription: `A practical ${tag} question for ${categoryName} interviews.`,
-        explanation,
-        sampleAnswer,
-        detailedAnswer: buildUltraDetailedAnswer(categoryName, baseQuestion, tag, explanation, sampleAnswer),
-        keyPoints: ["State your assumptions", "Use a specific example", "Explain the trade-off", "Close with the result or next step"],
-        commonMistakes: ["Starting without clarifying the goal", "Listing tools without explaining judgment", "Making claims without evidence"],
-        followUpQuestions: [
-          `How would your answer change ${contextA}?`,
-          `How would your answer change ${contextB}?`,
-          "What would you measure after making that decision?",
-        ],
-        tags: [tag, slugify(categoryName)],
-        isPublished: true,
-        seoTitle: question,
-        seoDescription: `Learn how to answer "${question}" with a clear, practical, interview-ready response.`
-      },
-      create: {
-        question,
-        slug,
-        categoryId,
-        subcategoryId: subcategory?.id,
-        experienceLevel,
-        difficulty,
-        interviewType,
-        shortDescription: `A practical ${tag} question for ${categoryName} interviews.`,
-        explanation,
-        sampleAnswer,
-        detailedAnswer: buildUltraDetailedAnswer(categoryName, baseQuestion, tag, explanation, sampleAnswer),
-        keyPoints: ["State your assumptions", "Use a specific example", "Explain the trade-off", "Close with the result or next step"],
-        commonMistakes: ["Starting without clarifying the goal", "Listing tools without explaining judgment", "Making claims without evidence"],
-        followUpQuestions: [
-          `How would your answer change ${contextA}?`,
-          `How would your answer change ${contextB}?`,
-          "What would you measure after making that decision?",
-        ],
-        tags: [tag, slugify(categoryName)],
-        isPublished: true,
-        seoTitle: question,
-        seoDescription: `Learn how to answer "${question}" with a clear, practical, interview-ready response.`
-      }
-    });
-  }
-
-  for (const article of articleSeeds) {
-    const category = article.slug.includes("technical") ? categoryMap.get("Software Developer") : categoryMap.get("General");
-    await prisma.article.upsert({
-      where: { slug: article.slug },
-      update: { ...article, categoryId: category, isPublished: true, publishedAt: new Date() },
-      create: { ...article, categoryId: category, isPublished: true, publishedAt: new Date() }
-    });
-  }
-
-  if (process.env.ADMIN_EMAIL) {
-    await prisma.user.updateMany({
-      where: { email: process.env.ADMIN_EMAIL.toLowerCase().trim() },
-      data: { role: "ADMIN" }
-    });
-  }
-
-  console.log(`Seeded ${topics.length} interview questions and ${articleSeeds.length} articles.`);
-}
-
-main().catch(error => { console.error(error); process.exit(1); }).finally(() => prisma.$disconnect());
+export const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");

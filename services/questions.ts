@@ -75,7 +75,7 @@ export async function listQuestions(filters: QuestionFilters) {
     ...filters,
     query: filters.query?.trim() ?? "",
   });
-  return unstable_cache(queryQuestions, ["public-questions", key], {
+  return unstable_cache(queryQuestions, ["public-questions-v4", key], {
     revalidate: 1800,
     tags: [PUBLIC_CONTENT_CACHE_TAG],
   })(filters);

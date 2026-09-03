@@ -1,12 +1,9 @@
 import { PrismaClient, Difficulty, ExperienceLevel, InterviewType } from "@prisma/client";
 import { articleSeeds } from "./article-seed";
-import { categories, originalTopics, topics, situationalContexts, slugify } from "./question-data";
 const prisma = new PrismaClient();
 
 // ---- UPDATED CATEGORIES (added 11 new) ----
-// (categories, originalTopics, topics, situationalContexts, slugify now live
-// in ./question-data.ts - shared with prisma/cleanup-old-questions.ts)
-/* const categories = [
+const categories = [
   // Existing categories
   ["Software Developer", "Technology"], ["Android Developer", "Technology"], ["Java Developer", "Technology"], ["Kotlin Developer", "Technology"], ["Python Developer", "Technology"], ["JavaScript Developer", "Technology"], ["React Developer", "Technology"], ["Web Developer", "Technology"], ["SQL", "Technology"], ["QA Tester", "Technology"], ["Data Analyst", "Technology"], ["Sales", "Business"], ["Marketing", "Business"], ["Human Resources", "Business"], ["Customer Support", "Business"], ["Accountant", "Finance"], ["Banking", "Finance"], ["Finance", "Finance"], ["Fresher", "General"], ["Internship", "General"], ["HR", "General"], ["Behavioral", "General"], ["Situational", "General"],
   // ---- NEW CATEGORIES ----
@@ -221,17 +218,10 @@ const extraAdvancedTopics = [
 ];
 
 // Combine all topics
-export const topics = [...originalTopics, ...existingAdvancedTopics, ...newCategoryTopics, ...extraAdvancedTopics] as const;
+const topics = [...originalTopics, ...existingAdvancedTopics, ...newCategoryTopics, ...extraAdvancedTopics] as const;
 
-// ---- Situational contexts ----
-// Previously these were appended to the base question to mass-produce a
-// separate page per combination (141 questions x 14 angles = 1,974 pages).
-// That produced near-duplicate pages with identical boilerplate sections
-// and even a grammar bug (a "?" question followed by another "?" suffix).
-// Instead, each topic now gets exactly ONE page, and two of these contexts
-// are surfaced as genuine follow-up questions on that single page - real
-// depth without duplicate, thin URLs.
-const situationalContexts = [
+// ---- Extended angles (14 angles) ----
+const angles = [
   "for a small team",
   "when requirements are unclear",
   "under a tight deadline",
@@ -248,7 +238,7 @@ const situationalContexts = [
   "for a global team with distributed members",
 ] as const;
 
-export const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, ""); */
+const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "");
 
 // ---- Clear, ultra-detailed interview answer builder ----
 // Creates a learner-friendly answer with explanation, example, trade-offs,
@@ -257,6 +247,7 @@ export const slugify = (value: string) => value.toLowerCase().replace(/[^a-z0-9]
 const buildUltraDetailedAnswer = (
   categoryName: string,
   baseQuestion: string,
+  angle: string,
   tag: string,
   explanation: string,
   sampleAnswer: string,
@@ -556,7 +547,7 @@ The goal is to find the right balance for the team's size, product complexity, r
 
   return `**Detailed Answer**
 
-This is a ${categoryName} interview question about **${tag}**. The key is to understand the actual requirement and constraints before choosing a technology or implementation, and to be able to explain the reasoning behind that choice out loud.
+For this ${categoryName} interview question, I would approach the problem ${angle}. The key is to understand the requirement before choosing a technology or implementation.
 
 **What the interviewer is looking for**
 
@@ -609,83 +600,70 @@ async function main() {
     });
   }
 
-  // One published page per real, distinct question - no angle multiplication.
-  // This replaces the previous 141 x 14 = 1,974 near-duplicate pages with
-  // 141 pages, each with unique, specific content and no grammar bug from
-  // concatenating a second "?" onto a question that already ends in one.
   for (let topicIndex = 0; topicIndex < topics.length; topicIndex++) {
-    const [categoryName, baseQuestion, tag, explanation, sampleAnswer] = topics[topicIndex];
+    const [categoryName, baseQuestion, tag, explanation, sampleAnswer, detailedAnswer] = topics[topicIndex];
     const categoryId = categoryMap.get(categoryName)!;
     const subcategory = await prisma.subcategory.findFirst({ where: { categoryId } });
 
-    const question = baseQuestion;
-    const slug = slugify(baseQuestion);
-
-    // Bias difficulty toward HARD for the advanced topic pools.
-    const isAdvancedPool = topicIndex >= originalTopics.length;
-    const difficulty: Difficulty = isAdvancedPool
-      ? [Difficulty.MEDIUM, Difficulty.HARD, Difficulty.HARD][topicIndex % 3]
-      : [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][topicIndex % 3];
-
-    const experienceLevel = [ExperienceLevel.FRESHER, ExperienceLevel.INTERNSHIP, ExperienceLevel.MID_LEVEL, ExperienceLevel.EXPERIENCED][topicIndex % 4];
-    const interviewType = categoryName === "Behavioral" || categoryName === "HR" ? InterviewType.BEHAVIORAL : categoryName === "Situational" ? InterviewType.SITUATIONAL : InterviewType.TECHNICAL;
-
-    // Pick two distinct situational contexts deterministically per topic so
-    // every page gets real, varied follow-up questions instead of the same
-    // two generic lines repeated on every page.
-    const contextA = situationalContexts[topicIndex % situationalContexts.length];
-    const contextB = situationalContexts[(topicIndex + 5) % situationalContexts.length];
-
-    await prisma.interviewQuestion.upsert({
-      where: { slug },
-      update: {
-        question,
-        categoryId,
-        subcategoryId: subcategory?.id,
-        experienceLevel,
-        difficulty,
-        interviewType,
-        shortDescription: `A practical ${tag} question for ${categoryName} interviews.`,
-        explanation,
-        sampleAnswer,
-        detailedAnswer: buildUltraDetailedAnswer(categoryName, baseQuestion, tag, explanation, sampleAnswer),
-        keyPoints: ["State your assumptions", "Use a specific example", "Explain the trade-off", "Close with the result or next step"],
-        commonMistakes: ["Starting without clarifying the goal", "Listing tools without explaining judgment", "Making claims without evidence"],
-        followUpQuestions: [
-          `How would your answer change ${contextA}?`,
-          `How would your answer change ${contextB}?`,
-          "What would you measure after making that decision?",
-        ],
-        tags: [tag, slugify(categoryName)],
-        isPublished: true,
-        seoTitle: question,
-        seoDescription: `Learn how to answer "${question}" with a clear, practical, interview-ready response.`
-      },
-      create: {
-        question,
-        slug,
-        categoryId,
-        subcategoryId: subcategory?.id,
-        experienceLevel,
-        difficulty,
-        interviewType,
-        shortDescription: `A practical ${tag} question for ${categoryName} interviews.`,
-        explanation,
-        sampleAnswer,
-        detailedAnswer: buildUltraDetailedAnswer(categoryName, baseQuestion, tag, explanation, sampleAnswer),
-        keyPoints: ["State your assumptions", "Use a specific example", "Explain the trade-off", "Close with the result or next step"],
-        commonMistakes: ["Starting without clarifying the goal", "Listing tools without explaining judgment", "Making claims without evidence"],
-        followUpQuestions: [
-          `How would your answer change ${contextA}?`,
-          `How would your answer change ${contextB}?`,
-          "What would you measure after making that decision?",
-        ],
-        tags: [tag, slugify(categoryName)],
-        isPublished: true,
-        seoTitle: question,
-        seoDescription: `Learn how to answer "${question}" with a clear, practical, interview-ready response.`
+    for (let angleIndex = 0; angleIndex < angles.length; angleIndex++) {
+      const question = `${baseQuestion} ${angles[angleIndex]}?`;
+      const slug = `${slugify(baseQuestion)}-${slugify(angles[angleIndex])}`;
+      
+      // ---- Difficulty: make sure advanced topics & advanced angles produce more HARD questions ----
+      let difficulty: Difficulty;
+      // If the topic index is in the advanced range (>= originalTopics.length) or angle is advanced (>= 10), bias toward HARD
+      if (topicIndex >= originalTopics.length || angleIndex >= 10) {
+        difficulty = [Difficulty.MEDIUM, Difficulty.HARD, Difficulty.HARD][(topicIndex + angleIndex) % 3];
+      } else {
+        difficulty = [Difficulty.EASY, Difficulty.MEDIUM, Difficulty.HARD][(topicIndex + angleIndex) % 3];
       }
-    });
+
+      const experienceLevel = [ExperienceLevel.FRESHER, ExperienceLevel.INTERNSHIP, ExperienceLevel.MID_LEVEL, ExperienceLevel.EXPERIENCED][(topicIndex + angleIndex) % 4];
+      const interviewType = categoryName === "Behavioral" || categoryName === "HR" ? InterviewType.BEHAVIORAL : categoryName === "Situational" ? InterviewType.SITUATIONAL : InterviewType.TECHNICAL;
+
+      await prisma.interviewQuestion.upsert({
+        where: { slug },
+        update: {
+          question,
+          categoryId,
+          subcategoryId: subcategory?.id,
+          experienceLevel,
+          difficulty,
+          interviewType,
+          shortDescription: `A practical ${tag} question focused on ${angles[angleIndex]}.`,
+          explanation,
+          sampleAnswer,
+          detailedAnswer: buildUltraDetailedAnswer(categoryName, baseQuestion, angles[angleIndex], tag, explanation, sampleAnswer),
+          keyPoints: ["State your assumptions", "Use a specific example", "Explain the trade-off", "Close with the result or next step"],
+          commonMistakes: ["Starting without clarifying the goal", "Listing tools without explaining judgment", "Making claims without evidence"],
+          followUpQuestions: [`What would you measure after making that decision?`, `What would you change with more time?`],
+          tags: [tag, slugify(categoryName)],
+          isPublished: true,
+          seoTitle: question,
+          seoDescription: `Learn how to approach this ${tag} interview question with a clear, practical answer.`
+        },
+        create: {
+          question,
+          slug,
+          categoryId,
+          subcategoryId: subcategory?.id,
+          experienceLevel,
+          difficulty,
+          interviewType,
+          shortDescription: `A practical ${tag} question focused on ${angles[angleIndex]}.`,
+          explanation,
+          sampleAnswer,
+          detailedAnswer: buildUltraDetailedAnswer(categoryName, baseQuestion, angles[angleIndex], tag, explanation, sampleAnswer),
+          keyPoints: ["State your assumptions", "Use a specific example", "Explain the trade-off", "Close with the result or next step"],
+          commonMistakes: ["Starting without clarifying the goal", "Listing tools without explaining judgment", "Making claims without evidence"],
+          followUpQuestions: [`What would you measure after making that decision?`, `What would you change with more time?`],
+          tags: [tag, slugify(categoryName)],
+          isPublished: true,
+          seoTitle: question,
+          seoDescription: `Learn how to approach this ${tag} interview question with a clear, practical answer.`
+        }
+      });
+    }
   }
 
   for (const article of articleSeeds) {
@@ -704,7 +682,7 @@ async function main() {
     });
   }
 
-  console.log(`Seeded ${topics.length} interview questions and ${articleSeeds.length} articles.`);
+  console.log(`Seeded ${topics.length * angles.length} interview questions and ${articleSeeds.length} articles.`);
 }
 
 main().catch(error => { console.error(error); process.exit(1); }).finally(() => prisma.$disconnect());
