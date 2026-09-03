@@ -1,5 +1,5 @@
 import { PrismaClient } from "@prisma/client";
-import { articleSeeds } from "../generated-article-seed";
+import { articleSeeds } from "./article-seed";
 import * as fs from "node:fs";
 import * as path from "node:path";
 

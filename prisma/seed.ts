@@ -1,5 +1,5 @@
 import { PrismaClient, Difficulty, ExperienceLevel, InterviewType } from "@prisma/client";
-import { articleSeeds } from "../generated-article-seed";
+import { articleSeeds } from "./article-seed";
 import { categories, topics, situationalContexts, slugify } from "./question-data";
 const prisma = new PrismaClient();
 const technologyResourceTerms = ["java", "python", "javascript", "typescript", "react", "angular", "vue", "nodejs", "spring-boot", "kotlin", "android", "ios", "swift", "docker", "kubernetes", "aws", "azure", "gcp", "devops", "cicd", "microservices", "system-design", "data-structures", "algorithms", "sql", "nosql", "mongodb", "postgresql", "graphql", "rest-api", "security", "artificial-intelligence", "machine-learning", "data-science", "blockchain", "git", "linux", "networking", "cloud-native", "serverless", "testing", "qa"];
