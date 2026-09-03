@@ -13,7 +13,7 @@ export function AnswerSection({
   sampleAnswer,
   detailedAnswer,
 }: AnswerSectionProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
   const answerToShow = detailedAnswer?.trim() || sampleAnswer;
 
   return (
@@ -27,6 +27,7 @@ export function AnswerSection({
           onClick={() => setIsExpanded(!isExpanded)}
           className="flex items-center justify-center gap-2 rounded-lg bg-mint/40 px-4 py-2 text-sm font-bold text-ink transition hover:bg-mint/60"
           aria-expanded={isExpanded}
+          aria-controls="sample-answer-content"
         >
           {isExpanded ? "Hide Answer" : "Show Answer"}
 
@@ -40,7 +41,7 @@ export function AnswerSection({
       </div>
 
       {isExpanded && (
-        <div className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
+        <div id="sample-answer-content" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
           <div className="text-base leading-8 text-ink/75">
             <ReactMarkdown
               components={{
@@ -125,11 +126,7 @@ export function AnswerSection({
         </div>
       )}
 
-      {!isExpanded && (
-        <p className="mt-4 text-sm italic text-ink/60">
-          Click "Show Answer" to reveal the detailed interview answer.
-        </p>
-      )}
+      {!isExpanded && <p className="mt-4 text-sm italic text-ink/60">The answer is hidden. Select "Show Answer" to reveal it.</p>}
     </div>
   );
 }

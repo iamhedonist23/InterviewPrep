@@ -138,6 +138,7 @@ export default async function QuestionPage({ params }: Props) {
               </div>
 
               <AnswerSection
+                key={question.slug}
                 sampleAnswer={question.sampleAnswer}
                 detailedAnswer={question.detailedAnswer ?? null}
               />

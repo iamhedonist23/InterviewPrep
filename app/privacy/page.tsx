@@ -11,7 +11,7 @@ export default function PrivacyPage() {
 			<p>When you use signed-in features, we store the content and activity needed to provide them, such as saved questions, learning progress, practice answers and results, daily challenge activity, and resumes you create. You choose what to enter into those features. Please do not submit passwords, API keys, or other sensitive information as an interview answer, resume, or support message.</p>
 
 			<h3>Information collected automatically</h3>
-			<p>When you visit or use the website, normal web requests and our security controls may process technical information such as your IP address, browser and device characteristics, requested pages, referring page, and date and time. We use this information as needed to deliver pages, apply rate limits, debug problems, and prevent abuse. The site does not currently use a separate third-party analytics service to build an analytics profile.</p>
+			<p>When you visit or use the website, normal web requests and our security controls may process technical information such as your IP address, browser and device characteristics, requested pages, referring page, and date and time. We use this information as needed to deliver pages, apply rate limits, debug problems, and prevent abuse. The site also includes Vercel Analytics to help us understand aggregate website usage and performance; Vercel may process related technical information under its own policies.</p>
 
 			<h3>Cookies and browser storage</h3>
 			<p>We use cookies and similar browser technologies for essential operation. NextAuth uses authentication cookies to maintain a secure signed-in session, and practice sessions use local browser storage to preserve an in-progress draft. Advertising technologies may use cookies if advertising is enabled. See our <a href="/cookie-policy">Cookie Policy</a> for details.</p>
@@ -33,14 +33,14 @@ export default function PrivacyPage() {
 				<li><strong>Essential cookies:</strong> cookies and browser storage needed for core site behavior, including keeping an in-progress practice draft.</li>
 				<li><strong>Authentication and session cookies:</strong> used by NextAuth when you sign in so protected features can recognize your session.</li>
 				<li><strong>Preference and functionality storage:</strong> the application may retain information locally when a feature needs to remember your in-progress work. It does not currently advertise a separate preference-cookie system.</li>
-				<li><strong>Analytics cookies:</strong> we do not currently configure a separate third-party analytics tool.</li>
+				<li><strong>Analytics:</strong> the site includes Vercel Analytics for aggregate usage and performance information. We do not use it to intentionally collect the content of your answers or resume fields.</li>
 				<li><strong>Advertising cookies:</strong> if advertising is enabled, Google or another advertising provider may use cookies or similar technologies to serve, personalize, and measure ads as described below.</li>
 			</ul>
 			<p>You can control or disable cookies and local browser storage through your browser settings. Blocking essential cookies may prevent sign-in or other account features from working. More information is available in the <a href="/cookie-policy">Cookie Policy</a>.</p>
 
 			<h2>Advertising and Google AdSense</h2>
 			<p>InstantInterviewPrep may display advertisements from third-party advertising providers such as Google AdSense. Advertising is enabled only when the required site configuration is turned on; it is currently disabled in the application configuration used for this site.</p>
-			<p>If advertising is enabled, these providers, including Google and its partners, may use cookies or similar technologies to serve, personalize, measure, or improve advertisements based on visits to this and other websites. Advertising may be contextual or personalized depending on your settings, consent, location, and applicable requirements. Advertising providers may collect or receive information about your visits for these purposes.</p>
+			<p>If advertising is enabled, Google and its partners may use cookies or similar technologies to serve, personalize, measure, or improve advertisements based on visits to this and other websites. In particular, Google may use the DoubleClick DART cookie to serve ads based on your visits to this site and other sites on the internet. Advertising may be contextual or personalized depending on your settings, consent, location, and applicable requirements. Advertising providers may collect or receive information about your visits for these purposes.</p>
 			<p>You can manage personalized advertising through <a href="https://adssettings.google.com/" rel="noreferrer">Google Ads Settings</a> and learn more from <a href="https://policies.google.com/technologies/ads" rel="noreferrer">Google's advertising privacy information</a>. Your browser and available regional privacy controls may also provide choices. Turning off personalized advertising does not necessarily prevent ads from being shown.</p>
 
 			<h2>Third-party services</h2>
@@ -50,7 +50,7 @@ export default function PrivacyPage() {
 				<li><strong>Authentication:</strong> NextAuth manages sessions, and Google OAuth may be available when the site operator configures Google sign-in. Email-and-password sign-in is also supported.</li>
 				<li><strong>Advertising:</strong> Google AdSense is supported but only loads when the site's AdSense settings enable it.</li>
 			</ul>
-			<p>The application does not currently configure a separate third-party analytics provider. Hosting and content delivery providers may process requests as necessary to deliver the website; their identities depend on the deployment environment.</p>
+			<p>Vercel Analytics and hosting providers may process request and usage information as necessary to provide analytics, hosting, and content delivery. Their processing is governed by their own policies and the deployment environment.</p>
 
 			<h2>Data sharing</h2>
 			<p>We do not sell personal information. We may share or permit access to information only when reasonably necessary to:</p>

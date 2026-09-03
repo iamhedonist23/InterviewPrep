@@ -34,6 +34,30 @@ const faqs = [
       "You can browse public questions and resources without an account. An account is useful for saving questions, tracking progress, and using other personalized features.",
   },
   {
+    id: "what-is-saved",
+    question: "What can I save in an account?",
+    answer:
+      "Signed-in users can save interview questions, track learning progress, record practice responses and results, and keep resume-builder information. Account data is associated with your user profile rather than being public.",
+  },
+  {
+    id: "are-practice-drafts-saved",
+    question: "What happens to an unfinished practice session?",
+    answer:
+      "The practice workflow keeps an in-progress draft in your browser's local storage so a refresh or navigation does not immediately lose it. Submitted results can also be saved to your account when you are signed in.",
+  },
+  {
+    id: "are-sample-answers-scripts",
+    question: "Should I memorize the sample answers?",
+    answer:
+      "No. Sample answers are starting points. Use the explanation, key points, and follow-up questions to build a response that reflects your own experience and judgment.",
+  },
+  {
+    id: "how-delete-data",
+    question: "How do I request deletion of my account data?",
+    answer:
+      "Email instantinterviewprep@gmail.com with a deletion request. We may ask for information needed to verify that you control the account, and we retain limited records where required for security, legal, or backup reasons.",
+  },
+  {
     id: "contact-help",
     question: "How can I get help?",
     answer:
