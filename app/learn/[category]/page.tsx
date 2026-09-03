@@ -50,6 +50,17 @@ export default async function LearnCategoryPage({ params }: Props) {
         <h1 className="mt-3 font-display text-4xl font-bold sm:text-5xl">{item.name}</h1>
         {item.description && <p className="mt-4 max-w-2xl text-lg leading-8 text-ink/60">{item.description}</p>}
 
+        {item.paths[0]?.modules[0]?.topics[0] && (
+          <div className="mt-8 flex flex-wrap items-center gap-3">
+            <Link
+              href={`/learn/${item.slug}/${item.paths[0].modules[0].topics[0].slug}`}
+              className="inline-flex items-center justify-center rounded-full bg-ink px-5 py-3 text-sm font-bold text-paper hover:bg-coral"
+            >
+              Start learning
+            </Link>
+          </div>
+        )}
+
         {item.paths.length === 0 && (
           <p className="mt-14 text-ink/60">No lessons are published in this guide yet. Check back soon.</p>
         )}

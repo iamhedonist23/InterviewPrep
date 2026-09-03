@@ -9,16 +9,42 @@ export const revalidate = 86400;
 export const metadata: Metadata = { title: "Learn", description: "Free, structured study guides to build the fundamentals behind your interview answers.", alternates: { canonical: "/learn" } };
 
 const LEVEL_LABEL: Record<string, string> = { BEGINNER: "Beginner", INTERMEDIATE: "Intermediate", ADVANCED: "Advanced", INTERVIEW_PREP: "Interview prep" };
+const PAGE_SIZE = 9;
 
-type Props = { searchParams: Promise<{ q?: string | string[] }> };
+type Props = { searchParams: Promise<{ q?: string | string[]; page?: string | string[] }> };
 const one = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
 
+export function paginateItems<T>(items: T[], currentPage: number, pageSize: number) {
+  const safePage = Number.isFinite(currentPage) && currentPage > 0 ? currentPage : 1;
+  const pageCount = Math.max(1, Math.ceil(items.length / pageSize));
+  const boundedPage = Math.min(safePage, pageCount);
+  const start = (boundedPage - 1) * pageSize;
+  const end = start + pageSize;
+
+  return {
+    currentPage: boundedPage,
+    pageCount,
+    items: items.slice(start, end),
+  };
+}
+
 export default async function LearnPage({ searchParams }: Props) {
-  const query = one((await searchParams).q) ?? "";
+  const params = await searchParams;
+  const query = one(params.q) ?? "";
+  const requestedPage = Number(one(params.page) ?? "1");
   const categories = await listPublishedStudyCategoriesForLearn();
   const visibleCategories = query
     ? categories.filter(category => `${category.name} ${category.slug}`.toLowerCase().includes(query.toLowerCase()))
     : categories;
+  const { currentPage, pageCount, items: pageCategories } = paginateItems(visibleCategories, requestedPage, PAGE_SIZE);
+  const createPageUrl = (nextPage: number) => {
+    const search = new URLSearchParams();
+    if (query) search.set("q", query);
+    if (nextPage > 1) search.set("page", String(nextPage));
+    const suffix = search.toString();
+    return suffix ? `/learn?${suffix}` : "/learn";
+  };
+
   return (
     <section className="py-16 sm:py-20">
       <Container>
@@ -46,28 +72,50 @@ export default async function LearnPage({ searchParams }: Props) {
           </p>
         )}
 
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {visibleCategories.map(category => (
-            <Link
-              key={category.id}
-              href={`/learn/${category.slug}`}
-              className="flex flex-col rounded-2xl border border-ink/10 bg-white/70 p-6 transition-colors hover:border-coral"
-            >
-              <h2 className="font-display text-xl font-bold">{category.name}</h2>
-              {category.description && <p className="mt-2 flex-1 text-sm leading-6 text-ink/60">{category.description}</p>}
-              <div className="mt-5 flex flex-wrap gap-2">
-                {category.paths.map(path => (
-                  <span key={path.id} className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-ink/70">
-                    {LEVEL_LABEL[path.level] ?? path.level}
-                  </span>
-                ))}
-              </div>
-              <p className="mt-5 text-xs font-bold uppercase tracking-widest text-ink/40">
-                {category._count.topics} {category._count.topics === 1 ? "topic" : "topics"}
-              </p>
-            </Link>
-          ))}
-        </div>
+        {visibleCategories.length > 0 && (
+          <>
+            <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {pageCategories.map(category => (
+                <Link
+                  key={category.id}
+                  href={`/learn/${category.slug}`}
+                  className="flex flex-col rounded-2xl border border-ink/10 bg-white/70 p-6 transition-colors hover:border-coral"
+                >
+                  <h2 className="font-display text-xl font-bold">{category.name}</h2>
+                  {category.description && <p className="mt-2 flex-1 text-sm leading-6 text-ink/60">{category.description}</p>}
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {category.paths.map(path => (
+                      <span key={path.id} className="rounded-full bg-mint px-3 py-1 text-xs font-bold text-ink/70">
+                        {LEVEL_LABEL[path.level] ?? path.level}
+                      </span>
+                    ))}
+                  </div>
+                  <p className="mt-5 text-xs font-bold uppercase tracking-widest text-ink/40">
+                    {category._count.topics} {category._count.topics === 1 ? "topic" : "topics"}
+                  </p>
+                </Link>
+              ))}
+            </div>
+
+            {pageCount > 1 && (
+              <nav aria-label="Learn pagination" className="mt-10 flex items-center justify-between gap-3">
+                {currentPage > 1 ? (
+                  <Link href={createPageUrl(currentPage - 1)} className="rounded-full border border-ink/15 px-5 py-3 text-sm font-bold text-ink hover:border-coral">Previous</Link>
+                ) : (
+                  <span />
+                )}
+                <p className="text-sm font-semibold text-ink/60">
+                  Page {currentPage} of {pageCount}
+                </p>
+                {currentPage < pageCount ? (
+                  <Link href={createPageUrl(currentPage + 1)} className="rounded-full bg-ink px-5 py-3 text-sm font-bold text-paper hover:bg-coral">Next</Link>
+                ) : (
+                  <span />
+                )}
+              </nav>
+            )}
+          </>
+        )}
       </Container>
     </section>
   );

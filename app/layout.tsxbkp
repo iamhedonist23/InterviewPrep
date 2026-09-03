@@ -6,7 +6,6 @@ import { AdsenseScript } from "@/components/ads/adsense-script";
 import { PublicBottomAd, PublicSidebarAd, PublicTopAd } from "@/components/ads/public-ad-slot";
 import { SessionProvider } from "@/components/providers/session-provider";
 import { siteConfig } from "@/lib/site";
-import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
@@ -40,7 +39,6 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <PublicBottomAd />
           <Footer />
         </SessionProvider>
-        <Analytics />
       </body>
     </html>
   );

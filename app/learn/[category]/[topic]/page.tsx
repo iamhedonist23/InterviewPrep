@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import ReactMarkdown from "react-markdown";
 import { notFound } from "next/navigation";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { Container } from "@/components/ui/container";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StudyExercise } from "@/components/study/study-exercise";
+import { LearnMarkdown } from "@/components/learn/learn-markdown";
 import { TopicProgressActions } from "@/components/study/topic-progress-actions";
 import { SaveTopicButton } from "@/components/study/save-topic-button";
 import { getOwnedTopicProgress } from "@/lib/study";
@@ -117,9 +117,7 @@ export default async function LearnTopicPage({ params }: Props) {
             {item.sections.map(section => (
               <div key={section.id} id={section.id}>
                 <h2 className="font-display text-2xl font-bold">{section.title}</h2>
-                <div className="prose prose-lg mt-4 max-w-none text-ink/70 prose-headings:font-display prose-headings:text-ink prose-p:leading-8 prose-strong:text-ink prose-a:text-coral prose-code:rounded prose-code:bg-ink/5 prose-code:px-1 prose-code:py-0.5 prose-code:text-sm prose-code:text-ink prose-pre:bg-ink prose-pre:text-paper prose-li:leading-8">
-                  <ReactMarkdown>{section.content}</ReactMarkdown>
-                </div>
+                <LearnMarkdown content={section.content} />
               </div>
             ))}
 
