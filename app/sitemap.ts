@@ -6,10 +6,10 @@ import { prisma } from "@/lib/prisma";
 const STATIC_PATHS = ["", "/interview-questions", "/practice", "/mock-interview", "/learn", "/blog", "/about", "/contact", "/faq", "/categories", "/privacy", "/terms", "/disclaimer", "/cookie-policy"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = process.env.NEXT_PUBLIC_SITE_URL ?? "https://instantinterviewprep.com/";
+  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://instantinterviewprep.com").replace(/\/+$/, "");
 
   const [categories, questions, articles, studyCategories, studyTopics] = await Promise.all([
-    prisma.category.findMany({ select: { slug: true, updatedAt: true } }),
+    prisma.category.findMany({ where: { questions: { some: { isPublished: true } } }, select: { slug: true, updatedAt: true } }),
     prisma.interviewQuestion.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.article.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.studyCategory.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),

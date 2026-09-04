@@ -23,6 +23,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: question.seoTitle ?? question.question,
       description: question.seoDescription ?? question.shortDescription,
       type: "article",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: question.question }],
     },
   };
 }

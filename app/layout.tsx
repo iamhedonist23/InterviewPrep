@@ -12,8 +12,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: { default: "InterviewPrep | Prepare Smarter", template: "%s | InterviewPrep" },
   description: "Practice interview questions, improve your answers, and prepare for your next job completely free.",
-  openGraph: { title: "InterviewPrep", description: "Prepare smarter. Interview with confidence.", type: "website" },
-  twitter: { card: "summary_large_image", title: "InterviewPrep", description: "Free interview practice for your next opportunity." },
+  openGraph: {
+    title: "InterviewPrep",
+    description: "Prepare smarter. Interview with confidence.",
+    type: "website",
+    images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Free Interview Practice - InterviewPrep" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "InterviewPrep",
+    description: "Free interview practice for your next opportunity.",
+    images: ["/opengraph-image"],
+  },
   robots: { index: true, follow: true },
 };
 

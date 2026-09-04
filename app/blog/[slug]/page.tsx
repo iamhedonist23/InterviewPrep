@@ -24,6 +24,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       title: article.seoTitle ?? article.title,
       description: article.seoDescription ?? article.excerpt,
       type: "article",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: article.title }],
       publishedTime: article.publishedAt?.toISOString(),
       authors: article.author ? [article.author] : undefined,
     },
