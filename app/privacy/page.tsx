@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/legal-page";
-export const metadata: Metadata = { title: "Privacy Policy", description: "How InterviewPrep collects, uses, and protects your information." };
+export const metadata: Metadata = { title: "Privacy Policy", description: "How InterviewPrep collects, uses, and protects your information.", alternates: { canonical: "/privacy" } };
 
 export default function PrivacyPage() {
 	return (

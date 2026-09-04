@@ -106,7 +106,15 @@ async function queryPublicQuestionCategory(categorySlug: string, page: number) {
       slug: true,
       group: true,
       description: true,
-      subcategories: { select: { id: true, name: true, slug: true } },
+      subcategories: {
+        select: {
+          id: true,
+          name: true,
+          slug: true,
+          _count: { select: { questions: { where: { isPublished: true } } } },
+        },
+        orderBy: { name: "asc" },
+      },
       questions: {
         where: { isPublished: true },
         select: {
@@ -124,10 +132,16 @@ async function queryPublicQuestionCategory(categorySlug: string, page: number) {
     },
   });
   if (!item) return null;
-  const [totalQuestions, relatedCategories, relatedArticles] =
+  const learnTerm = item.name.replace(/\b(developer|engineer|tester|professional|specialist)\b/gi, "").trim();
+  const [totalQuestions, experienceCounts, relatedCategories, relatedArticles, learnCategories] =
     await Promise.all([
       prisma.interviewQuestion.count({
         where: { categoryId: item.id, isPublished: true },
+      }),
+      prisma.interviewQuestion.groupBy({
+        by: ["experienceLevel"],
+        where: { categoryId: item.id, isPublished: true },
+        _count: { _all: true },
       }),
       prisma.category.findMany({
         where: {
@@ -145,12 +159,26 @@ async function queryPublicQuestionCategory(categorySlug: string, page: number) {
         take: 3,
         select: { id: true, title: true, slug: true, excerpt: true },
       }),
+      prisma.studyCategory.findMany({
+        where: {
+          isPublished: true,
+          OR: [
+            { name: { contains: learnTerm, mode: "insensitive" } },
+            { slug: { contains: learnTerm, mode: "insensitive" } },
+          ],
+        },
+        orderBy: { sortOrder: "asc" },
+        take: 3,
+        select: { id: true, name: true, slug: true, description: true },
+      }),
     ]);
   return {
     item,
     totalQuestions,
+    experienceCounts,
     relatedCategories,
     relatedArticles,
+    learnCategories,
     pageCount: Math.ceil(totalQuestions / pageSize),
   };
 }
@@ -165,4 +193,27 @@ export async function getCachedPublicQuestionCategory(
     ["public-question-category", categorySlug, String(safePage)],
     { revalidate: 1800, tags: [PUBLIC_CONTENT_CACHE_TAG] },
   )(categorySlug, safePage);
+}
+
+export async function getRelatedInterviewCategory(categoryName: string) {
+  const searchTerm = categoryName
+    .replace(/\b(core|fundamentals|concepts|basics|advanced|essentials)\b/gi, "")
+    .replace(/\([^)]*\)/g, "")
+    .trim();
+  return unstable_cache(
+    async () => {
+      const exact = await prisma.category.findFirst({
+        where: { questions: { some: { isPublished: true } }, name: { equals: categoryName, mode: "insensitive" } },
+        select: { name: true, slug: true },
+      });
+      if (exact || !searchTerm) return exact;
+      return prisma.category.findFirst({
+        where: { questions: { some: { isPublished: true } }, name: { contains: searchTerm, mode: "insensitive" } },
+        orderBy: { name: "asc" },
+        select: { name: true, slug: true },
+      });
+    },
+    ["public-related-interview-category", categoryName.toLowerCase()],
+    { revalidate: 3600, tags: [PUBLIC_CONTENT_CACHE_TAG] },
+  )();
 }

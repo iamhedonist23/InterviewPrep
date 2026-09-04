@@ -7,13 +7,23 @@ import { paginateItems } from "@/lib/learn-pagination";
 import { listPublishedStudyCategoriesForLearn } from "@/lib/study-public";
 
 export const revalidate = 86400;
-export const metadata: Metadata = { title: "Learn", description: "Free, structured study guides to build the fundamentals behind your interview answers.", alternates: { canonical: "/learn" } };
 
 const LEVEL_LABEL: Record<string, string> = { BEGINNER: "Beginner", INTERMEDIATE: "Intermediate", ADVANCED: "Advanced", INTERVIEW_PREP: "Interview prep" };
 const PAGE_SIZE = 9;
 
 type Props = { searchParams: Promise<{ q?: string | string[]; page?: string | string[] }> };
 const one = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const params = await searchParams;
+  const hasQuery = Boolean(one(params.q) || one(params.page));
+  return {
+    title: "Learn",
+    description: "Free, structured study guides to build the fundamentals behind your interview answers.",
+    alternates: { canonical: "/learn" },
+    robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
+  };
+}
 
 export default async function LearnPage({ searchParams }: Props) {
   const params = await searchParams;

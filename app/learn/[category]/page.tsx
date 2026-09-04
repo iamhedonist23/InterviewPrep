@@ -3,6 +3,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { getPublishedStudyCategoryTree } from "@/lib/study-public";
+import { siteUrl } from "@/lib/site";
+import { getRelatedInterviewCategory } from "@/lib/public-content";
+import { listQuestions } from "@/services/questions";
 
 export const revalidate = 86400;
 type Props = { params: Promise<{ category: string }> };
@@ -24,8 +27,13 @@ export default async function LearnCategoryPage({ params }: Props) {
   const { category } = await params;
   const item = await getPublishedStudyCategoryTree(category);
   if (!item) notFound();
+  const interviewCategory = await getRelatedInterviewCategory(item.name);
+  const relatedCategory = interviewCategory;
+  const relatedQuestions = relatedCategory
+    ? (await listQuestions({ category: relatedCategory.slug, page: 1 })).questions.slice(0, 4)
+    : [];
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const baseUrl = siteUrl;
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -49,6 +57,23 @@ export default async function LearnCategoryPage({ params }: Props) {
         <p className="mt-12 text-xs font-bold uppercase tracking-[.18em] text-coral">Study guide</p>
         <h1 className="mt-3 font-display text-4xl font-bold sm:text-5xl">{item.name}</h1>
         {item.description && <p className="mt-4 max-w-2xl text-lg leading-8 text-ink/60">{item.description}</p>}
+        {relatedCategory && (
+          <p className="mt-4 max-w-2xl text-sm text-ink/60">
+            Practice what you learn with <Link href={`/interview-questions/${relatedCategory.slug}`} className="font-bold text-coral hover:underline">{relatedCategory.name} interview questions</Link>.
+          </p>
+        )}
+        {relatedQuestions.length > 0 && (
+          <section className="mt-10 max-w-3xl">
+            <h2 className="font-display text-2xl font-bold">{relatedCategory?.name} questions to practice</h2>
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              {relatedQuestions.map((question) => (
+                <Link key={question.id} href={`/questions/${question.slug}`} className="rounded-xl border border-ink/10 p-4 text-sm font-semibold hover:border-coral hover:text-coral">
+                  {question.question}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {item.paths[0]?.modules[0]?.topics[0] && (
           <div className="mt-8 flex flex-wrap items-center gap-3">

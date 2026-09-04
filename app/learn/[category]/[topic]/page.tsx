@@ -11,7 +11,9 @@ import { TopicProgressActions } from "@/components/study/topic-progress-actions"
 import { SaveTopicButton } from "@/components/study/save-topic-button";
 import { getOwnedTopicProgress } from "@/lib/study";
 import { getPublishedTopic, getAdjacentTopics, getPublishedTopicLinks } from "@/lib/study-public";
+import { getRelatedInterviewCategory } from "@/lib/public-content";
 import { prisma } from "@/lib/prisma";
+import { siteUrl } from "@/lib/site";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ category: string; topic: string }> };
@@ -24,6 +26,16 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title: item.seoTitle ?? item.title,
     description: item.seoDescription ?? item.shortDescription ?? `Free ${item.title} study guide with worked examples and practice exercises.`,
     alternates: { canonical: `/learn/${item.category.slug}/${item.slug}` },
+    openGraph: {
+      title: item.seoTitle ?? item.title,
+      description: item.seoDescription ?? item.shortDescription ?? `Learn ${item.title} with worked examples and interview-focused practice.`,
+      type: "article",
+      url: `/learn/${item.category.slug}/${item.slug}`,
+      siteName: "InstantInterviewPrep",
+      locale: "en_US",
+      images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${item.title} learning guide` }],
+    },
+    robots: { index: true, follow: true },
   };
 }
 
@@ -31,6 +43,7 @@ export default async function LearnTopicPage({ params }: Props) {
   const { category, topic } = await params;
   const item = await getPublishedTopic(category, topic);
   if (!item) notFound();
+  const interviewCategory = await getRelatedInterviewCategory(item.category.name);
 
   const session = await getServerSession(authOptions);
   const prerequisiteIds = Array.isArray(item.prerequisiteIds) ? item.prerequisiteIds.filter((id): id is string => typeof id === "string") : [];
@@ -46,7 +59,7 @@ export default async function LearnTopicPage({ params }: Props) {
   const relatedTopics = relatedTopicLinks.sort((left, right) => relatedTopicIds.indexOf(left.id) - relatedTopicIds.indexOf(right.id));
   const progressStatus = progress?.status ?? "NOT_STARTED";
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const baseUrl = siteUrl;
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -59,10 +72,23 @@ export default async function LearnTopicPage({ params }: Props) {
   };
 
   const relatedQuestions = item.questionRelations.map(relation => relation.question);
+  const learningResource = {
+    "@context": "https://schema.org",
+    "@type": "LearningResource",
+    name: item.title,
+    description: item.shortDescription ?? `Learn ${item.title} with examples, exercises, and interview-focused guidance.`,
+    url: `${baseUrl}/learn/${item.category.slug}/${item.slug}`,
+    learningResourceType: "Lesson",
+    educationalLevel: item.module.studyPath.level,
+    isPartOf: { "@type": "Course", name: item.category.name, url: `${baseUrl}/learn/${item.category.slug}` },
+    teaches: item.sections.map(section => section.title),
+    hasPart: item.examples.length > 0 ? item.examples.map(example => ({ "@type": "LearningResource", name: `${example.language} example` })) : undefined,
+  };
 
   return (
     <section className="py-16 sm:py-20">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(learningResource) }} />
       <Container>
         <nav aria-label="Breadcrumb" className="text-sm text-ink/55">
           <Link href="/">Home</Link><span className="px-2">/</span>
@@ -77,7 +103,9 @@ export default async function LearnTopicPage({ params }: Props) {
             {item.estimatedMinutes && <span className="rounded-full bg-ink/5 px-3 py-1 text-xs font-bold text-ink/60">{item.estimatedMinutes} min read</span>}
           </div>
           <h1 className="mt-6 font-display text-4xl font-bold leading-tight sm:text-5xl">{item.title}</h1>
-          {item.shortDescription && <p className="mt-5 text-lg leading-8 text-ink/60">{item.shortDescription}</p>}
+          <p className="mt-5 text-lg leading-8 text-ink/60">
+            {item.shortDescription ?? `Study ${item.title} through focused explanations, examples, and interview-relevant practice.`}
+          </p>
           {session?.user?.id ? (
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <TopicProgressActions topicId={item.id} initialStatus={progressStatus} />
@@ -86,6 +114,11 @@ export default async function LearnTopicPage({ params }: Props) {
           ) : (
             <p className="mt-6 text-sm text-ink/50">
               <Link href="/login?callbackUrl=/learn" className="font-bold text-coral">Log in</Link> to track your progress on this topic.
+            </p>
+          )}
+          {interviewCategory && (
+            <p className="mt-4 text-sm text-ink/50">
+              Apply this lesson with <Link href={`/interview-questions/${interviewCategory.slug}`} className="font-bold text-coral hover:underline">{interviewCategory.name} interview questions</Link> or <Link href={`/practice?category=${interviewCategory.slug}`} className="font-bold text-coral hover:underline">practice by category</Link>.
             </p>
           )}
         </div>

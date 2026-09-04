@@ -1,21 +1,40 @@
 import type { Metadata } from "next";
+import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/layout/footer";
 import { Header } from "@/components/layout/header";
 import { AdsenseScript } from "@/components/ads/adsense-script";
 import { PublicBottomAd, PublicSidebarAd, PublicTopAd } from "@/components/ads/public-ad-slot";
 import { SessionProvider } from "@/components/providers/session-provider";
-import { siteConfig } from "@/lib/site";
+import { siteConfig, siteUrl } from "@/lib/site";
 import { Analytics } from "@vercel/analytics/next";
 
+const dmSans = DM_Sans({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-dm-sans",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-space-grotesk",
+});
+
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(siteUrl),
   title: { default: "InterviewPrep | Prepare Smarter", template: "%s | InterviewPrep" },
   description: "Practice interview questions, improve your answers, and prepare for your next job completely free.",
+  icons: {
+    icon: "/icon.png",
+    apple: "/icon.png",
+  },
   openGraph: {
     title: "InterviewPrep",
     description: "Prepare smarter. Interview with confidence.",
     type: "website",
+    siteName: "InstantInterviewPrep",
+    locale: "en_US",
     images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: "Free Interview Practice - InterviewPrep" }],
   },
   twitter: {
@@ -28,14 +47,34 @@ export const metadata: Metadata = {
 };
 
 const structuredData = [
-  { "@context": "https://schema.org", "@type": "WebSite", name: siteConfig.name, description: siteConfig.description, url: siteConfig.url },
-  { "@context": "https://schema.org", "@type": "Organization", name: siteConfig.name, url: siteConfig.url },
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": `${siteConfig.url}/#organization`,
+    name: siteConfig.name,
+    url: siteConfig.url,
+    logo: `${siteConfig.url}/icon.png`,
+  },
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteConfig.url}/#website`,
+    name: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    publisher: { "@id": `${siteConfig.url}/#organization` },
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${siteConfig.url}/search?q={search_term_string}`,
+      "query-input": "required name=search_term_string",
+    },
+  },
 ];
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body suppressHydrationWarning>
+      <body className={`${dmSans.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
         <AdsenseScript />
         <SessionProvider>

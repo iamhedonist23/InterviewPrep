@@ -5,22 +5,17 @@ import type {
   InterviewType,
 } from "@prisma/client";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { QuestionCard } from "@/components/questions/question-card";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
 import { listQuestions } from "@/services/questions";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 1800;
 // Canonical points at the unfiltered listing so that filter/pagination query
 // strings (?difficulty=..., ?page=2, etc.) don't get indexed as separate
 // duplicate pages.
-export const metadata: Metadata = {
-  title: "Interview Questions",
-  description:
-    "Browse free interview questions across every category, difficulty, and experience level.",
-  alternates: { canonical: "/interview-questions" },
-};
 type Props = {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
@@ -28,6 +23,19 @@ const one = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 const many = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value : value ? [value] : [];
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const params = await searchParams;
+  const hasQuery = Object.values(params).some((value) =>
+    Array.isArray(value) ? value.length > 0 : Boolean(value),
+  );
+  return {
+    title: "Interview Questions",
+    description:
+      "Browse free interview questions across every category, difficulty, and experience level.",
+    alternates: { canonical: "/interview-questions" },
+    robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
+  };
+}
 export default async function QuestionsPage({ searchParams }: Props) {
   const params = await searchParams;
   const query = one(params.q);
@@ -37,6 +45,7 @@ export default async function QuestionsPage({ searchParams }: Props) {
   const difficulty = many(params.difficulty) as Difficulty[];
   const interviewType = many(params.type) as InterviewType[];
   const page = Number(one(params.page) ?? 1);
+  if (!Number.isInteger(page) || page < 1) notFound();
   const result = await listQuestions({
     query,
     category,
@@ -46,6 +55,7 @@ export default async function QuestionsPage({ searchParams }: Props) {
     interviewType,
     page: Number.isFinite(page) ? page : 1,
   });
+  if (page > result.pageCount && result.pageCount > 0) notFound();
   const makeUrl = (nextPage: number) => {
     const next = new URLSearchParams();
     if (query) next.set("q", query);

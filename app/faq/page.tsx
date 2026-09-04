@@ -1,11 +1,13 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Container } from "@/components/ui/container";
+import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "FAQ",
   description:
     "Answers to common questions about using InterviewPrep, a free interview preparation platform.",
+  alternates: { canonical: "/faq" },
 };
 
 const faqs = [
@@ -66,7 +68,7 @@ const faqs = [
 ];
 
 export default function FaqPage() {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const baseUrl = siteUrl;
 
   // Keep structured data aligned with the questions rendered on this page.
   const structuredData = faqs.length

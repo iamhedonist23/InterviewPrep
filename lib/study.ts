@@ -404,6 +404,20 @@ export async function getPublishedTopicLinksData(topicIds: string[]) {
   });
 }
 
+export async function getPublishedTopicsForQuestionData(questionId: string) {
+  return prisma.studyTopic.findMany({
+    where: {
+      isPublished: true,
+      category: { isPublished: true },
+      module: { isPublished: true, studyPath: { isPublished: true } },
+      questionRelations: { some: { questionId } },
+    },
+    orderBy: { title: "asc" },
+    take: 3,
+    select: { id: true, title: true, slug: true, category: { select: { slug: true, name: true } } },
+  });
+}
+
 // ---------------------------------------------------------------------------
 // Progress — always scoped to an explicit, server-derived userId. Never
 // accept a userId from request bodies or query params.

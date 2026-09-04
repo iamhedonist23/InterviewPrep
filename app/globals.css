@@ -1,4 +1,3 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -18,8 +17,8 @@
 	--paper: var(--background);
 	--coral: var(--primary);
 	--mint: var(--secondary);
-	--font-sans: 'DM Sans';
-	--font-display: 'Space Grotesk';
+	--font-sans: var(--font-dm-sans);
+	--font-display: var(--font-space-grotesk);
 }
 * { box-sizing: border-box; }
 html { scroll-behavior: smooth; }

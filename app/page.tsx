@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { ArrowRight, BookOpen, Check, ChevronRight, Code2, MessageCircle, Search, Sparkles, Target, Users, Video } from "lucide-react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +10,37 @@ import { CategoryCarousel } from "@/components/home/category-carousel";
 import { getCachedHomepagePublicContent } from "@/lib/public-content";
 
 export const revalidate = 1800;
+export const metadata: Metadata = {
+  title: "Interview Questions & Answers for Every Career | InstantInterviewPrep",
+  description:
+    "Practice 3,000+ interview questions and answers for software development, Java, Python, SQL, React, DevOps, data science, behavioral interviews, sales, and more. Prepare for your next interview for free.",
+  alternates: { canonical: "/" },
+  openGraph: {
+    title: "Interview Questions & Answers for Every Career | InstantInterviewPrep",
+    description:
+      "Practice interview questions and answers for technical, behavioral, and career interviews. Prepare for your next interview for free.",
+    type: "website",
+    url: "/",
+    siteName: "InstantInterviewPrep",
+    locale: "en_US",
+    images: [
+      {
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
+        alt: "InstantInterviewPrep interview questions and answers",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Interview Questions & Answers for Every Career | InstantInterviewPrep",
+    description:
+      "Practice interview questions and answers for technical, behavioral, and career interviews for free.",
+    images: ["/opengraph-image"],
+  },
+  robots: { index: true, follow: true },
+};
 
 const levels = [
   { label: "Fresher", value: "FRESHER" },
@@ -26,10 +58,22 @@ const interviewTypes = [
 export default async function Home() {
   const { categoriesWithCounts, popularQuestions, resources: cachedResources, learnCategories, faqs } = await getCachedHomepagePublicContent();
   const resources = cachedResources.map((article) => ({ ...article, publishedAt: article.publishedAt ? new Date(String(article.publishedAt)) : null }));
+  const homepageFaq = faqs.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((faq) => ({
+          "@type": "Question",
+          name: faq.question,
+          acceptedAnswer: { "@type": "Answer", text: faq.answer },
+        })),
+      }
+    : null;
   const categories = categoriesWithCounts
     .map((category) => ({ id: category.id, name: category.name, slug: category.slug, description: category.description, questionCount: category._count.questions }));
 
   return <>
+  {homepageFaq && <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(homepageFaq) }} />}
   <section className="overflow-hidden border-b border-ink/10"><Container className="grid min-h-[610px] items-center gap-12 py-20 lg:grid-cols-[1.05fr_.95fr] lg:py-24"><div><Badge>100% free, always</Badge><h1 className="mt-6 max-w-3xl font-display text-5xl font-bold leading-[1.02] tracking-tight sm:text-7xl">Prepare smarter.<br /><span className="text-coral">Interview</span> with confidence.</h1><p className="mt-7 max-w-xl text-lg leading-8 text-ink/65">Practice interview questions, improve your answers, and prepare for your next job, completely free.</p><div className="mt-9 flex flex-wrap gap-3"><Button href="/practice">Start Practicing <ArrowRight size={17} /></Button><Button href="/interview-questions" variant="outline">Explore Questions</Button></div></div><div className="relative"><div className="absolute -inset-5 rounded-[3rem] bg-mint/60 blur-2xl" /><Card className="relative rotate-1 bg-white p-7 shadow-xl shadow-ink/10"><div className="flex items-center justify-between"><span className="text-xs font-bold uppercase tracking-widest text-ink/50">Today&apos;s practice</span><span className="text-sm font-bold text-coral">03 / 10</span></div><div className="mt-5 h-2 rounded-full bg-mint"><div className="h-full w-[30%] rounded-full bg-coral" /></div><p className="mt-10 font-display text-2xl font-bold leading-tight">Tell me about a project you&apos;re proud of.</p><p className="mt-5 text-sm leading-6 text-ink/55">A strong answer connects your actions to a clear outcome. Keep your story focused and specific.</p><div className="mt-8 rounded-xl border border-ink/10 bg-paper p-4 text-sm text-ink/60">Your answer appears here...</div><div className="mt-5 flex justify-end"><Button href="/practice">Next question <ChevronRight size={17} /></Button></div></Card></div></Container></section>
   <section className="bg-ink py-5"><Container className="flex flex-wrap items-center justify-between gap-4"><p className="text-sm font-semibold text-paper">Find your next question</p><form action="/search" className="flex min-w-[min(100%,420px)] flex-1 gap-2 sm:max-w-xl"><label className="sr-only" htmlFor="question-search">Search interview questions</label><input id="question-search" name="q" placeholder="Try “Tell me about yourself”" className="h-11 min-w-0 flex-1 rounded-full bg-paper px-5 text-sm text-ink outline-none" /><button className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-coral text-white" aria-label="Search"><Search size={18} /></button></form></Container></section>
   <Section eyebrow="Start with what matters" title="Popular Interview Questions">

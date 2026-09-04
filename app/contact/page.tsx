@@ -1,4 +1,4 @@
 import type { Metadata } from "next";
 import { LegalPage } from "@/components/legal/legal-page";
-export const metadata: Metadata = { title: "Contact", description: "Get in touch with the InterviewPrep team to report an issue, share feedback, or ask a question." };
+export const metadata: Metadata = { title: "Contact", description: "Get in touch with the InterviewPrep team to report an issue, share feedback, or ask a question.", alternates: { canonical: "/contact" } };
 export default function ContactPage() { return <LegalPage title="Contact InterviewPrep" intro="Found an issue, have a suggestion, or want to ask about the project? We welcome thoughtful feedback."><h2>Get in touch</h2><p>Email the team at <a href="mailto:instantinterviewprep@gmail.com">instantinterviewprep@gmail.com</a>. Please do not send passwords, API keys, or other sensitive information.</p><h2>Content feedback</h2><p>Tell us which question or resource needs clarification and include the page address. Specific feedback helps us improve the public learning experience.</p></LegalPage>; }

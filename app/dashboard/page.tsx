@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -11,6 +12,7 @@ import { getStreak, getWeakCategories } from "@/lib/analytics";
 import { listResumesWithCompletion } from "@/lib/resume";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "Dashboard", robots: { index: false, follow: false } };
 
 export default async function DashboardPage() {
   const session = await getServerSession(authOptions);

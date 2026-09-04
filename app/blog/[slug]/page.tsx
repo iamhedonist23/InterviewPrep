@@ -9,6 +9,9 @@ import {
   relatedArticles,
   relatedQuestions,
 } from "@/services/articles";
+import { siteConfig, siteUrl } from "@/lib/site";
+import { getRelatedInterviewCategory } from "@/lib/public-content";
+import { listPublishedStudyCategoriesForLearn } from "@/lib/study-public";
 
 export const revalidate = 1800;
 type Props = { params: Promise<{ slug: string }> };
@@ -38,7 +41,12 @@ export default async function ArticlePage({ params }: Props) {
     relatedArticles(article),
     relatedQuestions(article.categoryId),
   ]);
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const [interviewCategory, learnCategories] = await Promise.all([
+    article.category?.name ? getRelatedInterviewCategory(article.category.name) : Promise.resolve(null),
+    article.category?.name ? listPublishedStudyCategoriesForLearn() : Promise.resolve([]),
+  ]);
+  const relatedLearnCategory = learnCategories.find((category) => category.name.toLowerCase().includes((article.category?.name ?? "").toLowerCase())) ?? null;
+  const baseUrl = siteUrl;
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -63,9 +71,18 @@ export default async function ArticlePage({ params }: Props) {
     "@type": "Article",
     headline: article.title,
     description: article.excerpt,
+    image: `${baseUrl}/opengraph-image`,
     datePublished: article.publishedAt?.toISOString(),
     dateModified: article.updatedAt.toISOString(),
-    author: { "@type": "Person", name: article.author ?? "InterviewPrep team" },
+    author: article.author
+      ? { "@type": "Person", name: article.author }
+      : { "@type": "Organization", name: siteConfig.name, url: baseUrl },
+    publisher: {
+      "@type": "Organization",
+      name: siteConfig.name,
+      url: baseUrl,
+      logo: { "@type": "ImageObject", url: `${baseUrl}/icon.png` },
+    },
     mainEntityOfPage: `${baseUrl}/blog/${article.slug}`,
   };
   return (
@@ -105,6 +122,16 @@ export default async function ArticlePage({ params }: Props) {
           <div className="mt-12">
             <ArticleContent content={article.content} />
           </div>
+          {interviewCategory && (
+            <p className="mt-10 text-sm text-ink/60">
+              Explore <Link href={`/interview-questions/${interviewCategory.slug}`} className="font-bold text-coral hover:underline">{interviewCategory.name} interview questions</Link> related to this resource.
+            </p>
+          )}
+          {relatedLearnCategory && (
+            <p className="mt-3 text-sm text-ink/60">
+              Strengthen the fundamentals with the <Link href={`/learn/${relatedLearnCategory.slug}`} className="font-bold text-coral hover:underline">{relatedLearnCategory.name} learning guide</Link>.
+            </p>
+          )}
         </article>
         {questions.length > 0 && (
           <section className="mx-auto mt-20 max-w-5xl">

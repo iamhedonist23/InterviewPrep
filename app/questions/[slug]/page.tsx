@@ -6,8 +6,11 @@ import { AnswerSection } from "@/components/questions/answer-section";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { getQuestion, relatedQuestions } from "@/services/questions";
+import { siteUrl } from "@/lib/site";
+import { getPublishedTopicsForQuestion } from "@/lib/study-public";
+import { getRelatedInterviewCategory } from "@/lib/public-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -38,12 +41,16 @@ export default async function QuestionPage({ params }: Props) {
   const question = await getQuestion(slug);
   if (!question) notFound();
 
-  const related = await relatedQuestions(question);
+  const [related, learnTopics, learnCategory] = await Promise.all([
+    relatedQuestions(question),
+    getPublishedTopicsForQuestion(question.id),
+    getRelatedInterviewCategory(question.category.name),
+  ]);
   const keyPoints = list(question.keyPoints);
   const mistakes = list(question.commonMistakes);
   const followUps = list(question.followUpQuestions);
 
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  const baseUrl = siteUrl;
   const breadcrumb = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -189,6 +196,9 @@ export default async function QuestionPage({ params }: Props) {
               >
                 Start practicing
               </Button>
+              <Link href={`/practice?category=${question.category.slug}`} className="mt-4 block text-center text-sm font-semibold text-paper/75 hover:text-coral">
+                Practice {question.category.name} questions
+              </Link>
             </aside>
           </div>
         </div>
@@ -204,6 +214,23 @@ export default async function QuestionPage({ params }: Props) {
               ))}
             </div>
           </div>
+        )}
+        {learnTopics.length > 0 && (
+          <section className="mt-20 max-w-5xl">
+            <h2 className="font-display text-3xl font-bold">Learn more about {question.category.name}</h2>
+            <div className="mt-6 flex flex-wrap gap-3">
+              {learnTopics.map((topic) => (
+                <Link key={topic.id} href={`/learn/${topic.category.slug}/${topic.slug}`} className="rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:border-coral hover:text-coral">
+                  {topic.title}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+        {learnCategory && (
+          <p className="mt-8 max-w-5xl text-sm text-ink/60">
+            Build the fundamentals in the <Link href={`/learn/${learnCategory.slug}`} className="font-bold text-coral hover:underline">{learnCategory.name} learning guide</Link> before practicing more {question.category.name} questions.
+          </p>
         )}
       </Container>
     </section>

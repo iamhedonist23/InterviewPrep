@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
@@ -8,6 +9,7 @@ import { CreateResumeButton } from "@/components/resume/create-resume-button";
 import { DeleteResumeButton } from "@/components/resume/delete-resume-button";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "Resume Builder", robots: { index: false, follow: false } };
 
 export default async function ResumeBuilderPage() {
   const session = await getServerSession(authOptions);

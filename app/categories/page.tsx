@@ -4,10 +4,11 @@ import { ArrowRight } from "lucide-react";
 import { Container } from "@/components/ui/container";
 import { getCachedPublicCategories } from "@/lib/public-content";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 86400;
 export const metadata: Metadata = {
   title: "Interview categories",
   description: "Browse free interview questions by career category and role.",
+  alternates: { canonical: "/categories" },
 };
 export default async function CategoriesPage() {
   const categories = await getCachedPublicCategories();

@@ -1,19 +1,22 @@
 import type { MetadataRoute } from "next";
 import { prisma } from "@/lib/prisma";
+import { getEligibleExperienceSitemapPaths } from "@/lib/experience-seo";
+import { siteUrl } from "@/lib/site";
 
 // Only ever list public, published, non-authenticated pages here. Admin,
 // dashboard, auth, and resume routes must never appear in the sitemap.
 const STATIC_PATHS = ["", "/interview-questions", "/practice", "/mock-interview", "/learn", "/blog", "/about", "/contact", "/faq", "/categories", "/privacy", "/terms", "/disclaimer", "/cookie-policy"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const base = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://instantinterviewprep.com").replace(/\/+$/, "");
+  const base = siteUrl;
 
-  const [categories, questions, articles, studyCategories, studyTopics] = await Promise.all([
+  const [categories, questions, articles, studyCategories, studyTopics, experiencePaths] = await Promise.all([
     prisma.category.findMany({ where: { questions: { some: { isPublished: true } } }, select: { slug: true, updatedAt: true } }),
     prisma.interviewQuestion.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.article.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.studyCategory.findMany({ where: { isPublished: true }, select: { slug: true, updatedAt: true } }),
     prisma.studyTopic.findMany({ where: { isPublished: true, category: { isPublished: true }, module: { isPublished: true, studyPath: { isPublished: true } } }, select: { slug: true, updatedAt: true, category: { select: { slug: true } } } }),
+    getEligibleExperienceSitemapPaths(),
   ]);
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(path => ({
@@ -58,5 +61,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: 0.5,
   }));
 
-  return [...staticEntries, ...categoryEntries, ...questionEntries, ...articleEntries, ...studyCategoryEntries, ...studyTopicEntries];
+  const experienceEntries: MetadataRoute.Sitemap = experiencePaths.map((path) => ({
+    url: `${base}${path}`,
+    lastModified: new Date(),
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  const entries = [...staticEntries, ...categoryEntries, ...questionEntries, ...articleEntries, ...studyCategoryEntries, ...studyTopicEntries, ...experienceEntries];
+  return [...new Map(entries.map((entry) => [entry.url, entry])).values()];
 }

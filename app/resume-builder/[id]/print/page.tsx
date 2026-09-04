@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import { authOptions } from "@/lib/auth";
@@ -6,6 +7,7 @@ import { getResumeTemplateComponent } from "@/components/resume/templates";
 import { ResumePrintView } from "@/components/resume/resume-print-view";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "Print Resume", robots: { index: false, follow: false } };
 
 export default async function ResumePrintPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);

@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { getServerSession } from "next-auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
@@ -17,6 +18,7 @@ import {
 } from "@/components/resume/section-types";
 
 export const dynamic = "force-dynamic";
+export const metadata: Metadata = { title: "Edit Resume", robots: { index: false, follow: false } };
 
 export default async function ResumeEditorPage({ params }: { params: Promise<{ id: string }> }) {
   const session = await getServerSession(authOptions);

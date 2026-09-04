@@ -4,6 +4,7 @@ import {
   getPublishedStudyCategoryTreeData,
   getPublishedTopicData,
   getPublishedTopicLinksData,
+  getPublishedTopicsForQuestionData,
   listPublishedStudyCategoriesForLearnData,
   searchPublishedStudyTopicsData,
 } from "@/lib/study";
@@ -39,4 +40,8 @@ export async function getPublishedTopicLinks(topicIds: string[]) {
   const ids = [...new Set(topicIds)].sort();
   if (ids.length === 0) return [];
   return unstable_cache(getPublishedTopicLinksData, ["learn-topic-links", ...ids], { revalidate: 3600, tags: [LEARN_CACHE_TAG] })(ids);
+}
+
+export async function getPublishedTopicsForQuestion(questionId: string) {
+  return unstable_cache(getPublishedTopicsForQuestionData, ["learn-question-links", questionId], { revalidate: 3600, tags: [LEARN_CACHE_TAG] })(questionId);
 }
