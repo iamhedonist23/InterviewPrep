@@ -108,7 +108,7 @@ export function ResumeEditorForm(props: Props) {
           customSections,
         }),
       });
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
       if (!response.ok) {
         setError(data.error ?? "Could not save your changes.");
         return false;
@@ -248,6 +248,17 @@ export function ResumeEditorForm(props: Props) {
             onClick={handleSaveAndExit}
             disabled={saving}
             className="inline-flex min-h-11 items-center justify-center rounded-full bg-ink px-6 text-sm font-bold text-paper hover:bg-coral disabled:opacity-60"
+          >
+            {saving ? "Saving…" : "Save changes"}
+          </button>
+        )}
+
+        {!isLastTab && (
+          <button
+            type="button"
+            onClick={handleSave}
+            disabled={saving}
+            className="inline-flex min-h-11 items-center justify-center rounded-full border border-ink/15 px-5 text-sm font-bold text-ink/70 hover:border-coral hover:text-coral disabled:opacity-60"
           >
             {saving ? "Saving…" : "Save changes"}
           </button>

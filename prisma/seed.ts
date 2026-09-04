@@ -1,6 +1,7 @@
 import { PrismaClient, Difficulty, ExperienceLevel, InterviewType } from "@prisma/client";
 import { articleSeeds } from "./article-seed";
 import { categories, topics, situationalContexts, slugify } from "./question-data";
+import { isPublicQuestionQualityValid } from "../lib/public-question-quality";
 const prisma = new PrismaClient();
 const technologyResourceTerms = ["java", "python", "javascript", "typescript", "react", "angular", "vue", "nodejs", "spring-boot", "kotlin", "android", "ios", "swift", "docker", "kubernetes", "aws", "azure", "gcp", "devops", "cicd", "microservices", "system-design", "data-structures", "algorithms", "sql", "nosql", "mongodb", "postgresql", "graphql", "rest-api", "security", "artificial-intelligence", "machine-learning", "data-science", "blockchain", "git", "linux", "networking", "cloud-native", "serverless", "testing", "qa"];
 
@@ -616,6 +617,10 @@ async function main() {
   // concatenating a second "?" onto a question that already ends in one.
   for (let topicIndex = 0; topicIndex < topics.length; topicIndex++) {
     const [categoryName, baseQuestion, tag, explanation, sampleAnswer] = topics[topicIndex];
+    if (!isPublicQuestionQualityValid({ question: baseQuestion, shortDescription: `A practical ${tag} question for ${categoryName} interviews.`, explanation, sampleAnswer, category: { name: categoryName } })) {
+      console.warn(`Skipping low-quality seed question for ${categoryName}: ${baseQuestion}`);
+      continue;
+    }
     const categoryId = categoryMap.get(categoryName)!;
     const subcategory = await prisma.subcategory.findFirst({ where: { categoryId } });
 

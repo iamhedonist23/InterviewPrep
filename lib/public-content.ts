@@ -4,6 +4,7 @@ import {
   LEARN_CACHE_TAG,
   listPublishedStudyCategoriesForLearn,
 } from "@/lib/study-public";
+import { isPublicQuestionQualityValid } from "@/lib/public-question-quality";
 
 export const PUBLIC_CONTENT_CACHE_TAG = "public:content";
 
@@ -34,10 +35,12 @@ async function queryHomepagePublicContent() {
         slug: true,
         question: true,
         shortDescription: true,
+        explanation: true,
+        sampleAnswer: true,
         category: { select: { name: true, slug: true } },
       },
       orderBy: { createdAt: "desc" },
-      take: 6,
+      take: 500,
     }),
     prisma.article.findMany({
       where: { isPublished: true },
@@ -62,7 +65,7 @@ async function queryHomepagePublicContent() {
 
   return {
     categoriesWithCounts,
-    popularQuestions,
+    popularQuestions: popularQuestions.filter(isPublicQuestionQualityValid).slice(0, 6),
     resources,
     learnCategories,
     faqs,

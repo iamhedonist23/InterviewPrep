@@ -289,7 +289,7 @@ const templates = [
   { q: "How would you evaluate whether {topic} is working well?", hint: "Define success metrics for {topic}." },
   { q: "What's your approach to handling {topic}?", hint: "Focus on practical steps for {topic}." },
   { q: "How would you design a solution for {topic}?", hint: "Be creative and cover edge cases." },
-  { q: "Talk me through how you'd handle {topic}.", hint: "Step-by-step reasoning for {topic}." },
+  { q: "Talk me through how you'd handle {topic}?", hint: "Step-by-step reasoning for {topic}." },
   { q: "What would you prioritize when {topic}?", hint: "Identify the most critical aspects of {topic}." },
 ];
 
@@ -332,6 +332,10 @@ const situationalContexts = [
 
 // ==================== GENERATION LOGIC ====================
 
+function displayTopic(topic: string) {
+  return topic.replace(/-/g, " ").replace(/\s+/g, " ").trim();
+}
+
 function generateIdealAnswer(topic: string): string {
   const parts = [
     `I would start by clarifying the specific constraints around ${topic} – scale, risk tolerance, and existing systems.`,
@@ -352,15 +356,16 @@ function generateQuestions() {
   for (const [catName] of categories) {
     const topicsForCat = subTopicMap[catName] || [];
     for (const topic of topicsForCat) {
+      const topicLabel = displayTopic(topic);
       for (const tpl of templates) {
-        let question = tpl.q.replace(/\{topic\}/g, topic);
+        let question = tpl.q.replace(/\{topic\}/g, topicLabel);
         // Randomly add a context to ~30% of questions
         if (Math.random() > 0.7) {
           const ctx = contexts[Math.floor(Math.random() * contexts.length)];
-          question += ` ${ctx}`;
+          question = question.replace(/\?$/, ` ${ctx}?`);
         }
-        const hint = tpl.hint.replace(/\{topic\}/g, topic);
-        const answer = generateIdealAnswer(topic);
+        const hint = tpl.hint.replace(/\{topic\}/g, topicLabel);
+        const answer = generateIdealAnswer(topicLabel);
         const normalized = question.toLowerCase().replace(/[^a-z0-9]/g, '');
         if (!generated.has(normalized)) {
           generated.add(normalized);
