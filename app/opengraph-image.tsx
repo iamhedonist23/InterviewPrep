@@ -14,7 +14,7 @@ function toBase64(bytes: Uint8Array) {
 }
 
 export default async function OpenGraphImage() {
-  const logo = await fetch(new URL("../logo.png", import.meta.url)).then(
+  const logo = await fetch(new URL("../logo-og.png", import.meta.url)).then(
     (response) => response.arrayBuffer(),
   );
   const logoSource = `data:image/png;base64,${toBase64(new Uint8Array(logo))}`;
