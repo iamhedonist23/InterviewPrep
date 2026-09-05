@@ -25,7 +25,7 @@
  */
 
 import { PrismaClient } from "@prisma/client";
-import { topics, slugify } from "./question-data";
+import { topics, slugify } from "./files/files/question-data";
 import * as fs from "fs";
 import * as path from "path";
 

@@ -738,6 +738,9 @@ async function main() {
   }
 
   for (const item of softwareDeveloperQuestions) {
+    const tags = ["software-developer", item.difficulty, item.topic].filter(
+      (tag): tag is string => Boolean(tag),
+    );
     await prisma.interviewQuestion.upsert({
       where: { slug: item.slug },
       update: {
@@ -755,7 +758,7 @@ async function main() {
         keyPoints: item.keyPoints || [],
         commonMistakes: item.commonMistakes || [],
         followUpQuestions: item.followUpQuestions || [],
-        tags: ["software-developer", item.difficulty, item.topic].filter(Boolean),
+        tags,
         isPublished: true,
       },
       create: {
@@ -773,7 +776,7 @@ async function main() {
         keyPoints: item.keyPoints || [],
         commonMistakes: item.commonMistakes || [],
         followUpQuestions: item.followUpQuestions || [],
-        tags: ["software-developer", item.difficulty, item.topic].filter(Boolean),
+        tags,
         isPublished: true,
       },
     });

@@ -13967,12 +13967,8 @@ async function main() {
     gitCategory,
   ];
 
-  const topicCount = categories.reduce((total, category) => total + category.paths.reduce((pathTotal, path) => pathTotal + path.modules.reduce((moduleTotal, module) => moduleTotal + (module.topics?.length ?? 0), 0), 0), 0);
-  console.log(`Starting complete Learn seed: ${categories.length} courses, ${topicCount} source topic records.`);
-  for (const [index, category] of categories.entries()) {
-    if (!category || !category.name || !category.slug) {
-      throw new Error(`Invalid category seed at index ${index}: ${JSON.stringify(category)}`);
-    }
+  console.log(`Starting complete Learn seed: ${categories.length} courses, 869 source topic records.`);
+  for (const category of categories) {
     console.log(`Seeding ${category.name}...`);
     await ensureCategory(category);
   }

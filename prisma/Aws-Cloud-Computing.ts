@@ -81,7 +81,7 @@ Follow‑up angle to anticipate: They might ask how to retrieve IAM role credent
 
 Why this is asked: Interviewers want to assess your understanding of managed services versus raw infrastructure, and when to choose Elastic Beanstalk over EC2 for rapid development.
 
-Breaking it down: (1) It abstracts the underlying resources (EC2, RDS, ELB) so you focus on code. (2) Supports multiple environments (web server, worker) and languages (Java, .NET, PHP, Python, Ruby, Go, Docker). (3) You can customise via configuration files (`.ebextensions`). (4) It integrates with CodePipeline for CI/CD. (5) Ideal for startups, prototypes, and standard web apps where you don’t need granular control. (6) Not suitable for complex stateful apps or when you need to control every aspect of the infrastructure.
+Breaking it down: (1) It abstracts the underlying resources (EC2, RDS, ELB) so you focus on code. (2) Supports multiple environments (web server, worker) and languages (Java, .NET, PHP, Python, Ruby, Go, Docker). (3) You can customise via configuration files (\.ebextensions). (4) It integrates with CodePipeline for CI/CD. (5) Ideal for startups, prototypes, and standard web apps where you don’t need granular control. (6) Not suitable for complex stateful apps or when you need to control every aspect of the infrastructure.
 
 How to structure your spoken answer: Define it, mention the resources it manages, give supported languages, and explain the trade‑off: ease of use vs. control. Mention that you still pay for the underlying services.
 
