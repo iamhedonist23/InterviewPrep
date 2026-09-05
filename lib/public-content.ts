@@ -81,6 +81,7 @@ export async function getCachedHomepagePublicContent() {
 
 async function queryPublicCategories() {
   return prisma.category.findMany({
+    where: { questions: { some: { isPublished: true } } },
     orderBy: [{ group: "asc" }, { sortOrder: "asc" }, { name: "asc" }],
     select: {
       id: true,
@@ -93,7 +94,7 @@ async function queryPublicCategories() {
 }
 
 export async function getCachedPublicCategories() {
-  return unstable_cache(queryPublicCategories, ["public-categories"], {
+  return unstable_cache(queryPublicCategories, ["public-categories-v2"], {
     revalidate: 3600,
     tags: [PUBLIC_CONTENT_CACHE_TAG],
   })();
