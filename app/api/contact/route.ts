@@ -8,6 +8,7 @@ const contactSchema = z.object({
   issueType: z.string().trim().min(2).max(100),
   pageUrl: z.string().trim().url().max(500).or(z.literal("")),
   message: z.string().trim().min(10).max(5000),
+  suggestedCorrection: z.string().trim().max(5000).default(""),
   website: z.string().max(0).default(""),
 });
 
@@ -26,7 +27,7 @@ export async function POST(request: Request) {
         name: parsed.data.name || "Website visitor",
         email: parsed.data.email.toLowerCase(),
         subject: `Website feedback: ${parsed.data.issueType}`,
-        message: `${parsed.data.pageUrl ? `Page URL: ${parsed.data.pageUrl}\n\n` : ""}${parsed.data.message}`,
+        message: `${parsed.data.pageUrl ? `Page URL: ${parsed.data.pageUrl}\n\n` : ""}${parsed.data.message}${parsed.data.suggestedCorrection ? `\n\nSuggested correction:\n${parsed.data.suggestedCorrection}` : ""}`,
       },
     });
     return Response.json({ message: "Thanks. Your message was sent to InstantInterviewPrep." }, { status: 201 });

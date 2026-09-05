@@ -1,7 +1,9 @@
 import React from "react";
 import ReactMarkdown from "react-markdown";
 
-export function LearnMarkdown({ content }: { content: string }) {
+export function LearnMarkdown({ content, children }: { content?: string; children?: React.ReactNode }) {
+  const markdown = content ?? (typeof children === "string" ? children : "");
+
   return (
     <div className="prose prose-lg mt-4 max-w-none text-ink/70 prose-headings:font-display prose-headings:text-ink prose-p:leading-8 prose-strong:text-ink prose-a:text-coral prose-code:rounded prose-code:bg-ink/5 prose-code:px-1 prose-code:py-0.5 prose-code:text-sm prose-code:text-ink prose-pre:rounded-xl prose-pre:border prose-pre:border-ink/10 prose-pre:bg-ink/5 prose-pre:p-4 prose-pre:text-ink prose-li:leading-8">
       <ReactMarkdown
@@ -32,7 +34,7 @@ export function LearnMarkdown({ content }: { content: string }) {
           },
         }}
       >
-        {content}
+        {markdown}
       </ReactMarkdown>
     </div>
   );

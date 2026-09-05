@@ -252,7 +252,7 @@ export async function getPublishedTopicData(categorySlug: string, topicSlug: str
       module: { isPublished: true, studyPath: { isPublished: true } },
     },
     select: {
-      id: true, title: true, slug: true, shortDescription: true, estimatedMinutes: true,
+      id: true, title: true, slug: true, shortDescription: true, estimatedMinutes: true, updatedAt: true,
       seoTitle: true, seoDescription: true, prerequisiteIds: true, relatedTopicIds: true,
       category: { select: { id: true, name: true, slug: true } },
       module: { select: { studyPath: { select: { name: true, level: true } } } },

@@ -14,6 +14,7 @@ import { getPublishedTopic, getAdjacentTopics, getPublishedTopicLinks } from "@/
 import { getRelatedInterviewCategory } from "@/lib/public-content";
 import { prisma } from "@/lib/prisma";
 import { siteUrl } from "@/lib/site";
+import { ContentOwner } from "@/components/editorial/content-owner";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ category: string; topic: string }> };
@@ -106,6 +107,9 @@ export default async function LearnTopicPage({ params }: Props) {
           <p className="mt-5 text-lg leading-8 text-ink/60">
             {item.shortDescription ?? `Study ${item.title} through focused explanations, examples, and interview-relevant practice.`}
           </p>
+          <div className="mt-6 max-w-3xl">
+            <ContentOwner updatedAt={item.updatedAt} />
+          </div>
           {session?.user?.id ? (
             <div className="mt-6 flex flex-wrap items-center gap-3">
               <TopicProgressActions topicId={item.id} initialStatus={progressStatus} />

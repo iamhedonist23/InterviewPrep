@@ -9,19 +9,29 @@ export const metadata: Metadata = {
 };
 
 export default function SureshMaliPage() {
+  const person = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: "Suresh Mali",
+    url: "https://instantinterviewprep.com/author/suresh-mali",
+    sameAs: ["https://www.linkedin.com/in/suresh-mali-640939128"],
+    worksFor: { "@type": "Organization", name: "InstantInterviewPrep", url: "https://instantinterviewprep.com" },
+  };
+
   return (
     <LegalPage
       title="Suresh Mali"
-      intro="Suresh Mali is the content owner and maintainer of InstantInterviewPrep."
+      intro="Suresh Mali is the person responsible for the ownership and maintenance of InstantInterviewPrep, a resource for structured interview preparation."
     >
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(person) }} />
       <h2>Role on InstantInterviewPrep</h2>
       <p>
-        Suresh Mali maintains the website and its interview-preparation content. This page identifies ownership; it does not claim a separate expert-review panel or professional credentials that are not listed here.
+        Suresh Mali oversees the website, its public interview-preparation content, and the systems used to organize questions, learning material, practice, and feedback. This page identifies ownership; it does not claim a separate expert-review panel or professional credentials that are not listed here.
       </p>
       <h2>Professional profile</h2>
       <p>
         <a href="https://www.linkedin.com/in/suresh-mali-640939128" target="_blank" rel="noreferrer" className="font-semibold text-coral hover:underline">
-          View Suresh Mali&apos;s LinkedIn profile
+          View Suresh Mali&apos;s professional profile on LinkedIn
         </a>
       </p>
       <p>

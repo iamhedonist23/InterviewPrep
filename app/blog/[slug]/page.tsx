@@ -12,6 +12,7 @@ import {
 import { siteConfig, siteUrl } from "@/lib/site";
 import { getRelatedInterviewCategory } from "@/lib/public-content";
 import { listPublishedStudyCategoriesForLearn } from "@/lib/study-public";
+import { ContentOwner } from "@/components/editorial/content-owner";
 
 export const revalidate = 1800;
 type Props = { params: Promise<{ slug: string }> };
@@ -113,16 +114,10 @@ export default async function ArticlePage({ params }: Props) {
           <p className="mt-6 text-xl leading-8 text-ink/60">
             {article.excerpt}
           </p>
-          <p className="mt-5 text-sm text-ink/50">
-            {article.author ? `By ${article.author}` : "Published by InstantInterviewPrep"}
-            {article.publishedAt
-              ? ` · ${article.publishedAt.toLocaleDateString("en-US", { dateStyle: "long" })}`
-              : ""}
-            {" · "}
-            <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">
-              Editorial policy
-            </Link>
-          </p>
+          {article.author && <p className="mt-5 text-sm text-ink/50">By {article.author} · <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">Editorial policy</Link></p>}
+          <div className="mt-5">
+            <ContentOwner publishedAt={article.publishedAt ?? undefined} updatedAt={article.updatedAt} />
+          </div>
           <div className="mt-12">
             <ArticleContent content={article.content} />
           </div>

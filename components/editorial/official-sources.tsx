@@ -21,7 +21,7 @@ export function OfficialSources({ category }: { category: string }) {
   return (
     <section className="border-t border-ink/10 pt-8">
       <h2 className="font-display text-xl font-bold sm:text-2xl">Further reading</h2>
-      <p className="mt-3 text-base leading-8 text-ink/70">Use the official documentation below to verify version-specific details and continue learning.</p>
+      <p className="mt-3 text-base leading-8 text-ink/70">Use the official documentation below to verify version-specific details and continue learning. Behavior may vary by version or provider.</p>
       <ul className="mt-4 grid gap-2">{items.map((item) => <li key={item.href}><Link href={item.href} target="_blank" rel="noreferrer" className="font-semibold text-coral hover:underline">{item.label}</Link></li>)}</ul>
     </section>
   );

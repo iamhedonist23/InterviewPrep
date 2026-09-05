@@ -61,6 +61,9 @@ export function ContactForm() {
       <label className="text-sm font-bold">Message
         <textarea required name="message" minLength={10} maxLength={5000} className="mt-2 min-h-32 w-full rounded-xl border border-ink/15 bg-paper p-3 font-normal" placeholder="Describe the issue or suggestion." />
       </label>
+      <label className="text-sm font-bold">Suggested correction<span className="sr-only"> (optional)</span>
+        <textarea name="suggestedCorrection" maxLength={5000} className="mt-2 min-h-24 w-full rounded-xl border border-ink/15 bg-paper p-3 font-normal" placeholder="Optional: tell us what should be changed." />
+      </label>
       <label className="hidden" aria-hidden="true">Website
         <input name="website" tabIndex={-1} autoComplete="off" />
       </label>
