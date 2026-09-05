@@ -29,7 +29,7 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
     Array.isArray(value) ? value.length > 0 : Boolean(value),
   );
   return {
-    title: "Interview Questions",
+    title: "Interview Questions & Answers",
     description:
       "Browse free interview questions across every category, difficulty, and experience level.",
     alternates: { canonical: "/interview-questions" },

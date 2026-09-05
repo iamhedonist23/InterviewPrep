@@ -16,9 +16,9 @@ const one = (value: string | string[] | undefined) => Array.isArray(value) ? val
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams;
-  const hasQuery = Boolean(one(params.q) || one(params.page));
+  const hasQuery = Object.keys(params).length > 0;
   return {
-    title: "Learn",
+    title: "Learn Interview Fundamentals",
     description: "Free, structured study guides to build the fundamentals behind your interview answers.",
     alternates: { canonical: "/learn" },
     robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },

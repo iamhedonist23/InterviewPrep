@@ -6,7 +6,7 @@ import { getCachedPublicCategories } from "@/lib/public-content";
 
 export const revalidate = 86400;
 export const metadata: Metadata = {
-  title: "Interview categories",
+  title: "Interview Categories by Role and Topic",
   description: "Browse free interview questions by career category and role.",
   alternates: { canonical: "/categories" },
 };

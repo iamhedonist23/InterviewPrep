@@ -10,7 +10,7 @@ import { siteUrl } from "@/lib/site";
 export const revalidate = 1800;
 type Props = {
   params: Promise<{ category: string }>;
-  searchParams: Promise<{ page?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
 const EXPERIENCE_LEVELS = [
   ["FRESHER", "Freshers"],
@@ -20,7 +20,9 @@ const EXPERIENCE_LEVELS = [
 ] as const;
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { category } = await params;
-  const { page } = await searchParams;
+  const paramsValue = await searchParams;
+  const page = Array.isArray(paramsValue.page) ? paramsValue.page[0] : paramsValue.page;
+  const hasQuery = Object.keys(paramsValue).length > 0;
   const result = await getCachedPublicQuestionCategory(category, 1);
   const item = result?.item;
   const subtopics = item?.subcategories.filter((subcategory) => subcategory._count.questions > 0) ?? [];
@@ -41,13 +43,14 @@ export async function generateMetadata({ params, searchParams }: Props): Promise
           locale: "en_US",
           images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: `${item.name} interview questions and answers` }],
         },
-        robots: page ? { index: false, follow: true } : { index: true, follow: true },
+        robots: hasQuery ? { index: false, follow: true } : { index: true, follow: true },
       }
     : {};
 }
 export default async function CategoryPage({ params, searchParams }: Props) {
   const { category } = await params;
-  const { page: pageParam } = await searchParams;
+  const paramsValue = await searchParams;
+  const pageParam = Array.isArray(paramsValue.page) ? paramsValue.page[0] : paramsValue.page;
   const page = Math.max(1, Number(pageParam) || 1);
   const result = await getCachedPublicQuestionCategory(category, page);
   if (!result) notFound();
@@ -150,7 +153,6 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {subtopics.map((subcategory) => (
                 <Link key={subcategory.id} href={`/interview-questions?category=${item.slug}&subcategory=${subcategory.slug}`} className="rounded-2xl border border-ink/10 bg-white/70 p-5 hover:border-coral">
-                  <h3 className="font-display text-lg font-bold">{subcategory.name} interview questions</h3>
                   <p className="mt-2 text-sm text-ink/60">{subcategory._count.questions} published questions with answer guidance.</p>
                   <span className="mt-4 inline-block text-sm font-bold text-coral">Explore this topic</span>
                 </Link>

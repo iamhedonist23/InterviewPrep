@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 import { siteUrl } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: "FAQ",
+  title: "InterviewPrep FAQ",
   description:
     "Answers to common questions about using InterviewPrep, a free interview preparation platform.",
   alternates: { canonical: "/faq" },

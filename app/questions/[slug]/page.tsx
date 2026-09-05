@@ -9,6 +9,8 @@ import { getFollowUpQuestionLinks, getQuestion, relatedQuestions } from "@/servi
 import { siteUrl } from "@/lib/site";
 import { getPublishedTopicsForQuestion } from "@/lib/study-public";
 import { getRelatedInterviewCategory } from "@/lib/public-content";
+import { ContentOwner } from "@/components/editorial/content-owner";
+import { OfficialSources } from "@/components/editorial/official-sources";
 
 export const revalidate = 3600;
 
@@ -121,6 +123,10 @@ export default async function QuestionPage({ params }: Props) {
             {question.shortDescription}
           </p>
 
+          <div className="mt-6 max-w-3xl">
+            <ContentOwner updatedAt={question.updatedAt} />
+          </div>
+
           <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_280px] lg:gap-10">
             <article className="space-y-8">
               <div>
@@ -196,6 +202,19 @@ export default async function QuestionPage({ params }: Props) {
                   ))}
                 </ul>
               </div>
+
+              <OfficialSources category={question.category.name} />
+
+              <p className="border-t border-ink/10 pt-6 text-sm leading-6 text-ink/60">
+                Found incorrect information, broken code, an outdated statement, a broken link, or a typo?{" "}
+                <Link
+                  href={`mailto:instantinterviewprep@gmail.com?subject=Correction%20for%20${encodeURIComponent(question.slug)}`}
+                  className="font-semibold text-coral hover:underline"
+                >
+                  Suggest a correction
+                </Link>
+                .
+              </p>
             </article>
 
             <aside className="h-fit self-start rounded-2xl bg-ink p-5 text-paper sm:p-6 lg:sticky lg:top-24 lg:max-w-[280px] lg:justify-self-end">

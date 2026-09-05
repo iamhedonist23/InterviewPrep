@@ -4,7 +4,7 @@ import { Container } from "@/components/ui/container";
 import { MockInterviewSetup } from "@/components/mock-interview/mock-interview-setup";
 
 export const metadata: Metadata = {
-  title: "Mock interview",
+  title: "Mock Interview Practice",
   description: "Run a timed, structured mock interview built from real interview questions, then see where you stood strongest and weakest.",
   alternates: { canonical: "/mock-interview" },
 };

@@ -12,7 +12,7 @@ const one = (value: string | string[] | undefined) =>
   Array.isArray(value) ? value[0] : value;
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const params = await searchParams;
-  const hasQuery = Boolean(one(params.category) || one(params.page));
+  const hasQuery = Object.keys(params).length > 0;
   return {
     title: "Interview resources",
     description:

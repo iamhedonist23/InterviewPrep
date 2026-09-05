@@ -5,7 +5,7 @@ import { siteUrl } from "@/lib/site";
 
 // Only ever list public, published, non-authenticated pages here. Admin,
 // dashboard, auth, and resume routes must never appear in the sitemap.
-const STATIC_PATHS = ["", "/interview-questions", "/practice", "/mock-interview", "/learn", "/blog", "/about", "/contact", "/faq", "/categories", "/privacy", "/terms", "/disclaimer", "/cookie-policy"];
+const STATIC_PATHS = ["", "/interview-questions", "/practice", "/mock-interview", "/learn", "/blog", "/about", "/author/suresh-mali", "/contact", "/editorial-policy", "/faq", "/categories", "/privacy", "/terms", "/disclaimer", "/cookie-policy"];
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl;
@@ -21,7 +21,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const staticEntries: MetadataRoute.Sitemap = STATIC_PATHS.map(path => ({
     url: `${base}${path}`,
-    lastModified: new Date(),
     changeFrequency: "weekly",
     priority: path === "" ? 1 : 0.7,
   }));
@@ -63,7 +62,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   const experienceEntries: MetadataRoute.Sitemap = experiencePaths.map((path) => ({
     url: `${base}${path}`,
-    lastModified: new Date(),
     changeFrequency: "weekly",
     priority: 0.7,
   }));

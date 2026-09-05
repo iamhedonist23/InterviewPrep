@@ -114,10 +114,14 @@ export default async function ArticlePage({ params }: Props) {
             {article.excerpt}
           </p>
           <p className="mt-5 text-sm text-ink/50">
-            By {article.author ?? "InterviewPrep team"}
+            {article.author ? `By ${article.author}` : "Published by InstantInterviewPrep"}
             {article.publishedAt
               ? ` · ${article.publishedAt.toLocaleDateString("en-US", { dateStyle: "long" })}`
               : ""}
+            {" · "}
+            <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">
+              Editorial policy
+            </Link>
           </p>
           <div className="mt-12">
             <ArticleContent content={article.content} />
