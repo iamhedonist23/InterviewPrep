@@ -5,7 +5,7 @@ import { QuestionCard } from "@/components/questions/question-card";
 import { AnswerSection } from "@/components/questions/answer-section";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
-import { getQuestion, relatedQuestions } from "@/services/questions";
+import { getFollowUpQuestionLinks, getQuestion, relatedQuestions } from "@/services/questions";
 import { siteUrl } from "@/lib/site";
 import { getPublishedTopicsForQuestion } from "@/lib/study-public";
 import { getRelatedInterviewCategory } from "@/lib/public-content";
@@ -41,14 +41,18 @@ export default async function QuestionPage({ params }: Props) {
   const question = await getQuestion(slug);
   if (!question) notFound();
 
-  const [related, learnTopics, learnCategory] = await Promise.all([
+  const followUps = list(question.followUpQuestions);
+  const [related, learnTopics, learnCategory, followUpQuestionRows] = await Promise.all([
     relatedQuestions(question),
     getPublishedTopicsForQuestion(question.id),
     getRelatedInterviewCategory(question.category.name),
+    getFollowUpQuestionLinks(followUps),
   ]);
   const keyPoints = list(question.keyPoints);
   const mistakes = list(question.commonMistakes);
-  const followUps = list(question.followUpQuestions);
+  const followUpLinks = new Map(
+    followUpQuestionRows.map((item) => [item.question, item.slug]),
+  );
 
   const baseUrl = siteUrl;
   const breadcrumb = {
@@ -178,7 +182,16 @@ export default async function QuestionPage({ params }: Props) {
                       key={followUp}
                       className="rounded-xl border border-ink/10 p-4 text-base text-ink/70"
                     >
-                      {followUp}
+                      {followUpLinks.get(followUp) ? (
+                        <Link
+                          href={`/questions/${followUpLinks.get(followUp)}`}
+                          className="font-semibold text-coral hover:underline"
+                        >
+                          {followUp}
+                        </Link>
+                      ) : (
+                        followUp
+                      )}
                     </li>
                   ))}
                 </ul>

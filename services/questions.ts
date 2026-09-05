@@ -133,6 +133,15 @@ export async function getQuestion(slug: string) {
     tags: [PUBLIC_CONTENT_CACHE_TAG],
   })(slug);
 }
+
+export async function getFollowUpQuestionLinks(questions: string[]) {
+  if (!questions.length) return [];
+  return prisma.interviewQuestion.findMany({
+    where: { question: { in: questions }, isPublished: true },
+    select: { question: true, slug: true },
+  });
+}
+
 async function queryRelatedQuestions(question: {
   id: string;
   categoryId: string;
