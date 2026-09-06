@@ -73,7 +73,8 @@ async function queryHomepagePublicContent() {
 }
 
 export async function getCachedHomepagePublicContent() {
-  return unstable_cache(queryHomepagePublicContent, ["public-homepage"], {
+  const publishedQuestionCount = await prisma.interviewQuestion.count({ where: { isPublished: true } });
+  return unstable_cache(queryHomepagePublicContent, ["public-homepage", String(publishedQuestionCount)], {
     revalidate: 1800,
     tags: [PUBLIC_CONTENT_CACHE_TAG, LEARN_CACHE_TAG],
   })();
@@ -94,7 +95,8 @@ async function queryPublicCategories() {
 }
 
 export async function getCachedPublicCategories() {
-  return unstable_cache(queryPublicCategories, ["public-categories-v2"], {
+  const publishedQuestionCount = await prisma.interviewQuestion.count({ where: { isPublished: true } });
+  return unstable_cache(queryPublicCategories, ["public-categories-v2", String(publishedQuestionCount)], {
     revalidate: 3600,
     tags: [PUBLIC_CONTENT_CACHE_TAG],
   })();
