@@ -22,7 +22,12 @@ function normalizeAnswerLabels(answer: string) {
     `(?:^|\\s+)(?:\\*\\*)?(${labels})\\s*:?\\s*(?:\\*\\*)?`,
     "gim",
   );
-  return answer.replace(labelPattern, "\n\n**$1:**\n\n").trim();
+  const normalized = answer.replace(labelPattern, "\n\n**$1:**\n\n").trim();
+  return answerLabels.some((label) =>
+    new RegExp(`(?:^|\\n)\\s*\\*\\*${label}:\\*\\*`, "im").test(normalized),
+  )
+    ? normalized
+    : `**Direct answer:**\n\n${normalized}`;
 }
 
 export function AnswerSection({

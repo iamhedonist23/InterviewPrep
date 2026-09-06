@@ -201,7 +201,12 @@ export default async function QuestionPage({ params }: Props) {
                           {followUp}
                         </Link>
                       ) : (
-                        followUp
+                        <Link
+                          href={`/search?q=${encodeURIComponent(followUp)}`}
+                          className="font-semibold text-coral hover:underline"
+                        >
+                          {followUp}
+                        </Link>
                       )}
                     </li>
                   ))}
