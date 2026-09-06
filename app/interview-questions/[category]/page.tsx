@@ -135,18 +135,20 @@ export default async function CategoryPage({ params, searchParams }: Props) {
           <span className="px-2">/</span>
           <span className="font-semibold text-ink">{item.name}</span>
         </nav>
-        <p className="mt-12 text-xs font-bold uppercase tracking-[.18em] text-coral">
-          Category
-        </p>
-        <h1 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
-          {item.name} Interview Questions and Answers
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg leading-8 text-ink/60">
-          {item.description ?? `Prepare for ${item.name} interviews with published questions, practical answer guidance, and focused practice.`}
-        </p>
-        <Button href={`/practice?category=${item.slug}`} className="mt-7">
-          Practice this category
-        </Button>
+        <header>
+          <p className="mt-12 text-xs font-bold uppercase tracking-[.18em] text-coral">
+            Category
+          </p>
+          <h1 className="mt-3 font-display text-4xl font-bold sm:text-5xl">
+            {item.name} Interview Questions and Answers
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-8 text-ink/60">
+            {item.description ?? `Prepare for ${item.name} interviews with published questions, practical answer guidance, and focused practice.`}
+          </p>
+          <Button href={`/practice?category=${item.slug}`} className="mt-7">
+            Practice this category
+          </Button>
+        </header>
         {subtopics.length > 0 && (
           <div className="mt-14">
             <h2 className="font-display text-2xl font-bold">{item.name} interview topics</h2>

@@ -8,6 +8,9 @@ import { PublicBottomAd, PublicSidebarAd } from "@/components/ads/public-ad-slot
 import { SessionProvider } from "@/components/providers/session-provider";
 import { siteConfig, siteUrl } from "@/lib/site";
 import { Analytics } from "@vercel/analytics/next";
+import Script from "next/script";
+
+const googleAnalyticsId = "G-4BYHX0071P";
 
 const dmSans = DM_Sans({
   subsets: ["latin"],
@@ -76,6 +79,17 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
     <html lang="en">
       <body className={`${dmSans.variable} ${spaceGrotesk.variable}`} suppressHydrationWarning>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
+        <Script
+          async
+          src={`https://www.googletagmanager.com/gtag/js?id=${googleAnalyticsId}`}
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){window.dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${googleAnalyticsId}');`}
+        </Script>
         <AdsenseScript />
         <SessionProvider>
           <Header />

@@ -32,7 +32,7 @@ export function AdUnit({ slot, format = "auto", className = "" }: Props) {
 	}, [enabled, slot]);
 
 	if (!enabled || isEmpty) return null;
-	return <aside className={`my-8 overflow-hidden text-center ${className}`} aria-label="Advertisement"><p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-ink/40">Advertisement</p><ins ref={ref} className="adsbygoogle block min-h-[90px]" style={{ display: "block" }} data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID} data-ad-slot={slot} data-ad-format={format} data-full-width-responsive="true" /></aside>;
+	return <aside className={`my-8 min-h-[122px] overflow-hidden text-center ${className}`} aria-label="Advertisement"><p className="mb-2 text-[10px] font-bold uppercase tracking-widest text-ink/40">Advertisement</p><ins ref={ref} className="adsbygoogle block min-h-[90px]" style={{ display: "block" }} data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID} data-ad-slot={slot} data-ad-format={format} data-full-width-responsive="true" /></aside>;
 }
 export function AdBanner(props: Props) { return <AdUnit {...props} format="horizontal" />; }
 export function AdInArticle(props: Props) { return <AdUnit {...props} format="auto" />; }

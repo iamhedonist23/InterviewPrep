@@ -1,0 +1,371 @@
+### Kubernetes
+Q1: What is a Kubernetes Operator and what is its purpose?
+Q2: What is the difference between a Custom Resource and an Operator?
+Q3: How does the controller pattern work in Kubernetes?
+Q4: What is the role of the `controller-manager` in Kubernetes?
+Q5: What is the difference between a MutatingAdmissionWebhook and a ValidatingAdmissionWebhook?
+Q6: What is the role of etcd in Kubernetes?
+Q7: What is a high-availability (HA) Kubernetes cluster?
+Q8: What is the difference between a managed Kubernetes service and a self-managed cluster?
+Q9: How do you monitor a Kubernetes cluster?
+Q10: What is the role of `kubectl` in Kubernetes?
+Q11: How do you troubleshoot a node that is NotReady?
+Q12: How do you integrate CI/CD with Kubernetes?
+Q13: What is GitOps and how does it work with Kubernetes?
+Q14: What is ArgoCD and how does it differ from Jenkins?
+Q15: What is Helm and why is it used?
+Q16: What is the difference between a Helm chart and a Kubernetes manifest?
+Q17: What is a Helm release?
+Q18: How do you rollback a Helm release?
+Q19: You have a deployment that is not rolling out. How do you debug it?
+Q20: A Pod is crashing repeatedly. How do you diagnose it?
+Q21: How do you scale a deployment to 10 replicas?
+Q22: How do you perform a rolling update and rollback of a deployment?
+Q23: A service is not reachable. How do you debug it?
+Q24: How do you expose a service to the internet?
+Q25: How do you schedule a Pod on a specific node?
+Q26: How do you prevent a Pod from being scheduled on a node?
+Q27: How do you handle resource constraints in a cluster?
+Q28: You have a PVC stuck in Pending state. How do you debug it?
+Q29: A Pod is stuck in the CrashLoopBackOff state. How do you fix it?
+Q30: How do you roll back a failed deployment?
+Q31: A node is not joining the cluster. How do you debug it?
+Q32: How do you monitor the health of a Kubernetes cluster?
+Q33: You have a cluster with multiple namespaces. How do you manage RBAC for different teams?
+Q34: How do you handle configuration changes without restarting a Pod?
+Q35: A Pod has no external network access. How do you debug it?
+Q36: How do you implement a canary deployment in Kubernetes?
+Q37: What is the difference between a job and a cronjob in terms of scheduling?
+Q38: What is the role of the API server's admission controllers?
+Q39: What is the difference between `kubectl apply` and `kubectl create`?
+Q40: What is the difference between a node failure and a Pod eviction?
+Q41: How do you perform a blue-green deployment in Kubernetes?
+Q42: How does Kubernetes handle container liveness and readiness probes?
+Q43: What is an init container and how is it different from a regular container?
+Q44: What is the difference between a PersistentVolume and a StorageClass?
+Q45: What is the difference between an Ingress and a Gateway API?
+
+### Linux
+Q46: What is Linux and how is it different from Unix?
+Q47: Explain the Linux boot process from power-on to login prompt.
+Q48: What is the difference between a hard link and a soft (symbolic) link?
+Q49: Explain Linux file permissions. What do `rwx` mean for files and directories?
+Q50: What is the `umask` command and how does it affect file creation?
+Q51: What is an inode in Linux?
+Q52: How do you check disk space usage in Linux?
+Q53: How do you find a file in Linux?
+Q54: What is the difference between a process and a thread?
+Q55: What is the difference between `kill` and `kill -9`?
+Q56: How do you check running processes in Linux?
+Q57: What is the `cron` utility and how do you use it?
+Q58: How do you check network connectivity in Linux?
+Q59: What is the purpose of the `/etc/passwd` and `/etc/shadow` files?
+Q60: What is the `sudo` command and how is it configured?
+Q61: What are the differences between ext2, ext3, and ext4 filesystems?
+Q62: Explain the concept of journaling in Linux filesystems.
+Q63: What is LVM (Logical Volume Manager) and why is it used?
+Q64: How do you increase the size of an LVM partition?
+Q65: What is a swap partition and how does it work?
+Q66: Explain the difference between RAID 0, RAID 1, RAID 5, and RAID 10.
+Q67: What is the `/proc` filesystem and what is it used for?
+Q68: What is the `/sys` filesystem and how does it differ from `/proc`?
+Q69: How do you mount and unmount filesystems in Linux?
+Q70: Explain the OSI model and how TCP/IP maps to it.
+Q71: What is the difference between TCP and UDP?
+Q72: How does ARP (Address Resolution Protocol) work?
+Q73: What is the purpose of `/etc/hosts` and `/etc/resolv.conf`?
+Q74: How do you check listening ports and associated processes in Linux?
+Q75: What is the purpose of the loopback interface (`lo`)?
+Q76: Explain how `iptables`/`nftables` work.
+Q77: How do you troubleshoot a server that is unreachable over the network?
+Q78: What is the difference between a public and private IP address?
+Q79: How does DHCP work in Linux?
+Q80: How do you secure a newly provisioned Linux server?
+Q81: What is SELinux and how does it work?
+Q82: What is Fail2ban and how is it used?
+Q83: What is SSH key-based authentication and why is it more secure than passwords?
+Q84: What is the difference between `useradd` and `adduser`?
+Q85: How do you audit user activity on a Linux system?
+Q86: What is the purpose of PAM (Pluggable Authentication Modules)?
+Q87: What are the best practices for managing SSH access?
+Q88: What does the load average measure in Linux?
+Q89: How do you troubleshoot a system with high CPU usage?
+Q90: How do you troubleshoot a system with high memory usage?
+Q91: What is the difference between I/O wait and CPU utilization?
+Q92: How do you diagnose disk I/O performance issues?
+Q93: What is the purpose of the `strace` command?
+Q94: What is the difference between `top` and `htop`?
+Q95: How do you troubleshoot a 'Too many open files' error?
+Q96: What is the difference between `bash` and `sh`?
+Q97: How do you write a bash script that fails safely on error?
+Q98: What is the purpose of `grep`, `sed`, and `awk`?
+Q99: How do you find and kill a hanging process?
+Q100: What is the difference between `$*` and `$@` in bash?
+Q101: How do you redirect stdout and stderr to different files?
+Q102: How do you write a script that checks if a service is running and restarts it if not?
+Q103: What is `systemd` and how does it differ from SysV init?
+Q104: What is a `systemd` unit file and what types are there?
+Q105: How do you create a systemd service?
+Q106: What is the difference between `systemctl start`, `enable`, and `restart`?
+Q107: How do you view logs for a systemd service?
+Q108: What is a systemd target and how does it relate to runlevels?
+Q109: How does memory paging work in Linux?
+Q110: What is the Out-of-Memory (OOM) Killer and how does it work?
+Q111: What is the difference between virtualization and containerization?
+Q112: What are Linux namespaces and what types exist?
+Q113: What are control groups (cgroups) and how are they used?
+Q114: What is the difference between Docker and a virtual machine?
+Q115: What is Kubernetes and how does it relate to containers?
+Q116: What is the difference between `podman` and `docker`?
+Q117: What is the difference between XFS and ext4?
+Q118: What is a mount namespace and how does it work?
+Q119: How do you repair a corrupted filesystem?
+Q120: What is the difference between `dd` and `cp` for copying files?
+Q121: How do you set up centralized logging in Linux?
+Q122: What is the purpose of the `journald` service?
+Q123: What is the purpose of the `/var/log` directory?
+Q124: How do you use `tcpdump` to capture network traffic?
+Q125: What is Ansible and how does it work?
+Q126: What is the difference between Ansible and Puppet?
+Q127: What is Terraform and how is it different from Ansible?
+Q128: What is a GitOps workflow?
+Q129: What is a load balancer and how does it work?
+Q130: What is the difference between active-passive and active-active clustering?
+Q131: What is a heartbeat in high-availability clustering?
+Q132: What is eBPF and how is it used in Linux?
+Q133: What is Network Namespace and how is it used?
+Q134: How do you perform a backup using `rsync`?
+Q135: What is the purpose of the `tar` command?
+Q136: How do you restore a file from a backup?
+Q137: What is the principle of least privilege and how is it applied in Linux?
+Q138: What is AppArmor and how does it compare to SELinux?
+Q139: What is the purpose of the `/etc/sudoers` file and how do you edit it safely?
+Q140: What is the difference between `yum` and `apt`?
+Q141: How do you check the kernel version in Linux?
+Q142: What is the purpose of the `screen` or `tmux` command?
+Q143: How do you check the system's uptime?
+Q144: What is the difference between `nice` and `renice`?
+Q145: A server is running slow. How do you diagnose it?
+Q146: A service fails to start. How do you troubleshoot it?
+Q147: A server is running out of disk space. How do you handle it?
+Q148: How do you recover a non-booting Linux system?
+Q149: You SSH into a box and it is painfully slow. How do you diagnose it?
+Q150: A cron job is not running. How do you troubleshoot it?
+Q151: A process is consuming 100% CPU. How do you handle it?
+Q152: A server is not responding to ping. How do you diagnose it?
+
+### Machine Learning
+Q153: What is Machine Learning and what are its main types?
+Q154: What is the difference between supervised and unsupervised learning?
+Q155: What is reinforcement learning?
+Q156: What is the difference between classification and regression?
+Q157: What is overfitting and how do you prevent it?
+Q158: What is underfitting and how do you address it?
+Q159: What is the bias-variance tradeoff?
+Q160: What is cross-validation and why is it important?
+Q161: What is a confusion matrix?
+Q162: What are precision and recall?
+Q163: What is the F1 score?
+Q164: What is the ROC curve and AUC?
+Q165: What is feature engineering?
+Q166: What is feature selection and why is it important?
+Q167: What is regularization?
+Q168: What are hyperparameters?
+Q169: What is the difference between a parameter and a hyperparameter?
+Q170: What is the training set, validation set, and test set?
+Q171: What is the difference between generative and discriminative models?
+Q172: What is linear regression?
+Q173: What is logistic regression?
+Q174: What is the difference between linear regression and logistic regression?
+Q175: What is a decision tree?
+Q176: What is entropy and information gain?
+Q177: What is the Gini index?
+Q178: What is a random forest?
+Q179: What is gradient boosting?
+Q180: What is the difference between bagging and boosting?
+Q181: What is a support vector machine (SVM)?
+Q182: What is the kernel trick in SVM?
+Q183: What is k-nearest neighbors (KNN)?
+Q184: What is Naive Bayes?
+Q185: What is PCA (Principal Component Analysis)?
+Q186: What is clustering and what are common algorithms?
+Q187: What is K-means clustering?
+Q188: What is DBSCAN?
+Q189: What is hierarchical clustering?
+Q190: What is a neural network?
+Q191: What is activation function and why is it used?
+Q192: What is backpropagation?
+Q193: What is gradient descent?
+Q194: What is the difference between stochastic gradient descent (SGD) and batch gradient descent?
+Q195: What is the learning rate and how does it affect training?
+Q196: What is the loss function?
+Q197: What is regularization in neural networks?
+Q198: What is dropout?
+Q199: What are the steps in data preprocessing?
+Q200: How do you handle missing values?
+Q201: What is data normalization and standardization?
+Q202: What is one-hot encoding?
+Q203: What is label encoding?
+Q204: What is the difference between one-hot encoding and label encoding?
+Q205: What is feature scaling and why is it important?
+Q206: What are outliers and how do you detect them?
+Q207: What is data augmentation?
+Q208: What is data imbalance and how do you handle it?
+Q209: What is dimensionality reduction?
+Q210: What is the difference between PCA and t-SNE?
+Q211: How do you handle categorical features in machine learning?
+Q212: What are the common evaluation metrics for classification?
+Q213: What are the common evaluation metrics for regression?
+Q214: What is R-squared and how is it interpreted?
+Q215: What is the difference between MSE and MAE?
+Q216: What is cross-entropy loss?
+Q217: What is a learning curve?
+Q218: What is the difference between validation and test set?
+Q219: What is grid search and random search?
+Q220: What is deep learning and how does it differ from traditional ML?
+Q221: What is a convolutional neural network (CNN)?
+Q222: What is a recurrent neural network (RNN)?
+Q223: What is the vanishing gradient problem?
+Q224: What is LSTM and how does it solve the vanishing gradient problem?
+Q225: What is transfer learning?
+Q226: What is fine-tuning in deep learning?
+Q227: What is batch normalization?
+Q228: What is the Adam optimizer?
+Q229: What is learning rate scheduling?
+Q230: What is Natural Language Processing (NLP)?
+Q231: What are the common steps in text preprocessing?
+Q232: What is tokenization?
+Q233: What is the difference between stemming and lemmatization?
+Q234: What is TF-IDF?
+Q235: What is word embedding?
+Q236: What is the Transformer architecture?
+Q237: What is BERT and how does it work?
+Q238: What is the difference between BERT and GPT?
+Q239: What is an LLM (Large Language Model)?
+Q240: What is fine-tuning of LLMs?
+Q241: What are ensemble methods?
+Q242: What is random forest and how does it work?
+Q243: What is XGBoost?
+Q244: What is clustering and what is it used for?
+Q245: What is anomaly detection?
+Q246: What is the difference between clustering and classification?
+Q247: What is MLOps?
+Q248: What is the difference between batch and online learning?
+Q249: What is model drift and how do you detect it?
+Q250: What is feature store?
+Q251: What are the challenges in deploying ML models?
+Q252: What is A/B testing in ML?
+Q253: What is the difference between scikit-learn and TensorFlow?
+Q254: What is bias in machine learning?
+Q255: What is fairness in ML?
+Q256: What is interpretable AI?
+Q257: What are the ethical considerations in ML?
+Q258: How would you build a spam detection model?
+Q259: How would you build a recommendation system?
+Q260: How would you build a chatbot?
+Q261: How would you evaluate a model with imbalanced data?
+Q262: How would you deploy a model as a REST API?
+Q263: How would you handle concept drift in production?
+Q264: How would you design an experiment to compare two ML models?
+Q265: How would you build a time series forecasting model?
+Q266: How would you handle categorical features with many levels?
+Q267: How would you implement image classification?
+Q268: How would you build a sentiment analysis model?
+Q269: How would you handle very large datasets that don't fit in memory?
+Q270: How would you implement a model for multi-label classification?
+
+### MongoDB
+Q271: What is MongoDB and what are its main features?
+Q272: What is the difference between MongoDB and SQL databases?
+Q273: What is BSON and how is it different from JSON?
+Q274: What is a document in MongoDB?
+Q275: What is a collection in MongoDB?
+Q276: How do you start MongoDB?
+Q277: What is the role of the `_id` field?
+Q278: What is ObjectId in MongoDB?
+Q279: What are the data types supported by MongoDB?
+Q280: What is the difference between `null` and missing fields?
+Q281: How do you connect to MongoDB from a Node.js application?
+Q282: What is Mongoose and why is it used?
+Q283: What is the difference between MongoDB and Mongoose?
+Q284: What is the `find` method and how does it work?
+Q285: What is the `insertOne` and `insertMany` methods?
+Q286: What is the `updateOne` and `updateMany` methods?
+Q287: What is the `deleteOne` and `deleteMany` methods?
+Q288: What are the comparison operators in MongoDB? Give examples.
+Q289: What are the logical operators in MongoDB?
+Q290: What is the `$regex` operator and how is it used?
+Q291: What are element operators like `$exists` and `$type`?
+Q292: What are array operators like `$all`, `$elemMatch`, `$size`?
+Q293: How do you query for embedded documents?
+Q294: How do you sort, limit, and skip documents?
+Q295: What is the `$project` operator in aggregation and how does it differ from projection in `find()`?
+Q296: What is the difference between `find()` and `aggregate()`?
+Q297: How do you perform a text search in MongoDB?
+Q298: What is the `$lookup` stage in aggregation?
+Q299: How do you update a field using the value of another field?
+Q300: What is the `$inc` operator and how is it used?
+Q301: What is the `$set` and `$unset` operators?
+Q302: What is the `$rename` operator?
+Q303: What is the `$push` and `$addToSet` operators for arrays?
+Q304: How do you find and update a document atomically?
+Q305: What is the difference between `findOneAndUpdate` and `updateOne`?
+Q306: How do you perform bulk writes in MongoDB?
+Q307: What are indexes in MongoDB and why are they important?
+Q308: How do you create an index in MongoDB?
+Q309: What is a compound index and how does it work?
+Q310: What is a unique index and when would you use it?
+Q311: What is a TTL index and how is it used?
+Q312: How can you analyze query performance?
+Q313: What is the impact of indexing on write operations?
+Q314: What are the best practices for indexing?
+Q315: What is the aggregation pipeline?
+Q316: What are the common stages in the aggregation pipeline?
+Q317: What is the `$match` stage and how is it used?
+Q318: What is the `$group` stage and how does it work?
+Q319: What is the `$unwind` stage and when is it useful?
+Q320: What is the `$lookup` stage and how does it perform joins?
+Q321: What is the difference between `$project` and `$addFields`?
+Q322: What is the `$merge` stage?
+Q323: How do you debug an aggregation pipeline?
+Q324: What are the performance considerations for aggregation pipelines?
+Q325: What is the difference between embedding and referencing?
+Q326: What is denormalization in MongoDB?
+Q327: What are the anti-patterns in MongoDB schema design?
+Q328: How do you design for one-to-many relationships?
+Q329: What is the 16MB document limit and how do you work around it?
+Q330: What is GridFS and when is it used?
+Q331: What is MongoDB validation?
+Q332: How do you handle many-to-many relationships?
+Q333: What are the considerations for choosing shard key?
+Q334: What is a replica set?
+Q335: How does failover work in a replica set?
+Q336: What is the oplog (operation log)?
+Q337: What is the difference between a secondary and a primary?
+Q338: What are read preferences in MongoDB?
+Q339: What is the `writeConcern` and how does it affect durability?
+Q340: What is the `readConcern`?
+Q341: What is the election process in a replica set?
+Q342: What is sharding in MongoDB?
+Q343: What is a shard key?
+Q344: What are the different sharding strategies?
+Q345: How do you choose a shard key?
+Q346: What are the limitations of sharding?
+Q347: How do you secure a MongoDB deployment?
+Q348: What is authentication and authorization in MongoDB?
+Q349: How do you enable TLS/SSL in MongoDB?
+Q350: What is SCRAM authentication?
+Q351: How do you manage users in MongoDB?
+Q352: What are the security best practices for MongoDB?
+Q353: How do you encrypt data at rest in MongoDB?
+Q354: What are transactions in MongoDB?
+Q355: How do you implement a transaction in MongoDB?
+Q356: What is the difference between write concern and transactions?
+Q357: How do you optimize query performance in MongoDB?
+Q358: What is a slow query and how do you find it?
+Q359: What is the difference between collection scan and index scan?
+Q360: How do you monitor MongoDB performance?
+Q361: What is the WiredTiger cache and how does it affect performance?
+Q362: How do you handle high concurrency in MongoDB?
+Q363: What is the effect of `hint()` in queries?
+Q364: How do you manage MongoDB memory usage?

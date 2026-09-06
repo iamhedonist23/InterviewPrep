@@ -84,7 +84,7 @@ export default async function QuestionPage({ params }: Props) {
   };
 
   return (
-    <section className="py-16 sm:py-20">
+    <article className="py-16 sm:py-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
@@ -103,6 +103,7 @@ export default async function QuestionPage({ params }: Props) {
         </nav>
 
         <div className="mt-12 max-w-5xl">
+          <header>
           <div className="flex flex-wrap gap-2">
             <span className="rounded-full bg-mint px-3 py-1 text-xs font-bold">
               {question.category.name}
@@ -126,19 +127,20 @@ export default async function QuestionPage({ params }: Props) {
           <div className="mt-6 max-w-3xl">
             <ContentOwner updatedAt={question.updatedAt} />
           </div>
+          </header>
 
           <div className="mt-12 grid gap-8 lg:grid-cols-[1fr_280px] lg:gap-10">
-            <article className="space-y-8">
-              <div>
+            <div className="space-y-8">
+              <section>
                 <h2 className="font-display text-xl font-bold sm:text-2xl">
                   Why interviewers ask this
                 </h2>
                 <p className="mt-3 text-base leading-8 text-ink/70">
                   {question.explanation}
                 </p>
-              </div>
+              </section>
 
-              <div>
+              <section>
                 <h2 className="font-display text-xl font-bold sm:text-2xl">
                   What the interviewer wants
                 </h2>
@@ -153,7 +155,7 @@ export default async function QuestionPage({ params }: Props) {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
 
               <AnswerSection
                 key={question.slug}
@@ -161,7 +163,7 @@ export default async function QuestionPage({ params }: Props) {
                 detailedAnswer={question.detailedAnswer ?? null}
               />
 
-              <div>
+              <section>
                 <h2 className="font-display text-xl font-bold sm:text-2xl">
                   Common mistakes
                 </h2>
@@ -176,9 +178,9 @@ export default async function QuestionPage({ params }: Props) {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
 
-              <div>
+              <section>
                 <h2 className="font-display text-xl font-bold sm:text-2xl">
                   Follow-up questions
                 </h2>
@@ -201,7 +203,7 @@ export default async function QuestionPage({ params }: Props) {
                     </li>
                   ))}
                 </ul>
-              </div>
+              </section>
 
               <OfficialSources category={question.category.name} />
 
@@ -215,7 +217,7 @@ export default async function QuestionPage({ params }: Props) {
                 </Link>
                 .
               </p>
-            </article>
+            </div>
 
             <aside className="h-fit self-start rounded-2xl bg-ink p-5 text-paper sm:p-6 lg:sticky lg:top-24 lg:max-w-[280px] lg:justify-self-end">
               <h2 className="text-lg font-bold sm:text-xl">Ready to practice?</h2>
@@ -265,6 +267,6 @@ export default async function QuestionPage({ params }: Props) {
           </p>
         )}
       </Container>
-    </section>
+    </article>
   );
 }

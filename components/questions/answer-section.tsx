@@ -17,9 +17,9 @@ export function AnswerSection({
   const answerToShow = detailedAnswer?.trim() || sampleAnswer;
 
   return (
-    <div className="rounded-2xl bg-mint/60 p-5 sm:p-6">
+    <section className="rounded-2xl bg-mint/60 p-5 sm:p-6" aria-labelledby="sample-answer-heading">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <h2 className="font-display text-xl font-bold sm:text-2xl">
+        <h2 id="sample-answer-heading" className="font-display text-xl font-bold sm:text-2xl">
           Sample answer
         </h2>
 
@@ -46,9 +46,9 @@ export function AnswerSection({
             <ReactMarkdown
               components={{
                 h1: ({ children }) => (
-                  <h1 className="mb-4 mt-6 text-2xl font-bold text-ink first:mt-0">
+                  <h2 className="mb-4 mt-6 text-2xl font-bold text-ink first:mt-0">
                     {children}
-                  </h1>
+                  </h2>
                 ),
 
                 h2: ({ children }) => (
@@ -127,6 +127,6 @@ export function AnswerSection({
       )}
 
       {!isExpanded && <p className="mt-4 text-sm italic text-ink/60">The answer is hidden. Select "Show Answer" to reveal it.</p>}
-    </div>
+    </section>
   );
 }
