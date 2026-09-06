@@ -39,6 +39,13 @@ export function MockInterviewSetup({ categories }: Props) {
     }
   }
 
+  function resetFilters() {
+    setRole("");
+    setExperience("");
+    setDifficulty("");
+    setError("");
+  }
+
   if (questions) return <MockInterviewFlow questions={questions} timeLimitMinutes={timeLimitMinutes} />;
 
   return (
@@ -76,7 +83,14 @@ export function MockInterviewSetup({ categories }: Props) {
           </select>
         </label>
       </div>
-      {error && <p role="alert" className="mt-5 text-sm font-semibold text-coral">{error}</p>}
+      {error && (
+        <div role="alert" className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-xl bg-coral/5 p-4 text-sm">
+          <p className="font-semibold text-coral">{error}</p>
+          <button type="button" onClick={resetFilters} className="font-bold text-ink underline underline-offset-4">
+            Reset filters
+          </button>
+        </div>
+      )}
       <Button type="button" onClick={start} disabled={loading} className="mt-8">
         {loading ? "Building interview..." : "Start mock interview"} <ArrowRight size={17} />
       </Button>

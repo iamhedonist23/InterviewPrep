@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { prisma } from "@/lib/prisma";
+import { getCachedPublicCategories } from "@/lib/public-content";
 import { Container } from "@/components/ui/container";
 import { MockInterviewSetup } from "@/components/mock-interview/mock-interview-setup";
 
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
 };
 
 export default async function MockInterviewPage() {
-  const categories = await prisma.category.findMany({ orderBy: [{ group: "asc" }, { name: "asc" }], select: { id: true, name: true, slug: true } });
+  const categories = (await getCachedPublicCategories()).map(({ id, name, slug }) => ({ id, name, slug }));
   return (
     <section className="py-16 sm:py-20">
       <Container>

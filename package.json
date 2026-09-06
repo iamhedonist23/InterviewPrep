@@ -12,6 +12,7 @@
     "db:validate": "prisma validate",
     "db:migrate": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed:mock-interview": "tsx prisma/seed-mock-interview.ts",
     "db:seed:study": "tsx prisma/seed-study.ts",
     "db:seed:learn": "tsx prisma/seed-learn.ts",
     "db:seed:java": "tsx prisma/seed-java.ts",

@@ -76,7 +76,7 @@ export function PracticeSetup({ categories }: Props) {
             }
             className="mt-2 h-12 w-full rounded-xl border border-ink/15 bg-paper px-3 font-normal"
           >
-            <option value="">Any category</option>
+            <option value="">Any role</option>
             {categories.map((category) => (
               <option value={category.slug} key={category.id}>
                 {category.name}
