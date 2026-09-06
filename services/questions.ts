@@ -137,7 +137,7 @@ export async function getQuestion(slug: string) {
 export async function getFollowUpQuestionLinks(questions: string[]) {
   if (!questions.length) return [];
   return prisma.interviewQuestion.findMany({
-    where: { question: { in: questions }, isPublished: true },
+    where: { question: { in: questions, mode: "insensitive" }, isPublished: true },
     select: { question: true, slug: true },
   });
 }

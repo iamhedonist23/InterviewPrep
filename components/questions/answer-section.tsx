@@ -9,12 +9,28 @@ interface AnswerSectionProps {
   detailedAnswer?: string | null;
 }
 
+const answerLabels = [
+  "Direct answer",
+  "Why this is asked",
+  "Breaking it down",
+  "How to structure your spoken answer",
+];
+
+function normalizeAnswerLabels(answer: string) {
+  const labels = answerLabels.join("|");
+  const labelPattern = new RegExp(
+    `(?:^|\\s+)(?:\\*\\*)?(${labels})\\s*:?\\s*(?:\\*\\*)?`,
+    "gim",
+  );
+  return answer.replace(labelPattern, "\n\n**$1:**\n\n").trim();
+}
+
 export function AnswerSection({
   sampleAnswer,
   detailedAnswer,
 }: AnswerSectionProps) {
   const [isExpanded, setIsExpanded] = useState(true);
-  const answerToShow = detailedAnswer?.trim() || sampleAnswer;
+  const answerToShow = normalizeAnswerLabels(detailedAnswer?.trim() || sampleAnswer);
 
   return (
     <section className="rounded-2xl bg-mint/60 p-5 sm:p-6" aria-labelledby="sample-answer-heading">

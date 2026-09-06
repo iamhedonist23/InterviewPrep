@@ -38,6 +38,9 @@ const list = (value: unknown) =>
     ? value.filter((item): item is string => typeof item === "string")
     : [];
 
+const normalizeQuestionText = (value: string) =>
+  value.toLowerCase().replace(/[\u2018\u2019]/g, "'").replace(/[\u201C\u201D]/g, '"').replace(/[^a-z0-9]+/g, " ").trim();
+
 export default async function QuestionPage({ params }: Props) {
   const { slug } = await params;
   const question = await getQuestion(slug);
@@ -53,7 +56,7 @@ export default async function QuestionPage({ params }: Props) {
   const keyPoints = list(question.keyPoints);
   const mistakes = list(question.commonMistakes);
   const followUpLinks = new Map(
-    followUpQuestionRows.map((item) => [item.question, item.slug]),
+    followUpQuestionRows.map((item) => [normalizeQuestionText(item.question), item.slug]),
   );
 
   const baseUrl = siteUrl;
@@ -190,9 +193,9 @@ export default async function QuestionPage({ params }: Props) {
                       key={followUp}
                       className="rounded-xl border border-ink/10 p-4 text-base text-ink/70"
                     >
-                      {followUpLinks.get(followUp) ? (
+                      {followUpLinks.get(normalizeQuestionText(followUp)) ? (
                         <Link
-                          href={`/questions/${followUpLinks.get(followUp)}`}
+                          href={`/questions/${followUpLinks.get(normalizeQuestionText(followUp))}`}
                           className="font-semibold text-coral hover:underline"
                         >
                           {followUp}

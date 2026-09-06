@@ -7,6 +7,10 @@ import { siteUrl } from "@/lib/site";
 // dashboard, auth, and resume routes must never appear in the sitemap.
 const STATIC_PATHS = ["", "/interview-questions", "/practice", "/mock-interview", "/learn", "/blog", "/about", "/author/suresh-mali", "/contact", "/editorial-policy", "/faq", "/categories", "/privacy", "/terms", "/disclaimer", "/cookie-policy"];
 
+// Sitemap entries come from Prisma and must be generated when requested,
+// rather than requiring the database during the production build.
+export const dynamic = "force-dynamic";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = siteUrl;
 
