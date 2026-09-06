@@ -11,10 +11,10 @@ import { getCachedHomepagePublicContent } from "@/lib/public-content";
 
 export const revalidate = 1800;
 export const metadata: Metadata = {
-  title: "Interview Questions & Answers for Every Career | InstantInterviewPrep",
+  title: { absolute: "Interview Questions & Answers for Every Career | InstantInterviewPrep" },
   description:
-    "Practice interview questions and answers for software development, Java, Python, SQL, React, DevOps, data science, behavioral interviews, sales, and more. Prepare for your next interview for free.",
-  alternates: { canonical: "/" },
+    "Prepare for job interviews with practical interview questions, detailed answers, guided practice, learning paths, and mock interviews for technical and behavioral interviews.",
+  alternates: { canonical: "https://instantinterviewprep.com/" },
   openGraph: {
     title: "Interview Questions & Answers for Every Career | InstantInterviewPrep",
     description:
