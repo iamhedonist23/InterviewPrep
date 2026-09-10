@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireAdmin } from "@/lib/admin";
 import { prisma } from "@/lib/prisma";
 import { Container } from "@/components/ui/container";
+import { ReloadCacheButton } from "@/components/admin/reload-cache-button";
 
 export const dynamic = "force-dynamic";
 
@@ -47,6 +48,7 @@ const cards: Array<[label: string, count: number, href: string]> = [
           <Link href="/admin/study/topics/new" className="rounded-full border border-coral px-5 py-3 text-sm font-bold text-coral">
             Create study topic
           </Link>
+          <ReloadCacheButton />
         </div>
 
         <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

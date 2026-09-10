@@ -1,0 +1,610 @@
+#!/usr/bin/env python3
+"""
+Batch-improve TypeScript interview-content files with the OpenAI API.
+
+Folder layout:
+    project/
+      improve_ts_files.py
+      input/
+        java_questions.ts
+        spring_questions.ts
+      output/
+
+Usage:
+    1. Install:
+       pip install openai python-dotenv
+
+    2. Create .env:
+       OPENAI_API_KEY=your_api_key_here
+
+    3. Run:
+       python improve_ts_files.py
+
+Optional environment variables:
+    INPUT_DIR=input
+    OUTPUT_DIR=output
+    MODEL=gpt-5.6
+    REVIEW_MODEL=gpt-5.6
+    MAX_OUTPUT_TOKENS=30000
+    SKIP_EXISTING=true
+    TWO_PASS=true
+"""
+
+import os
+import re
+import sys
+import time
+from pathlib import Path
+
+from dotenv import load_dotenv
+from openai import OpenAI
+
+
+# ------------------------------------------------------------
+# Configuration
+# ------------------------------------------------------------
+
+load_dotenv()
+
+INPUT_DIR = Path(os.getenv("INPUT_DIR", "D:\Interview Website\prisma\LearnTopics\Java"))
+OUTPUT_DIR = Path(os.getenv("OUTPUT_DIR", "D:\Interview Website\prisma\LearnTopics\Java_Improved"))
+
+MODEL = os.getenv("MODEL", "gpt-5.6")
+REVIEW_MODEL = os.getenv("REVIEW_MODEL", MODEL)
+
+MAX_OUTPUT_TOKENS = int(os.getenv("MAX_OUTPUT_TOKENS", "30000"))
+SKIP_EXISTING = os.getenv("SKIP_EXISTING", "true").lower() == "true"
+TWO_PASS = os.getenv("TWO_PASS", "true").lower() == "true"
+
+MAX_RETRIES = 4
+RETRY_DELAY_SECONDS = 5
+
+
+# ------------------------------------------------------------
+# Editorial prompts
+# ------------------------------------------------------------
+
+WRITER_PROMPT = r"""
+You are a senior software engineer, technical interviewer,
+technical educator, and human technical-content editor.
+
+You are improving a TypeScript file containing interview questions
+and answers for a professional technical interview-preparation website.
+
+TARGET QUALITY: 9.5+/10.
+
+The goal is NOT merely to make answers longer.
+
+The goal is to make every answer:
+- technically accurate
+- genuinely useful
+- deeply explained
+- practical
+- interview-focused
+- natural and human-sounding
+- easy to understand
+- appropriately detailed for the actual question
+
+IMPORTANT:
+The input file is a TypeScript source file. Preserve its existing
+TypeScript data structure, exports, property names, and overall schema.
+
+Do not convert it to JSON.
+Do not return Markdown fences.
+Return ONLY the complete valid TypeScript source file.
+
+============================================================
+CONTENT QUALITY REQUIREMENTS
+============================================================
+
+For every question, improve the answer substantially where needed.
+
+A strong answer should normally cover the relevant concepts below,
+but DO NOT mechanically add every section to every answer.
+
+1. Direct answer
+   Start with a clear answer to the actual interview question.
+
+2. Concept explanation
+   Explain what the concept means in practical terms.
+
+3. Why it exists
+   Explain the problem the concept solves and why engineers use it.
+
+4. How it works
+   Explain the underlying mechanism when that is relevant.
+
+5. Practical example
+   Give a realistic software-development example.
+
+6. Code example
+   Use code when it genuinely helps.
+   Explain important parts of the code instead of dumping code.
+
+7. When to use it
+   Explain appropriate situations.
+
+8. When not to use it
+   Explain cases where another approach is better.
+
+9. Edge cases
+   Include important edge cases when applicable.
+
+10. Common mistakes
+    Explain mistakes candidates and developers commonly make.
+
+11. Trade-offs
+    Explain performance, maintainability, complexity, safety,
+    scalability, or other meaningful trade-offs where applicable.
+
+12. Related concepts
+    Compare with closely related concepts when that helps answer
+    likely interviewer follow-ups.
+
+13. Interview follow-up
+    Where appropriate, include likely follow-up questions and
+    concise but technically correct answers.
+
+============================================================
+HUMANIZATION REQUIREMENTS
+============================================================
+
+Write like an experienced engineer explaining the subject to another
+engineer.
+
+Avoid generic AI writing patterns.
+
+Do NOT repeatedly use phrases such as:
+- "In today's rapidly evolving world"
+- "Let's dive into"
+- "It is important to note"
+- "In conclusion"
+- "In the world of"
+- "This comprehensive guide"
+- "Whether you are a beginner or an expert"
+
+Do not artificially inflate answers.
+
+Do not repeat the same explanation in different words.
+
+Do not make every answer follow exactly the same sentence pattern.
+
+Use natural technical reasoning.
+
+Prefer concrete explanations such as:
+"Suppose the service receives 10,000 requests..."
+over vague statements such as:
+"This is very useful in modern applications."
+
+The writing should feel edited by a knowledgeable human technical writer,
+not generated by a template.
+
+============================================================
+TECHNICAL ACCURACY
+============================================================
+
+Accuracy is more important than length.
+
+Do not invent:
+- APIs
+- annotations
+- framework behavior
+- compiler behavior
+- commands
+- configuration options
+- performance characteristics
+- cloud-service behavior
+
+If the source contains a technically incorrect statement, correct it.
+
+Clearly distinguish:
+- programming-language behavior
+- library behavior
+- framework behavior
+- runtime behavior
+- platform behavior
+
+If behavior depends on a version, mention the version context when
+you can do so reliably.
+
+Do not claim something is guaranteed when it is implementation-dependent.
+
+============================================================
+INTERVIEW QUALITY
+============================================================
+
+The answer should help a candidate actually answer an interviewer.
+
+Avoid textbook-only definitions.
+
+A good interview answer should make it possible for the candidate to say:
+
+"Here is what it is, here is why it exists, here is how it works,
+and here is where I would use it in a real project."
+
+Include useful follow-up depth without turning every answer into an essay.
+
+============================================================
+PRESERVE THE SOURCE
+============================================================
+
+Do not:
+- remove questions
+- skip questions
+- merge questions
+- rename questions
+- change IDs unnecessarily
+- remove existing useful metadata
+- change the TypeScript schema
+- change exports
+- add imports unless genuinely required
+- change unrelated application logic
+
+You MAY improve answer content, explanations, examples, and wording.
+
+Preserve the ordering of questions.
+
+Every original question must remain represented in the output.
+
+============================================================
+OUTPUT
+============================================================
+
+Return ONLY the complete updated TypeScript file.
+
+No explanation before it.
+No explanation after it.
+No Markdown code fence.
+"""
+
+
+REVIEW_PROMPT = r"""
+You are the final senior technical-content reviewer.
+
+Review the supplied TypeScript interview-question file as if it were
+about to be published on a high-quality technical interview website.
+
+TARGET QUALITY: 9.5+/10.
+
+Your job is to fix weaknesses, not merely comment on them.
+
+Check every question and answer for:
+
+1. Technical correctness
+2. Completeness
+3. Clear direct answer
+4. Correct terminology
+5. Useful mechanism-level explanation
+6. Practical relevance
+7. Appropriate examples
+8. Correct code examples
+9. Edge cases
+10. Common mistakes
+11. Trade-offs where relevant
+12. Interview usefulness
+13. Natural human writing
+14. Avoidance of repetitive AI-style filler
+15. Appropriate answer length
+16. Preservation of the TypeScript schema
+
+IMPORTANT:
+Do not blindly make every answer extremely long.
+
+Depth should depend on the question.
+
+Simple questions should remain reasonably concise.
+Complex topics should receive significantly more explanation.
+
+Do not introduce unsupported facts.
+
+If the original content is already correct, improve clarity and depth
+only where useful.
+
+Preserve:
+- all questions
+- question ordering
+- IDs
+- property names
+- exports
+- TypeScript structure
+- useful existing metadata
+
+Return ONLY the complete corrected TypeScript file.
+
+No Markdown fences.
+No review comments.
+No explanation outside the TypeScript source.
+"""
+
+
+# ------------------------------------------------------------
+# Helpers
+# ------------------------------------------------------------
+
+def log(message: str) -> None:
+    print(message, flush=True)
+
+
+def extract_code(text: str) -> str:
+    """Remove accidental Markdown fences around returned TypeScript."""
+    text = text.strip()
+
+    match = re.search(
+        r"```(?:typescript|ts)?\s*(.*?)\s*```",
+        text,
+        flags=re.DOTALL | re.IGNORECASE,
+    )
+
+    if match:
+        return match.group(1).strip()
+
+    return text
+
+
+def basic_ts_validation(original: str, updated: str) -> tuple[bool, str]:
+    """
+    Lightweight safety checks.
+
+    This does NOT replace a real TypeScript compiler.
+    It catches common model-output failures before writing the file.
+    """
+
+    if not updated.strip():
+        return False, "Model returned an empty file."
+
+    if "```" in updated:
+        return False, "Markdown code fence remains in output."
+
+    # Make sure it still looks like TypeScript.
+    if not any(token in updated for token in [
+        "export ",
+        "const ",
+        "let ",
+        "interface ",
+        "type ",
+        "function ",
+    ]):
+        return False, "Output does not look like TypeScript."
+
+    # Avoid catastrophic truncation.
+    original_len = len(original)
+    updated_len = len(updated)
+
+    if original_len > 5000 and updated_len < original_len * 0.45:
+        return False, (
+            f"Output appears truncated: original={original_len:,} "
+            f"chars, output={updated_len:,} chars."
+        )
+
+    # Count obvious question-like strings as a rough preservation check.
+    # This is intentionally conservative because TS structures vary.
+    original_questions = re.findall(
+        r'(?:"question"|"prompt"|"title")\s*:\s*["`]',
+        original,
+        flags=re.IGNORECASE,
+    )
+    updated_questions = re.findall(
+        r'(?:"question"|"prompt"|"title")\s*:\s*["`]',
+        updated,
+        flags=re.IGNORECASE,
+    )
+
+    if len(original_questions) >= 5:
+        if len(updated_questions) < len(original_questions) * 0.75:
+            return False, (
+                "The number of question-like fields dropped significantly."
+            )
+
+    return True, "Basic validation passed."
+
+
+def call_model(
+    client: OpenAI,
+    model: str,
+    system_prompt: str,
+    source: str,
+) -> str:
+    """Call the OpenAI Responses API with retries."""
+
+    last_error = None
+
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            response = client.responses.create(
+                model=model,
+                instructions=system_prompt,
+                input=(
+                    "Here is the complete TypeScript file to process.\n\n"
+                    "----- BEGIN TYPESCRIPT FILE -----\n"
+                    f"{source}\n"
+                    "----- END TYPESCRIPT FILE -----\n"
+                ),
+                max_output_tokens=MAX_OUTPUT_TOKENS,
+            )
+
+            result = response.output_text
+            result = extract_code(result)
+
+            if not result.strip():
+                raise RuntimeError("Empty response from model.")
+
+            return result
+
+        except Exception as exc:
+            last_error = exc
+
+            if attempt == MAX_RETRIES:
+                break
+
+            wait = RETRY_DELAY_SECONDS * attempt
+            log(
+                f"    API error on attempt {attempt}/{MAX_RETRIES}: "
+                f"{exc}"
+            )
+            log(f"    Retrying in {wait} seconds...")
+            time.sleep(wait)
+
+    raise RuntimeError(
+        f"OpenAI request failed after {MAX_RETRIES} attempts: {last_error}"
+    )
+
+
+def process_file(client: OpenAI, source_path: Path, output_path: Path) -> bool:
+    log("")
+    log("=" * 72)
+    log(f"Processing: {source_path.name}")
+    log("=" * 72)
+
+    source = source_path.read_text(encoding="utf-8")
+
+    log(f"  Input size: {len(source):,} characters")
+    log(f"  Model: {MODEL}")
+
+    # Pass 1: Writer
+    log("  [1/2] Generating detailed humanized content...")
+
+    improved = call_model(
+        client=client,
+        model=MODEL,
+        system_prompt=WRITER_PROMPT,
+        source=source,
+    )
+
+    valid, reason = basic_ts_validation(source, improved)
+
+    if not valid:
+        log(f"  ERROR: Writer output failed validation: {reason}")
+        return False
+
+    log(f"  Writer output: {len(improved):,} characters")
+    log(f"  Validation: {reason}")
+
+    # Pass 2: reviewer
+    final_content = improved
+
+    if TWO_PASS:
+        log("  [2/2] Running senior quality review...")
+
+        reviewed = call_model(
+            client=client,
+            model=REVIEW_MODEL,
+            system_prompt=REVIEW_PROMPT,
+            source=improved,
+        )
+
+        valid, reason = basic_ts_validation(improved, reviewed)
+
+        if not valid:
+            log(
+                "  WARNING: Reviewer output failed validation. "
+                "Keeping writer output."
+            )
+            log(f"  Reason: {reason}")
+        else:
+            final_content = reviewed
+            log(f"  Reviewer output: {len(reviewed):,} characters")
+            log(f"  Validation: {reason}")
+
+    # Write only after successful processing.
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    temp_path = output_path.with_suffix(output_path.suffix + ".tmp")
+    temp_path.write_text(final_content, encoding="utf-8")
+    temp_path.replace(output_path)
+
+    log(f"  SAVED: {output_path}")
+    return True
+
+
+# ------------------------------------------------------------
+# Main
+# ------------------------------------------------------------
+
+def main() -> int:
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    if not api_key:
+        print(
+            "ERROR: OPENAI_API_KEY is not set.\n\n"
+            "Create a .env file containing:\n"
+            "OPENAI_API_KEY=your_api_key_here\n"
+        )
+        return 1
+
+    if not INPUT_DIR.exists():
+        print(f"ERROR: Input folder does not exist: {INPUT_DIR}")
+        print(f"Create it and place your .ts files inside it.")
+        return 1
+
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    ts_files = sorted(
+        path for path in INPUT_DIR.rglob("*.ts")
+        if path.is_file()
+    )
+
+    if not ts_files:
+        print(f"No .ts files found in: {INPUT_DIR}")
+        return 0
+
+    client = OpenAI(api_key=api_key)
+
+    log("")
+    log("=" * 72)
+    log("TYPECRIPT INTERVIEW CONTENT IMPROVER")
+    log("=" * 72)
+    log(f"Input folder : {INPUT_DIR.resolve()}")
+    log(f"Output folder: {OUTPUT_DIR.resolve()}")
+    log(f"Files found  : {len(ts_files)}")
+    log(f"Writer model : {MODEL}")
+    log(f"Review model : {REVIEW_MODEL}")
+    log(f"Two-pass     : {TWO_PASS}")
+    log(f"Skip existing: {SKIP_EXISTING}")
+    log("=" * 72)
+
+    successful = 0
+    skipped = 0
+    failed = 0
+
+    for source_path in ts_files:
+        relative_path = source_path.relative_to(INPUT_DIR)
+        output_path = OUTPUT_DIR / relative_path
+
+        if SKIP_EXISTING and output_path.exists():
+            log("")
+            log(f"SKIPPED: {relative_path}")
+            log("  Output already exists.")
+            skipped += 1
+            continue
+
+        try:
+            if process_file(client, source_path, output_path):
+                successful += 1
+            else:
+                failed += 1
+
+        except KeyboardInterrupt:
+            log("\nStopped by user.")
+            break
+
+        except Exception as exc:
+            failed += 1
+            log("")
+            log(f"FAILED: {relative_path}")
+            log(f"  {exc}")
+
+    log("")
+    log("=" * 72)
+    log("PROCESSING COMPLETE")
+    log("=" * 72)
+    log(f"Successful : {successful}")
+    log(f"Skipped    : {skipped}")
+    log(f"Failed     : {failed}")
+    log(f"Output     : {OUTPUT_DIR.resolve()}")
+    log("=" * 72)
+
+    return 0 if failed == 0 else 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())
