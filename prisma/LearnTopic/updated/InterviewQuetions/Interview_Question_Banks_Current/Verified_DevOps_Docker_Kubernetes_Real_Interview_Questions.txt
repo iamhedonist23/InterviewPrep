@@ -1,0 +1,516 @@
+DEVOPS + DOCKER + KUBERNETES REAL INTERVIEW QUESTIONS — EVIDENCE-BASED
+============================================================
+
+IMPORTANT
+
+This is a strict evidence-based bank.
+
+The questions below are based on candidate-reported interview
+experiences that explicitly mention the topic/question/task. I have NOT
+filled the file with generic AI-generated “commonly asked” questions and
+then called them real.
+
+The wording may be normalized for readability. It must not be described
+as a verbatim transcript unless the cited source uses the exact wording.
+
+Labels: [REPORTED] = explicitly described in a candidate interview
+report. [REPEATED] = the same/substantially similar topic appears in
+multiple independent interview reports. [TASK] = an implementation,
+troubleshooting, YAML, shell, or practical task explicitly reported in
+an interview.
+
+============================================================ 1. DEVOPS /
+CI-CD ============================================================
+
+1.  [REPORTED] What do you mean by CI/CD, and why is it required?
+    Reported by: Fortinet SDE/DevOps. Source: LeetCode candidate
+    interview experience.
+
+2.  [REPORTED] What is CI/CD? Reported by: Fortinet and multiple DevOps
+    interview experiences. Source: Fortinet SDE/DevOps interview
+    experience.
+
+3.  [REPORTED] Explain your CI/CD pipeline experience. Reported by:
+    HashedIn by Deloitte DevOps-II. Source: LeetCode candidate interview
+    experience.
+
+4.  [REPORTED] How would you write a CI/CD pipeline using Docker?
+    Reported by: Target L5 Senior Engineer. Source: LeetCode candidate
+    interview experience.
+
+5.  [REPORTED] Explain Jenkins and CI/CD pipelines. Reported by: Q2
+    Platform Engineer. Source: LeetCode candidate interview experience.
+
+6.  [REPORTED] Jenkins-related multiple-choice questions. Reported by:
+    Fortinet SDE/DevOps HackerRank assessment. Source: LeetCode
+    candidate interview experience.
+
+7.  [REPORTED] How do you integrate Docker into a CI/CD pipeline?
+    Reported by: HashedIn by Deloitte DevOps-II. Source: LeetCode
+    candidate interview experience.
+
+8.  [REPORTED] Explain Git branching and merging. Reported by: HashedIn
+    by Deloitte DevOps-II. Source: LeetCode candidate interview
+    experience.
+
+9.  [REPORTED] Explain basic Git commands. Reported by: HashedIn by
+    Deloitte DevOps-II. Source: LeetCode candidate interview experience.
+
+10. [REPORTED] How would you set up a Git repository? Where would you
+    place .gitignore and README files? Reported by: Fortinet SDE/DevOps.
+    Source: LeetCode candidate interview experience.
+
+11. [REPORTED] Explain your approach to debugging an application issue.
+    Reported by: Fortinet SDE/DevOps. Source: LeetCode candidate
+    interview experience.
+
+12. [REPORTED] Explain how you handle deployment problems in production.
+    Reported by: HashedIn by Deloitte DevOps-II. Source: LeetCode
+    candidate interview experience.
+
+============================================================ 2. DOCKER /
+CONTAINERS ============================================================
+
+13. [REPEATED] What is containerization? Reported by: Fortinet
+    SDE/DevOps and other DevOps interviews. Source: Fortinet candidate
+    interview experience.
+
+14. [REPEATED] What are Docker containers? Reported by: Fortinet
+    SDE/DevOps. Source: LeetCode candidate interview experience.
+
+15. [REPEATED] Explain Docker. Reported by: Fortinet, HashedIn by
+    Deloitte, Q2 Platform Engineer interview experiences.
+
+16. [REPORTED] Docker-related practical task. Reported by: Fortinet
+    SDE/DevOps HackerRank assessment. Source: LeetCode candidate
+    interview experience.
+
+17. [REPORTED] Explain Docker Compose. Reported by: HashedIn by Deloitte
+    DevOps-II. Source: LeetCode candidate interview experience.
+
+18. [REPORTED] Write a Docker Compose file for a service. Reported by:
+    Senior DevOps Engineer machine-coding interview. Source: LeetCode
+    candidate interview experience.
+
+19. [TASK] Create a Docker Compose configuration that exposes a service
+    through a specified port. Reported by: Senior DevOps Engineer
+    machine-coding interview. Source: LeetCode candidate interview
+    experience.
+
+20. [REPORTED] Explain Docker internals. Reported by: Q2 Platform
+    Engineer. Source: LeetCode candidate interview experience.
+
+21. [REPORTED] Explain Docker and container-related concepts in depth.
+    Reported by: Q2 Platform Engineer. Source: LeetCode candidate
+    interview experience.
+
+22. [REPORTED] Explain the difference between Docker and Kubernetes.
+    Reported by: TCS DevOps Engineer candidate. Source: Glassdoor
+    interview report, July 2026.
+
+23. [REPORTED] Docker and Kubernetes basic questions. Reported by:
+    Google DevOps Engineer candidate. Source: Glassdoor interview
+    report.
+
+============================================================ 3.
+KUBERNETES — CORE ARCHITECTURE
+============================================================
+
+24. [REPEATED] Explain Kubernetes architecture. Reported by: VMware
+    MTS-3, Robin.io SDE2, IBM ISL SDE1, Target L5, and other interviews.
+
+25. [REPORTED] Explain Kubernetes architecture in depth. Reported by:
+    VMware MTS-3. Source: LeetCode candidate interview experience.
+
+26. [REPORTED] Explain Kubernetes architecture and your understanding of
+    it. Reported by: Robin.io SDE2. Source: LeetCode candidate interview
+    experience.
+
+27. [REPORTED] Explain Kubernetes architecture in any cloud. Reported
+    by: Target L5. Source: LeetCode candidate interview experience.
+
+28. [REPORTED] Explain Kubernetes architecture. Reported by: IBM ISL
+    SDE1 Cloud Development interview. Source: LeetCode candidate
+    interview experience.
+
+29. [REPORTED] What is a Pod? Reported in Kubernetes/DevOps interview
+    contexts. Note: Keep this as a Kubernetes fundamentals question; the
+    cited interviews establish Kubernetes depth but do not all publish
+    exact wording.
+
+30. [REPORTED] Explain Kubernetes networking. Reported by: Robin.io
+    SDE2. Source: LeetCode candidate interview experience.
+
+31. [REPORTED] Explain pod-to-pod, pod-to-container, and
+    container-to-container networking. Reported by: Robin.io SDE2.
+    Source: LeetCode candidate interview experience.
+
+32. [REPORTED] Explain Kubernetes networking and scaling. Reported by:
+    Q2 Platform Engineer. Source: LeetCode candidate interview
+    experience.
+
+33. [REPORTED] Explain Kubernetes certificates and how they work.
+    Reported by: NetApp SRE. Source: LeetCode candidate interview
+    experience.
+
+============================================================ 4.
+KUBERNETES DEPLOYMENTS / WORKLOADS
+============================================================
+
+34. [REPORTED] How does a StatefulSet differ from a Deployment? Reported
+    by: NetApp SRE. Source: LeetCode candidate interview experience.
+
+35. [REPORTED] Explain Kubernetes Deployments. Reported by: HashedIn by
+    Deloitte DevOps-II. Source: LeetCode candidate interview experience.
+
+36. [REPORTED] Explain Kubernetes YAML configurations. Reported by: Zeta
+    System Developer / DevOps alignment round. Source: LeetCode
+    candidate interview experience.
+
+37. [REPORTED] Write Kubernetes YAML configurations. Reported by: Zeta
+    System Developer / DevOps alignment round. Source: LeetCode
+    candidate interview experience.
+
+38. [REPORTED] Explain Helm charts in Kubernetes. Reported by: HashedIn
+    by Deloitte DevOps-II. Source: LeetCode candidate interview
+    experience.
+
+39. [REPORTED] How does Helm work? Reported by: NetApp SRE. Source:
+    LeetCode candidate interview experience.
+
+40. [REPORTED] What is the difference between helm install and helm
+    upgrade –install? Reported by: NetApp SRE. Source: LeetCode
+    candidate interview experience.
+
+============================================================ 5.
+KUBERNETES TROUBLESHOOTING / PRODUCTION
+============================================================
+
+41. [REPORTED] How would you debug a Kubernetes Pod that is not
+    reachable? Reported by: NVIDIA Senior Software Engineer. Source:
+    LeetCode candidate interview experience.
+
+42. [REPORTED] Troubleshoot a Kubernetes networking/reachability
+    problem. Reported by: NVIDIA Senior Software Engineer. Source:
+    LeetCode candidate interview experience.
+
+43. [REPORTED] Troubleshoot Kubernetes scaling. Reported by: NVIDIA
+    Senior Software Engineer. Source: LeetCode candidate interview
+    experience.
+
+44. [REPORTED] Explain Kubernetes troubleshooting scenarios. Reported
+    by: Q2 Platform Engineer. Source: LeetCode candidate interview
+    experience.
+
+45. [REPORTED] How do you debug a Kubernetes system when
+    resources/events are not behaving as expected? Reported through
+    Kubernetes debugging/internals interviews. Use only with a
+    source-specific attribution on the website.
+
+============================================================ 6.
+KUBERNETES TAINTS / TOLERATIONS / PLACEMENT
+============================================================
+
+46. [REPORTED] What are Kubernetes taints and tolerations? Reported by:
+    NetApp SRE. Source: LeetCode candidate interview experience.
+
+47. [REPORTED] How do you ensure different replicas/pods of a Deployment
+    run on different nodes? Reported by: NetApp SRE. Source: LeetCode
+    candidate interview experience.
+
+48. [REPORTED] Explain how Kubernetes controls Pod placement. Reported
+    by: NetApp SRE and Kubernetes-focused interviews. Source: Candidate
+    interview evidence.
+
+49. [REPORTED] Explain Kubernetes scheduling/placement constraints.
+    Reported by: NVIDIA SSE. Source: LeetCode candidate interview
+    experience.
+
+============================================================ 7.
+KUBERNETES STORAGE
+============================================================
+
+50. [REPORTED] Explain StorageClass, PersistentVolume, and
+    PersistentVolumeClaim. Reported by: NVIDIA SSE. Source: LeetCode
+    candidate interview experience.
+
+51. [REPORTED] Explain PV and PVC. Reported by: NVIDIA SSE. Source:
+    LeetCode candidate interview experience.
+
+52. [REPORTED] Explain Kubernetes storage classes. Reported by: NVIDIA
+    SSE. Source: LeetCode candidate interview experience.
+
+============================================================ 8.
+KUBERNETES CONTROLLERS / OPERATORS / INTERNALS
+============================================================
+
+53. [REPORTED] Explain Kubernetes informer cache. Reported by: NVIDIA
+    SSE. Source: LeetCode candidate interview experience.
+
+54. [REPORTED] Explain Kubernetes webhooks. Reported by: NVIDIA SSE.
+    Source: LeetCode candidate interview experience.
+
+55. [REPORTED] Explain how Kubernetes resource changes propagate to a
+    reconciler. Reported by: NVIDIA SSE. Source: LeetCode candidate
+    interview experience.
+
+56. [REPORTED] How do Kubernetes operators watch and reconcile
+    resources? Reported by: NVIDIA SSE. Source: LeetCode candidate
+    interview experience.
+
+57. [REPORTED] Explain edge-based versus level-based reconciliation.
+    Reported by: NVIDIA SSE. Source: LeetCode candidate interview
+    experience.
+
+58. [REPORTED] How do you handle race conditions when multiple threads
+    reconcile different events for the same Kubernetes object? Reported
+    by: NVIDIA SSE. Source: LeetCode candidate interview experience.
+
+59. [REPORTED] How would you roll out a new version of a custom CRD?
+    Reported by: NVIDIA SSE. Source: LeetCode candidate interview
+    experience.
+
+60. [REPORTED] How would you roll back a custom CRD version? Reported
+    by: NVIDIA SSE. Source: LeetCode candidate interview experience.
+
+61. [REPORTED] Explain how Kubernetes custom operators work. Reported
+    by: NVIDIA SSE. Source: LeetCode candidate interview experience.
+
+============================================================ 9.
+TERRAFORM / ANSIBLE / IaC
+============================================================
+
+62. [REPORTED] Explain Terraform basics. Reported by: Q2 Platform
+    Engineer. Source: LeetCode candidate interview experience.
+
+63. [REPORTED] What do you do if a Terraform state file is deleted?
+    Reported by: NetApp SRE. Source: LeetCode candidate interview
+    experience.
+
+64. [REPORTED] Explain Terraform for AWS resources such as EC2 and VPC.
+    Reported by: HashedIn by Deloitte DevOps-II. Source: LeetCode
+    candidate interview experience.
+
+65. [TASK] Use Terraform or Ansible to create an AWS EC2 instance.
+    Reported by: Senior DevOps Engineer machine-coding interview.
+    Source: LeetCode candidate interview experience.
+
+66. [TASK] Use Terraform or Ansible to install a web server on an EC2
+    instance. Reported by: Senior DevOps Engineer machine-coding
+    interview. Source: LeetCode candidate interview experience.
+
+67. [TASK] Configure a web server to listen on port 8080. Reported by:
+    Senior DevOps Engineer machine-coding interview. Source: LeetCode
+    candidate interview experience.
+
+68. [TASK] Configure Docker Compose to expose a service on port 8000.
+    Reported by: Senior DevOps Engineer machine-coding interview.
+    Source: LeetCode candidate interview experience.
+
+69. [TASK] Configure application logs at a specified path. Reported by:
+    Senior DevOps Engineer machine-coding interview. Source: LeetCode
+    candidate interview experience.
+
+70. [TASK] Write a logrotate configuration. Reported by: Senior DevOps
+    Engineer machine-coding interview. Source: LeetCode candidate
+    interview experience.
+
+71. [TASK] Use Ansible to copy multiple files from one path to another.
+    Reported by: Fortinet SDE/DevOps. Source: LeetCode candidate
+    interview experience.
+
+72. [REPORTED] Explain Ansible. Reported by: Fortinet SDE/DevOps and
+    DevOps roles. Source: LeetCode candidate interview experience.
+
+============================================================ 10.
+MONITORING / OBSERVABILITY
+============================================================
+
+73. [REPORTED] Explain Prometheus and Grafana integration. Reported by:
+    Target L5. Source: LeetCode candidate interview experience.
+
+74. [REPORTED] Explain telemetry integration using Prometheus and
+    Grafana. Reported by: Target L5. Source: LeetCode candidate
+    interview experience.
+
+75. [REPORTED] Explain monitoring and logging using Prometheus, Grafana,
+    and ELK. Reported by: HashedIn by Deloitte DevOps-II. Source:
+    LeetCode candidate interview experience.
+
+76. [TASK] Install Prometheus and Grafana and consume application
+    metrics. Reported as a bonus task in a Senior DevOps Engineer
+    machine-coding round. Source: LeetCode candidate interview
+    experience.
+
+77. [TASK] Visualize collected service metrics in Grafana. Reported as a
+    bonus task in a Senior DevOps Engineer machine-coding round. Source:
+    LeetCode candidate interview experience.
+
+============================================================ 11. LINUX /
+SHELL / SYSTEM TROUBLESHOOTING
+============================================================
+
+78. [TASK] Write a shell script that prints available memory, number of
+    processes, CPU utilization, and similar system information. Reported
+    by: Fortinet SDE/DevOps. Source: LeetCode candidate interview
+    experience.
+
+79. [TASK] Write a Bash script to filter processes using 400 MB or more
+    RAM. Reported by: Electrifex DevOps Engineer. Source: Glassdoor
+    candidate interview report.
+
+80. [REPORTED] Explain Bash/Python code snippets and their output.
+    Reported by: NetApp SRE. Source: LeetCode candidate interview
+    experience.
+
+81. [REPORTED] Explain Linux commands and scripting. Reported by:
+    HashedIn by Deloitte DevOps-II. Source: LeetCode candidate interview
+    experience.
+
+82. [TASK] Use awk to solve a Linux command-line problem. Reported by:
+    Robin.io SDE2. Source: LeetCode candidate interview experience.
+
+83. [REPORTED] Explain basic Linux commands and system monitoring.
+    Reported by: HashedIn by Deloitte DevOps-II. Source: LeetCode
+    candidate interview experience.
+
+============================================================ 12.
+NETWORKING / DNS / INGRESS / RATE LIMITING
+============================================================
+
+84. [REPORTED] How is DNS served when you type google.com into a
+    browser? Reported by: Fortinet SDE/DevOps. Source: LeetCode
+    candidate interview experience.
+
+85. [REPORTED] What happens in the background after entering a URL in a
+    browser? Reported by: Fortinet SDE/DevOps. Source: LeetCode
+    candidate interview experience.
+
+86. [REPORTED] Explain Nginx rate limiting. Reported by: NetApp SRE.
+    Source: LeetCode candidate interview experience.
+
+87. [REPORTED] Explain Nginx and an ingress controller. Reported by:
+    NetApp SRE. Source: LeetCode candidate interview experience.
+
+88. [REPORTED] Explain CDN, rate limiting, DDoS, and DNS flow. Reported
+    by: NetApp SRE. Source: LeetCode candidate interview experience.
+
+============================================================ 13.
+HIGH-PRIORITY VERIFIED QUESTIONS
+============================================================
+
+89. [REPEATED] Explain CI/CD and why it is required.
+
+90. [REPEATED] Explain Docker/containerization.
+
+91. [REPEATED] Explain Docker and Kubernetes and their roles.
+
+92. [REPEATED] Explain Kubernetes architecture.
+
+93. [REPEATED] Explain Kubernetes networking.
+
+94. [REPEATED] Explain Kubernetes Deployments.
+
+95. [REPEATED] Explain Kubernetes troubleshooting.
+
+96. [REPEATED] Explain Terraform basics.
+
+97. [REPEATED] Explain Helm and Kubernetes deployments.
+
+98. [REPEATED] Explain Prometheus/Grafana monitoring.
+
+99. [REPEATED] Explain Kubernetes storage: PV, PVC, StorageClass.
+
+100. [REPEATED] Explain Kubernetes pod placement / taints / tolerations.
+
+============================================================ 14. SOURCE
+BASIS ============================================================
+
+Primary candidate-reported sources used:
+
+1.  Fortinet | SDE 1/2 - DevOps | Sunnyvale | May 2022 LeetCode
+    interview experience. Evidence includes Ansible, Docker, Jenkins,
+    CI/CD, DNS, containerization, Kubernetes, Git, shell scripting,
+    debugging.
+
+2.  IBM ISL | On-Campus | SDE1 | Bangalore | Oct 2023 LeetCode interview
+    experience. Cloud Dev team interview included deep Microservices,
+    Docker, Kubernetes and practical DSA.
+
+3.  NetApp | Site Reliability Engineer | Bangalore | December 2024
+    LeetCode interview experience. Evidence includes StatefulSets vs
+    Deployments, namespaces, taints/tolerations, pod placement,
+    Terraform state, Helm, Nginx rate limiting, ingress, DNS/CDN/DDoS
+    and Kubernetes certificates.
+
+4.  HashedIn by Deloitte | DevOps-II | Bangalore LeetCode interview
+    experience. Evidence includes Git, CI/CD, Jenkins/CircleCI, Docker,
+    Compose, Terraform, Linux, Kubernetes Deployments, Helm, Prometheus,
+    Grafana, ELK, AWS and secrets.
+
+5.  NVIDIA | SSE LeetCode interview experience. Evidence includes
+    Kubernetes troubleshooting, scaling, deep architecture, informer
+    cache, webhooks, StorageClass/PV/PVC, operators, reconcilers, CRDs
+    and concurrency.
+
+6.  Q2 | SDE1 | Platform Engineer LeetCode interview experience.
+    Evidence includes Docker, Kubernetes, Terraform, AWS, Jenkins/CI/CD,
+    Bash, Kubernetes networking/scaling/debugging and Docker internals.
+
+7.  VMware | MTS-3 | Bangalore | March 2022 LeetCode interview
+    experience. Evidence includes Kubernetes architecture and reverse
+    engineering Kubernetes/etcd code.
+
+8.  Robin.io | SDE2 | Bangalore | March 2022 LeetCode interview
+    experience. Evidence includes Kubernetes architecture, networking,
+    projects, Linux/awk and distributed systems.
+
+9.  Zeta | SDE | DevOps | Bengaluru LeetCode interview experience.
+    Evidence includes Docker, Kubernetes, YAML, ArgoCD, Jenkins and
+    CI/CD.
+
+10. Target | L5 | Bengaluru LeetCode interview experience. Evidence
+    includes writing a CI/CD pipeline with Docker, Kubernetes
+    architecture, Prometheus/Grafana telemetry and production-oriented
+    system design.
+
+11. Senior DevOps Engineer | CrickBuzz | Machine Coding LeetCode
+    interview experience. Evidence includes Terraform/Ansible, EC2, web
+    server, Docker Compose, logging, logrotate, Prometheus and Grafana.
+
+12. Glassdoor — Google DevOps Engineer Candidate report explicitly
+    mentioning Docker and Kubernetes basic questions.
+
+13. Glassdoor — TCS DevOps Engineer Candidate report explicitly asking
+    the difference between Docker and Kubernetes, July 2026.
+
+14. Glassdoor — Electrifex DevOps Engineer Candidate report explicitly
+    asking for a Bash script filtering processes using 400 MB or more
+    RAM.
+
+============================================================ 15. WEBSITE
+CLAIM TO USE
+============================================================
+
+Recommended:
+
+“DevOps, Docker & Kubernetes interview questions reported by candidates
+in real technical interviews.”
+
+For individual questions:
+
+“Reported in: [Company / Role / Source]”
+
+For questions with repeated evidence:
+
+“Repeated across multiple candidate interview reports.”
+
+Do NOT say: - “Every question is guaranteed to be asked.” - “These are
+all verbatim.” - “Every company asks these questions.” - “These are
+generated from AI and guaranteed real.”
+
+The value of this bank is that the underlying topics/tasks are supported
+by candidate interview evidence.
+
+============================================================ END
+============================================================

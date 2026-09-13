@@ -1,0 +1,415 @@
+DATA STRUCTURES & ALGORITHMS INTERVIEW QUESTIONS — QUALITY UPGRADED
+
+Category : Data Structures & Algorithms
+Topics : arrays, strings, linked lists, stacks, queues, trees, graphs, hashing and dynamic programming
+Audience : Fresher, intermediate and experienced candidates
+Format : Question : / Answer : / Example :
+Editorial standard : Clear, practical interview preparation with concrete examples. Reported-company labels are retained only where the source information in the original file supports them.
+
+Editorial cleanup applied:
+- Removed the entire repeated/high-priority topic section.
+- Consolidated duplicate LRU, palindrome, House Robber, and Permutation in String entries.
+- Moved vague/incomplete reported questions into a separate section.
+- Kept examples distinct and topic-specific.
+- Added short code solutions to selected high-value coding questions.
+
+Question : [REPORTED] Reverse a singly linked list. Reported by: Amazon SDE1; Microsoft SDE; Samsung Bangalore; other reports. Evidence: Amazon explicitly reported “Reverse a linked list”; Microsoft reported the same problem; Samsung reported reverse a linked list. Sources: - LeetCode Microsoft SDE interview experience - LeetCode Amazon SDE1 onsite experience - GeeksforGeeks Samsung Bangalore internship experience
+Answer : Keep three pointers: prev, current, and next. Save current.next before changing the link, point current.next to prev, then move both pointers forward. Every node is visited once, so the time is O(n) and auxiliary space is O(1). The empty-list and one-node cases fall out naturally from the loop.
+
+Code (Python):
+```python
+def reverse(head):
+    prev = None
+    cur = head
+    while cur:
+        nxt = cur.next
+        cur.next = prev
+        prev, cur = cur, nxt
+    return prev
+```
+Example : Input: 1 -> 2 -> 3 -> null. After reversal: 3 -> 2 -> 1 -> null. The important pointer moment is saving 2 before changing 1.next to null.
+------------------------------------------------------------------------------
+Question : [REPORTED] Reverse a linked list in groups of a given size. Reported by: Amazon SDE1; GeeksforGeeks SDE interview. Source: - GeeksforGeeks Amazon SDE-1 interview experience - GeeksforGeeks SDE Android Team interview experience
+Answer : Walk through the list one block at a time. Before reversing a block, make sure it contains the required number of nodes; then reverse those links and reconnect the previous block. A useful interview detail is to ask what should happen to a final block smaller than k. A common version leaves that block unchanged. The iterative solution is O(n) time and O(1) auxiliary space.
+Example : For 1 -> 2 -> 3 -> 4 -> 5 with k=2, a common variant produces 2 -> 1 -> 4 -> 3 -> 5. The final single node stays unchanged.
+------------------------------------------------------------------------------
+Question : [REPORTED] Reverse a linked list in groups of three nodes. Reported by: Snapdeal Java interview experience. Source: GeeksforGeeks Snapdeal Interview Experience Set 3.
+Answer : Walk through the list one block at a time. Before reversing a block, make sure it contains the required number of nodes; then reverse those links and reconnect the previous block. A useful interview detail is to ask what should happen to a final block smaller than k. A common version leaves that block unchanged. The iterative solution is O(n) time and O(1) auxiliary space.
+Example : For 1 -> 2 -> 3 -> 4 -> 5 -> 6 with k=3, the result is 3 -> 2 -> 1 -> 6 -> 5 -> 4. This makes the group boundary visible.
+------------------------------------------------------------------------------
+Question : [REPORTED] Reverse a linked list between positions L and R. Reported by: Amazon SDE1 onsite interview. Source: LeetCode Amazon SDE1 Seattle interview experience.
+Answer : Use a dummy node so the case where L is the head is handled cleanly. Move to the node just before L, then repeatedly take the next node from the segment and move it to the front of that segment. Only the requested portion changes. The scan is O(n) and the extra space is O(1).
+Example : For 1 -> 2 -> 3 -> 4 -> 5, L=2 and R=4 gives 1 -> 4 -> 3 -> 2 -> 5. The prefix and suffix are not reversed.
+------------------------------------------------------------------------------
+Question : [REPORTED] Determine whether a linked list containing characters is a palindrome. Reported by: Amazon interview experience. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+Answer : For a linked list, find the middle with slow and fast pointers, reverse the second half, and compare the two halves node by node. Comparing values—not node addresses—is the important part. This gives O(n) time and O(1) auxiliary space; restoring the second half afterward is a good production-minded touch.
+Example : For a list a -> b -> b -> a, compare the two halves after reversing the second half; the values match, so it is a palindrome.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the path / process associated with a linked-list problem involving multiple lists and intersections. Reported by: Flipkart SDE II. Source: GeeksforGeeks Flipkart Interview Set 7.
+Answer : Treat intersection as sharing the same node object, not simply having equal values. Two pointers solve the usual singly linked-list version neatly: pointer A traverses list A and then B, while pointer B traverses B and then A. After at most m+n steps they either meet at the shared node or both reach null. Time is O(m+n) and extra space is O(1).
+Example : If A is 1 -> 2 -> 7 -> 9 and B is 4 -> 5 -> 7 -> 9, the intersection is node 7 only when both lists literally point to the same node object.
+------------------------------------------------------------------------------
+Question : [REPORTED] Implement an LRU cache. Reported by: Amazon, Microsoft, Joveo, OnlineSales AI, Flipkart, OLX Groups and other interview experiences. Sources: - LeetCode Amazon SDE1 onsite - LeetCode Microsoft SDE - LeetCode Joveo SDE1 - LeetCode OnlineSales AI SDE2 - GeeksforGeeks Flipkart SDE II - GeeksforGeeks OLX Groups Interview variants reported by Joveo SDE1, Microsoft SDE, OnlineSales AI SDE2, Flipkart SDE II, OLX Groups and other reports include O(1) get/put, a doubly linked list + hash map, and implementing it on paper.
+Answer : The standard LRU design uses two structures together: a hash map for fast key lookup and a doubly linked list for recency order. The map points to list nodes. On get(), move the node to the front; on put(), update or insert at the front and remove the tail when capacity is exceeded. Lookup, unlink, insert, and eviction are O(1) on average, with O(capacity) space.
+
+Code sketch (Python):
+```python
+from collections import OrderedDict
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.cache = OrderedDict()
+
+    def get(self, key):
+        if key not in self.cache:
+            return -1
+        self.cache.move_to_end(key)
+        return self.cache[key]
+
+    def put(self, key, value):
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)
+```
+This sketch uses Python's ordered dictionary; in a language where that structure is unavailable, the usual interview implementation is a hash map plus a doubly linked list.
+Example : With capacity 2: put(1,A), put(2,B), get(1) makes 1 most-recent, then put(3,C) evicts key 2.
+------------------------------------------------------------------------------
+Question : [REPORTED] Modify an LRU cache to support TTL/expiration. Reported by: Microsoft Senior Software Engineer. Source: LeetCode Microsoft Senior SE interview experience, March 2026.
+Answer : Keep the normal LRU structure—a hash map plus a doubly linked list—but add an expiration timestamp to each entry. A get() first checks whether the key exists and whether its TTL has expired; an expired entry is removed before returning a miss. Capacity eviction still removes the least-recently-used entry. Average get/put can remain O(1), but proactive cleanup of expired entries may require an additional time-based structure such as a min-heap if expired keys must be removed even when they are never accessed.
+Example : If key 42 has value X with TTL 5 seconds and the cache is queried after 7 seconds, get(42) should behave as a miss and remove the expired entry.
+------------------------------------------------------------------------------
+Question : [REPORTED] Discuss concurrency/thread safety for an LRU cache. Reported by: Microsoft Senior Software Engineer. Source: LeetCode Microsoft Senior SE interview experience, March 2026.
+Answer : The ordinary hash-map-plus-list design is not thread-safe by itself because get() can mutate recency order while put() changes both structures. A simple correct design can protect the whole operation with a mutex. If contention becomes a bottleneck, consider finer-grained locking or sharding, but only after defining the consistency requirements. The key interview point is that O(1) algorithmic complexity does not automatically mean safe concurrent behavior.
+Example : Two threads calling get(1) can both modify the recency list. A mutex around the lookup-and-move operation prevents list corruption; a read-only lock would not be enough because get changes state.
+------------------------------------------------------------------------------
+Question : [REPORTED] Implement LRU cache on paper. Reported by: OLX Groups. Source: GeeksforGeeks OLX Groups Interview Experience. ==================================================== 3. ARRAYS ====================================================
+Answer : The standard LRU design uses two structures together: a hash map for fast key lookup and a doubly linked list for recency order. The map points to list nodes. On get(), move the node to the front; on put(), update or insert at the front and remove the tail when capacity is exceeded. Lookup, unlink, insert, and eviction are O(1) on average, with O(capacity) space.
+Example : On paper, draw the hash-map entry and its list node side by side. After get(5), move only node 5 to the front and update no unrelated entries.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the smallest positive missing number in an array. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+Answer : The goal is to find the first positive integer that is absent. A linear-time, constant-extra-space approach uses the array itself as a presence map: place each value x in position x-1 whenever 1 <= x <= n, then scan for the first index i where a[i] is not i+1. That returns i+1; if every position is correct, the answer is n+1. Time is O(n) and auxiliary space is O(1).
+Example : For [3,4,-1,1], place 1 at index 0 and 3 at index 2; the first missing positive is 2.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the largest number that can be formed by concatenating an array of numbers. Reported by: Amazon interview experience. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+Answer : Convert the numbers to strings and sort them with the comparator a+b > b+a. That comparator captures which pair should appear first when concatenated. After sorting, concatenate the strings and handle the all-zero case so an input such as [0,0] returns "0" rather than "00". Sorting dominates the complexity: O(n log n) comparisons, with comparison cost depending on string lengths.
+Example : For [3,30,34,5,9], compare "303" with "330" rather than comparing numeric values; the final ordering forms 9534330.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve the Trapping Rain Water problem. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+Answer : A strong O(n), O(1)-space solution uses two pointers. Keep left and right boundaries and the highest wall seen from each side. Whichever side has the smaller current height can be resolved because its water level is limited by that side’s maximum. Add leftMax-leftHeight or rightMax-rightHeight as appropriate, then move inward.
+
+Code (Python):
+```python
+def trap(h):
+    left, right = 0, len(h) - 1
+    left_max = right_max = 0
+    water = 0
+    while left <= right:
+        if h[left] <= h[right]:
+            left_max = max(left_max, h[left])
+            water += left_max - h[left]
+            left += 1
+        else:
+            right_max = max(right_max, h[right])
+            water += right_max - h[right]
+            right -= 1
+    return water
+```
+Example : For heights [0,1,0,2,1,0,1,3,2,1,2,1], the trapped water totals 6 units.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a permutation-in-string problem. Reported by: Microsoft SDE2 India. Source: LeetCode Microsoft SDE2 India interview experience.
+Answer : Use a fixed-size frequency window. Build the character counts for the pattern, slide a window of the same length across the text, add the new character, remove the old one, and compare the counts. With a fixed alphabet, the comparison can be treated as O(1), giving O(n) time and O(1) auxiliary space for the alphabet counts.
+Example : For text "eidbaooo" and pattern "ab", the window "ba" has the same character counts, so a permutation of the pattern exists.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve Spiral Matrix. Reported by: Joveo SDE1. Source: LeetCode Joveo SDE1 interview experience.
+Answer : Maintain four boundaries: top, bottom, left, and right. Traverse the top row, right column, bottom row in reverse, and left column upward, shrinking the corresponding boundary after each pass. Check the boundaries before the second pair of traversals so a single remaining row or column is not emitted twice. Time is O(rows*columns) and extra space is O(1), excluding the output.
+
+Code (Python):
+```python
+def spiral(matrix):
+    out = []
+    top, bottom = 0, len(matrix) - 1
+    left, right = 0, len(matrix[0]) - 1
+    while top <= bottom and left <= right:
+        out += matrix[top][left:right + 1]
+        top += 1
+        for r in range(top, bottom + 1):
+            out.append(matrix[r][right])
+        right -= 1
+        if top <= bottom:
+            out += matrix[bottom][left:right + 1][::-1]
+            bottom -= 1
+        if left <= right:
+            for r in range(bottom, top - 1, -1):
+                out.append(matrix[r][left])
+            left += 1
+    return out
+```
+Example : For [[1,2,3],[4,5,6],[7,8,9]], spiral traversal is 1,2,3,6,9,8,7,4,5.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve Next Permutation. Reported by: Amazon SDE1. Source: LeetCode interview experience by candidate reporting Amazon SDE1.
+Answer : Scan from the end to find the first index i where a[i] < a[i+1]. Then find the smallest value to the right that is larger than a[i], swap them, and reverse the suffix. If no such i exists, the sequence is already the largest permutation, so simply reverse it to obtain the smallest. The algorithm is O(n) time and O(1) auxiliary space.
+
+Code (Python):
+```python
+def next_permutation(a):
+    i = len(a) - 2
+    while i >= 0 and a[i] >= a[i + 1]:
+        i -= 1
+    if i >= 0:
+        j = len(a) - 1
+        while a[j] <= a[i]:
+            j -= 1
+        a[i], a[j] = a[j], a[i]
+    a[i + 1:] = reversed(a[i + 1:])
+```
+Example : For [1,2,3], the next permutation is [1,3,2]. For [3,2,1], there is no larger permutation, so reverse it to [1,2,3].
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve House Robber. Reported by: Amazon SDE1. Source: LeetCode interview experience by candidate reporting Amazon SDE1. ==================================================== 4. STRINGS ====================================================
+Answer : At each house you have two choices: skip it or take it and therefore skip the previous house. Keep two values representing the best result before the current position and the best result if the current house is considered. The transition is max(previousBest, twoBack + current). This is O(n) time and can be reduced to O(1) space.
+
+Code (Python):
+```python
+def rob(nums):
+    prev2 = prev1 = 0
+    for x in nums:
+        prev2, prev1 = prev1, max(prev1, prev2 + x)
+    return prev1
+```
+Example : For houses [2,7,9,3,1], the best non-adjacent total is 12 from 2+9+1.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the longest palindromic substring. Reported by: Amazon SDE1; Amazon interview experience. Sources cited in the original file.
+Answer : For the longest palindromic substring, expand around every possible center. Each character is a center for an odd-length palindrome, and each gap is a center for an even-length palindrome. Expand while the characters match and retain the longest range. The straightforward solution is O(n²) time and O(1) auxiliary space; Manacher’s algorithm can reduce the time to O(n), but it is usually unnecessary unless the constraints demand it.
+
+Code (Python):
+```python
+def longest_palindrome(s):
+    best = ""
+    def expand(l, r):
+        while l >= 0 and r < len(s) and s[l] == s[r]:
+            l -= 1
+            r += 1
+        return s[l + 1:r]
+    for i in range(len(s)):
+        for l, r in ((i, i), (i, i + 1)):
+            p = expand(l, r)
+            if len(p) > len(best):
+                best = p
+    return best
+```
+Example : For "babad", both "bab" and "aba" are valid longest palindromic substrings. For "cbbd", the answer is "bb".
+------------------------------------------------------------------------------
+Question : [REPORTED] Find whether a string/linked-list sequence is a palindrome. Reported by: Amazon. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+Answer : For a linked list, find the middle with slow and fast pointers, reverse the second half, and compare the two halves node by node. Comparing values—not node addresses—is the important part. This gives O(n) time and O(1) auxiliary space; restoring the second half afterward is a good production-minded touch.
+Example : For "racecar", compare r/c/e from the outside inward; every pair matches, so the string is a palindrome.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve Permutation in String. Reported by: Microsoft SDE2 India. Source: LeetCode Microsoft SDE2 India interview experience.
+Answer : Use a fixed-size frequency window. Build the character counts for the pattern, slide a window of the same length across the text, add the new character, remove the old one, and compare the counts. With a fixed alphabet, the comparison can be treated as O(1), giving O(n) time and O(1) auxiliary space for the alphabet counts.
+Example : Pattern "ab" occurs as a permutation inside "eidbaooo" because the window "ba" has the same counts as the pattern.
+------------------------------------------------------------------------------
+Question : [REPORTED] Reverse a stack using recursion. Reported by: PharmEasy SDE1. Source: LeetCode candidate interview experience.
+Answer : Use recursion to remove the top element until the stack is empty. Then insert each removed element at the bottom while the recursive calls return. The key helper is insertAtBottom, which temporarily removes elements until the bottom is reached. This uses O(n²) time in the straightforward implementation and O(n) call-stack space.
+
+Code (Python):
+```python
+def insert_bottom(stack, x):
+    if not stack:
+        stack.append(x)
+        return
+    top = stack.pop()
+    insert_bottom(stack, x)
+    stack.append(top)
+
+def reverse_stack(stack):
+    if not stack:
+        return
+    top = stack.pop()
+    reverse_stack(stack)
+    insert_bottom(stack, top)
+```
+Example : Stack [1,2,3] becomes empty during recursive removal, then 1 is inserted at the bottom first, followed by 2 and 3, restoring [1,2,3] in reversed-processing order as required by the helper.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a stack-based coding problem. Reported by: GeeksforGeeks SDE interview. Source: GeeksforGeeks SDE Android Team interview experience.
+Answer : First identify what the stack is buying you: usually it stores unresolved elements or remembers the most recent state. Common interview patterns include matching parentheses, next greater elements, monotonic stacks, and expression evaluation. State the invariant—for example, a monotonic stack keeps candidates in a defined order—and then analyze how many times each element is pushed and popped.
+Example : For parentheses "{[()]}", push opening brackets and pop when the matching closing bracket arrives. A mismatch or an early closing bracket means invalid.
+------------------------------------------------------------------------------
+Question : [REPORTED] Design a stack that supports getMin in O(1). Reported by: OLX Groups. Source: GeeksforGeeks OLX Groups Interview Experience.
+Answer : Use a second stack that stores the minimum value seen at each depth. On push, push min(value, currentMinimum) onto the minimum stack; on pop, remove from both stacks. Then getMin() simply reads the top of the minimum stack. All three operations are O(1), with O(n) extra space.
+
+Code (Python):
+```python
+class MinStack:
+    def __init__(self):
+        self.data = []
+        self.mins = []
+
+    def push(self, x):
+        self.data.append(x)
+        self.mins.append(x if not self.mins else min(x, self.mins[-1]))
+
+    def pop(self):
+        self.mins.pop()
+        return self.data.pop()
+
+    def getMin(self):
+        return self.mins[-1]
+```
+Example : Push 5, 2, 7. getMin() returns 2. Pop 7 and getMin() is still 2; pop 2 and getMin() becomes 5.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the bottom view of a binary tree. Reported by: Amazon. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+Answer : Assign each node a horizontal distance from the root. During a level-order traversal, record the node seen at each horizontal distance, replacing earlier values as deeper nodes are encountered. BFS is convenient because nodes are processed from top to bottom. With a map keyed by horizontal distance, the time is O(n) and space is O(n).
+Example : For a tree rooted at 1 with children 2 and 3, the bottom view keeps the lowest node at each horizontal distance; deeper nodes replace shallower nodes at the same distance.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the top view of a binary tree. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+Answer : Use horizontal distance from the root and a BFS. The first node encountered at a horizontal distance is the node visible from the top, so store that value only if the distance has not been seen before. BFS naturally gives the required top-to-bottom order. Time is O(n) and extra space is O(n).
+Example : For root 1 with left 2 and right 3, the first node seen at horizontal distance -1 is 2, distance 0 is 1, and distance +1 is 3.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the maximum path sum in a binary tree. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+Answer : For each node, calculate the best downward contribution it can give to its parent. A node can also form the highest point of a path using its own value plus the best positive contribution from the left and right children. Update a global answer with that complete path, while returning only the best one-sided contribution upward. This is O(n) time and O(h) recursion space.
+Example : For tree -10 with children 9 and 20, and 20 having children 15 and 7, the maximum path is 15 -> 20 -> 7 with sum 42.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the difference between maximum and minimum values in a binary tree. Reported by: Samsung Bangalore internship. Source: GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+Answer : Traverse the entire tree while carrying the minimum and maximum values seen so far. At the end, return maxValue - minValue. DFS or BFS works because every node must be inspected. The time is O(n), and auxiliary space is O(h) for recursive DFS or O(w) for a queue-based BFS.
+Example : For node values [8,3,10,1,6], the minimum is 1 and maximum is 10, so the difference is 9.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find a value related to GCD across values in a binary tree. Reported by: Samsung Bangalore internship. Source: GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+Answer : The exact tree variant is not fully specified, but the natural approach is to carry the running GCD as you traverse the relevant nodes. Since gcd(gcd(a,b),c) is associative, values can be combined incrementally rather than stored separately. For a whole-tree GCD, a DFS can update the running result for every node in O(n) time.
+Example : For values 18, 24, and 30 in the relevant tree traversal, the running GCD becomes gcd(18,24)=6 and then gcd(6,30)=6.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find nodes at distance K from a given binary-tree node. Reported by: Flipkart SDE II. Source: GeeksforGeeks Flipkart Interview Set 7.
+Answer : A binary tree is naturally directed downward, but distance-K can require moving from a node to its parent. One clean approach is to build a parent map first, then run BFS from the target treating left, right, and parent as neighbors. Stop after K levels. The traversal is O(n) time and O(n) space in the worst case.
+Example : If target is 5 and K=2, BFS can discover nodes that are two edges away through left, right, and parent links. A parent map is what makes upward movement possible.
+------------------------------------------------------------------------------
+Question : [REPORTED] Mirror a binary tree. Reported by: Snapdeal. Source: GeeksforGeeks Snapdeal Interview Experience Set 3.
+Answer : At every node, swap its left and right children and then do the same recursively or iteratively for the children. The important detail is that you swap first, then continue with the resulting children. Every node is visited once, so the time is O(n) and recursion space is O(h).
+Example : For a root 1 with left 2 and right 3, mirroring swaps them so the root’s left is 3 and right is 2; repeat recursively below both nodes.
+------------------------------------------------------------------------------
+Question : [REPORTED] Transform a binary tree into a sum tree. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+Answer : A sum-tree conversion typically replaces each node with the sum of values in its left and right subtrees, while leaves become zero. Use post-order traversal because a node cannot be updated correctly until both children have been processed. Return the old subtree sum to the parent while storing the new value in the node. This is O(n) time and O(h) recursion space.
+Example : For a tree 10 with children -2 and 6, a sum-tree conversion uses subtree totals; leaves become 0 and internal nodes receive the sum of their original left and right subtrees.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a backtracking problem based on N-Queens. Reported by: PharmEasy SDE1. Source: LeetCode candidate interview experience.
+Answer : Place one queen per row and backtrack when a placement conflicts with an earlier queen. Track occupied columns and the two diagonal families so a candidate position can be checked in O(1). When a row is complete, record the board or count the solution. The search is exponential in the worst case, which is expected for the general N-Queens problem.
+Example : For N=4, a valid board is [".Q..","...Q","Q...","..Q."]. Backtracking rejects placements that share a column or diagonal.
+------------------------------------------------------------------------------
+Question : [REPORTED] Design Git using a graph-based approach. Reported by: Samsung Bangalore internship. Source: GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+Answer : A graph model fits Git because commits form a directed acyclic graph: each commit points to one or more parent commits. A branch is essentially a movable reference to a commit, while merge commits can have multiple parents. In an interview, focus on the data model and operations—create commit, move branch, traverse history, and find common ancestors—rather than reproducing Git’s entire implementation.
+Example : Represent commits as nodes and parent relationships as directed edges. A merge commit can have two parents, while a branch name points to a particular commit node.
+------------------------------------------------------------------------------
+Question : [REPORTED] Use graph concepts for a tree/data-structure problem. Reported by: Samsung Bangalore internship. Source: GeeksforGeeks Samsung Bangalore SRIB Internship Experience. ==================================================== 8. DYNAMIC PROGRAMMING / GREEDY ====================================================
+Answer : A tree is a special kind of graph: it is connected and has no cycles. That lets graph ideas such as DFS, BFS, parent tracking, and distance traversal be reused, while the absence of cycles simplifies many algorithms. If you model a tree as an undirected graph, remember to avoid immediately walking back to the parent.
+Example : For tree nodes 1-2 and 1-3, treat each edge as bidirectional during a distance search but remember the parent so DFS does not immediately return to the node it came from.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a dynamic-programming problem in an online assessment. Reported by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview experience.
+Answer : Start with the smallest subproblem and define a state that contains exactly the information needed for future decisions. Then write the transition, base cases, and evaluation order. Memoization is often the easiest way to turn a recursive solution into O(number of states × transition cost); tabulation can remove recursion overhead and sometimes reduce memory.
+Example : A representative DP state might be dp[i]=best answer using the first i items. Before coding, write the transition and base cases on paper; that usually exposes off-by-one errors early.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a Building Bridges problem. Reported by: Amazon. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+Answer : For the classic Building Bridges formulation, sort the bridge endpoints by one coordinate and then find a longest increasing subsequence on the other coordinate, taking care with ties so crossing bridges are not counted incorrectly. The reduction is the key insight: a geometric-looking problem becomes an LIS problem. With an O(n log n) LIS implementation, the overall solution can be O(n log n).
+Example : For bridge pairs (1,8),(2,3),(3,4),(4,9), sort by one endpoint and look for the longest increasing sequence in the other endpoint while handling equal first endpoints carefully.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the maximum/minimum-related values in a binary tree. Reported by: Samsung Bangalore internship. Source: GeeksforGeeks Samsung Bangalore SRIB Internship Experience. ==================================================== 10. REPEATED / HIGH-PRIORITY VERIFIED TOPICS ==================================================== The following have particularly strong evidence because they appear in multiple candidate reports:
+Answer : Traverse the tree once and update the required extreme value as each node is visited. If the question asks for a second-smallest or second-largest value, keep the required number of candidates rather than sorting every value unless the constraints justify it. For a simple min/max query, the time is O(n) and the auxiliary space is O(h) with recursive DFS.
+Example : For tree values 8,3,10,1,6, the maximum is 10 and minimum is 1. If the question asks for something more specific, such as second-largest, maintain that state directly instead of sorting the whole tree.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Reverse a linked list in groups. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : Walk through the list one block at a time. Before reversing a block, make sure it contains the required number of nodes; then reverse those links and reconnect the previous block. A useful interview detail is to ask what should happen to a final block smaller than k. A common version leaves that block unchanged. The iterative solution is O(n) time and O(1) auxiliary space.
+Example : Group-reversal example: 1 -> 2 -> 3 -> 4 -> 5 with k=2 becomes 2 -> 1 -> 4 -> 3 -> 5 under the common “leave short tail unchanged” rule.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Implement LRU cache using a hash map and doubly linked list. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : The standard LRU design uses two structures together: a hash map for fast key lookup and a doubly linked list for recency order. The map points to list nodes. On get(), move the node to the front; on put(), update or insert at the front and remove the tail when capacity is exceeded. Lookup, unlink, insert, and eviction are O(1) on average, with O(capacity) space.
+Example : Map key 10 to a node in a doubly linked list. When 10 is accessed, splice that node to the front; when capacity is exceeded, remove the tail and delete its key from the map.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Palindrome-related string/linked-list problem. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : For a linked list, find the middle with slow and fast pointers, reverse the second half, and compare the two halves node by node. Comparing values—not node addresses—is the important part. This gives O(n) time and O(1) auxiliary space; restoring the second half afterward is a good production-minded touch.
+Example : For "level", the first and last characters match and the middle is symmetric, so the string is a palindrome. For a linked list, the same idea is implemented with slow/fast pointers and a reversed second half.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Dynamic-programming problems. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : Start with the smallest subproblem and define a state that contains exactly the information needed for future decisions. Then write the transition, base cases, and evaluation order. Memoization is often the easiest way to turn a recursive solution into O(number of states × transition cost); tabulation can remove recursion overhead and sometimes reduce memory.
+Example : For a DP problem, write a tiny table for inputs 0,1,2,3 before coding. If the state and transition produce the expected values by hand, the implementation is much less likely to contain an indexing mistake.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Sliding-window and string-matching problems. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : Maintain a window whose contents satisfy a clear invariant. Expand the right side, and when the condition is violated, move the left side until the window is valid again. With constant-time bookkeeping, each character enters and leaves the window once, giving O(n) time.
+Example : For text "abcabcbb", a sliding window keeps the longest substring without repeated characters as "abc", giving length 3. Each character is added and removed from the window at most once.
+------------------------------------------------------------------------------
+
+INCOMPLETE REPORTED INTERVIEW QUESTIONS
+
+These entries are retained separately because the original evidence in the source does not provide enough of the exact problem statement to present them as complete standalone interview questions. They are useful as research leads, but should not be treated as exact verbatim interview questions.
+
+Question : [REPORTED] Solve linked-list coding questions with linear time complexity. Reported by: GeeksforGeeks SDE interview experience. Source: GeeksforGeeks SDE Android Team interview experience. ==================================================== 2. LRU CACHE / HASHING ====================================================
+Answer : The important idea is to avoid repeatedly walking the same nodes. For a linked-list problem, choose an invariant that lets each node be processed a constant number of times—for example, slow/fast pointers for a midpoint or cycle problem. That gives O(n) time instead of accidentally creating an O(n²) nested traversal. The exact algorithm still depends on the missing original problem statement.
+Example : If a list contains 100,000 nodes, repeatedly scanning from the head for each node can become O(n²). A single slow/fast traversal keeps the work linear.
+------------------------------------------------------------------------------
+Question : [REPORTED] Find the maximum path/subsequence-style sum. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+Answer : Because the source does not give the exact variant, first clarify whether the problem means a contiguous subarray, a subsequence with no adjacent picks, or a path through a structure. For a non-adjacent maximum subsequence, keep two states: best up to the previous element, and best when the current element is taken. The transition is max(skip, take). This is O(n) time and O(1) space.
+Example : For values [2,7,9,3,1] under the non-adjacent-subsequence interpretation, choose 2+9+1 = 12 rather than taking adjacent values.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a subarray-related DSA problem. Reported by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview experience.
+Answer : The exact reported variant is not specified, so do not pretend a particular subarray problem was asked. A good interview approach is to identify whether the requirement is about a contiguous range, a target sum, a maximum/minimum, or a fixed/variable window. Then choose the matching pattern—prefix sum, Kadane’s algorithm, hash map, or sliding window—and state why it fits the constraints.
+Example : If the exact subarray problem is unknown, use a representative case such as [1,2,3,4] and ask whether the goal is maximum sum, target sum, fixed length, or another property before choosing the pattern.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a string/array problem involving two pointers. Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida interview experience.
+Answer : Two pointers are useful when the input has an order or when the answer can be maintained from both ends. Start by stating what each pointer represents and what invariant is preserved after moving one. The common goal is to turn a nested scan into a single O(n) pass. The exact reported problem should be clarified before committing to a specific implementation.
+Example : For a sorted array [1,2,3,4,6] and target 7, left=1 and right=6; move the pointers according to the sum until 1+6 is found.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a string matching problem using two pointers. Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida interview experience.
+Answer : Two pointers are useful when the input has an order or when the answer can be maintained from both ends. Start by stating what each pointer represents and what invariant is preserved after moving one. The common goal is to turn a nested scan into a single O(n) pass. The exact reported problem should be clarified before committing to a specific implementation.
+Example : For two strings where the exact matching rule is unspecified, first clarify whether order must be preserved, whether repeats matter, and whether the match is contiguous. Those details change the algorithm.
+------------------------------------------------------------------------------
+Question : [REPORTED] Process a string containing lowercase letters and blocker characters to find the longest safe path. Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida interview experience. ==================================================== 5. STACKS / QUEUES ====================================================
+Answer : The source confirms this topic was reported, but the exact original problem statement is not reproduced. In a real interview, first clarify the input, output, constraints, and edge cases. Then choose the data structure or algorithm, explain the invariant that makes it correct, and state time and auxiliary-space complexity.
+Example : A representative version could use a string such as "..#...##...." where # blocks movement; the correct answer depends on whether the path is measured as a contiguous run or as a grid movement rule, so the original statement must be confirmed.
+------------------------------------------------------------------------------
+Question : [REPORTED] Implement a queue/cache-like structure using appropriate linked data structures. Reported across coding interviews. Use only when the exact company/source is cited on the website. ==================================================== 6. TREES ====================================================
+Answer : The source does not specify the exact operation set, so clarify whether the structure needs FIFO behavior, random lookup, eviction, or recency ordering. For a normal queue, a linked list with head and tail gives O(1) enqueue and dequeue. If lookup by key is also required, add a hash map rather than forcing the linked list to answer a lookup it was not designed for.
+Example : For a queue, enqueue 10,20,30 then dequeue returns 10 first. With head and tail pointers, both operations are O(1).
+------------------------------------------------------------------------------
+Question : [REPORTED] Determine whether a binary tree satisfies a specified property through traversal. Reported in multiple company experiences. Exact variant should be attributed to its source. ==================================================== 7. GRAPHS / BACKTRACKING ====================================================
+Answer : The exact property is not included in the source, so the safe interview response is to clarify it before coding. For a traversal-based tree property, define what must be true at each node, choose DFS or BFS based on whether depth or level order matters, and maintain the smallest state needed to verify the property. Do not claim a specific company problem variant without the original statement.
+Example : Because the source does not specify the property, use a small tree and explicitly state the property before coding. For example, if the property were “all leaves are at the same depth,” DFS can track the first leaf depth and compare later leaves against it.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a graph-based problem in an Amazon DSA round. Reported by: Amazon SDE1. Source: LeetCode candidate interview experience.
+Answer : The source confirms a graph problem but not the exact statement. Start by deciding what the graph represents and whether edges are directed, weighted, or unweighted. Then choose BFS/DFS for reachability, Dijkstra for non-negative weighted shortest paths, topological sorting for dependency order, or union-find for connectivity under edge additions. State the representation and complexity before coding.
+Example : A representative graph case is a network 1-2-3 and 1-4. BFS from 1 visits 2 and 4 first, then 3. The exact Amazon-reported variant should be checked against the original experience before claiming it.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a graph problem in an online assessment. Reported by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview experience.
+Answer : The source confirms a graph problem but not the exact statement. Start by deciding what the graph represents and whether edges are directed, weighted, or unweighted. Then choose BFS/DFS for reachability, Dijkstra for non-negative weighted shortest paths, topological sorting for dependency order, or union-find for connectivity under edge additions. State the representation and complexity before coding.
+Example : For a directed graph A->B, A->C, B->D, a topological order could be A,B,C,D. If the OA instead asks reachability or shortest path, the algorithm changes, which is why the exact statement matters.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a greedy problem in an online assessment. Reported by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview experience.
+Answer : A greedy algorithm commits to a locally best choice, but the interview-worthy part is explaining why that choice is safe. Look for an exchange argument, a cut property, or another proof that an optimal solution can be transformed to include the greedy choice. If you cannot justify the choice, consider dynamic programming or another method instead.
+Example : A classic greedy example is selecting non-overlapping intervals by earliest finishing time. Choosing the interval that ends first leaves the most room for the remaining intervals.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a maximum-sum-subsequence variant. Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1. ==================================================== 9. HEAPS / OTHER DATA STRUCTURES ====================================================
+Answer : Because the source does not give the exact variant, first clarify whether the problem means a contiguous subarray, a subsequence with no adjacent picks, or a path through a structure. For a non-adjacent maximum subsequence, keep two states: best up to the previous element, and best when the current element is taken. The transition is max(skip, take). This is O(n) time and O(1) space.
+Example : Under a non-adjacent maximum-sum interpretation, [5,5,10,100,10,5] gives 110 by choosing 5+100+5. If the source’s variant differs, confirm its exact constraints first.
+------------------------------------------------------------------------------
+Question : [REPORTED] Solve a hard heap-related problem in an online assessment. Reported by: Microsoft SDE1 Noida. Source: LeetCode Microsoft SDE1 Noida interview experience.
+Answer : A heap is useful when the problem repeatedly asks for the current smallest or largest item while the rest of the data remains available. Choose a min-heap or max-heap based on the operation, and ask whether only the top K items are needed. Typical solutions run in O(n log k) for maintaining a size-k heap or O(n log n) when all elements must be processed in heap order. The exact reported problem should be clarified before coding.
+Example : A top-k style heap problem can maintain a min-heap of size 3 while scanning values. For [7,1,9,3,8], the heap ends with [7,9,8], so the third-largest value is 7.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Reverse a linked list. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : The source confirms this topic was reported, but the exact original problem statement is not reproduced. In a real interview, first clarify the input, output, constraints, and edge cases. Then choose the data structure or algorithm, explain the invariant that makes it correct, and state time and auxiliary-space complexity.
+Example : Basic reverse-list example: 1 -> 2 -> 3 becomes 3 -> 2 -> 1. If the source variant adds constraints, those should be confirmed before presenting the example as exact.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Binary-tree traversal, view, and path problems. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : The source confirms this topic was reported, but the exact original problem statement is not reproduced. In a real interview, first clarify the input, output, constraints, and edge cases. Then choose the data structure or algorithm, explain the invariant that makes it correct, and state time and auxiliary-space complexity.
+Example : For a simple tree, preorder is root-left-right, inorder is left-root-right, and postorder is left-right-root. View questions add horizontal distance, while path questions usually need subtree contributions.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Graph and graph-like coding problems. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : The source confirms this topic was reported, but the exact original problem statement is not reproduced. In a real interview, first clarify the input, output, constraints, and edge cases. Then choose the data structure or algorithm, explain the invariant that makes it correct, and state time and auxiliary-space complexity.
+Example : For an unweighted graph, BFS gives shortest path length in number of edges. For non-negative weighted edges, Dijkstra is the usual choice; for dependency ordering, use topological sorting.
+------------------------------------------------------------------------------
+Question : [REPEATED PATTERN] Common reported pattern: Heap-based problems. Source summary: recurring pattern in the supplied interview evidence bank; not a claim of one exact verbatim interview question.
+Answer : A heap is useful when the problem repeatedly asks for the current smallest or largest item while the rest of the data remains available. Choose a min-heap or max-heap based on the operation, and ask whether only the top K items are needed. Typical solutions run in O(n log k) for maintaining a size-k heap or O(n log n) when all elements must be processed in heap order. The exact reported problem should be clarified before coding.
+Example : For values [5,1,9,3,8] and k=2, a min-heap of size 2 keeps the two largest values seen so far; the final heap contains 8 and 9.
+------------------------------------------------------------------------------
+RELATED INTERVIEW TOPICS
+- Digital Marketing: landing-pages/digital-marketing.md
+- MySQL / SQL / DBMS: landing-pages/mysql-sql-dbms.md
+- Data Science: landing-pages/data-science.md
+- System Design: landing-pages/system-design.md
+- Java: landing-pages/java.md

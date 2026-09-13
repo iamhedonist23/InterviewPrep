@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { MultiSelectDropdown } from "@/components/ui/multi-select-dropdown";
@@ -7,7 +7,7 @@ import { PracticeSession } from "@/components/practice/practice-session";
 import type { PracticeQuestion } from "@/lib/practice";
 
 type Category = { id: string; name: string; slug: string };
-type Props = { categories: Category[] };
+type Props = { categories: Category[]; initialQuestionSlug?: string };
 const options = {
   experience: [
     ["", "Any experience"],
@@ -29,7 +29,7 @@ const options = {
     ["SITUATIONAL", "Situational"],
   ],
 };
-export function PracticeSetup({ categories }: Props) {
+export function PracticeSetup({ categories, initialQuestionSlug }: Props) {
   const [filters, setFilters] = useState({
     category: "",
     experience: "",
@@ -39,6 +39,40 @@ export function PracticeSetup({ categories }: Props) {
   const [questions, setQuestions] = useState<PracticeQuestion[] | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const hasLoadedInitialQuestion = useRef(false);
+
+  async function loadQuestionPractice(questionSlug: string) {
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await fetch(`/api/practice/questions?question=${encodeURIComponent(questionSlug)}`);
+      const data = await response.json();
+
+      if (!response.ok || !data.questions?.length) {
+        throw new Error("No questions");
+      }
+
+      setQuestions(data.questions);
+    } catch {
+      setError("This question is not available for practice right now.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (
+      initialQuestionSlug &&
+      !hasLoadedInitialQuestion.current &&
+      !questions &&
+      !loading
+    ) {
+      hasLoadedInitialQuestion.current = true;
+      void loadQuestionPractice(initialQuestionSlug);
+    }
+  }, [initialQuestionSlug, questions, loading]);
+
   async function start() {
     setLoading(true);
     setError("");
@@ -64,6 +98,14 @@ export function PracticeSetup({ categories }: Props) {
     }
   }
   if (questions) return <PracticeSession questions={questions} />;
+
+  if (initialQuestionSlug && loading) {
+    return (
+      <div className="rounded-3xl border border-ink/10 bg-white/70 p-6 sm:p-8">
+        <p className="text-sm font-semibold text-ink/70">Loading practice question...</p>
+      </div>
+    );
+  }
   return (
     <div className="rounded-3xl border border-ink/10 bg-white/70 p-6 sm:p-8">
       <div className="grid gap-5 sm:grid-cols-2">

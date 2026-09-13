@@ -22,7 +22,10 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const where: Prisma.InterviewQuestionWhereInput = { isPublished: true };
   const category = url.searchParams.get("category");
+  const questionSlug = url.searchParams.get("question");
+
   if (category) where.category = { slug: category };
+  if (questionSlug) where.slug = questionSlug;
   const experience = enumValue(
     url.searchParams.get("experience"),
     Object.values(ExperienceLevel),

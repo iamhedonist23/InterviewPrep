@@ -1,0 +1,2542 @@
+import { PrismaClient, StudyLevel } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+type TopicSeed = {
+  title: string;
+  slug: string;
+  description: string;
+  estimatedMinutes: number;
+  sections?: Array<{
+    title: string;
+    content: string;
+  }>;
+};
+
+type ModuleSeed = {
+  title: string;
+  slug: string;
+  description: string;
+  topics?: TopicSeed[];
+};
+
+type PathSeed = {
+  name: string;
+  slug: string;
+  description: string;
+  level: StudyLevel;
+  modules: ModuleSeed[];
+};
+
+type CategorySeed = {
+  name: string;
+  slug: string;
+  description: string;
+  icon: string;
+  sortOrder: number;
+  paths: PathSeed[];
+};
+
+const modules: ModuleSeed[] = [
+  {
+    title: "Java Basics",
+    slug: "java-basics",
+    description: "Core Java language foundations: setup, syntax, types, variables, arrays, methods, packages, and the JVM model.",
+    topics: [
+      {
+        title: "Java overview and use cases",
+        slug: "java-overview-and-use-cases",
+        description: "Java is more than a language syntax: it is a platform built around a virtual machine, a standard library, strong type checking, and a mature ecosystem. Learn where Java fits well, why it remains common in backend and enterprise systems, and what trade-offs you should recognize before choosing it.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Java is a statically typed, object-oriented language designed around portability, strong tooling, and a managed runtime. “Write once, run anywhere” is not magic: source is compiled to JVM bytecode, and a compatible JVM on the target platform executes that bytecode. The same language can therefore support web services, enterprise systems, command-line tools, Android-related ecosystems, desktop software, and large distributed backends.\n\nThe important engineering trade-off is that Java favors explicit types, mature libraries, predictable runtime semantics, and long-term maintainability. It is particularly valuable when a system needs a large ecosystem, strong observability and profiling tools, concurrency support, and teams working on code that must remain understandable for years."
+          },
+          {
+            title: "Deep conceptual model",
+            content: "Java is best understood as a set of connected ideas rather than a list of syntax rules. Source code expresses intent, the compiler checks and translates that source into bytecode, the JVM loads and executes the bytecode, and the standard library supplies reusable behavior. When learning a feature, ask three questions: what problem does it solve, what rule does the compiler enforce, and what happens when the program runs? This prevents memorizing syntax without understanding behavior.\n\nA useful mental model is to separate language rules from library APIs. `if`, classes, methods, primitive types, and operators are language concepts; `String`, `Scanner`, collections, and I/O classes are library types built around those language rules. Strong Java knowledge comes from knowing where the boundary is and how the pieces cooperate."
+          },
+          {
+            title: "What it means",
+            content: `Java is a statically-typed, object-oriented language that runs on the JVM instead of directly on hardware — and that one design choice explains almost everything else about it. When Java was designed, its core promise was 'write once, run anywhere.' Instead of compiling your code straight into machine instructions for one specific CPU/OS combination (like C does), Java compiles to an intermediate form called bytecode, which is then executed by the Java Virtual Machine (JVM). As long as a JVM exists for a platform, your compiled program runs there unchanged.
+
+This architecture gives Java four practical strengths that explain where you'll see it used today:
+
+1. Platform independence — the same .class file runs on Windows, Linux, macOS, or inside a Docker container, because the JVM handles the platform-specific translation.
+
+2. Automatic memory management — Java's garbage collector reclaims memory for objects you're no longer using, so you don't manually allocate/free memory like in C/C++. This eliminates a huge class of bugs (dangling pointers, double-frees, memory leaks from forgotten frees).
+
+3. A mature ecosystem — decades of libraries and frameworks (Spring, Hibernate, Kafka clients) exist specifically because Java has been an enterprise standard for so long.
+
+4. Strong static typing — the compiler catches type errors before your code ever runs, which matters enormously once a codebase grows past a few thousand lines and multiple people are editing it. In practice, you'll find Java powering large enterprise backends (banking, insurance, logistics systems), Android apps, and big-data infrastructure — Hadoop, Kafka, and Spark are all JVM-based projects. The JVM itself has also become a platform other languages build on: Kotlin and Scala both compile to the same bytecode and can freely call Java libraries.`
+          },
+          {
+            title: "How it works",
+            content: `Java is best understood as a language plus a runtime model. You write source code in Java syntax, the compiler checks that source against Java's type system and produces bytecode, and the JVM loads and executes that bytecode. The important point is that the JVM provides the platform-specific execution layer, so application code does not need a separate native binary for every operating system. This is the practical meaning behind Java's portability model.
+
+Java's design also shifts several responsibilities from the application developer to the runtime. Memory for objects is managed by the JVM's garbage collector, while the compiler and runtime enforce type rules that help catch many mistakes early. At the same time, Java remains a general-purpose language: the same core language is used for command-line programs, backend services, desktop tools, and large frameworks.
+
+When learning Java, do not treat 'platform independent' as meaning 'there is no platform dependency at all.' The JVM, operating system, native libraries, file paths, environment variables, and external services can still differ. The useful mental model is that Java standardizes the bytecode and language level while the runtime hides much of the underlying machine-specific work.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// A minimal Java program — this alone shows the platform-independence idea:
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+// Compile once:       javac HelloWorld.java        -> produces HelloWorld.class (bytecode)
+// Run anywhere:       java HelloWorld              -> runs on any machine with a JVM installed
+\`\`\``
+          },
+          {
+            title: "Practice",
+            content: `Try to explain in your own words why a compiled .class file can run unmodified on both Windows and Linux, when a compiled C program generally cannot.`
+          },
+          {
+            title: "Engineering view",
+            content: `Java is easiest to reason about as three cooperating layers: the Java language, the class-file format, and a JVM implementation. That separation is why a Java application can move between operating systems without recompiling source for each CPU, while still allowing runtime optimizations such as JIT compilation. It also explains an important boundary: portability is not the same as environmental independence. File paths, native libraries, environment variables, certificates, locale settings, and external services can still vary between deployments.
+
+For interviews, distinguish the language from the platform. Java is the language developers write; the JVM executes bytecode; the JDK supplies development tools and a runtime. A strong answer connects these pieces instead of treating "Java" and "JVM" as synonyms.`
+          },
+          {
+            title: "Real-world decision",
+            content: `For a backend service, Java is attractive when a team values a mature ecosystem, strong tooling, predictable typing, concurrency support, and long-lived operational practices. The trade-off is that startup time, memory footprint, and runtime tuning can matter for very small command-line programs or highly constrained environments. The correct engineering question is not "Is Java fast?" but "Does this runtime and ecosystem fit the workload, operational constraints, and team?" `
+          },
+          {
+            title: "Interview drill",
+            content: `A common follow-up is: "If Java is compiled, why is it considered portable?" Answer by separating compile-time output from runtime execution: javac normally produces JVM bytecode, not one operating-system-specific executable. A JVM implementation for the target platform loads that bytecode and executes it. A senior answer adds that portability still depends on APIs and environment assumptions used by the application.`
+          }
+        ]
+      },
+      {
+        title: "Installing Java and checking the version",
+        slug: "installing-java-and-checking-the-version",
+        description: "A reliable Java setup starts with understanding the JDK on your machine, `PATH`, `JAVA_HOME`, and the difference between the Java runtime used by a command and the JDK used for development. Learn how to verify the environment instead of assuming that an installed Java command means the development toolchain is configured correctly.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Installation is more than making a `java` command appear. A developer environment normally needs a JDK because compiling source requires tools such as `javac`, while running an already compiled class only requires a compatible Java runtime. `PATH` determines which executable the shell finds, while `JAVA_HOME` is commonly used by build tools to locate the JDK.\n\nWhen troubleshooting, verify both `java -version` and `javac -version`. They can point to different installations. A project can also deliberately select a different JDK through an IDE, Maven/Gradle toolchain, container image, or CI configuration. “It works on my machine” often begins with an unnoticed JDK-version mismatch."
+          },
+          {
+            title: "What it means",
+            content: `Before writing any Java code, you need a JDK installed and your system configured so the \`java\` and \`javac\` commands are available from any terminal. A JDK (Java Development Kit) is what you install to write and run Java code — it bundles the compiler, the runtime, and development tools together. There are several free distributions built from the same open-source OpenJDK project: Eclipse Temurin (formerly AdoptOpenJDK), Amazon Corretto, and Oracle's own OpenJDK builds are all common choices, and functionally they behave the same for everyday development.
+
+After installing, two pieces of setup matter: setting the JAVA_HOME environment variable to point at your JDK's installation folder, and adding $JAVA_HOME/bin to your system PATH so the \`java\` and \`javac\` executables can be found from any terminal without typing the full path. Once that's done, you verify everything worked with two commands: \`java -version\` shows which runtime you have, and \`javac -version\` shows which compiler you have. These can technically report different versions if you have multiple JDKs installed and your PATH happens to resolve to different ones for the runtime vs the compiler — a real (if uncommon) source of confusing bugs, so it's worth checking both when something feels off.
+
+One more thing worth knowing as you learn: since Java 9, a new version is released every six months, but only some versions are 'LTS' (Long-Term Support) — 8, 11, 17, 21, and 25 are LTS releases; production systems may remain on older LTS versions for compatibility, while JDK 25 is the current LTS baseline, since they get years of security patches. As a learner, JDK 25 is a sensible LTS baseline for new study material. JDK 26 is the current feature release, so version-specific examples should state their required Java version explicitly.`
+          },
+          {
+            title: "How it works",
+            content: `The JDK is the correct starting point for development because it contains the tools required to compile Java source code as well as the runtime needed to execute programs. The \`java\` command launches a Java application, while \`javac\` compiles source files. Keeping these roles distinct helps when diagnosing setup problems: a working runtime does not necessarily mean the compiler is available.
+
+Environment configuration matters because command-line tools are normally discovered through \`PATH\`. \`JAVA_HOME\` is commonly used by development tools and build systems to identify the JDK installation. If the terminal reports that a command is not recognized, the first checks should be the installed JDK location, the environment variables, and whether the terminal was restarted after a configuration change.
+
+Version checking is more than a one-time installation test. Java projects often depend on a particular language level and runtime behavior, so knowing the exact JDK version is important when reproducing builds, investigating compiler errors, or matching a production environment.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+# Terminal commands to verify your installation
+java -version
+javac -version
+# Check where JAVA_HOME points
+echo $JAVA_HOME     # macOS/Linux
+echo %JAVA_HOME%    # Windows
+\`\`\``
+          },
+          {
+            title: "Installation reasoning",
+            content: `Use the JDK for development because javac and other development tools are part of the kit. The runtime launcher is only one piece of the toolchain. In a team environment, the important property is reproducibility: the JDK used locally, by CI, and by production tooling should be explicit rather than whichever executable happens to appear first on PATH.
+
+When a machine has multiple JDKs, inspect both the version and executable location. A version command can tell you what was selected, but PATH ordering and IDE/build-tool configuration can still point at another JDK.`
+          },
+          {
+            title: "Troubleshooting checklist",
+            content: `If \`java -version\` works but \`javac -version\` fails, suspect that a runtime is available while the JDK compiler is not on PATH. If both work but a build uses another version, inspect the IDE's configured JDK, Maven/Gradle toolchain settings, environment variables, and CI configuration. On Windows, remember that an already-open terminal may not see newly changed environment variables until it is restarted.`
+          },
+          {
+            title: "Interview drill",
+            content: `Question: "Why do we care about the exact Java version?" A strong answer mentions language features, compiler behavior, bytecode compatibility, library support, security updates, and runtime behavior. For production work, "it works on my machine" is not enough; the build should make the intended Java version explicit.`
+          }
+        ]
+      },
+      {
+        title: "Java source code compilation and execution",
+        slug: "java-source-code-compilation-and-execution",
+        description: "Trace a Java program from source text to bytecode and then through class loading, linking, initialization, interpretation, and JIT compilation. The goal is to understand where compile-time errors stop the process, where runtime errors occur, and why the same bytecode can run on different operating systems.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "The execution pipeline is easier to reason about when separated into stages. `javac` parses source code, performs type checking and other compile-time checks, and produces JVM bytecode. At runtime, the JVM locates classes, loads and verifies them, resolves required symbolic references as needed, initializes classes when their initialization rules require it, and executes bytecode. Frequently executed code may be compiled by the JIT into optimized native machine code.\n\nThis explains several common interview distinctions: a compile-time error means the source violates language/type rules before execution; an exception usually occurs during execution; and a JVM can optimize code without changing the Java language contract. The `.class` file is therefore not “native code”; it is an intermediate representation for the JVM."
+          },
+          {
+            title: "What it means",
+            content: `Understanding what happens between writing a .java file and seeing output on screen is the foundation for understanding almost every other Java concept. There are three distinct stages between your source code and a running program, and each one matters for different reasons. Stage 1 — Compilation.
+
+Running \`javac HelloWorld.java\` invokes the Java compiler. It checks your code for syntax errors and type errors, then — if everything is valid — produces a \`.class\` file. This file doesn't contain native machine code; it contains bytecode, a platform-neutral set of instructions designed for the JVM, not for any specific CPU.
+
+Stage 2 — Class loading. When you run \`java HelloWorld\`, the JVM's class loader finds the \`.class\` file and loads it into memory. Before executing anything, it runs the bytecode through a verifier that checks the code is safe — no illegal type casts, no corrupted stack operations, nothing that could crash the JVM or violate memory safety.
+
+This verification step is part of why Java is considered a 'safe' language to run untrusted code in, historically (think: old Java applets). Stage 3 — Execution. The JVM's execution engine starts running the bytecode.
+
+Initially it interprets instructions one at a time, which is straightforward but relatively slow. For code that runs frequently — a 'hot' method called thousands of times — the JIT (Just-In-Time) compiler kicks in and compiles that specific method directly into native machine code, caching it for reuse. This is why long-running Java applications (like a web server) often get measurably faster after running for a little while — the JIT has had time to identify and optimize the hot paths.
+
+The takeaway: this two-stage design (compile to portable bytecode, then JIT-compile hot code to native instructions at runtime) is what gives Java both 'runs anywhere' portability and genuinely competitive runtime performance.`
+          },
+          {
+            title: "How it works",
+            content: `Java separates compilation from execution. A source file such as \`HelloWorld.java\` contains human-readable Java code. \`javac\` parses the source, performs compile-time checks, and produces bytecode in a class file. The \`java\` launcher then starts the JVM and asks it to load the required class and invoke the entry point.
+
+This separation explains why a source-code change normally requires another compilation before the changed behavior can be observed. It also explains why a compiler error and a runtime exception are different categories of problems. A compiler error prevents valid bytecode from being produced, while a runtime exception occurs after execution has already started.
+
+In a larger application there may be many compiled classes and dependencies rather than one class file. The JVM uses the classpath or module system to locate those classes. Understanding this basic pipeline makes later topics such as packages, class loading, JAR files, and build tools much easier to understand.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// HelloWorld.java
+public class HelloWorld {
+    public static void main(String[] args) {
+        System.out.println("Hello, World!");
+    }
+}
+// Step 1: javac HelloWorld.java         -> creates HelloWorld.class (bytecode)
+// Step 2 & 3: java HelloWorld           -> JVM loads, verifies, and executes the bytecode
+\`\`\``
+          },
+          {
+            title: "Execution pipeline",
+            content: `A useful mental model is: source → compiler checks → class file → class loading/linking → initialization → execution → runtime optimization. Compilation catches source-level and type-system problems before execution. The JVM then works with class files, resolves required types, and invokes the requested entry point. During execution, frequently executed code may be optimized by the runtime.
+
+Do not describe every Java program as "interpreted." Modern JVMs can interpret bytecode and compile hot code to native instructions, with optimization decisions made dynamically.`
+          },
+          {
+            title: "Failure boundaries",
+            content: `A syntax error or type error prevents successful compilation. A \`ClassNotFoundException\` or linkage problem occurs later when classes are loaded or resolved. An exception such as \`NullPointerException\` occurs during program execution. Separating these phases makes debugging much faster because you know which evidence to inspect first.`
+          },
+          {
+            title: "Interview trap",
+            content: `Question: "Does javac compile Java directly into machine code?" Usually no. It produces class files containing JVM bytecode. The JVM may later interpret bytecode and/or JIT-compile hot code to native instructions. This distinction explains both portability and runtime optimization.`
+          },
+          {
+            title: "Senior-level reasoning",
+            content: `Think of execution as a lifecycle rather than a single compile/run step: source is compiled into class files, classes are loaded and linked, initialization occurs, and bytecode executes under the JVM. Runtime compilation can optimize hot paths. When debugging, first identify the failing phase; a compiler diagnostic, class-loading/linkage failure, and application exception require different evidence.`
+          }
+        ]
+      },
+      {
+        title: "Java program structure",
+        slug: "java-program-structure",
+        description: "Learn how a Java source file is organized and how packages, imports, classes, methods, fields, constructors, and blocks fit together. More importantly, understand which parts affect compilation, which parts affect object behavior, and which parts are simply organizational conventions.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A Java program is a composition of declarations, types, methods, statements, expressions, and blocks. Braces define lexical structure, while the compiler uses the declared types and scopes to determine whether names and operations are valid. A method body can contain local variables and control flow, but a class-level declaration cannot simply appear where a statement is expected.\n\nUnderstanding structure helps explain errors such as “illegal start of expression” or “cannot find symbol.” These messages are often symptoms of an earlier missing brace, incorrect declaration location, or misspelled identifier. Read compiler errors from the first meaningful error rather than treating every later error as independent."
+          },
+          {
+            title: "What it means",
+            content: `Every Java source file follows a predictable structure — learning the rules the compiler enforces will save you from confusing errors later. A Java file has a required order: an optional \`package\` declaration comes first (declaring which package this file's classes belong to), then any number of \`import\` statements (bringing in classes from other packages), and then your actual class/interface/enum/record declarations. You can define multiple top-level types in a single file, but only one of them can be \`public\`.
+
+And if there is a public type in the file, the file name must exactly match that type's name, including capitalization — \`public class Main\` must live in a file named \`Main.java\`, or the compiler will reject it. This isn't just a style convention; it's a hard rule the compiler checks. Inside a class, you'll typically see fields (the data each object holds), constructors (special methods that set up a new object), regular methods (behavior), and sometimes nested classes or initializer blocks.
+
+The \`main\` method is the conventional starting point of a program — it's the method the JVM looks for and calls first — but not every class needs one; only the class you actually launch with \`java ClassName\` needs a \`main\` method. As a modern convenience: since Java 11, you can skip the separate compile step entirely for quick single-file programs and just run \`java HelloWorld.java\` directly — the JVM compiles it in memory and runs it immediately. This is great for learning and quick scripts, though real projects still use a proper build process.`
+          },
+          {
+            title: "How it works",
+            content: `A Java source file is organized into declarations that the compiler can understand: an optional package declaration, import declarations, type declarations such as classes, and members inside those types. The braces define the boundaries of classes, methods, constructors, and control-flow blocks. Learning this structure prevents the common beginner mistake of treating Java as a script where statements can simply appear anywhere in the file.
+
+For a basic executable program, one class contains a \`main\` method. The method body contains the statements that should run when the program starts. Other methods can then be called from that entry point, allowing a program to grow without putting every instruction into one large method.
+
+The structure also has a direct relationship with visibility and organization. A public top-level class normally determines the expected source-file name, packages determine the class's namespace, and imports make other types easier to reference. These rules are not cosmetic; the compiler uses them to resolve names and validate the program.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+package com.example.app;
+import java.util.List;
+public class Main {                  // must match filename: Main.java
+    private int counter;
+    public Main() {
+        this.counter = 0;
+    }
+    public static void main(String[] args) {
+        System.out.println("App started");
+    }
+}
+class Helper {                        // non-public, allowed in the same file
+
+}
+\`\`\``
+          },
+          {
+            title: "Compiler-oriented structure",
+            content: `A source file is not an arbitrary script. Package declarations, imports, and top-level type declarations follow language rules. A public top-level type normally determines the expected file name. Members such as fields, constructors, and methods then form the implementation of that type.
+
+Modern Java also has newer entry-point conveniences in recent releases, but the conventional \`public static void main(String[] args)\` form remains important for compatibility and interviews.`
+          },
+          {
+            title: "Common failure modes",
+            content: `Typical errors include placing a package declaration after an import, mismatching a public class and file name, using a type without the required import or qualification, and assuming every class needs a \`main\` method. A library/domain class generally does not need its own program entry point.`
+          },
+          {
+            title: "Interview drill",
+            content: `Explain why \`package\` appears before \`import\`. Package membership is part of the source declaration and establishes the namespace before imports are processed. Then explain that imports shorten names; they do not copy classes into the current package.`
+          }
+        ]
+      },
+      {
+        title: "Keywords and identifiers",
+        slug: "keywords-and-identifiers",
+        description: "Java's keywords define the language grammar, while identifiers give names to program elements. Learn the naming and lexical rules that the compiler enforces, along with the practical conventions that make a codebase easier to read and maintain.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Keywords are reserved by the Java language, so they cannot be used as ordinary identifiers. Identifiers name program elements such as classes, methods, variables, and packages. Java is case-sensitive, so `count`, `Count`, and `COUNT` are different names even though using such names interchangeably is a readability problem.\n\nNaming rules are separate from naming conventions. The compiler determines whether a name is legal; conventions determine whether other developers can understand it quickly. A legal identifier can still be a poor API name. Prefer names that communicate role and intent, especially for public methods and domain objects."
+          },
+          {
+            title: "What it means",
+            content: `Identifiers are the names you choose for variables, methods, and classes — but Java has strict rules about what makes a name valid. An identifier is any name you give to a variable, method, class, or package. Java's rules are: it must start with a letter, underscore (_), or dollar sign ($) — never a digit.
+
+After that first character, it can contain letters, digits, underscores, and dollar signs in any combination. Identifiers are case-sensitive, so \`total\` and \`Total\` are two completely different names. And an identifier can never be exactly the same as a reserved keyword.
+
+It's worth learning the difference between 'keywords' and 'reserved words,' because it explains some odd edge cases you might run into. Words like \`class\`, \`if\`, \`public\`, and \`static\` are true keywords with fixed syntactic meaning. But \`true\`, \`false\`, and \`null\` are technically 'reserved literals' rather than keywords in the formal language spec — practically, this distinction rarely matters, since you still can't use any of them as a variable name either way.
+
+A more genuinely useful edge case to know: \`var\` (introduced in Java 10) is a 'reserved type name,' not a keyword. That means you can't create a class named \`var\`, but you actually can still use \`var\` as the name of a regular variable in most situations — a quirk that surprises a lot of learners. Style-wise, while \`$\` and \`_\` are technically legal in identifiers, both are discouraged in everyday code: the compiler uses \`$\` internally for naming inner classes, and a single underscore \`_\` alone has actually been made illegal as an identifier since Java 9 (it's reserved for future language features).`
+          },
+          {
+            title: "How it works",
+            content: `Keywords are reserved words that have predefined meaning in the Java language, such as \`class\`, \`if\`, \`static\`, and \`return\`. They cannot be reused as ordinary names because the compiler needs to recognize them as part of the language grammar. Identifiers are the names developers choose for classes, methods, variables, packages, and other program elements.
+
+The important distinction is that an identifier is not meaningful merely because of its spelling. Its meaning comes from the declaration and scope in which it appears. For example, the identifier \`count\` can be a local variable in one method and an unrelated field in another class. The compiler resolves each use according to Java's naming and scope rules.
+
+Good naming is therefore part of correctness and maintainability, not just style. Names should communicate the role of a value or operation, while avoiding names that are easily confused with keywords or with unrelated concepts. Consistent naming becomes especially valuable once classes contain many fields and methods.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int totalCount;          // valid identifier
+int _tempValue;           // valid but discouraged style
+int 2ndPlace;             // ILLEGAL - starts with a digit
+int class;                // ILLEGAL - 'class' is a reserved keyword
+var var = 5;          // legal! 'var' is a reserved TYPE name, not a keyword
+System.out.println(var);
+\`\`\``
+          },
+          {
+            title: "Naming rules that matter",
+            content: `Identifiers are constrained by Java's lexical rules and Unicode support, while keywords and restricted type names reserve specific syntax. The practical rule is simple: choose names that are valid, unambiguous, and conventional. Avoid technically legal names such as \`$value\` or \`_temp\` when ordinary descriptive names are clearer.`
+          },
+          {
+            title: "Edge cases",
+            content: `Java identifiers are case-sensitive. A name that differs only by case can compile but become confusing on review. \`var\` is a restricted type name introduced with local variable type inference; it is not equivalent to an ordinary keyword in every grammatical position. A single \`_\` cannot be used as an identifier in modern Java.`
+          },
+          {
+            title: "Interview trap",
+            content: `If asked whether \`var\` means Java became dynamically typed, the answer is no. The compiler still determines a static type at compile time; \`var\` only asks the compiler to infer that local variable's type from its initializer.`
+          }
+        ]
+      },
+      {
+        title: "Variables and constants",
+        slug: "variables-and-constants",
+        description: "A variable is not simply a box containing a value: its type determines what values and operations are legal, while scope and lifetime determine where that state can be accessed. Learn how local variables, fields, parameters, and `final` variables behave differently and why those differences matter in design.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A variable is a named storage location whose value can change; a `final` variable cannot be assigned a new value after its required initialization. The distinction between “constant” and “immutable object” is important: `final` prevents reassignment of a reference, but it does not automatically make the referenced object immutable.\n\nScope and lifetime also matter. A local variable exists within its method/block scope, an instance field belongs to an object, and a static field belongs to the class rather than an individual instance. Choosing the right kind of state is a design decision because it affects coupling, concurrency, testing, and object ownership."
+          },
+          {
+            title: "What it means",
+            content: `Java has four distinct kinds of variables that behave differently in terms of scope, default values, and storage — knowing which is which prevents a lot of early confusion. The four categories are: local variables (declared inside a method or block — these live temporarily while that method runs, and Java requires you to give them a value before using them, since they get no automatic default), instance variables (fields that belong to a specific object — every object gets its own copy, and Java automatically initializes them to a default value like 0, false, or null if you don't set one), static variables (fields that belong to the class itself rather than any individual object — there's exactly one shared copy no matter how many objects you create), and method parameters (which behave like local variables scoped to that one method call).
+
+For constants — values that should never change — Java doesn't have a dedicated \`const\` keyword like some languages. Instead, the idiomatic pattern is combining two keywords: \`static\` (one shared copy) and \`final\` (can only be assigned once). By convention, constant names are written in UPPER_SNAKE_CASE: \`public static final int MAX_RETRIES = 3;\` An important nuance to internalize early: \`final\` only prevents *reassigning the variable itself*.
+
+If that variable holds a reference to a mutable object, like a \`List\`, the object itself can still be changed — you just can't point the variable at a *different* object afterward. This is a subtlety that trips up a lot of learners who assume \`final\` makes everything about the object immutable, when it only locks the reference.`
+          },
+          {
+            title: "How it works",
+            content: `A variable is a named storage location whose value can change during program execution. Java requires a variable to have a declared or inferred type, which tells the compiler what kinds of values can be assigned and what operations are valid. Local variables, instance fields, and static fields are all variables, but their lifetime and ownership are different.
+
+A \`final\` variable introduces a different rule: after the variable has been assigned, it cannot be assigned a new value. For primitive types, that means the primitive value cannot change. For a reference variable, \`final\` prevents the reference from being redirected to another object; it does not automatically make the referenced object immutable. This distinction is one of the most important details to understand when discussing constants.
+
+A conventional constant is commonly expressed with \`static final\` because one immutable reference or value is shared at the class level. Initialization must follow Java's definite-assignment rules, and a local variable must be assigned before it is read. These rules allow the compiler to detect many initialization mistakes before execution.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+public class Config {
+    public static final int MAX_RETRIES = 3; // constant: shared + unchangeable
+    private int instanceCounter;              // instance variable, defaults to 0
+    private static int globalCounter;          // static variable, shared by all objects
+    public void process() {
+        int localVar = 10; // local variable - MUST be initialized before use
+    }
+}
+final List<String> names = new ArrayList<>();
+names.add("Ana");   // fine - the LIST is still mutable
+// names = new ArrayList<>(); // ILLEGAL - can't reassign a final variable
+\`\`\``
+          },
+          {
+            title: "Lifetime and ownership",
+            content: `Local variables belong to a method or block scope and must be definitely assigned before use. Instance fields belong to an object and receive default values when the object is initialized. Static fields belong to the class and are shared across instances. Method parameters are local to the invocation.
+
+This distinction is more useful than memorizing four labels: ask who owns the value, how long it exists, and which code can access it.`
+          },
+          {
+            title: "Final does not mean immutable",
+            content: `\`final\` freezes a variable's assignment after initialization; it does not recursively freeze the object referenced by that variable. A \`final List<String>\` can still have elements added unless the list itself is made unmodifiable. For true immutability, the object's own state and exposed operations must prevent mutation.`
+          },
+          {
+            title: "Production and interview angle",
+            content: `Prefer constants for stable configuration values that are genuinely part of program semantics. Avoid turning every configurable runtime value into a compile-time constant. In production applications, environment-specific settings usually belong in configuration rather than hard-coded \`static final\` values.`
+          },
+          {
+            title: "Design judgment",
+            content: `Ask three questions when choosing a variable kind: who owns this state, how long should it live, and who should be able to change it? That reasoning separates local state, instance state, class-level state, and constants and exposes why mutable global state can create coupling and concurrency problems.`
+          }
+        ]
+      },
+      {
+        title: "Primitive data types",
+        slug: "primitive-data-types",
+        description: "Java's eight primitive types are deliberately small building blocks with defined ranges, representations, and arithmetic rules. Learn how integer promotion, floating-point precision, overflow, and `char` semantics affect real expressions instead of memorizing a table of types.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Java primitives represent values directly rather than references to ordinary objects. The eight primitive types are `byte`, `short`, `int`, `long`, `float`, `double`, `char`, and `boolean`. Numeric types have defined ranges and arithmetic rules; they are not arbitrary “numbers.” Integer overflow wraps according to two's-complement arithmetic for the integral types, while floating-point arithmetic follows IEEE 754 behavior and can represent values such as positive/negative infinity and NaN.\n\nA subtle point is that arithmetic may promote smaller integer types to `int`. Also, decimal literals such as `1.0` are `double` by default, while `1L` denotes a `long`. For financial calculations, binary floating point is often the wrong abstraction; decimal arithmetic such as `BigDecimal` is commonly preferable when exact decimal semantics are required."
+          },
+          {
+            title: "What it means",
+            content: `Java has exactly eight primitive types, and unlike many languages, their sizes are fixed by the language spec rather than depending on the machine you're running on. The eight primitives split into a few groups. Whole numbers: \`byte\` (8 bits, holds -128 to 127), \`short\` (16 bits), \`int\` (32 bits — the default and most commonly used integer type), and \`long\` (64 bits, for very large numbers — literals need an \`L\` suffix, like \`10000000000L\`).
+
+Decimal numbers: \`float\` (32 bits, needs an \`f\` suffix, rarely used today because of limited precision) and \`double\` (64 bits — the default choice for decimals). And two more: \`char\` (16 bits, representing a single character as a UTF-16 code unit) and \`boolean\` (true or false). Because these sizes are fixed by the Java specification — not left up to the platform, the way \`int\` in C can vary — a Java program behaves identically on every machine when it comes to how numbers overflow or wrap around.
+
+This consistency is part of the 'write once, run anywhere' promise. A detail worth learning early: default values only apply to *fields* (instance or static variables) — numeric fields default to 0, \`boolean\` defaults to \`false\`, \`char\` defaults to a null character. Local variables inside a method get no automatic default at all; you must assign them a value before you can use them, or the compiler will refuse to compile.
+
+One more useful fact: \`char\` in Java is unsigned, while \`byte\` and \`short\` are signed. When you do arithmetic mixing these smaller types, Java automatically promotes them to \`int\` first — this is why adding two \`byte\` values and assigning the result back into a \`byte\` variable requires an explicit cast, which we'll cover in the type-casting lesson.`
+          },
+          {
+            title: "How it works",
+            content: `Java's primitive types represent basic values directly rather than object instances. The numeric primitives include integer types such as \`byte\`, \`short\`, \`int\`, and \`long\`, floating-point types \`float\` and \`double\`, plus \`char\` for a UTF-16 code unit and \`boolean\` for logical values. Each type has defined rules for storage size, range, promotion, and operations.
+
+Choosing a primitive is not only about how much memory it uses. The type also affects arithmetic behavior. For example, integer division discards the fractional part, and smaller integer types are often promoted to \`int\` during expressions. Floating-point arithmetic follows different precision and rounding rules, so it should not be treated as exact decimal arithmetic.
+
+Java can also represent primitive values through wrapper classes such as \`Integer\` and \`Double\` when an object is required. That distinction becomes important with collections and generic types, which work with reference types rather than primitives.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+byte age = 25;
+short year = 2026;
+int population = 8_000_000;
+long worldPopulation = 8_000_000_000L; // L suffix required for large values
+float price = 19.99f;                   // f suffix required
+double pi = 3.14159265358979;
+char grade = 'A';
+boolean isActive = true;
+\`\`\``
+          },
+          {
+            title: "Practice",
+            content: `What happens if you write \`int total = 3_000_000_000;\`? Try it and see what error the compiler gives, then figure out which type would actually hold that value.`
+          },
+          {
+            title: "Choosing a primitive",
+            content: `Use \`int\` for ordinary integer arithmetic unless the domain requires a different range or representation. Use \`long\` when the domain can exceed \`int\` range, such as large counters or identifiers. Use \`double\` for general binary floating-point calculations, but do not assume it represents decimal money exactly. Use \`BigDecimal\` when exact decimal arithmetic is a domain requirement.`
+          },
+          {
+            title: "Arithmetic edge cases",
+            content: `Smaller integer operands are promoted during many arithmetic expressions, which is why \`byte + byte\` produces an \`int\`. Integer overflow is defined wraparound behavior rather than an automatic exception. Floating-point calculations introduce rounding and special values such as NaN and infinities. These are semantic properties, not random bugs.`
+          },
+          {
+            title: "Interview drill",
+            content: `Question: "Why can't \`byte c = a + b\` compile when both variables are bytes?" Because binary numeric promotion converts those operands to \`int\` before addition. The result is therefore an \`int\`, and assigning it back to \`byte\` would be a narrowing conversion.`
+          },
+          {
+            title: "Senior-level reasoning",
+            content: `Type selection should follow domain semantics. \`int\` is the normal integer choice, \`long\` handles a wider integer range, and floating-point types represent approximate binary real values. If a calculation requires exact decimal semantics, use an appropriate decimal representation and define rounding rules.`
+          }
+        ]
+      },
+      {
+        title: "Reference types",
+        slug: "reference-types",
+        description: "A reference variable stores a value that identifies an object or represents `null`; it does not contain the object's state itself. Build a precise mental model for identity, aliases, mutation, `==`, `.equals()`, `null`, and how multiple references can observe the same object.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A reference variable does not contain the object itself; its value identifies an object or is `null`. Multiple reference variables can hold references to the same object, creating aliasing. If that object is mutable, changing it through one reference can be observed through another reference. Reassigning one reference, however, does not reassign the other reference.\n\nThis model explains several Java behaviors at once: `==` on references compares whether two references identify the same object, `.equals()` can compare logical equality when a class defines it appropriately, and dereferencing `null` causes a `NullPointerException`. Garbage collection is also easier to understand from this model: an object can become eligible for collection when it is no longer reachable from relevant live references."
+          },
+          {
+            title: "What it means",
+            content: `Unlike primitives, a reference-type variable doesn't hold the actual object — it holds a pointer to where that object lives on the heap. This single idea explains a lot of Java's behavior. Classes, interfaces, arrays, and enums are all reference types.
+
+When you write \`Point p1 = new Point();\`, \`p1\` doesn't contain the Point object directly — it contains a reference value that the JVM uses to locate the object; Java code should not treat that reference as a C-style raw memory address. This matters enormously when you assign one reference variable to another. \`Point p2 = p1;\` copies the reference, not the object — now both \`p1\` and \`p2\` point to the exact same object in memory. If you change a field through \`p2\`, and then look at \`p1\`, you'll see the same change, because there was only ever one object; you just have two names pointing at it.
+
+This is completely different from primitives, where assignment copies the actual value. This also explains one of the most common early confusions in Java: the difference between \`==\` and \`.equals()\`. For reference types, \`==\` checks whether two variables point to the exact same object in memory (reference/identity equality) — not whether the objects have the same content.
+
+To compare content, you use \`.equals()\`, which a class can override to define what 'equal' means for its own data. This is exactly why two separately-created \`String\` objects with identical text can be \`==\`-unequal but \`.equals()\`-equal. Finally, a reference variable can hold the special value \`null\`, meaning it points to nothing at all.
+
+Calling a method or accessing a field through a \`null\` reference throws a \`NullPointerException\` at runtime — one of the most frequently encountered exceptions in real Java programs, and a big part of why defensive null-checking (and, in modern Java, \`Optional\`) exists.`
+          },
+          {
+            title: "How it works",
+            content: `A reference variable does not contain the object's fields directly. Instead, it holds a reference value that can be used to locate an object managed by the JVM. This is why two variables can refer to the same object: copying the reference creates another reference to the same object rather than a duplicate object.
+
+The distinction between a reference and an object explains several common behaviors. Assigning one reference variable to another does not clone the object. Mutating the object through either reference can therefore be visible through the other reference. Reassigning one variable, however, changes only that variable's reference and does not automatically change the other variable.
+
+A reference can also be \`null\`, meaning it does not currently refer to an object. Attempting to invoke an instance method or access an instance field through \`null\` causes a \`NullPointerException\`. The right mental model is therefore 'a typed reference to an object,' not 'the object itself.'`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+class Point { int x, y; }
+Point p1 = new Point();
+p1.x = 5;
+Point p2 = p1;      // copies the REFERENCE, not the object
+p2.x = 10;
+System.out.println(p1.x); // prints 10 - p1 and p2 point to the same object!
+String a = new String("hi");
+String b = new String("hi");
+System.out.println(a == b);            // false - two different objects
+System.out.println(a.equals(b));       // true - same content
+\`\`\``
+          },
+          {
+            title: "Reference semantics",
+            content: `Assignment of a reference copies the reference value, not the object. If two variables refer to the same mutable object, a mutation through one reference is observable through the other. Reassigning one variable is different: it changes only that variable's reference.
+
+This is the foundation for understanding aliasing, defensive copying, \`==\`, \`.equals()\`, and many collection bugs.`
+          },
+          {
+            title: "Null and equality",
+            content: `\`null\` means a reference currently refers to no object. Dereferencing it causes \`NullPointerException\`. For object comparisons, \`==\` tests identity while \`.equals()\` tests the equality contract implemented by the class. A robust implementation must also respect the \`equals\` contract and, when objects are used as hash keys, the corresponding \`hashCode\` contract.`
+          },
+          {
+            title: "Production scenario",
+            content: `Suppose a service passes a mutable \`CustomerProfile\` object to two components. If one component modifies it, the other may observe the change unexpectedly. Defensive copying, immutable value objects, or clearly documented ownership can prevent this class of aliasing problem.`
+          },
+          {
+            title: "Senior-level reasoning",
+            content: `The most useful mental model is aliasing: a reference is a value that can identify an object, and copying it creates another alias. Mutation through either alias can be visible through the other. Good API design therefore considers ownership, mutability, defensive copying, immutability, and equality contracts rather than treating references as raw memory addresses.`
+          }
+        ]
+      },
+      {
+        title: "Type casting",
+        slug: "type-casting",
+        description: "Casting is a promise about how Java should view a value or reference, but the meaning depends on whether the conversion is primitive or reference-based. Learn what the compiler can prove, what the JVM must check at runtime, and why a cast that compiles can still fail with `ClassCastException`.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Casting is an explicit instruction to view a value as another compatible type; it does not magically transform every object into any requested type. Primitive casts can convert numeric values and may lose information, while reference casts rely on the actual runtime type of the object and can fail with `ClassCastException`.\n\nFor example, a `Dog` object can be referenced through an `Animal` variable because `Dog` is an `Animal`. Casting that reference back to `Dog` is safe only when the actual object really is a `Dog`. When possible, design polymorphic code around interfaces or common supertypes instead of scattering casts throughout business logic."
+          },
+          {
+            title: "What it means",
+            content: `Casting means treating a value as a different type — but the mechanics are quite different depending on whether you're casting a primitive or an object. For primitives, casting converts the actual numeric value from one representation to another. \`(int) 3.99\` produces \`3\` — it truncates the decimal, it does not round. Casting a larger type down to a smaller one, like \`long\` to \`int\`, can silently lose information if the value doesn't fit — this is a real bug source when working with very large numbers, because there's no automatic error; the value just quietly wraps around to something unexpected.
+
+For object references, casting works completely differently: it doesn't convert any data at all. It's really an assertion — you're telling the compiler 'trust me, I know this object is actually of this more specific type.' \`Object o = "hello"; String s = (String) o;\` works because \`o\` genuinely does refer to a String underneath. But if the object isn't actually compatible with the type you're casting to, the JVM throws a \`ClassCastException\` at runtime — the compiler can't always catch this in advance, because the real type of an object is only fully known while the program is running.
+
+The safe pattern before doing a risky downcast is to check first with \`instanceof\`. Modern Java (16+) even lets you combine the check and the cast in one step with pattern-matching \`instanceof\`, which both tests the type and gives you a ready-to-use variable of that type if the check passes — no separate explicit cast needed afterward.`
+          },
+          {
+            title: "How it works",
+            content: `Casting tells the compiler to treat a value as another compatible type according to Java's conversion rules. Some casts are widening conversions and are performed automatically because the target type can represent all values of the source type. Other casts are narrowing conversions and require explicit syntax because information can be lost.
+
+Casting references follows a different idea. A reference can be upcast to a superclass or interface type without an explicit cast because the object is still an instance of that broader type. A downcast to a more specific type requires an explicit cast and is only valid when the actual object is compatible with the target type. An invalid runtime downcast results in \`ClassCastException\`.
+
+The safest way to reason about a cast is to ask two questions: what is the compile-time type of the expression, and what is the actual runtime type of the value? The compiler primarily uses the first question for static checking, while runtime type compatibility matters for reference downcasts.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Primitive casting
+double price = 9.99;
+int whole = (int) price;         // 9 - truncates, doesn't round
+// Reference casting
+Object o = "hello";
+if (o instanceof String s) {   // pattern-matching instanceof (Java 16+)
+    System.out.println(s.length()); // 's' is already a String here, no separate cast needed
+}
+Object number = Integer.valueOf(5);
+// String bad = (String) number; // compiles fine, but THROWS ClassCastException at runtime
+\`\`\``
+          },
+          {
+            title: "Two different kinds of casting",
+            content: `Primitive casts convert values according to numeric conversion rules. Reference casts do not transform the object; they change the type through which the compiler allows the object to be viewed. The runtime still checks whether the actual object is compatible with a reference downcast.`
+          },
+          {
+            title: "Safer design",
+            content: `Repeated downcasts often signal that a polymorphic design can be improved. Prefer behavior through an interface or superclass when possible. When a type test is genuinely required, \`instanceof\` with pattern matching can make the check and narrowed variable explicit and reduce accidental casts.`
+          },
+          {
+            title: "Failure modes",
+            content: `Primitive narrowing can truncate or overflow. Reference downcasts can throw \`ClassCastException\`. A cast may also compile while still being a poor design choice because it hides a missing abstraction. Interviewers often care about that design judgment, not just whether you know the syntax.`
+          },
+          {
+            title: "Design judgment",
+            content: `A cast solves a type-view problem; it should not become the default mechanism for navigating an object model. Frequent downcasts deserve a design review because a stable interface, superclass contract, or polymorphic operation may express the intent more safely.`
+          }
+        ]
+      },
+      {
+        title: "Widening vs narrowing conversion",
+        slug: "widening-vs-narrowing-conversion",
+        description: "Widening and narrowing conversions are about whether Java can move a value into another type without the same kind of information-loss risk. Learn the rules for numeric promotion, explicit narrowing, precision loss, overflow, and why a wider type does not automatically mean a more accurate value.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Widening conversion moves a value into a type that can represent the source domain more broadly under Java's conversion rules, while narrowing conversion requires an explicit cast because information may be lost. `int` to `long` is a common widening conversion; `long` to `int` is narrowing.\n\n“Wider” does not mean “always more accurate.” Converting a `long` to `float`, for example, can lose integer precision even though the conversion is permitted without an explicit cast. Always reason about the destination type's representation and range rather than relying only on the word widening."
+          },
+          {
+            title: "What it means",
+            content: `Java automatically converts between compatible types in some cases (widening) but requires you to explicitly ask for it in others (narrowing) — understanding why clarifies a lot of confusing compiler errors. Widening conversion moves a value into a type that can hold a larger range of values — for example \`byte -> int -> long -> double\`. Because a larger type can always represent everything the smaller type could, Java performs this conversion automatically, with no cast required. (One caveat: converting a very large \`long\` or \`int\` to \`float\`/\`double\` can lose some precision for the exact digits, even though the overall magnitude fits — floating-point types trade exactness for range.) Narrowing conversion is the reverse — moving a value into a type with a smaller range, like \`double -> int\` or \`int -> byte\`.
+
+Since this can genuinely lose information (a decimal gets truncated, or a large number can overflow and wrap into something unexpected), Java refuses to do this automatically. You must write an explicit cast to acknowledge you understand the risk. Here's a nuance that confuses a lot of learners: \`byte smallNum = 100;\` compiles just fine even though \`100\` is technically an \`int\` literal — because the compiler can look at that specific constant and verify at compile time that it safely fits inside a \`byte\`.
+
+But if you write \`int x = 100; byte smallNum = x;\`, that fails to compile without an explicit cast — even though \`x\` happens to hold the exact same value — because the compiler only tracks that \`x\` is declared as an \`int\`, not what specific value it currently holds. This connects to something you'll notice constantly in arithmetic: when you do math with \`byte\`, \`short\`, or \`char\` values, Java automatically promotes them to \`int\` first before performing the operation. That's why \`byte a = 5, b = 10; byte c = a + b;\` fails to compile — \`a + b\` actually produces an \`int\`, and assigning an \`int\` back into a \`byte\` variable is a narrowing conversion that needs an explicit cast.`
+          },
+          {
+            title: "How it works",
+            content: `Widening conversion moves a value to a type with a broader representable range or compatible representation, such as \`int\` to \`long\`. Java can perform many primitive widening conversions automatically because the conversion is considered safe with respect to range. The target may still have a different representation, such as when an integer becomes a floating-point value, so 'widening' should not be confused with 'perfectly exact in every mathematical sense.'
+
+Narrowing conversion moves toward a type with less range or precision, such as \`long\` to \`int\`. Java requires an explicit cast for these cases because the result may overflow, truncate, or lose precision. The compiler makes the programmer acknowledge that trade-off rather than silently accepting it.
+
+These rules are especially important inside expressions. Binary numeric promotion can convert operands before an operation is performed, and the final assignment may then require another conversion. Understanding the conversion chain is often more useful than memorizing isolated cast examples.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int i = 100;
+long l = i;           // widening - automatic, always safe
+double d = l;         // widening - automatic
+double price = 9.99;
+int whole = (int) price;      // narrowing - explicit cast required, loses .99
+byte fitsAtCompileTime = 100;        // OK - compiler verifies 100 fits in a byte
+byte b1 = 5, b2 = 10;
+// byte sum = b1 + b2;     // COMPILE ERROR - b1+b2 is an int
+byte sum = (byte) (b1 + b2); // fixed with an explicit cast
+\`\`\``
+          },
+          {
+            title: "Why Java distinguishes them",
+            content: `Widening conversions generally move to a representation that can accommodate the source value's range, so Java permits many of them automatically. Narrowing can lose range, precision, or fractional information, so the programmer must request it explicitly. However, widening to floating-point is not synonymous with exact preservation of every integer value.`
+          },
+          {
+            title: "Expression behavior",
+            content: `When arithmetic combines \`byte\`, \`short\`, and \`char\`, numeric promotion commonly lifts operands to \`int\`. The important debugging habit is to inspect the type of the intermediate expression, not only the declared types of its inputs.`
+          },
+          {
+            title: "Interview trap",
+            content: `\`byte b = 100\` can compile because the constant expression fits the target type. \`int x = 100; byte b = x\` does not, because the compiler cannot assume every possible future value of \`x\` fits. This is a useful example of compile-time constant analysis versus general variable conversion.`
+          }
+        ]
+      },
+      {
+        title: "Literals",
+        slug: "literals",
+        description: "Literals are the values written directly into Java source code, but their types are determined by language rules rather than by what the value might look like to a human. Learn integer, floating-point, character, string, boolean, `null`, binary/octal/hexadecimal, and underscore literal behavior.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A literal is a value written directly in source code, such as `42`, `3.14`, `'A'`, `true`, `null`, or a string literal. Literal syntax also controls type: an integer literal is normally an `int`, a decimal literal is normally a `double`, and suffixes such as `L` and `F` request other numeric types.\n\nLiteral rules matter when overload resolution or numeric conversion is involved. For example, a method overloaded for `int` and `long` can receive `10` as an `int` without conversion, while `10L` selects the `long` form. Underscores can improve readability in numeric literals, but they must follow Java's lexical placement rules."
+          },
+          {
+            title: "What it means",
+            content: `A literal is a fixed value written directly into your code — and Java offers more flexible ways to write numbers and text than most learners initially realize. Integer literals can be written in several bases: decimal is the default (\`42\`), hexadecimal starts with \`0x\` (\`0x2A\`), octal starts with a leading zero (\`052\`), and binary starts with \`0b\` (\`0b101010\`, added in Java 7). If a literal needs to be a \`long\`, you must append an \`L\` (uppercase is preferred over lowercase \`l\`, which looks too much like the digit \`1\`).
+
+Since Java 7, you can also insert underscores anywhere in the middle of a numeric literal purely for human readability — \`1_000_000\` is exactly the same value as \`1000000\`, just easier to read at a glance. Decimal literals default to \`double\`; if you specifically want a \`float\`, you need an \`f\` or \`F\` suffix (\`2.5f\`). Scientific notation works too: \`1.5e3\` means 1.5 × 10³.
+
+Character literals use single quotes and support escape sequences for special characters — \`'\n'\` for newline, \`'\t'\` for tab, and \`'\u0041'\` for a specific Unicode character by its code point. String literals use double quotes, and one modern feature worth knowing is the text block, introduced in Java 15, using triple double-quotes (\`"""\`). Text blocks let you write multi-line strings — like embedded JSON, SQL, or HTML — without needing to escape every quote and manually insert \`\n\` at every line break, which makes embedded structured text dramatically more readable.`
+          },
+          {
+            title: "How it works",
+            content: `A literal is a value written directly in source code rather than obtained from a variable or method call. Integer literals such as \`42\`, floating-point literals such as \`3.14\`, character literals such as \`'A'\`, string literals such as \`"hello"\`, boolean literals, and the \`null\` literal are all examples. The compiler gives each literal a type and applies context-specific conversion rules.
+
+Integer literals deserve special attention because an unsuffixed integer literal is normally treated as an \`int\` when it fits. Suffixes such as \`L\` can explicitly request a \`long\` literal, while \`F\` can mark a \`float\` literal. Hexadecimal, binary, and octal forms are also available for integer values.
+
+String literals are reference values and participate in Java's string pool behavior, while \`null\` represents the absence of an object reference and therefore cannot be used as a primitive value. These details matter when overload resolution, comparisons, and assignments depend on the exact literal type.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int hex = 0x1A;
+int oct = 012;
+int bin = 0b1010;
+long big = 10_000_000_000L;               // underscores for readability, L suffix required
+float f = 2.5f;
+double sci = 1.5e3;                       // 1500.0
+char unicodeChar = '\u0041';              // 'A'
+String json = """
+{
+    name: "Java"
+}
+""";
+\`\`\``
+          },
+          {
+            title: "Literal type matters",
+            content: `An unsuffixed integer literal is normally an \`int\` when representable, while \`L\` requests a \`long\`. Decimal floating-point literals default to \`double\`, and \`f\` requests \`float\`. Literal type can affect overload selection, assignment compatibility, and arithmetic promotion, so it is more than formatting.`
+          },
+          {
+            title: "Readability and correctness",
+            content: `Numeric separators such as \`1_000_000\` improve reviewability without changing the value. Be careful with octal literals: a leading zero changes the interpretation, so \`010\` is not decimal ten. Prefer separators and explicit bases when the representation carries meaning.`
+          },
+          {
+            title: "Interview drill",
+            content: `Ask: "Why does \`long x = 3_000_000_000\` fail without \`L\`?" The literal is first treated as an \`int\` candidate, and that value is outside the \`int\` range. Marking it as a long literal with \`3_000_000_000L\` makes the intended type explicit.`
+          }
+        ]
+      },
+      {
+        title: "Operators",
+        slug: "operators",
+        description: "Operators define how Java combines values, compares state, changes variables, and controls evaluation. Learn not only what each operator returns, but also precedence, promotion, short-circuiting, side effects, integer division, remainder, and the signed versus unsigned right-shift distinction.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Operators are not merely symbols for arithmetic; they define evaluation behavior, result types, conversions, and sometimes side effects. `&&` and `||` short-circuit, assignments change state, `++` changes a variable, and `+` can perform either numeric addition or string concatenation depending on its operands.\n\nFor difficult expressions, evaluate from the language rules rather than visual intuition. Ask what each operand's type is, whether evaluation is guaranteed, what conversion occurs, and whether an operation mutates state. In production code, splitting a complicated side-effect-heavy expression into named steps is often safer and easier to review."
+          },
+          {
+            title: "What it means",
+            content: `Java's operators cover arithmetic, comparisons, logic, and bit manipulation — and a few of them behave in ways that surprise people coming from other languages. The main groups are: arithmetic (\`+ - * / %\`), relational/comparison (\`== != < > <= >=\`), logical (\`&& || !\`), bitwise (\`& | ^ ~ << >> >>>\`), assignment (\`= += -=\` and similar shorthand), and the ternary operator (\`condition ? valueIfTrue : valueIfFalse\`). A few behaviors are worth memorizing early because they cause real bugs.
+
+First, dividing two integers truncates the result instead of rounding — \`7 / 2\` gives \`3\`, not \`3.5\`. To get a decimal answer, at least one operand needs to be a \`float\` or \`double\`. Second, the modulo operator (\`%\`) on negative numbers in Java follows the sign of the number being divided (the dividend) — so \`-7 % 2\` is \`-1\`, which surprises people expecting a purely positive remainder like in some other languages.
+
+Another crucial distinction: \`&&\` and \`||\` are 'short-circuiting' — if the left side of \`&&\` is already false, Java doesn't even bother evaluating the right side, since the overall result is already determined. This isn't just an optimization; it's a safety feature you'll rely on constantly, like in \`if (obj != null && obj.isValid())\` — the right side only runs if \`obj\` is confirmed non-null, avoiding a crash. The single-character versions \`&\` and \`|\`, when used on booleans, always evaluate both sides regardless, so they don't offer this protection.
+
+Finally, the two right-shift operators differ on negative numbers: \`>>\` preserves the sign bit (arithmetic shift), while \`>>>\` always fills with zeros (logical shift) — they produce identical results for positive numbers but diverge for negative ones.`
+          },
+          {
+            title: "How it works",
+            content: `Operators are the language constructs that combine values or change program state. Arithmetic operators perform numeric calculations, relational and equality operators produce boolean results, logical operators combine boolean conditions, assignment operators update variables, and unary operators work on a single operand. Java also provides bitwise and shift operators for integer-level operations and the conditional operator for compact value selection.
+
+The same symbol can behave differently depending on operand types. The \`+\` operator performs numeric addition for numeric operands but string concatenation when string operands participate in the expression. Likewise, \`&&\` and \`||\` use short-circuit evaluation, meaning the right-hand side may not execute when the left-hand side already determines the result.
+
+When an expression becomes complex, understanding both the operator's result type and its evaluation behavior is important. Increment operators, assignments, method calls, and object creation can have side effects, so an expression can be both a value-producing construct and a change to program state.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+System.out.println(7 / 2);          // 3 - integer division truncates
+System.out.println(7.0 / 2);        // 3.5 - one operand is a double
+System.out.println(-7 % 2);         // -1 - follows the sign of the dividend
+String s = null;
+if (s != null && s.length() > 0) {
+    // safe! short-circuiting means s.length() never runs if s is null
+}
+int negative = -8;
+System.out.println(negative >> 1); // -4 - sign-preserving shift
+System.out.println(negative >>> 1); // large positive number - zero-fill shift
+\`\`\``
+          },
+          {
+            title: "Practice",
+            content: `Predict the output of \`System.out.println(5 % -3);\` before running it, then check whether your prediction matches Java's actual behavior.`
+          },
+          {
+            title: "Operator families",
+            content: `Think of operators by the kind of state change or value production they perform: arithmetic, comparison, logical, bitwise, assignment, conditional, and type-related operators. The same symbol can have context-sensitive behavior; for example, \`+\` can mean numeric addition or string concatenation.`
+          },
+          {
+            title: "Short-circuiting",
+            content: `\`&&\` and \`||\` may skip evaluation of the right-hand operand. This is useful for guard conditions such as \`value != null && value.isValid()\`. The short-circuit is part of the operator's semantics, so placing a side effect on the skipped side can produce surprising behavior.`
+          },
+          {
+            title: "Interview trap",
+            content: `Do not claim \`&\` and \`&&\` are interchangeable for booleans. \`&\` evaluates both operands; \`&&\` can short-circuit. The difference matters when the second operand is expensive, stateful, or unsafe to evaluate without a guard.`
+          }
+        ]
+      },
+      {
+        title: "Operator precedence",
+        slug: "operator-precedence",
+        description: "Precedence determines how Java groups an expression before evaluation, but it does not replace understanding of evaluation order. Learn which operators bind more tightly, when associativity matters, and why parentheses are often the clearest way to make intent explicit.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Precedence determines how an expression is grouped when parentheses are absent. It is a parsing rule, not a statement about which operation “runs faster.” Associativity then determines grouping among operators at the same precedence level. Parentheses can make the intended grouping explicit and should be preferred when an expression would otherwise require mental parsing.\n\nA classic mistake is confusing `&&` with `&`, or assuming `a + b * c` evaluates `a + b` first. The compiler constructs an expression according to Java's grammar before runtime evaluation occurs. Good code uses precedence deliberately but does not make readers reverse-engineer clever expressions."
+          },
+          {
+            title: "What it means",
+            content: `When an expression mixes multiple operators, Java follows a fixed order for which one runs first — but the practical lesson is knowing when to stop relying on memory and just add parentheses. Java evaluates complex expressions using a strict precedence table: things like \`++\`/\`--\` and method calls happen first, then unary operators (like unary minus), then multiplication/division/modulo, then addition/subtraction, then shifts, then comparisons, then bitwise operators, then logical operators, then the ternary operator, and finally assignment (which happens last and groups right-to-left).
+
+Rather than memorizing the entire table, it's more useful to know the handful of cases that actually cause real confusion. Addition and subtraction bind more tightly than the shift operators, so \`1 + 2 << 3\` is evaluated as \`(1 + 2) << 3\`, giving \`24\` — not \`1 + (2 << 3)\`, which some people expect. Bitwise \`&\`, \`|\`, and \`^\` sit at a lower precedence than comparison operators like \`==\`, which surprises people who assume \`&\` behaves 'just like \`&&\`' in terms of where it sits relative to comparisons.
+
+The practical, professional-level takeaway is this: precedence rules are well-defined and consistent, but relying on someone (including future-you) correctly remembering them while reading code is asking for trouble. Adding explicit parentheses costs absolutely nothing at runtime — the compiler handles it — but it makes intent immediately obvious to any reader. Experienced developers use parentheses defensively for anything beyond the simplest arithmetic, precisely because ambiguity in a shared codebase is a real liability.`
+          },
+          {
+            title: "How it works",
+            content: `Operator precedence defines how Java groups operators when parentheses are absent. For example, multiplication is evaluated before addition, so \`2 + 3 * 4\` is grouped as \`2 + (3 * 4)\`. Precedence determines grouping, while associativity determines how operators of the same precedence are grouped.
+
+Precedence does not mean every subexpression is executed before another in an arbitrary way. Java still follows its evaluation rules, including left-to-right evaluation of operands in many expressions. Short-circuit logical operators can additionally prevent an operand from being evaluated at all. This is why precedence, evaluation order, and side effects should be considered separately.
+
+In production code, parentheses are often the best way to make intent explicit even when the language rules would produce the same result without them. This is especially useful around boolean conditions, shifts, bitwise operations, and mixed arithmetic. The goal is not merely to satisfy the compiler but to make the expression unambiguous to another developer.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int result = 1 + 2 << 3;          // evaluates as (1+2) << 3 = 24 - easy to misread!
+int clearer = (1 + 2) << 3;       // same value, but the intent is obvious
+boolean x = true, y = false;
+boolean tricky = x == true & y == false; // works, but hard to read at a glance
+boolean clear = (x == true) & (y == false); // identical result, much clearer
+\`\`\``
+          },
+          {
+            title: "Why precedence matters",
+            content: `Precedence determines how an expression is grouped when parentheses are absent. It is safer to use parentheses when a business rule or bit manipulation expression could be misread. Do not rely on readers remembering a long precedence table when clarity is cheap.`
+          },
+          {
+            title: "Debugging technique",
+            content: `When an expression produces an unexpected result, rewrite it with explicit parentheses before changing operators. This makes the intended evaluation tree visible and helps distinguish precedence errors from type-conversion errors.`
+          },
+          {
+            title: "Interview drill",
+            content: `A common trap is mixing \`&&\`, \`||\`, comparison, and arithmetic in one line. Explain the grouping rather than merely quoting a table. Then state whether short-circuiting changes which operands are actually evaluated.`
+          }
+        ]
+      },
+      {
+        title: "Expressions and statements",
+        slug: "expressions-and-statements",
+        description: "An expression produces a value and may also have side effects; a statement controls how those expressions participate in a program's execution. Understanding the distinction makes assignments, method calls, declarations, blocks, conditionals, and loops much easier to reason about.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "An expression produces a value and may also have side effects; a statement performs a complete unit of program action. `a + b` is an expression, while `int total = a + b;` is a declaration statement containing an expression. Method calls and object creation are expressions because they produce values, even when the returned value is ignored.\n\nThis distinction becomes useful when reading control flow and compiler errors. Conditions in `if` require boolean expressions, while a statement cannot be inserted arbitrarily where an expression is required. Understanding the grammar also makes chained calls, assignments inside expressions, and lambda expressions much less mysterious."
+          },
+          {
+            title: "What it means",
+            content: `Every line of Java code is either an expression (something that produces a value) or a statement (something that performs an action) — understanding the difference explains a lot of syntax rules. An expression is anything that evaluates to a value: \`2 + 3\`, \`x++\`, \`isValid()\`, and \`a > b\` are all expressions, because each one can be substituted with the value it produces. A statement is a complete, standalone instruction that performs an action — an \`if\` block, a \`for\` loop, a variable declaration, or an 'expression statement,' which is simply an expression used purely for its side effect and ended with a semicolon.
+
+Not every expression is allowed to become a standalone statement on its own. Java only permits specific kinds as expression statements: assignments (\`x = 5;\`), increment/decrement (\`x++;\`), method calls (\`doWork();\`), and object creation (\`new Foo();\`). This is why writing \`x + 1;\` alone as a line of code is a compile error — the compiler recognizes that this computes a value and then throws it away for no reason, and disallows that pattern structurally, whereas \`x++;\` is fine because incrementing has a meaningful side effect.
+
+This distinction directly explains why the ternary operator can be embedded inside an assignment (\`int max = a > b ? a : b;\`) but an \`if\` statement cannot be used the same way — the ternary is an expression that produces a value you can assign, while \`if\`/\`else\` is purely a control-flow statement that never produces a usable value of its own.`
+          },
+          {
+            title: "How it works",
+            content: `An expression is a construct that produces a value, while a statement is a complete instruction that performs an action or controls execution. Arithmetic such as \`a + b\`, a method call, a comparison, and a conditional expression are examples of expressions. Declarations, \`if\` blocks, loops, and many expression statements are statements.
+
+This distinction explains why some expressions can appear by themselves and others cannot. An assignment, increment, method invocation, or object creation has a useful side effect, so Java permits it as an expression statement. A bare calculation whose result is immediately discarded is not generally accepted as a statement because it has no observable purpose.
+
+Expressions can be nested inside larger expressions, which is how Java builds compact calculations and conditions. Statements provide the surrounding control structure. Thinking in these two layers makes syntax such as \`int x = condition ? a : b;\` easier to understand: the declaration is a statement containing an expression that computes the value assigned to \`x\`.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Expressions - each one produces a value
+int sum = 2 + 3;
+boolean valid = isValid();
+int max = (a > b) ? a : b;   // the ternary operator IS an expression
+// Statements - perform an action, don't themselves produce a usable value
+if (valid) { doSomething(); }
+for (int i = 0; i < 10; i++) { }
+x++;         // valid expression statement
+// x + 1;    // COMPILE ERROR - a bare expression can't stand alone as a statement
+\`\`\``
+          },
+          {
+            title: "Expression versus statement",
+            content: `An expression produces a value and may have side effects; a statement is a complete executable construct. Some statements contain expressions, such as an expression statement or the condition of an \`if\`. This distinction becomes useful when reading compiler errors and reasoning about what can appear in a particular syntactic position.`
+          },
+          {
+            title: "Side effects",
+            content: `An expression can both calculate a value and mutate state. Code becomes harder to reason about when several side effects are packed into one expression. Separate operations when order or state visibility matters, especially around increment operators, method calls, and shared mutable data.`
+          },
+          {
+            title: "Interview drill",
+            content: `If asked whether every expression is a statement, answer no. An expression such as \`a + b\` can be used as part of a larger construct, while \`a++;\` is an expression statement because the expression is used as a complete statement.`
+          }
+        ]
+      },
+      {
+        title: "Input and output",
+        slug: "input-and-output",
+        description: "Java I/O becomes easier when you separate the data source or destination from the API used to access it. Learn the difference between console output, byte-oriented streams, character-oriented readers/writers, buffering, and resource management, then apply those ideas to practical programs.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Console I/O is fundamentally about converting between program values and external character/byte streams. `System.in` represents standard input, while `System.out` and `System.err` represent standard output and error streams. `println` formats a value into text; reading input requires parsing text or bytes into the desired data type.\n\nProduction applications usually separate I/O from business logic. That makes code easier to test because the core logic can operate on values rather than depending directly on a console. It also avoids mixing prompts, parsing, validation, and domain calculations into one large method."
+          },
+          {
+            title: "What it means",
+            content: `Java gives you a few layers for reading console input and writing console output — knowing which tool fits which situation will save you from a very common early bug. Output is straightforward: \`System.out\` is a stream connected to your console, offering \`print\` (no newline), \`println\` (adds a newline), and \`printf\` (formatted output using placeholders like \`%d\` for integers, \`%s\` for strings, and \`%.2f\` for a decimal with two places). There's also \`System.err\`, a separate stream for error messages, kept distinct so error output can be redirected independently from regular output when running programs from a shell.
+
+For input, the most beginner-friendly tool is \`java.util.Scanner\`, which wraps a source (usually \`System.in\`, the keyboard) and provides convenient methods like \`nextInt()\`, \`nextDouble()\`, and \`nextLine()\` to read typed values directly, doing the parsing work for you. Here's the classic bug worth knowing before you hit it yourself: methods like \`nextInt()\` and \`nextDouble()\` read the number itself, but they leave the trailing newline character (from when the user pressed Enter) still sitting unread in the input.
+
+If you then call \`nextLine()\` expecting to read the *next* full line of text, it instead immediately returns an empty string — because it just consumed that leftover newline character. The standard fix is to insert an extra \`scanner.nextLine();\` call right after reading a number, purely to absorb that leftover newline before reading actual text input.`
+          },
+          {
+            title: "How it works",
+            content: `Console input and output are simple but important examples of Java's stream-based I/O model. Standard output is represented by \`System.out\` and is commonly used with \`print\` or \`println\`. Standard input is represented by \`System.in\`, which supplies bytes that higher-level classes can interpret as characters or values.
+
+Output formatting becomes important when a program needs predictable text rather than simple debugging messages. \`printf\` supports formatted values, while \`println\` is convenient for line-oriented output. Input requires more attention because the raw input stream does not automatically know whether the user intends an integer, floating-point number, or line of text. A class such as \`Scanner\` can provide that higher-level parsing.
+
+Resource ownership is another important concept. Streams can hold operating-system resources, so larger applications should close resources when appropriate, preferably with try-with-resources. Even for console programs, separating input parsing from business logic makes the code easier to test and maintain.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+Scanner sc = new Scanner(System.in);
+System.out.print("Enter age: ");
+int age = sc.nextInt();
+sc.nextLine(); // absorbs the leftover newline character - without this, the next line breaks!
+System.out.print("Enter name: ");
+String name = sc.nextLine(); // now correctly reads the actual name
+System.out.printf("%s is %d years old%n", name, age);
+\`\`\``
+          },
+          {
+            title: "Common mistakes",
+            content: `- - Calling nextInt() followed immediately by nextLine() and being confused why the string comes back empty`
+          },
+          {
+            title: "Choosing an I/O API",
+            content: `\`System.out\` is convenient for simple console output, but production applications normally use a logging framework so output can be filtered, structured, routed, and correlated. For input, choose an API based on the source and workload rather than treating console input as a general application architecture.`
+          },
+          {
+            title: "Failure handling",
+            content: `Input is untrusted data even when it comes from a local user. Parsing can fail, streams can end early, and encodings can matter. Robust programs define what should happen for malformed input instead of allowing an exception or partial state to become the normal control flow.`
+          },
+          {
+            title: "Interview angle",
+            content: `A useful answer distinguishes data acquisition from business logic. Read and validate input at the boundary, convert it into a useful domain representation, and keep the core logic independent of console-specific APIs.`
+          }
+        ]
+      },
+      {
+        title: "Scanner",
+        slug: "scanner",
+        description: "`Scanner` is convenient for small console programs, but its token-based parsing rules can surprise developers, especially when `nextInt()` or `next()` is mixed with `nextLine()`. Learn how input is consumed, how delimiters work, how parsing failures behave, and when another API is a better choice.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "`Scanner` provides convenient token-oriented and line-oriented parsing over an input source. Methods such as `nextInt()` parse a token as an integer, while `nextLine()` consumes the remainder of the current line. The well-known `nextInt()`/`nextLine()` surprise happens because `nextInt()` does not consume the line separator that `nextLine()` subsequently reads.\n\n`Scanner` is excellent for learning and small command-line programs, but it is not automatically the best choice for high-throughput input. Parsing strategy should match the workload. Also validate user input and handle cases such as malformed numeric text instead of assuming every token is valid."
+          },
+          {
+            title: "What it means",
+            content: `Scanner is the go-to tool for reading input in beginner Java programs — it's convenient, but it's worth understanding how it works and when it's not the best choice. Scanner can read from many different sources — the keyboard (\`System.in\`), a file, or even a plain String — which makes it flexible for learning and testing. Internally, it works by using regular-expression-based tokenizing: it scans forward through the input looking for the next 'token' (by default, tokens are separated by whitespace), checks that the token matches what you asked for (like a valid integer for \`nextInt()\`), and only then moves its internal position forward past it.
+
+If the next token doesn't match — say you call \`nextInt()\` but the user typed letters — Scanner throws an \`InputMismatchException\`. Because of this regex-based scanning under the hood, Scanner is noticeably slower than more low-level input tools like \`BufferedReader\`. For simple console programs and learning exercises this difference is completely irrelevant, but if you ever process very large input files or need maximum performance, a \`BufferedReader\` paired with manual parsing is the faster choice.
+
+A few practical habits worth building: use \`hasNext()\`, \`hasNextInt()\`, and similar methods to check whether more input is available (and of the right type) *before* trying to read it, which avoids exceptions entirely. Also, always close a \`Scanner\` that's reading from a file (ideally using try-with-resources) to release the file handle — but be careful not to close a \`Scanner\` wrapping \`System.in\`, since doing so closes standard input for the rest of your program too, which will break any later attempt to read more console input.`
+          },
+          {
+            title: "How it works",
+            content: `Scanner is a convenience class for reading tokens and values from an input source. When connected to \`System.in\`, it can parse integers, floating-point numbers, booleans, and strings using methods such as \`nextInt()\` and \`nextLine()\`. It is useful for learning because it hides much of the low-level byte-to-character parsing work.
+
+One common issue is mixing token-oriented methods with \`nextLine()\`. Methods such as \`nextInt()\` consume the numeric token but can leave the line separator behind, so a following \`nextLine()\` may immediately read the remainder of the current line. The solution is to understand exactly what each method consumes rather than assuming all input methods behave identically.
+
+Scanner also performs parsing and validation, so invalid input can result in an input mismatch exception. For simple command-line exercises this is acceptable, but production applications often use more controlled parsing and validation. The important learning goal is understanding that input is text that must be converted into typed values.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+Scanner sc = new Scanner(System.in);
+while (sc.hasNextInt()) {
+    int n = sc.nextInt();
+    System.out.println("Got: " + n);
+}
+// Reading from a file - close it properly with try-with-resources
+try (Scanner fileScanner = new Scanner(new File("data.txt"))) {
+    while (fileScanner.hasNextLine()) {
+        process(fileScanner.nextLine());
+    }
+}
+\`\`\``
+          },
+          {
+            title: "How Scanner behaves",
+            content: `\`Scanner\` tokenizes input according to delimiters and parses tokens into requested types. Mixing token methods such as \`nextInt()\` with line-oriented \`nextLine()\` is a common source of confusion because a numeric token method can leave the line separator unread.`
+          },
+          {
+            title: "Common mistake",
+            content: `If a program reads an integer and then immediately calls \`nextLine()\`, the line call may consume the remainder of the current line instead of waiting for the next full line. The fix is to understand the input cursor rather than adding arbitrary delays or extra reads.`
+          },
+          {
+            title: "When not to use it",
+            content: `\`Scanner\` is convenient for learning and modest console tools, but it may not be the best choice for high-throughput input. For performance-sensitive workloads, buffered byte or character input with explicit parsing can reduce overhead and give the application more control.`
+          }
+        ]
+      },
+      {
+        title: "Comments and documentation comments",
+        slug: "comments-and-documentation-comments",
+        description: "Comments should explain intent, constraints, or non-obvious decisions rather than restating the code. Learn how ordinary comments differ from Javadoc, how documentation becomes part of a public API's developer experience, and when comments become misleading maintenance debt.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Comments are for humans and documentation tools; they do not change Java runtime behavior. Ordinary comments explain intent or temporarily annotate code, while Javadoc comments can describe public APIs and be processed into generated documentation.\n\nThe strongest comments explain why a non-obvious decision exists rather than restating the syntax. A comment such as “increment i” adds little value, while explaining a compatibility workaround or invariant can prevent future regressions. Outdated comments are actively harmful because readers may trust them more than the code."
+          },
+          {
+            title: "What it means",
+            content: `Java has three comment styles, and one of them isn't just for humans — it's structured input that a tool can turn into real API documentation. The three styles are single-line comments (\`// this explains one line\`), multi-line comments (\`/* this can span several lines */\`), and documentation comments (\`/** this is a Javadoc comment */\`). That third style is special: when placed directly above a class, method, field, or constructor, a tool called Javadoc can parse it and automatically generate readable HTML documentation for your code.
+
+Javadoc comments support special tags that structure the documentation: \`@param\` describes a method parameter, \`@return\` describes what a method gives back, \`@throws\` documents an exception the method might throw, \`@since\` notes which version introduced this code, and \`@deprecated\` marks something as outdated (often alongside the separate \`@Deprecated\` annotation, which specifically triggers a compiler warning wherever the deprecated code is used). As a learner, the most important habit to build isn't memorizing every tag — it's developing judgment about *when* a comment adds value.
+
+A good comment explains *why* something is done a certain way, especially when the reasoning isn't obvious from the code itself. A comment that just restates what the code plainly already shows (\`i++; // increment i\`) adds noise rather than clarity. Public methods that other developers will call from outside your code deserve solid Javadoc; small private helper methods usually don't need much commenting at all if their names and logic are already clear.`
+          },
+          {
+            title: "How it works",
+            content: `Comments are ignored by the compiler as executable instructions, but they communicate intent to humans and tools. Single-line comments use \`//\`, block comments use \`/* .. */\`, and documentation comments use \`/** .. */\`. The last form can be processed by Javadoc to generate API documentation.
+
+Useful comments explain decisions, constraints, or non-obvious behavior rather than repeating what the code already says. For example, a comment that says 'increment i' adds little value when the statement is \`i++\`. A comment explaining why an unusual algorithm is required can prevent a future maintainer from accidentally removing an important behavior.
+
+Documentation comments are especially valuable on public classes and methods because they become part of the developer-facing API. Tags such as \`@param\`, \`@return\`, and \`@throws\` describe contracts and expectations. Good documentation should match the actual behavior of the code; stale comments are worse than missing comments because they actively mislead readers.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+/**
+* Calculates compound interest.
+*
+* @param principal the initial amount invested
+* @param rate annual interest rate as a decimal (e.g., 0.05 for 5%)
+* @param years number of years to compound
+* @return the final amount after compounding
+*/
+public double compoundInterest(double principal, double rate, int years) {
+    return principal * Math.pow(1 + rate, years);
+}
+\`\`\``
+          },
+          {
+            title: "Comments as engineering artifacts",
+            content: `Comments should explain intent, invariants, constraints, or non-obvious decisions rather than restating syntax. A comment such as "increment counter" adds little value; a comment explaining why a retry limit is three attempts can preserve important engineering context.`
+          },
+          {
+            title: "Javadoc quality",
+            content: `Documentation comments can describe public APIs, parameters, return values, exceptions, thread-safety expectations, and usage constraints. Good API documentation tells callers what they may rely on without forcing them to read the implementation.`
+          },
+          {
+            title: "Maintenance trap",
+            content: `Outdated comments are worse than no comments because they create false confidence. When behavior changes, update the explanation or remove it. Treat documentation as part of the API contract where appropriate.`
+          }
+        ]
+      },
+      {
+        title: "Arrays",
+        slug: "arrays",
+        description: "An array is a fixed-length object whose component type is known by the runtime. Learn how indexing, allocation, default values, covariance, `ArrayStoreException`, multidimensional arrays, and array references interact so that array behavior is predictable rather than memorized.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A Java array is an object with a fixed length and elements of one declared component type. The array variable holds a reference to that array object. Indexing is zero-based, and an invalid index results in `ArrayIndexOutOfBoundsException`. Primitive arrays contain primitive values; reference arrays contain references, which may themselves be `null`.\n\nArray covariance is a subtle runtime rule: a `String[]` can be assigned to an `Object[]` reference because `String` is an `Object`. But storing an incompatible object through that broader reference can cause `ArrayStoreException`. This is one reason generic collections are often preferable for flexible application code."
+          },
+          {
+            title: "What it means",
+            content: `An array is a fixed-size, indexed container — and even though it can hold primitives, the array itself is always an object living on the heap. When you write \`int[] arr = new int[5];\`, Java allocates a 5-element block on the heap, and \`arr\` is a reference variable pointing at it — just like any other object reference. Every element starts at a default value (0, null, or false depending on the element type).
+
+The array's \`length\` is a public field, not a method — a small but very common source of typos for people used to \`String.length()\` or \`List.size()\`. Arrays are strictly fixed-size: once created, that size can never change. 'Resizing' an array in practice actually means creating a brand-new, larger array and copying the old elements into it — and that's exactly what \`ArrayList\` does internally every time it needs to grow beyond its current capacity.
+
+One genuinely interesting Java quirk worth knowing: arrays are covariant, meaning \`String[]\` is treated as a kind of \`Object[]\`. So \`Object[] objs = new String[3];\` compiles just fine. But if you then try to store something incompatible, like \`objs[0] = 42;\` (compiles too, since an \`int\` autoboxes to \`Object\`), the JVM throws an \`ArrayStoreException\` at runtime, because it remembers the array's real element type is \`String\`.
+
+This runtime safety net exists specifically because array covariance is allowed at compile time but isn't actually type-safe — generics (covered later) deliberately avoid this exact problem. Compared to \`ArrayList\` and other collections, arrays are more memory-efficient for fixed-size numeric data, especially primitives, since collections of primitives require boxing them into wrapper objects. But collections offer dynamic resizing and a far richer set of built-in operations, which is why they're the default choice in most everyday application code.`
+          },
+          {
+            title: "How it works",
+            content: `An array stores a fixed number of values of one component type. The array object has a length determined when it is created, and elements are accessed using zero-based indexes. This gives constant-time indexed access, but it also means the program must respect the valid range from \`0\` through \`length - 1\`.
+
+Arrays are objects in Java even when their elements are primitives. A variable such as \`int[] values\` therefore holds a reference to an array object. Creating an array initializes its elements to their default values, such as zero for numeric primitives and \`null\` for reference elements.
+
+The fixed length is both a strength and a limitation. It makes the memory layout and indexing model simple, but it means an array cannot grow when more elements are needed. That is why collections such as \`ArrayList\` are commonly used for dynamically sized data. Arrays remain fundamental because they are efficient, predictable, and form the basis for many other data structures.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int[] nums = new int[5];         // all elements default to 0
+String[] names = {"Al", "Bo"};    // array literal shorthand
+System.out.println(nums.length); // field, not a method!
+Object[] objs = new String[3];
+objs[0] = "ok";                    // fine
+try {
+    objs[1] = 42;                    // compiles.. but throws at runtime
+} catch (ArrayStoreException e) {
+    System.out.println("Caught: " + e);
+}
+\`\`\``
+          },
+          {
+            title: "Array semantics",
+            content: `An array has a fixed length after creation, stores elements of one component type, and uses zero-based indexing. For reference-type arrays, the array stores references; it does not make the referenced objects immutable or independent.`
+          },
+          {
+            title: "Edge cases",
+            content: `Watch for zero-length arrays, negative indexes, indexes equal to \`length\`, and partially initialized reference arrays whose elements are \`null\`. \`ArrayIndexOutOfBoundsException\` is a runtime signal that the index invariant was violated.`
+          },
+          {
+            title: "Performance and alternatives",
+            content: `Indexed access is constant-time because the element position is derived from the index. The trade-off is fixed length and less flexibility than collection types. Use an array when fixed-size, indexed storage fits the problem; use a collection when resizing and richer operations are more important.`
+          },
+          {
+            title: "Interview trap",
+            content: `Array covariance is legal but can move a type error to runtime: a \`String[]\` can be viewed as \`Object[]\`, but storing an incompatible object can throw \`ArrayStoreException\`. This contrasts with generic collections, where incompatible element types are normally rejected at compile time.`
+          }
+        ]
+      },
+      {
+        title: "Multidimensional arrays",
+        slug: "multidimensional-arrays",
+        description: "Java doesn't have true multidimensional arrays — a 2D array is really an array of array references, and understanding that unlocks a useful feature: jagged rows. Unlike languages with a single contiguous block for a. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Java does not require multidimensional arrays to be rectangular. A declaration such as `int[][]` is an array whose elements are themselves `int[]` references. Each inner array can therefore have a different length, and some inner references can even be `null`.\n\nThis “array of arrays” model explains why allocating `new int[3][4]` creates three inner arrays of length four, while `new int[3][]` creates only the outer array until the rows are initialized. When processing nested data, always distinguish the outer length from each row's length."
+          },
+          {
+            title: "What it means",
+            content: `Java doesn't have true multidimensional arrays — a 2D array is really an array of array references, and understanding that unlocks a useful feature: jagged rows. Unlike languages with a single contiguous block for a 2D grid, Java implements \`int[][] grid\` as an array whose elements are themselves references to separate \`int[]\` arrays. Each row is its own independently allocated object on the heap.
+
+This 'array of arrays' model is a genuinely important mental model shift, and it directly explains a feature you'll use often: jagged arrays, where each row can have a completely different length. Because rows are separate objects, you don't need to specify every dimension up front. You can declare \`new int[3][]\` — three rows, but with lengths left unspecified — and then assign each row its own array of whatever length you need afterward.
+
+That flexibility wouldn't make sense with a true fixed-size grid. Iterating requires nested loops (or nested for-each loops for cleaner syntax), and a common beginner mistake is assuming every row has the same length as the first one — always check \`row.length\` per row rather than assuming a single, uniform column count for the whole grid, unless you specifically created it as a rectangular array.`
+          },
+          {
+            title: "How it works",
+            content: `Java does not have a separate built-in matrix type. A multidimensional array is an array whose elements are themselves arrays. In a two-dimensional structure, the first index selects a row array and the second index selects an element inside that row.
+
+This model explains why Java arrays can be jagged. Each row is a separate array object, so different rows can have different lengths. A declaration such as \`int[][] values\` creates a reference to an array of \`int[]\` references; the inner arrays are then created separately or through the combined allocation syntax.
+
+Traversal normally uses nested loops, with the outer loop selecting each row and the inner loop visiting elements in that row. When code assumes every row has the same length, it is effectively treating the structure as rectangular. When rows may differ, the correct inner bound is each row's own \`length\`. Understanding this object-of-arrays model is more useful than memorizing a special '2D array' rule.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int[][] rectangular = new int[3][4]; // 3 rows, 4 columns each - uniform
+int[][] jagged = new int[3][];
+jagged[0] = new int[]{1};
+jagged[1] = new int[]{1, 2, 3};
+jagged[2] = new int[]{1, 2};
+for (int[] row : jagged) {
+    System.out.println(row.length); // varies: 1, 3, 2
+}
+int[][] matrix = {     // literal syntax
+    {1, 2, 3},
+    {4, 5, 6}
+};
+\`\`\``
+          },
+          {
+            title: "Java's model",
+            content: `A two-dimensional Java array is actually an array whose elements are themselves arrays. That means rows can have different lengths, unlike a rectangular matrix in some languages. This jagged-array model is important when validating dimensions and calculating traversal costs.`
+          },
+          {
+            title: "Edge cases",
+            content: `An outer array can be non-null while an individual row is \`null\`, and different rows can have different lengths. Code that assumes \`matrix.length\` equals every \`matrix[row].length\` can therefore fail or silently process the wrong shape.`
+          },
+          {
+            title: "Interview drill",
+            content: `Question: "Is \`int[][]\` a true contiguous 2D block?" Not at the language level. It is an array of \`int[]\` references. This design allows jagged structures and means row objects are separate arrays.`
+          }
+        ]
+      },
+      {
+        title: "var local variable type inference",
+        slug: "var-local-variable-type-inference",
+        description: "var lets the compiler figure out a variable's type from its initializer — but this is compile-time inference, not the dynamic typing you might know from other languages. Introduced in Java 10, `var` tells the. Covers static type inference, initializer requirements, readability, and common interview traps.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "`var` is compile-time local-variable type inference, not dynamic typing. The compiler determines the variable's static type from its initializer, and that type remains fixed. For example, `var names = new ArrayList<String>();` gives the variable an `ArrayList<String>` static type, not an unknown runtime type.\n\n`var` improves readability when the initializer already communicates the type, especially with long generic types. It cannot be used for fields, method parameters, or return types, and it needs an initializer because the compiler must infer a type. Avoid using it when the inferred type is surprising or obscures an important abstraction."
+          },
+          {
+            title: "What it means",
+            content: `var lets the compiler figure out a variable's type from its initializer — but this is compile-time inference, not the dynamic typing you might know from other languages. Introduced in Java 10, \`var\` tells the compiler: look at what I'm assigning, and figure out the type yourself. Critically, that inferred type is locked in permanently at compile time — \`var x = 5;\` makes \`x\` a genuine \`int\` forever, exactly as if you'd written \`int x = 5;\` yourself. \`x = "hello";\` afterward is still a compile error, because the type was fixed the moment it was inferred.
+
+This is very different from dynamic typing in languages like Python, where a variable's type can change at runtime. \`var\` is intentionally limited to local variables — you can use it for a variable inside a method, a for-loop counter, or a try-with-resources variable, but never for a field, a method parameter, or a return type. This keeps class APIs explicit and stable, since anyone reading a class definition should be able to see its contract clearly without needing to trace through initializer expressions.
+
+There are a few hard restrictions: \`var\` requires an initializer (you can't write \`var x;\` with nothing to infer from), and it can't be initialized directly with \`null\` or with something inherently ambiguous like a bare lambda expression, because the compiler needs enough information from the right-hand side to pin down a concrete type. As a style question, the general guidance is: use \`var\` when the right-hand side already makes the type obvious (\`var list = new ArrayList<String>();\` — clearly an ArrayList), and avoid it when it would hide useful information (\`var result = process(data);\` leaves the reader guessing what \`process\` even returns).`
+          },
+          {
+            title: "How it works",
+            content: `The \`var\` keyword asks the compiler to infer the static type of a local variable from its initializer. It does not make Java dynamically typed. After compilation, the variable still has a specific type, and the compiler uses that type for method calls, assignments, and overload resolution.
+
+Because inference needs evidence, a \`var\` declaration must have an initializer. It is intended for local variables and local variables in loops, not for fields, method parameters, or method return types. A declaration such as \`var name = "Alice"\` therefore has the inferred type \`String\`, not a generic 'unknown' type.
+
+The main design question is readability. \`var\` can remove repetitive type names when the initializer already makes the type obvious, especially with long generic types. It can also make code harder to understand when the initializer hides the type or uses a factory method with an unfamiliar return type. Good use of \`var\` balances reduced noise with clear intent.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+var list = new ArrayList<String>(); // inferred as ArrayList<String>
+var count = 0;                       // inferred as int
+for (var i = 0; i < 10; i++) { }          // fine inside for loops
+// var name;                // ILLEGAL - nothing to infer from
+// var x = null;            // ILLEGAL - can't infer a type from null
+var x = 5;
+// x = "hello";             // COMPILE ERROR - x is permanently typed as int
+\`\`\``
+          },
+          {
+            title: "Static typing still applies",
+            content: `\`var\` does not remove static typing. The compiler infers a concrete type from the initializer, and that type is fixed for the variable's lifetime. \`var\` is available for local variables and certain local contexts; it is not a general replacement for explicit field, parameter, or method-return declarations.`
+          },
+          {
+            title: "Good and bad uses",
+            content: `\`var\` improves readability when the initializer makes the type obvious, such as \`var customer = repository.findById(id)\`. It can hurt readability when the initializer hides an important abstraction or generic type. The goal is to reduce noise, not to hide the program's model.`
+          },
+          {
+            title: "Interview trap",
+            content: `\`var x = null;\` cannot compile because there is no type information from which the compiler can infer a concrete static type. Likewise, \`var\` requires an initializer because inference needs evidence at compile time.`
+          }
+        ]
+      },
+      {
+        title: "JDK vs JRE vs JVM",
+        slug: "jdk-vs-jre-vs-jvm",
+        description: "These three acronyms describe three nested layers of increasing scope: the engine that runs your code, the environment needed to execute it, and the full toolkit needed to build it. The **JVM** (Java Virtual Machine).. Clarifies the modern Java runtime/tooling model and how JVM execution differs from JDK development tooling. The useful distinction is not memorizing three acronyms; it is knowing which part provides development tools, which part runs Java programs, and how the JVM actually executes bytecode.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "The JVM is the runtime engine that executes Java bytecode. The JDK is the development kit containing the tools and runtime components needed to build and run Java programs. The term JRE historically described a runtime distribution around the JVM and libraries; modern JDK distributions no longer require treating a separate JRE installation as the normal development model.\n\nFor modern Java discussions, think primarily in terms of “JDK for development and deployment” versus “JVM as the execution engine.” This is more accurate than memorizing an old three-box diagram and assuming every current Java installation ships a separately installable JRE."
+          },
+          {
+            title: "What it means",
+            content: `These three acronyms describe three nested layers of increasing scope: the engine that runs your code, the environment needed to execute it, and the full toolkit needed to build it. The **JVM** (Java Virtual Machine) is the engine that actually executes bytecode. It handles loading classes, verifying that bytecode is safe, managing memory through garbage collection, and JIT-compiling frequently used code into native instructions.
+
+The JVM is technically a specification, and different implementations exist — HotSpot is the default one shipped with OpenJDK, but others like GraalVM exist too. The **JRE** (Java Runtime Environment) is the JVM plus the standard class libraries — things like \`java.lang\`, \`java.util\`, and \`java.io\` — that any compiled Java program relies on to actually run. It has everything needed to *run* an existing Java application, but no compiler, so it can't be used to build one.
+
+The **JDK** (Java Development Kit) is the full package: the JRE plus the compiler (\`javac\`), a debugger, the \`jar\` packaging tool, the \`javadoc\` documentation generator, and other development tools. This is what you install to actually write and compile Java code. A useful fact for context: since Java 11, standalone JRE-only distributions were discontinued industry-wide — today, essentially everyone just installs a full JDK, even if all they need is to run an existing application, since it's simpler to maintain one unified distribution.
+
+The cleanest way to remember the relationship: JVM sits inside the JRE, and the JRE sits inside the JDK — each layer adds more capability on top of the one before it.`
+          },
+          {
+            title: "How it works",
+            content: `These three terms describe different layers of the Java execution environment. The JVM is the execution engine that loads and runs Java bytecode. The runtime environment historically described by the JRE consists of the JVM plus the libraries and components needed to run Java applications. The JDK is the development kit that includes the tools required to build Java programs, including the compiler and other development utilities.
+
+For modern Java distributions, the separate JRE packaging model is less prominent than it was in older Java releases. The practical development distinction is simpler: developers install a JDK, and the JDK provides the runtime needed to execute applications. This avoids treating the three names as three completely separate products that must always be installed independently.
+
+The conceptual distinction still matters in interviews because it tests whether you understand compilation versus execution. \`javac\` belongs to the development side, while the JVM is responsible for executing the resulting bytecode.`
+          },
+          {
+            title: "The layered model",
+            content: `The JVM is the execution engine for Java class files. The JRE is historically the runtime-oriented bundle around the JVM and libraries, while the JDK is the development kit containing the compiler and development tooling. Modern Java distributions do not always ship a separately branded JRE package, so explain the conceptual distinction without implying that a standalone JRE must be installed today.`
+          },
+          {
+            title: "Production decision",
+            content: `For developers and build agents, install or configure a JDK. A production runtime may use a custom runtime image or a distribution appropriate to the deployment rather than a separately installed legacy JRE package. The exact packaging is a deployment decision; the JVM execution model remains the key concept.`
+          },
+          {
+            title: "Interview drill",
+            content: `If asked "What does javac do?" answer: it compiles Java source into class files containing JVM bytecode. If asked "What does the JVM do?" answer: it loads, links, initializes, and executes class files, using runtime services and optimizations.`
+          },
+          {
+            title: "Production takeaway",
+            content: `For modern Java work, pin the Java version in the build and CI configuration rather than relying on whichever JDK happens to be installed. The JVM is the execution engine, the JDK is the development toolchain, and the historical JRE concept should not be presented as a mandatory separately installed product.`
+          }
+        ]
+      },
+      {
+        title: "main method",
+        slug: "main-method",
+        description: "The exact signature of the main method — public static void main(String[] args) — isn't arbitrary; each keyword solves a specific problem the JVM needs solved. Consider each part of `public static void main(String[]. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 15,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "The traditional Java application entry point is `public static void main(String[] args)`. `static` means the JVM can invoke the method without first creating an instance of the enclosing class; `void` indicates no return value; and the parameter receives command-line arguments. Java also supports some newer launcher conveniences, but the conventional signature remains the clearest baseline for interviews and general application code.\n\nThe `args` array contains strings supplied by the launcher, so numeric arguments must be parsed explicitly. The method itself should usually delegate to application code rather than becoming a giant container for business logic. Keeping startup orchestration separate makes testing and composition easier."
+          },
+          {
+            title: "What it means",
+            content: `The exact signature of the main method — public static void main(String[] args) — isn't arbitrary; each keyword solves a specific problem the JVM needs solved. Consider each part of \`public static void main(String[] args)\` individually. \`public\` — the JVM, which is external to your class, needs to be able to call this method, so it can't be more restrictive than that. \`static\` — the JVM calls \`main\` before any object of your class has been created, so the method must be callable without needing an instance to exist first. \`void\` — the return value isn't used to communicate anything back to the operating system; if you need to signal an exit code, you use \`System.exit(int)\` explicitly instead. \`String[] args\` — command-line arguments are handed to your program as an array of strings, with no automatic type conversion, so if you expect a number, you'll need to parse it yourself with something like \`Integer.parseInt(args[0])\`.
+
+A few lesser-known but perfectly legal variations exist: you can write \`String.. args\` (varargs) instead of \`String[] args\` — functionally identical, since varargs really is just an array under the hood. You can also write \`String args[]\` with C-style brackets after the parameter name (legal, but not idiomatic Java style). And the order of \`public\` and \`static\` doesn't actually matter to the compiler — \`static public void main\` compiles just as well, even though \`public static\` is what everyone conventionally writes.
+
+It's also worth knowing that a class doesn't need a \`main\` method at all to compile successfully — it's only required in whichever class you plan to actually launch directly with \`java ClassName\`.`
+          },
+          {
+            title: "How it works",
+            content: `The \`main\` method is the conventional entry point for a standalone Java application launched by the Java launcher. The familiar form \`public static void main(String[] args)\` has four important pieces. \`public\` makes the method accessible to the launcher, \`static\` allows it to be invoked without first creating an instance of the class, \`void\` means it does not return a value to the launcher, and the \`String[]\` parameter receives command-line arguments.
+
+The arguments array is simply data supplied when the application starts. For example, launching a program with additional words after the class name places those words into \`args\`. The program can then parse or validate them as needed.
+
+The \`main\` method is not magic application logic; it is a starting point. Good programs often keep it small and delegate real work to methods and classes. That makes the entry point easy to understand and keeps business logic independently testable.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Standard signature
+public static void main(String[] args) { }
+// Legal variations you might encounter
+public static void main(String.. args) { }       // varargs - functionally the same
+static public void main(String[] args) { }         // modifier order doesn't matter to the compiler
+\`\`\``
+          },
+        ]
+      },
+      {
+        title: "Defining and calling methods",
+        slug: "defining-and-calling-methods",
+        description: "A method's 'signature' consists of its name and parameter types — and understanding that precisely explains a strict rule about overloading that trips up a lot of learners. A method declaration is made up of. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A method defines a named unit of behavior with a return type, name, parameter list, and body. Calling a method creates a new invocation context with its own parameter variables and local variables. The method can return a value or complete with `void`.\n\nGood methods usually have a clear responsibility and a meaningful contract. The signature is part of that contract: changing parameter types, return types, or checked exceptions can affect callers and overload resolution. Method design is therefore not just about reducing line count; it is about creating a stable boundary around behavior."
+          },
+          {
+            title: "What it means",
+            content: `A method's 'signature' consists of its name and parameter types — and understanding that precisely explains a strict rule about overloading that trips up a lot of learners. A method declaration is made up of modifiers (access level, \`static\`, \`final\`, etc.), a return type, a name, a list of parameters, and an optional list of exceptions it might throw, followed by its body. The method *signature* specifically refers to just the name plus the parameter types and their order — the return type is deliberately excluded from the signature.
+
+This exclusion has a very concrete consequence worth learning early: you cannot have two methods in the same class with the exact same name and exact same parameter list but different return types. That's a compile error, not valid overloading, because the compiler (and the calling code) would have no reliable way to tell which one you meant based purely on the call site. So \`int getValue()\` and \`String getValue()\` can never coexist — but \`int getValue()\` and \`int getValue(String key)\` can, because their parameter lists genuinely differ.
+
+When you call an overloaded method, Java decides which version to run at compile time, based on the types of the arguments you pass. It follows a specific priority order: it first looks for an exact type match, then a match reachable only by widening a primitive type (like passing an \`int\` where a \`long\` is expected), then a match requiring autoboxing (like passing an \`int\` where an \`Integer\` is expected), and only as a last resort, a matching varargs method. This ordering is exactly why, if both an \`int\` overload and a \`long\` overload exist, calling with a plain \`int\` argument picks the \`int\` version — the exact match always wins first.`
+          },
+          {
+            title: "How it works",
+            content: `A method packages a reusable operation behind a name, parameter list, and return type. A declaration tells the compiler the method's contract, while a method call supplies arguments and transfers control into the method body. This separation allows the same operation to be reused from multiple places without copying its implementation.
+
+A method can be instance-based or static. Instance methods operate in the context of an object and can directly access that object's instance state. Static methods belong to the class and do not have an implicit object context. The choice should reflect whether the operation requires object state.
+
+Method calls create a new execution context with their own local variables and parameters. When a method returns, control goes back to the calling location, optionally carrying a return value. Breaking a large operation into focused methods improves readability and gives each piece a clear responsibility, which is one of the simplest ways to make Java code easier to test.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+void process(int x) { }
+void process(String s) { }     // valid - different parameter types
+// int process(int x) { }      // INVALID - identical signature to void process(int x), differs on
+ly in return type
+void show(int x)     { System.out.println("int"); }
+void show(long x)    { System.out.println("long"); }
+void show(Integer x) { System.out.println("Integer"); }
+show(5); // prints "int" - exact match wins over widening or boxing
+\`\`\``
+          },
+          {
+            title: "Method contract",
+            content: `A method defines a named operation with a parameter list, return type, access level, and body. Calling it transfers control to the method, creates the invocation context, evaluates arguments, and eventually returns normally or exits through an exception.`
+          },
+          {
+            title: "Design guidance",
+            content: `Methods should have one clear responsibility and a useful contract. Avoid methods that both validate input, perform unrelated I/O, mutate global state, and calculate a result unless those responsibilities genuinely belong together. Small, cohesive methods are easier to test and reason about.`
+          },
+          {
+            title: "Interview drill",
+            content: `Explain the difference between declaring and invoking a method. Declaration describes the method's signature and implementation; invocation evaluates arguments and requests execution. Mention overload resolution when multiple methods share the same name.`
+          }
+        ]
+      },
+      {
+        title: "Method parameters and return values",
+        slug: "method-parameters-and-return-values",
+        description: "Varargs let a method accept any number of arguments of one type, and while Java can only ever return one value directly, there are clean idiomatic ways to bundle multiple results together. A varargs parameter,. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Parameters are local variables initialized from the argument values supplied at the call site. The return value is another value produced by the method and transferred back to the caller. Java does not support output parameters by reference; methods communicate through return values and through observable changes to objects referenced by their parameters.\n\nA method should make its contract obvious: what inputs are valid, what it returns, and what happens for invalid input. Returning a value is often cleaner than mutating external state, while mutation can be appropriate when the method's purpose is explicitly to update an object."
+          },
+          {
+            title: "What it means",
+            content: `Varargs let a method accept any number of arguments of one type, and while Java can only ever return one value directly, there are clean idiomatic ways to bundle multiple results together. A varargs parameter, written as \`Type.. name\`, lets callers pass zero, one, or many arguments of that type without you needing to overload the method for every possible count. Internally, the compiler simply treats the parameter as an array — inside the method body, \`name\` behaves exactly like \`Type[]\`.
+
+You can even pass an actual array directly to a varargs method instead of listing individual values. The only syntax rule: a varargs parameter must be the last one in the parameter list, and a method can have at most one. For return values, Java only ever lets a method return one value of one declared type — there's no built-in way to return multiple values directly, unlike some languages that support tuples.
+
+When you genuinely need to hand back several related pieces of information, the cleanest modern option is a \`record\` (available since Java 16), which gives you a small, self-documenting, immutable data carrier with almost no boilerplate. Older alternatives include returning an array or \`List\` (only sensible if the values are all the same type) or a small dedicated class. One structural rule the compiler strictly enforces: every possible path through a non-void method must end in a \`return\` (or throw an exception) — if there's any way execution could fall off the end of the method without returning a value, that's a compile error, caught well before you ever run the program.`
+          },
+          {
+            title: "How it works",
+            content: `Parameters are the named inputs a method receives, while a return value is the result a non-void method sends back to its caller. Java checks the argument types against the declared parameter types during compilation. A method can have zero parameters, several parameters, or a varargs parameter for a variable number of arguments.
+
+Varargs syntax such as \`int.. values\` is handled as an array inside the method. The parameter must be the last parameter, and a method can have only one varargs parameter. This is convenient when the caller naturally has a variable number of values but the method still wants normal indexed array access internally.
+
+A method returns one value directly. When several related results are needed, Java code commonly groups them into an object or record rather than trying to simulate multiple independent return channels. A non-void method must also return a compatible value on every possible path, unless that path cannot continue because it throws an exception.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Varargs
+int sum(int.. nums) {
+    int total = 0;
+    for (int n : nums) total += n;
+    return total;
+}
+sum(1, 2, 3);          // works
+sum(new int[]{1,2,3}); // also works - varargs IS an array under the hood
+// Returning multiple values idiomatically with a record (Java 16+)
+record MinMax(int min, int max) {}
+MinMax findRange(int[] arr) {
+    int min = arr[0], max = arr[0];
+    for (int v : arr) { if (v < min) min = v; if (v > max) max = v; }
+    return new MinMax(min, max);
+}
+\`\`\``
+          },
+          {
+            title: "Parameter semantics",
+            content: `Java passes argument values into parameters. For primitives, that value is the primitive value; for references, that value is a reference to an object. A method can mutate an object through a passed reference, but assigning a new reference to the parameter does not reassign the caller's variable.`
+          },
+          {
+            title: "Return design",
+            content: `A return value should represent the method's contract clearly. Avoid returning \`null\` as an ambiguous signal when a more explicit result type or exception policy would make absence clear. For performance-sensitive code, also consider allocation behavior and whether a value object is appropriate.`
+          },
+          {
+            title: "Interview trap",
+            content: `If a method receives \`User user\` and executes \`user = new User()\`, the caller's variable does not change. The parameter itself was reassigned. If the method executes \`user.setName("Sam")\`, the caller can observe the mutation because both references identify the same object.`
+          }
+        ]
+      },
+      {
+        title: "Pass-by-value in Java",
+        slug: "pass-by-value-in-java",
+        description: "This is one of the most commonly misunderstood ideas in Java: the language is always pass-by-value, even when it looks like it's passing objects by reference. Java is strictly pass-by-value, with no exceptions —. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview. The key is to separate the copied reference value from the object it can point to, then use that distinction to reason about mutation and reassignment.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Java always passes arguments by value. For an object argument, the value being copied is the reference to the object. Therefore the caller and parameter can refer to the same object, allowing mutation of that shared object, but assigning a new reference to the parameter does not change the caller's variable.\n\nThe cleanest demonstration uses two cases: `person.setName(..)` changes the shared object, while `person = new Person(..)` changes only the parameter's local copy. This distinction is exact and avoids the misleading statement that Java “passes objects by reference.”"
+          },
+          {
+            title: "What it means",
+            content: `This is one of the most commonly misunderstood ideas in Java: the language is always pass-by-value, even when it looks like it's passing objects by reference. Java is strictly pass-by-value, with no exceptions — there is no true pass-by-reference in Java at all. The confusion comes entirely from what exactly gets copied when the value being passed happens to be a reference.
+
+With primitives, this is intuitive: the actual number is copied, so changing the parameter inside the method has zero effect on the caller's original variable. With objects, what gets copied is the *reference itself* — a handle pointing to the object on the heap — not the object. So the method receives its own independent copy of that handle, but both the caller's copy and the method's copy point to the exact same underlying object.
+
+This is precisely why calling a mutating method on that parameter (like \`list.add(..)\`) is visible back in the caller — you're mutating the one shared object through a valid pointer to it — while *reassigning* the parameter variable itself to point somewhere new only changes the method's own local copy and is completely invisible to the caller. A great way to prove this to yourself is the classic 'failed swap' example: writing a method that tries to swap two object references by reassigning its parameters will not actually swap the caller's variables.
+
+If Java genuinely passed references by reference, reassigning a parameter would rebind the caller's variable too — but it never does, which conclusively demonstrates that the reference itself is passed by value.`
+          },
+          {
+            title: "How it works",
+            content: `Java uses pass-by-value for method arguments. For a primitive argument, the value itself is copied into the parameter, so assigning a new value to the parameter cannot change the caller's variable. For a reference argument, the value being copied is the reference. The caller and the parameter therefore hold separate copies of the reference that can point to the same object.
+
+This explains the behavior that often causes confusion. If the method mutates the shared object through its parameter, the caller can observe that mutation because both references identify the same object. If the method reassigns the parameter to a different object, only the parameter's copy of the reference changes, so the caller's reference is unaffected.
+
+The classic failed-swap example makes the rule clear. A method cannot swap the caller's two reference variables simply by reassigning its own parameters. The method would need to return the new values or mutate a shared holder object.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Mutating through a reference IS visible to the caller - same shared object
+void addItem(List<String> list) {
+    list.add("new");
+}
+List<String> myList = new ArrayList<>();
+addItem(myList);
+System.out.println(myList); // [new] - the caller sees the change!
+// Reassigning the parameter is NOT visible - only rebinds the local copy
+void reassign(List<String> list) {
+    list = new ArrayList<>(List.of("replaced"));
+}
+List<String> original = new ArrayList<>(List.of("original"));
+reassign(original);
+System.out.println(original); // [original] - completely unchanged!
+\`\`\``
+          },
+          {
+            title: "Common mistakes",
+            content: `- - Saying 'Java passes objects by reference' — it actually passes the reference by value - - Assuming reassigning a parameter inside a method changes what the caller's variable points to - OOP Fundamentals`
+          },
+          {
+            title: "The precise rule",
+            content: `Java is pass-by-value. The confusing part is that an object reference is itself a value. Passing an object therefore copies the reference value into the parameter. Both variables can then refer to the same object, but the parameter is not an alias for the caller's variable.`
+          },
+          {
+            title: "Two contrasting examples",
+            content: `If a method assigns \`person = anotherPerson\`, only the parameter changes. If it mutates \`person.setName(..)\`, the shared object changes. This distinction resolves most "Java is pass-by-reference" arguments.`
+          },
+          {
+            title: "Interview answer",
+            content: `A strong short answer is: "Java always passes values. For objects, the value being copied is the reference." Follow with a tiny example showing parameter reassignment versus object mutation. Avoid saying "objects are passed by reference"; that wording obscures the actual rule.`
+          },
+          {
+            title: "Interview trap",
+            content: `Never answer that Java passes objects by reference. The precise answer is that Java passes values, and an object argument's value is a reference. Parameter reassignment cannot replace the caller's variable; mutation through the reference can change the shared object.`
+          }
+        ]
+      },
+      {
+        title: "Recursion",
+        slug: "recursion",
+        description: "Recursion solves a problem by reducing it to a smaller instance of the same problem. Learn how stack frames accumulate, how a base case guarantees termination, how recursive state moves toward that base case, and when iteration is a safer production choice.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Recursion solves a problem by reducing it to a smaller instance of itself and stopping at a base case. Each recursive call has its own stack frame, so recursion consumes stack space proportional to call depth. Java does not generally perform tail-call elimination, so a deeply recursive algorithm can terminate with `StackOverflowError` even when the algorithm is logically correct.\n\nThe important design question is not “can this be recursive?” but “does recursion make the structure clearer and is the maximum depth controlled?” Tree traversal is often naturally recursive; processing untrusted, arbitrarily deep input may be safer with an explicit stack or iterative algorithm."
+          },
+          {
+            title: "What it means",
+            content: `Recursion is a method calling itself with a base case that eventually stops it — but in Java specifically, deep recursion carries a real risk you should understand before relying on it heavily. A recursive method solves a problem by calling itself on a smaller version of that problem, always with a base case that stops the recursion from continuing forever. Every method call — recursive or not — pushes a new stack frame onto the current thread's call stack, holding that specific call's local variables and where to return to once it finishes.
+
+That frame only gets removed once the call returns, which is the mechanical reason recursion has a real memory cost tied directly to how deep it goes. This becomes a genuine, practical concern in Java specifically, because the default thread stack size is relatively small (often somewhere around 512KB to 1MB, depending on the JVM and platform). Recursing tens of thousands of levels deep — say, processing a deeply nested JSON structure or a very long linked list recursively — can exhaust that stack space and throw a \`StackOverflowError\`.
+
+Here's an important thing to know that surprises people coming from functional-programming backgrounds: Java does not perform tail-call optimization. Even if you carefully write a recursive method so the recursive call is the very last thing it does (a 'tail-recursive' shape), the JVM still allocates a brand-new stack frame for every single call — it doesn't collapse them into a loop the way some languages do. This means the common trick of 'just write it tail-recursively and it magically becomes efficient' simply doesn't apply in Java.
+
+If you're worried about depth, converting deep recursion into an explicit loop is generally the safe, reliable fix.`
+          },
+          {
+            title: "How it works",
+            content: `Recursion occurs when a method solves a problem by calling itself on a smaller or simpler version of that problem. A correct recursive design needs a base case that stops further calls and a recursive case that moves toward that base case. Without those two parts, the call chain may continue until the JVM cannot allocate another stack frame, producing \`StackOverflowError\`.
+
+Each recursive call has its own parameters and local variables. This creates a chain of stack frames, which is why recursion has a memory cost proportional to the depth of the call chain. When the deepest call reaches its base case, it returns and the previous frame resumes, causing the calls to unwind in reverse order.
+
+Recursion is especially natural for tree structures, divide-and-conquer algorithms, and problems that are recursively defined. It is not automatically better than iteration. If the recursion can become very deep or provides no conceptual benefit, a loop is often safer and easier to reason about.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Simple, safe recursion - bounded, shallow depth
+int factorial(int n) {
+    if (n <= 1) return 1;          // base case
+    return n * factorial(n - 1);   // recursive case
+}
+// RISKY with large n - Java does NOT optimize tail calls
+long sumTo(long n, long acc) {
+    if (n == 0) return acc;
+    return sumTo(n - 1, acc + n); // still uses a new stack frame every call
+}
+// sumTo(10_000_000, 0) will very likely throw StackOverflowError
+// Iterative version - constant, safe stack usage
+long sumToIterative(long n) {
+    long acc = 0;
+    for (long i = 1; i <= n; i++) acc += i;
+    return acc;
+}
+\`\`\``
+          },
+          {
+            title: "Recursive state",
+            content: `A recursive method needs a base case and a progress rule that moves each call toward that base case. Every call has its own parameters and local variables, while shared mutable state remains shared. The call stack therefore represents pending work, not a magical copy of the entire program.`
+          },
+          {
+            title: "Failure modes",
+            content: `Missing or unreachable base cases can cause \`StackOverflowError\`. Deep recursion can also consume more stack than an iterative solution. Recursive algorithms are useful when the problem itself is recursive, such as tree traversal, but iteration is often simpler for linear repetition.`
+          },
+          {
+            title: "Interview drill",
+            content: `When analyzing recursive complexity, count both work per call and the number of calls. For a simple linear recursion with one smaller subproblem, the call count can be O(n) and stack space O(n). Branching recursion can grow much faster, so do not assume every recursive method is O(n).`
+          },
+          {
+            title: "Production decision",
+            content: `Choose recursion when the problem structure is naturally recursive and stack depth is controlled. For potentially deep input, an explicit stack can avoid exhausting the thread stack. Analyze both algorithmic work and maximum recursion depth before selecting the implementation.`
+          }
+        ]
+      },
+      {
+        title: "Packages and imports",
+        slug: "packages-and-imports",
+        description: "Packages do more than organize files into folders — they create real namespaces and even a genuine access-control boundary that imports have no effect on whatsoever. Packages give you namespacing, letting two. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A package organizes classes into a namespace and also participates in access-control rules. An `import` statement does not copy code into the class; it lets source code refer to a type by its simple name instead of its fully qualified name. The compiler still resolves the referenced type through the class path/module path and compilation environment.\n\nPackage naming and boundaries matter for maintainability. A well-structured package can communicate architectural ownership, while wildcard imports can sometimes hide which type is actually being used. Remember that two classes with the same simple name can coexist when their fully qualified names differ."
+          },
+          {
+            title: "What it means",
+            content: `Packages do more than organize files into folders — they create real namespaces and even a genuine access-control boundary that imports have no effect on whatsoever. Packages give you namespacing, letting two completely different libraries each have their own \`Logger\` class without conflicting, as long as they live in different packages. Less obviously, packages also directly affect access control: 'package-private' access (the default, when you write no access modifier at all) makes a member visible only to other classes within the same package — this is a genuine encapsulation boundary enforced by the compiler, not just an organizational habit.
+
+The package declaration you write at the top of a file must correspond to the actual folder structure the compiled class lives in — \`com.example.util.Helper\` must be compiled to \`com/example/util/Helper.class\` somewhere on the classpath. This is enforced by how class loading works, not merely a stylistic convention you're free to ignore. \`import\` statements, by contrast, exist purely for your convenience while writing code — they let you refer to a class by its short name instead of typing its full path every time.
+
+Critically, imports leave absolutely no trace in the compiled bytecode: the compiler resolves every reference to its fully qualified name at compile time and bakes that in directly, so imports carry zero runtime cost or footprint. One convenience worth knowing: \`import static\` lets you import a static member directly so you can use it unqualified — \`import static java.lang.Math.sqrt;\` then lets you write \`sqrt(4)\` instead of \`Math.sqrt(4)\`. It's genuinely handy for things like test assertions (\`assertEquals\`, \`assertTrue\`), but overusing it broadly can hurt readability by hiding where a method actually comes from.
+
+Also worth noting: everything in \`java.lang\` — \`String\`, \`Object\`, \`Integer\`, and so on — is automatically available in every file without any import at all.`
+          },
+          {
+            title: "How it works",
+            content: `A package gives related Java types a namespace and also participates in access control. Two classes with the same simple name can coexist when they belong to different packages because their fully qualified names are different. The package declaration therefore becomes part of a type's identity.
+
+The \`import\` statement is mainly a source-code convenience. It lets you write \`List\` instead of \`java.util.List\` after the compiler has resolved the imported name. An import does not make a class public, does not grant extra permissions, and does not create a runtime dependency by itself. \`java.lang\` types are automatically available without explicit imports.
+
+Packages also define the boundary used by package-private members. A member with no explicit access modifier is accessible to other classes in the same package. This makes package design relevant to encapsulation, not merely directory organization.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+package com.example.util;
+import java.util.List;                    // regular import
+import static java.lang.Math.sqrt;         // static import
+public class MathHelper {
+    public double hypotenuse(double a, double b) {
+        return sqrt(a*a + b*b); // unqualified, thanks to the static import
+    }
+}
+\`\`\``
+          },
+          {
+            title: "Namespace versus import",
+            content: `A package organizes types into a namespace; an import lets source code refer to a type by its simple name. An import does not move a class into the current package and does not change the type's actual fully qualified name.`
+          },
+          {
+            title: "Production organization",
+            content: `Package structure should reflect ownership and boundaries rather than becoming a mirror of every tiny implementation detail. Keep public APIs stable and avoid accidental cyclic dependencies between packages. In larger systems, package boundaries can reinforce architectural boundaries.`
+          },
+          {
+            title: "Interview trap",
+            content: `Two classes can have the same simple name if their fully qualified names differ. An import chooses which simple name is available in a compilation unit, while fully qualified names remove ambiguity.`
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "Control Flow",
+    slug: "control-flow",
+    description: "Conditional logic and loop constructs used to control program execution.",
+    topics: [
+      {
+        title: "if, else if, and else",
+        slug: "if-else-if-and-else",
+        description: "An if/else-if/else chain runs its branches in order and stops at the first one that matches — a simple rule, but the order you write your conditions in actually matters a lot. Java checks the conditions in an. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "An `if` statement evaluates a boolean expression and executes one branch when it is true. An `else if` is simply another conditional checked only when earlier conditions were false, and `else` is the fallback. Conditions are evaluated top to bottom, so overlapping predicates must be ordered intentionally.\n\nA common mistake is writing conditions that are individually correct but unreachable because an earlier condition catches every possible case. Prefer mutually understandable branches, and use guard clauses when early rejection makes the main path easier to read."
+          },
+          {
+            title: "Deep conceptual model",
+            content: "Control flow determines which statements execute, in what order, and how many times. Java's fundamental constructs include sequential execution, conditional branching, loops, `switch`, and control-transfer statements such as `break` and `continue`.\n\nFor every control-flow construct, identify the entry condition, the possible paths, and the termination condition. Bugs often come from a path that was never considered: an empty input, a missing `break`, a loop whose state never changes, or an exception that exits the expected path. Thinking in paths is more reliable than memorizing syntax."
+          },
+          {
+            title: "What it means",
+            content: `An if/else-if/else chain runs its branches in order and stops at the first one that matches — a simple rule, but the order you write your conditions in actually matters a lot. Java checks the conditions in an if/else-if/else chain from top to bottom and executes the block belonging to the *first* condition that evaluates to true — every condition after that is skipped entirely, even if it would also have been true. This ordering behavior causes a genuinely common mistake when conditions overlap in range.
+
+Imagine grading scores: if you write \`if (score >= 60) grade = "Pass"; else if (score >= 90) grade = "Excellent";\`, a score of 95 will incorrectly get graded as just "Pass" — because 95 also satisfies \`score >= 60\`, and that's the first condition checked, so the "Excellent" branch never even gets evaluated. The fix is to always check the *most specific* (narrowest) condition first, then work down to the broadest. A second subtlety worth learning as a habit rather than memorizing as a rule: without curly braces, an \`if\` only controls the single statement immediately following it.
+
+If you later come back and add a second line to that block without adding braces, it silently falls *outside* the if — it will run every time, regardless of the condition, which is a bug that's genuinely easy to introduce during a quick edit. The professional habit is to always use braces \`{}\` around if/else bodies, even for a single statement, specifically so future edits are safe by default. One more thing worth knowing: Java's \`if\` condition must be a genuine \`boolean\` expression.
+
+Unlike some C-family languages where a nonzero integer is treated as 'true,' Java simply won't compile \`if (someInt)\` — this removes an entire category of bugs from the language by design.`
+          },
+          {
+            title: "How it works",
+            content: `The \`if\` statement chooses whether a block executes based on a boolean condition. An \`else if\` chain evaluates conditions in order and stops when one condition is true, while \`else\` provides the fallback block when none of the preceding conditions matched.
+
+Because conditions are expressions that produce boolean values, they can combine comparisons and logical operators. Short-circuit operators such as \`&&\` and \`||\` are particularly useful when the second condition should only be evaluated when the first condition makes it safe or necessary.
+
+The important design issue is not just syntax but decision structure. Overly long \`if\` chains can become difficult to maintain when many cases are independent. At that point, a \`switch\`, a lookup structure, or polymorphism may express the same decision more clearly. For interview questions, be ready to distinguish condition evaluation from block execution and to identify unreachable or contradictory branches.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int score = 95;
+// BUG: order matters - broad conditions checked first swallow the specific ones
+if (score >= 60) {
+    System.out.println("Pass");       // wrongly matches 95 first!
+} else if (score >= 90) {
+    System.out.println("Excellent"); // unreachable for any score 90+
+}
+// Correct: most specific condition first
+if (score >= 90) {
+    System.out.println("Excellent");
+} else if (score >= 60) {
+    System.out.println("Pass");
+} else {
+    System.out.println("Fail");
+}
+\`\`\``
+          },
+          {
+            title: "Practice",
+            content: `Rewrite this buggy chain so all three grades are reachable: \`if (score >= 50) print('Pass'); else if (score >= 80) print('Merit'); else if (score >= 95) print('Distinction');\``
+          },
+          {
+            title: "Control-flow reasoning",
+            content: `An \`if\` evaluates a boolean condition and chooses one path. An \`else if\` is simply another conditional branch considered only when earlier conditions were false. The first matching branch executes; later branches are skipped.`
+          },
+          {
+            title: "Boundary bugs",
+            content: `Most real mistakes come from boundary conditions: \`<\` versus \`<=\`, null assumptions, or conditions whose order changes the outcome. Put the most specific or safety-critical checks where they are evaluated before broader cases when the logic requires it.`
+          },
+          {
+            title: "Interview scenario",
+            content: `Given a pricing rule with VIP, promotional, and default prices, ask which rule should win when a customer satisfies multiple conditions. The answer is a business-ordering decision first, then an \`if\` structure. Code should make that priority obvious.`
+          }
+        ]
+      },
+      {
+        title: "switch",
+        slug: "switch",
+        description: "The switch statement has changed a lot in modern Java — the old fall-through behavior that caused so many bugs is now optional, and switch can do much more than it used to. The classic `switch` (the only form that. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "`switch` selects among alternatives based on a selector value. Traditional `case` labels can fall through when `break` is omitted, while arrow-style switch rules avoid accidental fall-through. Modern Java also supports switch expressions that produce a value.\n\nThe conceptual question is whether the alternatives represent a closed set of cases. `switch` can make such branching clearer than a long chain of `if` statements. Always consider what should happen for an unhandled value and whether the compiler can help enforce exhaustiveness for the selected switch form."
+          },
+          {
+            title: "What it means",
+            content: `The switch statement has changed a lot in modern Java — the old fall-through behavior that caused so many bugs is now optional, and switch can do much more than it used to. The classic \`switch\` (the only form that existed before Java 14) works by jumping straight to the matching \`case\` label and then continuing to execute every case *after* it too, unless you explicitly write \`break\`. This 'fall-through' behavior is one of the most notorious sources of subtle bugs in C-family languages — forgetting a single \`break\` silently changes your program's behavior.
+
+It's occasionally used intentionally, to let several case labels share the exact same code, but that's the exception rather than the rule. Java 14 introduced a much better alternative: the switch *expression*, written with an arrow (\`case X -> ..\`). With this form, each case is completely isolated — no fall-through at all, by default — and the entire construct can directly produce a value you assign to a variable or return.
+
+If a particular case needs multiple statements to compute its result, you use the \`yield\` keyword to specify what value that block produces. You can also combine several case labels with commas in one line: \`case MONDAY, TUESDAY -> ..\`. There's a genuine safety benefit here too: when you switch over an \`enum\`, the compiler can verify you've handled every possible value (this is called exhaustiveness checking) — if you later add a new value to that enum and forget to handle it in your switch expression, the compiler will flag it, catching a bug the old switch statement never could.
+
+Java 21 pushed this even further with pattern matching for switch — you can switch based on an object's actual type, and even pull apart ('deconstruct') a record's fields directly in the case label, optionally combined with a \`when\` clause for extra conditions. This turns switch into a genuinely powerful tool for matching against different kinds of data, much closer to what you'd find in modern functional languages.`
+          },
+          {
+            title: "How it works",
+            content: `The \`switch\` statement selects behavior based on one selector value and a set of cases. In the traditional form, a matching case begins execution and can continue into later cases unless \`break\` or another control-flow construct stops it. This fall-through behavior is useful in deliberate grouping but is a frequent source of bugs.
+
+Modern Java also supports switch expressions, which produce a value. Arrow-style cases make accidental fall-through less likely, while \`yield\` can return a value from a block-style case. The language has also expanded switch capabilities over time, so the exact syntax available depends on the Java version being targeted.
+
+When choosing switch, think about the kind of decision being modeled. It is well suited to a finite set of discrete alternatives. If the logic depends on complex ranges or unrelated conditions, \`if\` chains may be clearer.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Old style - fall-through risk if you forget 'break'
+switch (day) {
+    case MONDAY:
+    case TUESDAY:
+    System.out.println("Early week");
+    break; // required to stop here
+    default:
+    System.out.println("Other");
+}
+// Modern switch expression (Java 14+) - no fall-through, produces a value
+String result = switch (day) {
+    case MONDAY, TUESDAY -> "Early week";
+    case WEDNESDAY -> {
+        String s = "Midweek";
+        yield s; // 'yield' hands back the value from a multi-line block
+    }
+    default -> "Other";
+};
+// Pattern matching switch (Java 21+)
+String describe(Object obj) {
+    return switch (obj) {
+        case Integer i when i > 0 -> "positive int";
+        case Integer i -> "non-positive int";
+        case String s -> "string of length " + s.length();
+        default -> "unknown";
+    };
+}
+\`\`\``
+          },
+          {
+            title: "Modern switch thinking",
+            content: `\`switch\` expresses selection among discrete alternatives. Modern Java supports both statement and expression forms, with arrow labels available in newer language levels. The expression form can return a value, which often makes exhaustive mappings clearer than mutable temporary variables.`
+          },
+          {
+            title: "Fall-through and exhaustiveness",
+            content: `Traditional colon-style cases can fall through unless control flow exits explicitly. Arrow cases do not fall through in the same way. For enum or sealed-type logic, exhaustive handling can let the compiler help identify missing cases.`
+          },
+          {
+            title: "Interview trap",
+            content: `Do not say \`switch\` always compares with \`==\`. The exact matching rules depend on the selector type and language construct. Explain the supported selector types and the semantics of the form being used.`
+          }
+        ]
+      },
+      {
+        title: "for loop",
+        slug: "for-loop",
+        description: "Java has two forms of the for loop — the classic counter-based version and the simpler for-each version — and each has situations where it's clearly the better choice. The classic `for` loop follows the pattern `for. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 15,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A `for` loop is useful when initialization, continuation, and progression form a compact iteration contract. The classic form has initialization, a boolean condition, and an update expression; enhanced `for` iterates over arrays or `Iterable` values without exposing index management.\n\nThe key correctness property is progress: every iteration should move the loop toward termination unless the loop is intentionally unbounded. Off-by-one errors usually come from confusing an inclusive endpoint with Java's common exclusive upper bound, such as `i < length` for array indices."
+          },
+          {
+            title: "What it means",
+            content: `Java has two forms of the for loop — the classic counter-based version and the simpler for-each version — and each has situations where it's clearly the better choice. The classic \`for\` loop follows the pattern \`for (initialization; condition; update)\`, giving you full control over exactly how the loop variable starts, when it stops, and how it changes each time. Any of the three parts can technically be left empty — \`for (;;)\` is a perfectly valid way to write an infinite loop — and you can even initialize or update multiple variables at once using commas.
+
+The enhanced for loop, often called 'for-each,' was added to make iterating over collections and arrays simpler: \`for (String s : list)\` reads each item in turn without you having to manage an index variable yourself. Under the hood, this is really just convenient shorthand — for a collection, it automatically calls the collection's iterator and repeatedly asks it for the next item until there isn't one left. The important limitation to learn early: a for-each loop doesn't give you direct access to the index of the current item, and — more importantly — you cannot safely add or remove items from the collection you're looping over while using for-each.
+
+Doing so throws a \`ConcurrentModificationException\`, because the loop detects that the collection changed unexpectedly while it was mid-iteration. If you genuinely need to remove items while looping, use the collection's \`Iterator\` directly and call its own \`remove()\` method, or simply use the convenient \`removeIf()\` method that many collections provide. As a performance note worth knowing: for-each is efficient for every common collection type, including \`LinkedList\`.
+
+But if you instead write a classic indexed loop using \`get(i)\` on a \`LinkedList\`, each call has to walk through the list from one end to reach that index, which makes the whole loop far slower overall than it would be for an \`ArrayList\`. This is a good practical reason to reach for for-each by default unless you specifically need the index.`
+          },
+          {
+            title: "How it works",
+            content: `A \`for\` loop is designed for repeated execution where initialization, continuation, and update can be expressed together. The classic form has three parts: the initialization runs once, the condition is checked before each iteration, and the update runs after the loop body. This makes counted loops easy to read because the control variables are visible in one place.
+
+The loop variable normally changes according to the update expression, but Java does not require it to increase by one. You can count down, use different step sizes, or update multiple variables when the problem requires it. The condition determines whether another iteration is allowed, so a mistake there can create an infinite loop or skip the intended final value.
+
+The enhanced \`for\` loop is a different form intended for traversing arrays and iterable collections without explicit index management. Use the classic form when you need an index or custom update logic, and the enhanced form when you simply need each element.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Classic for loop - full control over the loop variable
+for (int i = 0, j = 10; i < j; i++, j--) {
+    System.out.println(i + "," + j);
+}
+// Enhanced for-each - simple iteration
+List<String> names = new ArrayList<>(List.of("Amy", "Bo", "Cy"));
+for (String name : names) {
+    System.out.println(name);
+}
+// WRONG - modifying the list during for-each throws ConcurrentModificationException
+// for (String name : names) { if (name.equals("Bo")) names.remove(name); }
+// CORRECT - safe removal during iteration
+names.removeIf(n -> n.equals("Bo"));
+\`\`\``
+          },
+        ]
+      },
+      {
+        title: "while loop",
+        slug: "while-loop",
+        description: "A `while` loop repeatedly evaluates a condition and executes a body while that condition remains true. Learn how initialization, progress, termination, timeouts, cancellation, and state changes interact, including the subtle bugs caused by conditions that never become false.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A `while` loop checks its condition before each iteration, so it may execute zero times. It is ideal when the number of iterations is not known in advance and termination depends on changing state, input, or an external condition.\n\nProduction polling loops should include a clear exit strategy such as a timeout, cancellation signal, bounded retry count, or state transition. A loop that waits for something but never changes the observed state or never checks cancellation can become an infinite resource consumer. Make the condition and the state update easy to identify."
+          },
+          {
+            title: "What it means",
+            content: `A while loop checks its condition before every iteration, which makes it the natural choice whenever you don't know in advance how many times you'll need to loop. A \`while\` loop is a pre-test loop: Java checks the condition first, and only enters the loop body if it's true. That means the body might not run at all if the condition is already false the first time it's checked — this is a key difference from \`do-while\`, which always runs the body at least once.
+
+You'll reach for \`while\` naturally whenever the number of iterations depends on something happening at runtime rather than a simple counter — reading lines from a file until you hit the end, retrying a network call until it succeeds or you give up, or processing items in a queue until it's empty. In fact, a \`for\` loop is really just a \`while\` loop with the setup and update steps folded into the header syntax; the choice between them is mostly about which one communicates your intent more clearly.
+
+Use \`for\` when there's an obvious counter; use \`while\` when the loop is driven by a condition instead. The classic beginner mistake with \`while\` loops is forgetting to update whatever variable the condition depends on, which creates an infinite loop. Because the update step isn't baked into the loop syntax the way it is with \`for\`, it's easier to accidentally leave it out, especially once the loop body grows and the state-changing line gets buried among other logic.`
+          },
+          {
+            title: "How it works",
+            content: `A \`while\` loop repeats a block as long as its condition remains true. The condition is evaluated before the body, which means the body may execute zero times. This makes \`while\` a natural fit when the number of iterations is not known in advance and depends on some changing state or external input.
+
+The loop must have a path that changes the state relevant to its condition. If nothing can make the condition false, the loop can run indefinitely. This is not inherently wrong—servers and event-processing loops may intentionally run for the lifetime of a process—but accidental infinite loops are usually caused by forgetting an update.
+
+When reading a \`while\` loop, identify the initial condition, the state changed inside the body, and the condition that eventually stops the loop. This three-part mental model makes debugging much easier than simply tracing individual iterations.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+// Pre-test: might run zero times if connected is already true
+int retries = 0;
+while (retries < maxRetries && !connected) {
+    connected = tryConnect();
+    retries++;
+}
+// Driven by a condition, not a fixed counter
+String line;
+while ((line = reader.readLine()) != null) {
+    process(line);
+}
+\`\`\``
+          },
+          {
+            title: "When while fits",
+            content: `Use \`while\` when the number of iterations is naturally unknown and continuation depends on a condition checked before each iteration. Examples include reading until end-of-input or retrying while a condition remains true.`
+          },
+          {
+            title: "Termination",
+            content: `The loop body must make progress toward termination or delegate that progress to an operation whose state changes. If the condition depends on external state, include timeout or cancellation behavior where waiting indefinitely is unacceptable.`
+          },
+          {
+            title: "Interview scenario",
+            content: `Ask how to poll a remote operation safely. A strong answer includes a bounded timeout, a sensible polling interval, cancellation handling, and logging/metrics rather than a tight infinite loop.`
+          },
+          {
+            title: "Production polling",
+            content: `A production polling loop should normally include a deadline or bounded retry count, cancellation support, and controlled delay/backoff. An unbounded tight loop can consume CPU, overload a dependency, and make an outage worse.`
+          }
+        ]
+      },
+      {
+        title: "do-while loop",
+        slug: "do-while-loop",
+        description: "do-while flips the order of a while loop: it runs the body first and checks the condition afterward, guaranteeing at least one execution. `do-while` is a post-test loop — the body always executes at least once before. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A `do-while` loop guarantees at least one execution because its condition is checked after the body. This makes it useful for workflows such as prompting for input, performing an operation, and then deciding whether to repeat.\n\nThe trailing semicolon is part of the syntax and is easy to overlook. When choosing between `while` and `do-while`, focus on the business rule: should the body run when the condition is initially false? If the answer is no, `while` communicates the contract more directly."
+          },
+          {
+            title: "What it means",
+            content: `do-while flips the order of a while loop: it runs the body first and checks the condition afterward, guaranteeing at least one execution. \`do-while\` is a post-test loop — the body always executes at least once before the condition is even evaluated. Syntactically, it requires a semicolon after the closing \`while(condition)\`, which is easy to forget the first time you write one. The clearest real-world case for \`do-while\` is anything where you need a result from the body before you can meaningfully check whether to continue.
+
+The textbook example is a menu-driven program: you have to display the menu and read the user's choice at least once before you can check 'did they choose to quit?' A regular \`while\` loop would need something to check *before* the first pass even happens, which doesn't exist yet. In everyday practice, \`do-while\` is the least commonly used of the three loop types, simply because most iteration naturally fits a pre-test model where you want to check the condition before doing anything. But recognizing the specific situation where you genuinely need 'run once, then decide whether to continue' will save you from writing an awkward workaround with a regular \`while\` loop and a duplicated priming step before it.`
+          },
+          {
+            title: "How it works",
+            content: `A \`do-while\` loop differs from \`while\` because the body executes before the condition is tested. Therefore the body always runs at least once. This is useful for operations such as displaying a menu, accepting input, and then deciding whether the user should be prompted again.
+
+The condition appears at the bottom of the loop, which changes the control-flow reasoning. The first execution is unconditional with respect to that loop condition; only subsequent executions depend on it. Developers should therefore ensure that running the body once is valid even when the eventual condition would be false.
+
+The same state-transition principle used with \`while\` applies here: something inside the loop normally changes the state used by the condition. A \`do-while\` is preferable when 'perform once, then decide whether to repeat' is the natural requirement. Otherwise, a normal \`while\` may communicate the intent more directly.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int choice;
+do {
+    System.out.println("1. Add 2. Remove          3. Quit");
+    choice = scanner.nextInt();
+    handle(choice);
+} while (choice != 3); // the menu always shows at least once
+\`\`\``
+          },
+          {
+            title: "At-least-once semantics",
+            content: `A \`do-while\` loop executes its body before checking the condition, so it is appropriate when one attempt is mandatory. Examples include showing a menu at least once or performing an operation before deciding whether another attempt is needed.`
+          },
+          {
+            title: "Edge cases",
+            content: `Because the body runs first, validation that must happen before any work belongs outside the loop or inside a guarded operation. Be especially careful when the first execution can have side effects such as sending a request or writing data.`
+          },
+          {
+            title: "Interview drill",
+            content: `The key difference from \`while\` is not performance; it is evaluation order. \`while\` may execute zero times, while \`do-while\` executes at least once.`
+          }
+        ]
+      },
+      {
+        title: "break and continue",
+        slug: "break-and-continue",
+        description: "break and continue give you fine-grained control over loop execution, and labeled versions of both let you control outer loops from deep inside nested ones. `break` exits the nearest enclosing loop (or `switch`). The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "`break` exits the nearest applicable loop or switch, while `continue` skips the remainder of the current loop iteration and proceeds to the next iteration. Both alter the normal top-to-bottom flow and can make nested logic harder to reason about if overused.\n\nUse them to express meaningful control decisions, such as stopping after a match or skipping invalid input. In deeply nested loops, a small helper method or clearer condition may communicate intent better. Remember that `break` without a label affects only the nearest loop/switch."
+          },
+          {
+            title: "What it means",
+            content: `break and continue give you fine-grained control over loop execution, and labeled versions of both let you control outer loops from deep inside nested ones. \`break\` exits the nearest enclosing loop (or \`switch\`) immediately. \`continue\` skips the rest of the current iteration and jumps straight to the next one — for a \`for\` loop, that means running the update step and then re-checking the condition. Both, by default, only affect the loop they're directly written inside. That default becomes a real limitation with nested loops.
+
+Imagine searching a 2D grid for a value: once you find it in the inner loop, a plain \`break\` only stops the inner loop — the outer loop keeps running unnecessarily. Java's solution, instead of a \`goto\` (which the language deliberately doesn't have), is a labeled break or continue: you put a label before the outer loop, and \`break outerLabel;\` exits that specific loop directly, jumping out of every level of nesting in between in one step. Labeled break/continue is a legitimate, idiomatic Java feature for this exact nested-search pattern — it's not a hack.
+
+That said, it's used sparingly in real code, because heavily nested loops with labeled jumps can get hard to follow. A common alternative that's often cleaner: extract the nested search into its own method and simply \`return\` as soon as you find what you're looking for — \`return\` naturally exits every level of nesting at once, without needing a label at all.`
+          },
+          {
+            title: "How it works",
+            content: `The \`break\` statement exits the nearest enclosing loop or switch immediately. The \`continue\` statement skips the remainder of the current loop iteration and proceeds to the next iteration's condition or update phase, depending on the loop form.
+
+These statements are control-flow shortcuts, so their effect is easiest to understand by identifying the exact construct they target. A \`break\` inside a nested loop exits the inner loop, not all loops surrounding it. Java also supports labeled \`break\` and \`continue\` for explicitly targeting an outer loop, although labels should be used sparingly because they can make control flow harder to follow.
+
+A common mistake is using \`continue\` before the state update needed to make a loop progress. That can create an infinite loop. The safest approach is to verify what code will be skipped and whether the next iteration still has a path toward termination.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+int[][] grid = {{1,2,3},{4,5,6},{7,8,9}};
+int target = 5;
+outer:
+for (int i = 0; i < grid.length; i++) {
+    for (int j = 0; j < grid[i].length; j++) {
+        if (grid[i][j] == target) {
+            break outer; // exits BOTH loops immediately
+        }
+    }
+}
+// Often cleaner: extract to a method and just return
+boolean contains(int[][] g, int target) {
+    for (int[] row : g) {
+        for (int v : row) {
+            if (v == target) return true; // exits everything naturally
+        }
+    }
+    return false;
+}
+\`\`\``
+          },
+          {
+            title: "Control-flow trade-off",
+            content: `\`break\` exits the nearest applicable loop or switch, while \`continue\` skips the remainder of the current loop iteration and starts the next one. Both can simplify search or filtering logic, but excessive use can hide the main control-flow path.`
+          },
+          {
+            title: "Nested loops",
+            content: `In nested loops, an unlabeled \`break\` affects the nearest loop. Labeled control flow exists but should be used sparingly because it can make reasoning harder. Often extracting the nested operation into a method gives a clearer design.`
+          },
+          {
+            title: "Interview scenario",
+            content: `When searching a matrix for the first match, decide whether you need to stop only the inner loop or the entire search. Explain the desired scope of termination before choosing \`break\` or a different structure.`
+          }
+        ]
+      }
+    ]
+  },
+  {
+    title: "OOP Fundamentals",
+    slug: "oop-fundamentals",
+    description: "Object-oriented building blocks: overloading, static and final members, access control, classes, objects, and constructors.",
+    topics: [
+      {
+        title: "Method overloading",
+        slug: "method-overloading",
+        description: "Overloading lets one method name represent several compile-time signatures. Learn how Java selects an overload, including widening, boxing, varargs, `null`, inheritance, and ambiguity, and why overload resolution is fundamentally different from runtime overriding.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Overloading means multiple methods share a name but have different parameter lists. The compiler chooses an applicable overload at compile time using the static types and conversion rules available at the call site. Return type alone cannot distinguish overloads.\n\nThis is why an overload can be selected differently when a variable is declared as a supertype, even if the runtime object is a subtype. Overloading should improve API usability, not create ambiguous calls. Be especially careful with `null`, boxing/unboxing, varargs, and numeric conversions because they can make overload resolution surprising."
+          },
+          {
+            title: "Deep conceptual model",
+            content: "Object-oriented design is primarily about modeling responsibilities and boundaries, not merely creating classes. Encapsulation controls how state changes, abstraction exposes the behavior consumers need, polymorphism allows different implementations behind a common contract, and inheritance is one reuse mechanism rather than the goal of OOP.\n\nPrefer composition when one object can collaborate with another without pretending to be a subtype. Inheritance should communicate a genuine substitutable relationship. This distinction prevents fragile class hierarchies where subclasses inherit behavior they do not conceptually own."
+          },
+          {
+            title: "What it means",
+            content: `Overloading lets you give several methods the same name as long as their parameter lists differ — and the compiler decides which one to call using a well-defined priority order. Overloading means defining multiple methods in the same class with the same name but different parameter lists — different types, different number of parameters, or a different order. It's resolved entirely at compile time based on the types of the arguments you pass, which is why it's sometimes called 'compile-time polymorphism,' in contrast to overriding, which is resolved at runtime instead.
+
+The compiler works through a specific sequence of phases when deciding which overload matches your call: it first checks for an exact type match with no conversion needed at all; if there isn't one, it allows widening primitive conversions (like \`int\` to \`long\`); if still nothing matches, it allows autoboxing/unboxing; and only as an absolute last resort will it consider a varargs method. Java always picks the single most specific applicable method — if two overloads are equally applicable and neither is clearly more specific, the compiler refuses to guess and reports an 'ambiguous method call' error instead.
+
+One tricky case worth knowing: passing \`null\` directly as an argument can be genuinely ambiguous if two overloads take unrelated reference types, like \`foo(String)\` and \`foo(Integer)\` — the compiler can't tell which one you mean, and you'll need an explicit cast like \`foo((String) null)\` to clarify your intent.`
+          },
+          {
+            title: "How it works",
+            content: `Method overloading allows multiple methods in the same class to use the same name when their parameter lists are different. The compiler chooses the applicable overload at compile time based on the number, order, and types of the arguments. The return type alone is not enough to distinguish two methods, so changing only the return type creates a duplicate method signature.
+
+Overload resolution follows Java's conversion rules. An exact type match is generally preferred, followed by compatible widening conversions and other applicable mechanisms such as boxing and varargs. This is why adding an overload can sometimes change which method a previously valid call selects. Calls involving \`null\` can also become ambiguous when multiple reference-type overloads are equally specific.
+
+Overloading is useful when operations are conceptually the same but accept different inputs. The overloads should remain semantically consistent; creating many unrelated meanings behind one method name can make APIs harder to understand.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+void print(int x) { System.out.println("int: " + x); }
+void print(double x) { System.out.println("double: " + x); }
+void print(String x) { System.out.println("String: " + x); }
+print(5);       // "int: 5"
+print(5.0);     // "double: 5.0"
+print("hi");    // "String: hi"
+void ambiguous(String s) {}
+void ambiguous(Integer i) {}
+// ambiguous(null); // COMPILE ERROR - ambiguous! Needs an explicit cast to disambiguate
+\`\`\``
+          },
+          {
+            title: "Overload resolution",
+            content: `Overloading means multiple methods share a name but have different parameter lists. The compiler chooses an applicable overload using the compile-time types and conversion rules of the arguments. The runtime type of an object can affect overridden method dispatch, but it does not dynamically choose an overload in the same way.`
+          },
+          {
+            title: "Common traps",
+            content: `Autoboxing, widening, varargs, \`null\`, and ambiguous numeric literals can change which overload is selected or make a call ambiguous. Avoid creating overloads that differ only in subtle conversions unless the API remains obvious to callers.`
+          },
+          {
+            title: "Interview trap",
+            content: `Overloading is resolved primarily at compile time; overriding is dynamically dispatched for instance methods. This distinction is one of the most common Java interview questions.`
+          },
+          {
+            title: "Interview trap",
+            content: `Overloading and overriding are different mechanisms. Overloading is selected from signatures and compile-time types; overriding participates in runtime dispatch for instance methods. Boxing, unboxing, widening, varargs, and \`null\` can make overload resolution surprisingly subtle.`
+          }
+        ]
+      },
+      {
+        title: "static methods and fields",
+        slug: "static-methods-and-fields",
+        description: "A static member belongs to the class rather than to an individual object. Learn class initialization, static state, access through instances versus classes, utility methods, and the concurrency and testability problems that shared mutable static state can introduce.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A static member belongs to the class rather than to a particular object instance. A static method has no implicit `this`, so it cannot directly access instance state without receiving an object reference. A static field has one class-level storage location per relevant class loader, making it shared mutable state when it can change.\n\nStatic methods are excellent for behavior that does not depend on object identity, such as pure utility operations. Static mutable fields require more care because they create hidden shared state, complicate tests, and may need synchronization or other concurrency controls. “Static” is not synonymous with “global and always good.”"
+          },
+          {
+            title: "What it means",
+            content: `static members belong to the class itself rather than any individual object — useful for shared state and utility methods, but easy to misuse if you're not careful. A \`static\` member belongs to the class as a whole, not to any specific object of that class. There's exactly one copy, shared by every instance, loaded into memory once when the class is first loaded — no matter how many objects you create afterward, or even if you create none at all.
+
+This has a direct consequence for static methods: since there's no guaranteed instance behind a static method call, a static method has no \`this\` reference and therefore cannot directly access instance (non-static) fields or call instance methods — there might be zero objects of that class in existence when the static method runs. It can, however, freely use other static members, and it can operate on a specific instance if one is explicitly passed in as a parameter. Static members shine for a handful of legitimate use cases: constants (paired with \`final\`), utility methods that don't need any object state (\`Math.sqrt()\`, \`Integer.parseInt()\` are all static), and shared counters or caches meant to be common across every instance.
+
+But mutable static fields are effectively global state, and that comes with real downsides — they make unit tests harder to write reliably (since state can leak between tests unless carefully reset) and create hidden coupling between unrelated parts of a codebase that both happen to touch the same static field. As you grow as a Java developer, you'll notice modern, testable designs lean toward passing dependencies explicitly (dependency injection) rather than reaching for shared static state.`
+          },
+          {
+            title: "How it works",
+            content: `A \`static\` member belongs to the class rather than to an individual object. A static field therefore represents shared state, while a static method can be called without an instance. This is why utility methods such as \`Math.sqrt()\` can operate without a particular \`Math\` object.
+
+A static method has no implicit \`this\` reference because there is no required current instance. It can directly access other static members, but it cannot directly read an instance field or call an instance method without first being given an object. An instance method, by contrast, can access both instance and static members.
+
+Static mutable fields should be treated carefully because they behave like shared global state within the application. They can introduce hidden coupling and make tests order-dependent. \`static final\` constants and genuinely stateless utility operations are much easier to reason about than arbitrary shared mutable state.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+class Counter {
+    static int totalInstances = 0;           // shared across ALL Counter objects
+    int id;
+    Counter() {
+        id = ++totalInstances;                // an instance method CAN touch static state
+    }
+    static int getTotal() {
+        return totalInstances;                // fine - static accessing static
+        // return id;                        // COMPILE ERROR - no 'this' available here
+    }
+}
+\`\`\``
+          },
+          {
+            title: "Class-level state",
+            content: `A static field belongs to the class rather than an individual object. A static method can be called without an instance and therefore cannot directly access instance state through an implicit \`this\`. This makes static members suitable for stateless utilities and genuinely shared class-level state.`
+          },
+          {
+            title: "Concurrency risk",
+            content: `A mutable static field becomes shared state across threads and requests. That can create race conditions, test pollution, and lifecycle problems. Prefer immutable constants or dependency-managed state over mutable global variables in application code.`
+          },
+          {
+            title: "Interview drill",
+            content: `Why can't a static method directly use \`this\`? There is no instance receiver for a static invocation. If instance behavior is required, the method needs an explicit object reference or should be an instance method.`
+          },
+          {
+            title: "Concurrency warning",
+            content: `A mutable static field is shared state. Single-threaded correctness does not prove thread safety, and tests can leak state from one case into another. Prefer immutable static constants or explicitly managed shared-state mechanisms when the state truly needs process-wide scope.`
+          }
+        ]
+      },
+      {
+        title: "final variables and methods",
+        slug: "final-variables-and-methods",
+        description: "final means something slightly different depending on whether you apply it to a variable, a method, or a class — worth learning all three uses distinctly. On a **variable**, `final` means it can be assigned exactly. The goal is to understand how this feature behaves in real code, where it can surprise you, and how to explain it clearly in an interview.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "`final` means different things depending on where it is applied. A final variable cannot be assigned again after initialization; a final reference can still point to a mutable object whose internal state changes. A final method cannot be overridden by subclasses. A final class cannot be subclassed.\n\nUse `final` to communicate invariants and design intent, not as a promise that an object is immutable. For true immutability, the object's observable state must also be protected from mutation, including through mutable fields, returned collections, or leaked internal references."
+          },
+          {
+            title: "What it means",
+            content: `final means something slightly different depending on whether you apply it to a variable, a method, or a class — worth learning all three uses distinctly. On a **variable**, \`final\` means it can be assigned exactly once and never reassigned afterward. For object references, this only locks the reference itself — it says nothing about whether the object it points to can still be changed internally.
+
+A \`final\` local variable also plays a special role with lambdas and anonymous classes: only a \`final\` (or 'effectively final,' meaning never reassigned even without the keyword) local variable can be used inside one, because the closure captures its value at creation time, and allowing later reassignment would create confusion about which value the closure should actually see. On a **method**, \`final\` prevents any subclass from overriding it. This is used when a base class needs to guarantee that a specific piece of behavior can never be changed by a subclass — protecting an invariant the rest of the class relies on staying exactly as written.
+
+On a **class**, \`final\` prevents it from being subclassed at all. \`String\` and all the primitive wrapper classes like \`Integer\` are \`final\` for exactly this reason — it guarantees their behavior (including their immutability) can never be subtly altered by an unexpected subclass, which is important both for correctness and for the strong optimization assumptions the JVM can make about them.`
+          },
+          {
+            title: "How it works",
+            content: `The \`final\` modifier means different things depending on what it is applied to. A final variable can be assigned only once. A final method cannot be overridden by a subclass. A final class cannot be subclassed. These are compile-time constraints that communicate and enforce design intent.
+
+For references, \`final\` freezes the variable's reference, not necessarily the object. A \`final List<String>\` can still have elements added if the list itself is mutable; the variable simply cannot be pointed to a different list. This distinction is essential when discussing immutability.
+
+Final fields also interact with object initialization. They must be definitely assigned, either at the declaration, in an initializer, or in every applicable constructor path. Using \`final\` can make state easier to reason about because the compiler prevents accidental reassignment, but it does not automatically make a complete object immutable.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+final int MAX = 100;
+// MAX = 200; // COMPILE ERROR - can't reassign a final variable
+final List<String> list = new ArrayList<>();
+list.add("ok"); // fine - mutating the object, not reassigning the reference
+// list = new ArrayList<>(); // COMPILE ERROR
+class Base {
+    final void criticalMethod() { /* cannot ever be overridden */ }
+}
+// class Sub extends Base { void criticalMethod() {} } // COMPILE ERROR
+final class ImmutablePoint { /* cannot be subclassed at all, just like String */ }
+\`\`\``
+          },
+          {
+            title: "What final guarantees",
+            content: `A final variable can be assigned only once according to Java's initialization rules. A final method cannot be overridden by subclasses. A final class cannot be subclassed. These are different guarantees and should not be collapsed into "final means immutable.`
+          },
+          {
+            title: "Initialization nuance",
+            content: `A blank final field can be assigned during a constructor or appropriate initialization path, but it must satisfy definite-assignment rules. This allows immutable objects to initialize state from constructor parameters while preventing later reassignment.`
+          },
+          {
+            title: "Interview trap",
+            content: `\`final List<String> items\` does not make the list immutable. The reference cannot be redirected, but the list may still be mutated. If immutability is required, the object's state and the references it exposes must also be protected.`
+          }
+        ]
+      },
+      {
+        title: "Access modifiers",
+        slug: "access-modifiers",
+        description: "Visibility is an API-design decision. Learn the exact rules for `private`, package-private, `protected`, and `public`, including the special behavior of `protected` across packages and why the narrowest sufficient visibility usually produces safer code.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Java's access modifiers define who can use a type or member. `private` is limited to the declaring class, package-private is available within the package, `protected` has package and subclass semantics, and `public` exposes the member broadly subject to other type/module boundaries.\n\nVisibility is an API design choice. Start with the narrowest access that satisfies the requirement, then widen deliberately. Public fields expose representation directly and make future invariants harder to enforce. Protected members are particularly subtle across packages, so explain the exact access context rather than memorizing “subclasses can access everything protected.”"
+          },
+          {
+            title: "What it means",
+            content: `Java has exactly four access levels forming a clear widening hierarchy — and one of them, protected, has a genuinely subtle rule about how it behaves across packages. The four levels, from most to least restrictive, are: \`private\` (visible only inside the declaring class, including any nested classes within it), package-private (no modifier at all — visible to any class in the same package), \`protected\` (package-private, plus visible to subclasses even in a different package, with a real nuance below), and \`public\` (visible from anywhere).
+
+The nuance with \`protected\` is genuinely subtle and worth learning carefully: it grants access to subclasses in a different package, but only when you access the member through a reference of the subclass's own type (or a further subtype) — not through a plain reference typed as the original superclass. In practice, if class \`B extends A\` lives in a different package than \`A\`, code inside \`B\` can access \`A\`'s protected member through \`this\` or through another \`B\`-typed variable, but not through a variable simply typed as \`A\` from outside \`A\`'s own package.
+
+This restriction exists specifically to prevent \`protected\` access from leaking to anyone who merely holds a reference to the superclass — it's meant to be usable only within the actual inheritance relationship. A closely related rule about overriding: when you override a method, you're only ever allowed to widen its access level, never narrow it. Overriding a \`protected\` method with a \`private\` one, for example, is a compile error — because that would silently break the guarantee that code holding a superclass reference can always call that method, regardless of which actual subtype the object turns out to be at runtime.`
+          },
+          {
+            title: "How it works",
+            content: `Java's access modifiers control which code can see a class or member. \`public\` provides the broadest normal visibility, \`private\` restricts access to the declaring class, \`protected\` permits access within the package and provides additional rules for subclasses, and package-private access applies when no modifier is written.
+
+The protected rule is especially important in cross-package inheritance. A subclass can access inherited protected members through the appropriate subclass context, but code in another package cannot simply treat protected access as public access to any superclass instance. This is why a simplistic 'protected means subclasses can access it anywhere' explanation is incomplete.
+
+Access control is part of encapsulation. Keeping implementation details private and exposing a smaller public API reduces coupling and gives a class more freedom to change internally. When overriding a method, the subclass cannot reduce the visibility of the inherited method because callers that could access the superclass method must remain able to access the override.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+package pkgA;
+public class A {
+    protected void greet() { System.out.println("hi"); }
+}
+package pkgB;
+import pkgA.A;
+public class B extends A {
+    void test(A a, B b) {
+        this.greet();     // OK - via the subclass instance
+        b.greet();        // OK - via a B-typed reference
+        // a.greet();       // COMPILE ERROR - via a plain A-typed reference from outside pkgA
+    }
+}
+// Overriding can widen access, never narrow it
+class Base { protected void method() {} }
+class Sub extends Base {
+    // private void method() {} // COMPILE ERROR - narrows protected to private
+    public void method() {}      // OK - widening is always allowed
+}
+\`\`\``
+          },
+          {
+            title: "Designing visibility",
+            content: `Access modifiers are API design tools. \`private\` keeps implementation details inside a class, package-private can expose collaboration within a package, \`protected\` has inheritance/package semantics that are often misunderstood, and \`public\` exposes an API to broader consumers.`
+          },
+          {
+            title: "Encapsulation",
+            content: `Do not make fields public merely to avoid writing methods. Encapsulation lets a class enforce invariants, validate changes, and change its internal representation without breaking callers.`
+          },
+          {
+            title: "Interview trap",
+            content: `\`protected\` does not simply mean "visible to every subclass everywhere." Its behavior depends on package membership and qualified access from subclasses. Explain the actual access rules rather than using a loose slogan.`
+          },
+          {
+            title: "API design",
+            content: `Visibility is a compatibility decision. Start with the narrowest access that satisfies the design, then widen deliberately. Public members become part of the API surface; private and package-level implementation details can evolve with less coupling.`
+          }
+        ]
+      },
+      {
+        title: "Object-oriented programming basics",
+        slug: "object-oriented-programming-basics",
+        description: "OOP in Java is useful when its ideas help model responsibilities and boundaries. Learn encapsulation, abstraction, inheritance, and polymorphism through concrete design decisions, including when composition is safer than inheritance and how dynamic dispatch enables substitutable implementations.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "Encapsulation, abstraction, inheritance, and polymorphism are useful as design lenses, but they should be tied to concrete Java behavior. Encapsulation protects invariants around state; abstraction exposes a useful contract without requiring callers to know implementation details; polymorphism lets callers work against a common type; inheritance establishes a subtype relationship.\n\nA practical design test is substitutability: if `Dog` extends `Animal`, code written for an `Animal` should be able to use a `Dog` without violating the expected contract. If that is not true, inheritance is probably modeling the wrong relationship. Interfaces and composition often provide a cleaner boundary."
+          },
+          {
+            title: "What it means",
+            content: `Encapsulation, inheritance, polymorphism, and abstraction are the four pillars of OOP — and each one maps to a specific, concrete Java feature worth connecting explicitly. **Encapsulation** means bundling data together with the methods that operate on it, while restricting direct access to that internal state. In Java this is achieved with \`private\` fields exposed through carefully controlled \`public\` getters and setters, or more compactly through \`record\` types for simple, immutable data carriers. **Inheritance** lets one class acquire the fields and methods of another using \`extends\`, modeling 'is-a' relationships and enabling code reuse.
+
+Java deliberately allows only single inheritance for classes (one direct superclass) while allowing a class to implement multiple interfaces — a design choice made specifically to avoid the classic 'diamond problem' ambiguity that complicates languages permitting full multiple inheritance of classes. **Polymorphism** is the ability for a single interface or reference type to behave differently depending on the actual underlying implementation. Java expresses this in two distinct ways: overloading (multiple methods with the same name but different parameters, resolved at compile time) and overriding (a subclass providing its own version of an inherited method, resolved dynamically at runtime based on the object's actual type). **Abstraction** means exposing only the essential behavior of something while hiding the implementation details behind it.
+
+Java achieves this through \`abstract\` classes and \`interface\`s, letting other code depend on a contract rather than a specific concrete implementation — this is exactly why well-designed code prefers to work with the \`List\` interface rather than committing directly to \`ArrayList\`, since it keeps the door open to swap implementations later without touching the calling code.`
+          },
+          {
+            title: "How it works",
+            content: `Object-oriented programming organizes software around objects that combine state and behavior. Encapsulation keeps related data and operations together while controlling direct access. Abstraction exposes the important contract without requiring callers to know implementation details. Inheritance allows a class to derive from another class, and polymorphism lets code work with a general type while the actual implementation varies.
+
+These ideas map directly to Java features. Private fields and methods support encapsulation; interfaces and abstract classes provide contracts and abstraction; \`extends\` and \`implements\` express inheritance relationships; and method overriding provides runtime polymorphic behavior. Java allows a class to extend one class but can implement multiple interfaces, which encourages composition of capabilities without multiple class inheritance.
+
+The most important practical lesson is that OOP is not merely about creating many classes. Good object-oriented design assigns responsibilities clearly, protects invariants, and lets callers depend on stable abstractions. A class should expose what other code needs while keeping unnecessary implementation details private.`
+          },
+          {
+            title: "Four ideas, used carefully",
+            content: `Encapsulation protects invariants and hides representation. Abstraction exposes useful behavior without requiring callers to know every implementation detail. Inheritance can model an is-a relationship, while polymorphism lets callers use a common contract with different implementations. These ideas are tools, not four mandatory layers in every class.`
+          },
+          {
+            title: "Composition versus inheritance",
+            content: `Composition often produces more flexible designs because behavior can be delegated to collaborators and changed without changing a type hierarchy. Inheritance is appropriate when the subtype genuinely satisfies the parent contract and substitutability remains valid.`
+          },
+          {
+            title: "Interview scenario",
+            content: `If a \`PaymentService\` needs a fraud checker, injecting a \`FraudChecker\` interface is often clearer than making \`PaymentService\` inherit from a fraud-checking class. The design question is which object owns which behavior, not how many OOP keywords can be used.`
+          },
+          {
+            title: "Senior design scenario",
+            content: `Use OOP to model contracts and responsibilities, not to maximize inheritance. A \`PaymentMethod\` interface can provide polymorphism while composition keeps the system extensible. Prefer inheritance when the subtype genuinely satisfies the parent contract and remains substitutable.`
+          }
+        ]
+      },
+      {
+        title: "Classes and objects",
+        slug: "classes-and-objects",
+        description: "A class defines a type's structure and behavior; an object is a runtime instance carrying its own state. Learn how fields, methods, constructors, identity, references, and object creation fit together and why a class definition should express a coherent responsibility.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A class is a type definition describing state and behavior; an object is a runtime instance of that class. Creating an object allocates an instance and initializes its fields according to Java's initialization rules. A reference variable then holds a reference to that object.\n\nA class should protect its invariants through controlled state changes. If every field is public and any value can be assigned at any time, the class has little control over its own correctness. Think of a class as a contract with valid states, operations that preserve those states, and dependencies it needs to perform its work."
+          },
+          {
+            title: "What it means",
+            content: `A class is a blueprint that exists once at compile time; an object is a concrete instance built from that blueprint at runtime — and the exact order operations happen in during object creation matters more than you'd expect. A class describes what fields and behavior its instances will have, while an object is an actual, independent entity built from that blueprint and allocated on the heap when the program runs. You can create as many objects from one class as you like, each with its own separate copy of instance fields, while all of them share the exact same method implementations and class-level metadata.
+
+Object creation with \`new\` follows a specific, learnable sequence: first, memory is allocated on the heap for the object's fields; second, every field is set to its default value (0, null, or false) as a starting baseline; third, field initializers and instance initializer blocks run in the exact order they appear in the source code; and finally, the constructor's own body executes. One detail that ties this together: if a constructor doesn't explicitly start with a call to \`this(..)\` or \`super(..)\`, the compiler automatically inserts a call to the superclass's no-argument constructor as the very first thing that happens — meaning the entire superclass construction process (including its own field initializers) completes before the subclass's own field initializers even begin.
+
+This ordering explains a subtle but real bug pattern worth remembering: calling an overridable method from inside a constructor is risky, because if a subclass overrides that method, its override will run during the superclass's construction phase — potentially before the subclass has initialized any of its own fields yet, leading the override to operate on incomplete, default state without any obvious warning.`
+          },
+          {
+            title: "How it works",
+            content: `A class defines the structure and behavior that its instances can have, while an object is a runtime instance of that class. Instance fields belong to each object, so two objects created from the same class can hold different state. Instance methods are defined by the class and can operate on whichever object is the receiver of the call.
+
+Creating an object with \`new\` involves more than simply allocating memory. The object receives default field values, initialization logic is applied, and a constructor runs to establish the intended initial state. Understanding this sequence is useful when fields have initializers or initializer blocks.
+
+References make object usage flexible. A variable can have a superclass or interface type while referring to a more specific object, which is the foundation for polymorphism. The class describes the available contract at compile time, while the actual object determines which overridden instance implementation executes at runtime.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+class Base {
+    Base() {
+        System.out.println("Base constructor");
+        init(); // risky - calls a potentially-overridden method during construction
+    }
+    void init() { System.out.println("Base init"); }
+}
+class Sub extends Base {
+    private String name = "ready"; // not yet assigned when Base() runs!
+    Sub() {
+        System.out.println("Sub constructor, name=" + name);
+    }
+    @Override
+    void init() {
+        System.out.println("Sub init, name=" + name); // prints null - field not initialized yet!
+    }
+}
+// new Sub() prints: Base constructor -> Sub init, name=null -> Sub constructor, name=ready
+\`\`\``
+          },
+          {
+            title: "Object lifecycle",
+            content: `A class defines structure and behavior; an object is a runtime instance with its own instance state. Creating an object allocates and initializes an instance, while static members remain associated with the class. The distinction matters when reasoning about state sharing and memory behavior.`
+          },
+          {
+            title: "Encapsulation and invariants",
+            content: `A class should prevent invalid states where practical. For example, an \`Account\` object can reject a negative balance transition instead of exposing a public field that any caller can modify. Constructors, methods, and access modifiers work together to maintain such invariants.`
+          },
+          {
+            title: "Interview drill",
+            content: `Question: "What is the difference between a class and an object?" Give the concise answer, then add the engineering value: the class defines the type's contract and implementation; an object is a concrete runtime instance carrying instance state.`
+          }
+        ]
+      },
+      {
+        title: "Constructors",
+        slug: "constructors",
+        description: "A constructor establishes the initial state of a newly created object. Learn constructor chaining, implicit `super()`, initialization order, overloaded constructors, validation, and why constructors should establish invariants without turning object creation into an unpredictable workflow.",
+        estimatedMinutes: 30,
+        sections: [
+          {
+            title: "Deep conceptual model",
+            content: "A constructor establishes a newly created object's initial state. It is invoked as part of object creation and does not have a return type. If a class declares no constructor, the compiler can provide a default no-argument constructor; once you declare a constructor yourself, that automatic constructor is no longer supplied.\n\nConstructor chaining matters: an instance constructor must ultimately initialize the superclass portion of the object, and `this(..)` or `super(..)` can delegate to another constructor. Keep constructors focused on establishing valid state. Expensive I/O, network calls, or operations that can fail unpredictably are often better handled outside construction."
+          },
+          {
+            title: "What it means",
+            content: `Constructors have a few strict rules around chaining and defaults that Java enforces — knowing them upfront avoids some genuinely confusing compile errors later. A constructor shares its name with the class, has no return type at all (not even \`void\`), and can be overloaded to support multiple ways of creating an object. If a class defines no constructors whatsoever, the compiler automatically supplies a no-argument default constructor whose accessibility matches the class that does essentially nothing but call the superclass's constructor.
+
+The important catch: this free default constructor only appears when you define *zero* constructors yourself — the moment you write even one constructor of your own, that automatic one disappears entirely, and you'll need to write a no-arg constructor explicitly if you still want one. Constructors can chain to each other in two directions: \`this(..)\` calls a different constructor within the *same* class (useful for avoiding duplicated setup logic across several overloaded constructors), and \`super(..)\` calls a constructor in the *parent* class.
+
+Both must be the very first statement in the constructor if used, and you can never use both \`this(..)\` and \`super(..)\` together in the same constructor, since that would attempt two separate, conflicting initialization paths for the same object. If you write neither, the compiler quietly inserts a call to the parent's no-argument constructor for you. This has a real, practical consequence worth remembering: if a superclass only defines constructors that require arguments — with no no-argument constructor available at all — then every single subclass constructor *must* explicitly call \`super(..)\` with matching arguments.
+
+The compiler's usual automatic insertion of a no-arg \`super()\` call simply fails to compile in that situation, since there's no such constructor to call, forcing you to write the chain explicitly.`
+          },
+          {
+            title: "How it works",
+            content: `A constructor initializes a newly created object. It has the same name as its class and no return type, and it runs as part of object creation. If a class declares no constructor, Java may provide a default no-argument constructor, but that automatic constructor disappears once the class declares another constructor.
+
+Constructor chaining is central to inheritance. A constructor can call another constructor in the same class with \`this(..)\`, or it can invoke a superclass constructor with \`super(..)\`. A constructor invocation must occur as the first statement in the constructor body. If no explicit superclass constructor call is written, Java attempts to invoke the superclass's no-argument constructor.
+
+Constructors should establish valid initial state rather than performing unrelated work. In a class hierarchy, each constructor is responsible for initializing its own part of the object, while constructor chaining ensures superclass initialization occurs before subclass-specific initialization. This is why a missing accessible superclass no-argument constructor can cause a subclass constructor to fail at compile time.`
+          },
+          {
+            title: "Example",
+            content: `\`\`\`java
+class Vehicle {
+    String type;
+    Vehicle(String type) { this.type = type; } // no no-arg constructor exists here
+}
+class Car extends Vehicle {
+    int wheels;
+    Car(String type) {
+        super(type);        // REQUIRED - there's no implicit super() possible
+        this.wheels = 4;
+    }
+    Car() {
+        this("sedan");       // chains to the other Car constructor above
+    }
+}
+// class Motorbike extends Vehicle { Motorbike() {} } // COMPILE ERROR - missing required super(
+type) call
+\`\`\``
+          },
+          {
+            title: "Constructor design",
+            content: `A constructor should establish a valid initial state. Keep expensive external work, network calls, and unpredictable side effects out of constructors when possible because object creation then becomes harder to test and failure becomes harder to manage. Dependency injection frameworks may have additional lifecycle rules, so constructor design should match the framework's expectations.`
+          },
+          {
+            title: "Chaining and inheritance",
+            content: `\`this(..)\` delegates to another constructor in the same class; \`super(..)\` invokes a superclass constructor. A constructor can choose one of these paths, and the selected constructor chain must eventually initialize the superclass portion of the object. If the superclass has no accessible no-argument constructor, the subclass must call an available constructor explicitly.`
+          },
+          {
+            title: "Interview trap",
+            content: `The compiler-provided default constructor is not necessarily public. Its accessibility follows the class's accessibility when the compiler supplies it. Also, declaring any constructor prevents the compiler from supplying that default constructor, so adding a parameterized constructor can break callers that previously used \`new Type()\`. `
+          },
+          {
+            title: "Production design",
+            content: `A constructor should establish a valid object state and required dependencies. Avoid surprising network calls, database writes, or long-running work in constructors when possible. Constructor chaining through \`this(..)\` and \`super(..)\` should make initialization order explicit.`
+          }
+        ]
+      }
+    ]
+  }
+];
+
+const coreJavaCategory: CategorySeed = {
+  name: "Core Java",
+  slug: "core-java",
+  description: "A structured Core Java curriculum covering Java fundamentals, control flow, arrays, methods, packages, the JVM model, and object-oriented programming with explanations, examples, edge cases, production reasoning, and interview practice.",
+  icon: "JAVA",
+  sortOrder: 1,
+  paths: [
+    {
+      name: "Core Java",
+      slug: "core-java",
+      description: "Build a strong Core Java foundation from language basics through object-oriented programming.",
+      level: StudyLevel.BEGINNER,
+      modules,
+    },
+  ],
+};
+
+async function ensureCategory(categorySeed: CategorySeed) {
+  const category = await prisma.studyCategory.upsert({
+    where: { slug: categorySeed.slug },
+    update: {
+      name: categorySeed.name,
+      description: categorySeed.description,
+      icon: categorySeed.icon,
+      sortOrder: categorySeed.sortOrder,
+      isPublished: true,
+    },
+    create: {
+      name: categorySeed.name,
+      slug: categorySeed.slug,
+      description: categorySeed.description,
+      icon: categorySeed.icon,
+      sortOrder: categorySeed.sortOrder,
+      isPublished: true,
+    },
+  });
+  for (let pathIndex = 0; pathIndex < categorySeed.paths.length; pathIndex += 1) {
+    const pathSeed = categorySeed.paths[pathIndex];
+    const path = await prisma.studyPath.upsert({
+      where: { categoryId_slug: { categoryId: category.id, slug: pathSeed.slug } },
+      update: {
+        name: pathSeed.name,
+        description: pathSeed.description,
+        level: pathSeed.level,
+        isPublished: true,
+        sortOrder: pathIndex,
+      },
+      create: {
+        categoryId: category.id,
+        name: pathSeed.name,
+        slug: pathSeed.slug,
+        description: pathSeed.description,
+        level: pathSeed.level,
+        isPublished: true,
+        sortOrder: pathIndex,
+      },
+    });
+    for (let moduleIndex = 0; moduleIndex < pathSeed.modules.length; moduleIndex += 1) {
+      const moduleSeed = pathSeed.modules[moduleIndex];
+      const studyModule = await prisma.studyModule.upsert({
+        where: { studyPathId_slug: { studyPathId: path.id, slug: moduleSeed.slug } },
+        update: {
+          title: moduleSeed.title,
+          description: moduleSeed.description,
+          isPublished: true,
+          sortOrder: moduleIndex,
+        },
+        create: {
+          studyPathId: path.id,
+          title: moduleSeed.title,
+          slug: moduleSeed.slug,
+          description: moduleSeed.description,
+          isPublished: true,
+          sortOrder: moduleIndex,
+        },
+      });
+      for (let topicIndex = 0; topicIndex < (moduleSeed.topics ?? []).length; topicIndex += 1) {
+        const topicSeed = moduleSeed.topics![topicIndex];
+        const topicSlug = `${pathSeed.slug}-${topicSeed.slug}`;
+        const topic = await prisma.studyTopic.upsert({
+          where: { categoryId_slug: { categoryId: category.id, slug: topicSlug } },
+          update: {
+            title: topicSeed.title,
+            moduleId: studyModule.id,
+            seoDescription: topicSeed.description,
+            estimatedMinutes: topicSeed.estimatedMinutes,
+            isPublished: true,
+            sortOrder: topicIndex,
+          },
+          create: {
+            categoryId: category.id,
+            moduleId: studyModule.id,
+            title: topicSeed.title,
+            slug: topicSlug,
+            seoDescription: topicSeed.description,
+            estimatedMinutes: topicSeed.estimatedMinutes,
+            isPublished: true,
+            sortOrder: topicIndex,
+            prerequisiteIds: [],
+            relatedTopicIds: [],
+          },
+        });
+        for (let sectionIndex = 0; sectionIndex < (topicSeed.sections ?? []).length; sectionIndex += 1) {
+          const section = topicSeed.sections![sectionIndex];
+          await prisma.studyTopicSection.upsert({
+            where: { id: `${topic.id}-section-${sectionIndex}` },
+            update: {
+              title: section.title,
+              content: section.content,
+              sortOrder: sectionIndex,
+            },
+            create: {
+              id: `${topic.id}-section-${sectionIndex}`,
+              topicId: topic.id,
+              title: section.title,
+              content: section.content,
+              sortOrder: sectionIndex,
+            },
+          });
+        }
+      }
+    }
+  }
+}
+
+async function main() {
+  await ensureCategory(coreJavaCategory);
+  const moduleCount = modules.length;
+  const topicCount = modules.reduce((total, module) => total + (module.topics?.length ?? 0), 0);
+  const sectionCount = modules.reduce((total, module) => total + (module.topics ?? []).reduce((topicTotal, topic) => topicTotal + (topic.sections?.length ?? 0), 0), 0);
+  console.log(`Core Java seed completed: ${moduleCount} modules, ${topicCount} topics, ${sectionCount} sections`);
+}
+
+main()
+  .catch((error) => {
+    console.error("Core Java seed failed:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });
+

@@ -1,0 +1,192 @@
+JAVA INTERVIEW QUESTIONS — VERIFIED + HIGH-CONFIDENCE SET
+
+PURPOSE This is a high-confidence interview bank. It separates questions
+explicitly reported in published interview-experience reports from
+recurring/common interview questions.
+
+LABELS [REPORTED] = a published interview experience explicitly
+describes the question or task. Wording is lightly normalized and is not
+presented as a verbatim quotation. [COMMON] = a recurring interview
+question supported by current interview-question references and multiple
+interview patterns; it is not claimed to be tied to one specific
+interview.
+
+IMPORTANT Do not market this file as ‘questions guaranteed to be asked’.
+Interview questions vary by company, role, seniority, resume and
+interviewer. Recommended website wording: ‘Curated interview questions
+based on reported interview experiences and commonly tested interview
+patterns.’
+
+============================================================ REPORTED
+INTERVIEW QUESTIONS
+============================================================ [REPORTED]
+TCS: Explain the difference between object-oriented and object-based
+programming. [REPORTED] TCS: What is object cloning in Java? [REPORTED]
+TCS: Implement binary search in Java and explain your approach.
+[REPORTED] TCS: What is the Java Stream API? [REPORTED] TCS: Using
+Streams, find employee names that start with a particular prefix.
+[REPORTED] TCS: Given static and instance members, explain which method
+can change which values. [REPORTED] TCS: Write a SQL query to find the
+highest-paid employee. [REPORTED] TCS: What is Hibernate? [REPORTED]
+TCS: What is Spring Boot Actuator? [REPORTED] TCS: Name design patterns
+commonly used in Spring. [REPORTED] JPMorgan Chase: What is the
+difference between Exception and RuntimeException? [REPORTED] JPMorgan
+Chase: How would you rate-limit a REST API to 1000 requests in five
+minutes? [REPORTED] JPMorgan Chase: What is a functional interface?
+[REPORTED] JPMorgan Chase: How is a functional interface different from
+a normal interface? [REPORTED] JPMorgan Chase: How would you design a
+secure REST API? [REPORTED] JPMorgan Chase: How is Hibernate
+connection-pool sizing determined? [REPORTED] JPMorgan Chase: What are
+@Embeddable and @Embedded used for? [REPORTED] JPMorgan Chase: How would
+you centralize exception handling in a large application? [REPORTED]
+JPMorgan Chase: What are interceptors used for? [REPORTED] JPMorgan
+Chase: How do profilers help diagnose Java applications? [REPORTED]
+JPMorgan Chase: What is try-with-resources and why use it? [REPORTED]
+JPMorgan Chase: How would you implement an asynchronous REST API?
+[REPORTED] JPMorgan Chase: What is the purpose of @Transactional?
+[REPORTED] JPMorgan Chase: How would you implement pagination with
+Hibernate? [REPORTED] Volkswagen IT Services: Explain IS-A and HAS-A
+relationships. [REPORTED] Volkswagen IT Services: Explain loose coupling
+and tight coupling. [REPORTED] Volkswagen IT Services: Compare
+interfaces and abstract classes. [REPORTED] Volkswagen IT Services: What
+is a class-level lock versus an object-level lock? [REPORTED] Volkswagen
+IT Services: Why are wait(), notify(), and notifyAll() methods defined
+on Object? [REPORTED] Volkswagen IT Services: What is join() used for in
+multithreading? [REPORTED] Volkswagen IT Services: What is
+synchronization? [REPORTED] Volkswagen IT Services: Explain deadlock
+with an example. [REPORTED] Volkswagen IT Services: Explain HashMap
+internal working and collision handling. [REPORTED] Volkswagen IT
+Services: Compare ArrayList and LinkedList complexity. [REPORTED]
+Volkswagen IT Services: How would you print duplicate strings from a
+sentence? [REPORTED] Volkswagen IT Services: What is Throwable?
+[REPORTED] Volkswagen IT Services: What are checked and unchecked
+exceptions? [REPORTED] Volkswagen IT Services: Write a custom exception.
+[REPORTED] Volkswagen IT Services: What garbage collectors are you
+familiar with? [REPORTED] Volkswagen IT Services: What is a daemon
+thread? [REPORTED] Volkswagen IT Services: What is ORM? [REPORTED]
+Volkswagen IT Services: What is dependency injection? [REPORTED]
+Volkswagen IT Services: How does dependency injection help achieve loose
+coupling? [REPORTED] Volkswagen IT Services: What is circular
+dependency? [REPORTED] Volkswagen IT Services: What does @Entity do?
+[REPORTED] Deloitte: Design tables and class relationships for a doctor
+appointment scheduling system. [REPORTED] Deloitte: Compare Factory and
+Abstract Factory. [REPORTED] Deloitte: Compare setter injection and
+constructor injection. [REPORTED] Deloitte: Write SQL using GROUP BY.
+[REPORTED] Deloitte: Find the number of occurrences of a pattern in a
+circular linked list. [REPORTED] Deloitte: What Java 8 features do you
+know? [REPORTED] Deloitte: Write Java code to count unique words and
+their frequencies. [REPORTED] Tech Mahindra: What are Java access
+specifiers? [REPORTED] Tech Mahindra: What is dependency injection?
+[REPORTED] Tech Mahindra: What is a Spring Boot starter dependency?
+[REPORTED] Tech Mahindra: What is Hibernate caching? [REPORTED] Tech
+Mahindra: Find the Nth-highest salary in an Employee table. [REPORTED]
+Tech Mahindra: What is @ComponentScan used for? [REPORTED] UST Global:
+How would you optimize database queries? [REPORTED] UST Global: How can
+one Spring Boot application connect to multiple databases? [REPORTED]
+UST Global: How would you test a private-method-related code path?
+[REPORTED] UST Global: How would you monitor and troubleshoot production
+bugs? [REPORTED] UST Global: Design a database for a student attendance
+system. [REPORTED] UST Global: Design a login-lockout system after
+repeated incorrect passwords. [REPORTED] UST Global: Explain
+@SpringBootApplication. [REPORTED] UST Global: Compare @RestController
+and @Controller. [REPORTED] UST Global: Why use Hibernate? [REPORTED]
+UST Global: Explain Spring bean scopes and when they are useful.
+[REPORTED] Maybank: Explain Java 8 features such as streams, lambdas and
+functional interfaces. [REPORTED] Maybank: Explain Spring Boot bean
+scopes. [REPORTED] Maybank: Discuss Spring mappings. [REPORTED] Maybank:
+Answer Hibernate-related questions for a backend application. [REPORTED]
+Maybank: Solve a string-permutation coding problem. [REPORTED] Finzly:
+Write demo APIs in Spring Boot. [REPORTED] Finzly: Explain common HTTP
+status codes. [REPORTED] Finzly: Compare 401 Unauthorized and 403
+Forbidden. [REPORTED] Finzly: Explain database indexing. [REPORTED]
+Finzly: Explain JWT authentication and authorization flow. [REPORTED]
+Finzly: Compare SQL and NoSQL. [REPORTED] Finzly: Compare PostgreSQL and
+MongoDB. [REPORTED] Finzly: Compare ACID and CAP. [REPORTED] Finzly: Why
+would you use sharding? [REPORTED] Finzly: Explain inversion of control
+and dependency injection. [REPORTED] Finzly: Compare getter/setter
+injection with other injection styles. [REPORTED] Finzly: Explain the
+Singleton pattern.
+
+============================================================ COMMON /
+HIGH-FREQUENCY INTERVIEW QUESTIONS
+============================================================ [COMMON]
+What is the difference between == and equals()? [COMMON] Why is String
+immutable in Java? [COMMON] What is the String pool? [COMMON] Why should
+hashCode() be consistent with equals()? [COMMON] How does HashMap work
+at a high level? [COMMON] What happens during a HashMap collision?
+[COMMON] Why can HashMap keys be mutable? [COMMON] HashMap vs Hashtable?
+[COMMON] HashMap vs ConcurrentHashMap? [COMMON] ArrayList vs LinkedList?
+[COMMON] HashSet vs TreeSet vs LinkedHashSet? [COMMON] Comparable vs
+Comparator? [COMMON] What is a functional interface? [COMMON] What is a
+lambda expression? [COMMON] map() vs filter() vs flatMap() in Streams?
+[COMMON] How would you find duplicates in a list using Streams? [COMMON]
+What is Optional and when should it not be used? [COMMON] Checked vs
+unchecked exceptions? [COMMON] final vs finally vs finalize? [COMMON]
+What is try-with-resources? [COMMON] How does Java garbage collection
+work at a high level? [COMMON] Stack vs heap? [COMMON] What does
+volatile guarantee? [COMMON] volatile vs synchronized? [COMMON] What is
+a race condition? [COMMON] What is deadlock and how do you avoid it?
+[COMMON] ExecutorService vs creating threads manually? [COMMON] Future
+vs CompletableFuture? [COMMON] How would you make a Singleton
+thread-safe? [COMMON] What is class loading? [COMMON] What is the JIT
+compiler? [COMMON] How would you investigate an OutOfMemoryError?
+[COMMON] What is JDBC and what are the normal steps to execute a query?
+[COMMON] Statement vs PreparedStatement? [COMMON] How does
+PreparedStatement help against SQL injection? [COMMON] What is
+connection pooling? [COMMON] What is HikariCP used for? [COMMON] What is
+the Servlet lifecycle? [COMMON] How does HTTP session management work?
+[COMMON] What is dependency injection in Spring? [COMMON] Why is
+constructor injection generally preferred? [COMMON] What does
+@SpringBootApplication combine? [COMMON] How does Spring Boot
+auto-configuration work? [COMMON] What are Spring bean scopes? [COMMON]
+@Component vs @Service vs @Repository? [COMMON] @Controller vs
+@RestController? [COMMON] @RequestParam vs @PathVariable? [COMMON]
+@ConfigurationProperties vs @Value? [COMMON] What are Spring profiles?
+[COMMON] What is @Transactional? [COMMON] Why might @Transactional
+appear not to work? [COMMON] What is Spring AOP? [COMMON] JDK proxy vs
+CGLIB proxy? [COMMON] What is Spring Security? [COMMON] How does
+JWT-based authentication work? [COMMON] What is JPA? [COMMON] JPA vs
+Hibernate? [COMMON] What is an entity lifecycle? [COMMON] LAZY vs EAGER
+fetching? [COMMON] What causes LazyInitializationException? [COMMON]
+What is the N+1 query problem? [COMMON] How would you diagnose and fix
+N+1 queries? [COMMON] First-level vs second-level Hibernate cache?
+[COMMON] What are cascade types in JPA? [COMMON] What does orphanRemoval
+do? [COMMON] JPQL vs native SQL? [COMMON] What is a derived query method
+in Spring Data JPA? [COMMON] How do Pageable and Sort work? [COMMON]
+What is @Modifying? [COMMON] How would you investigate a slow Spring
+Boot API? [COMMON] How would you diagnose HikariCP connection timeouts?
+[COMMON] How would you make a POST endpoint idempotent when clients
+retry requests? [COMMON] How would you design centralized REST exception
+handling? [COMMON] How would you secure sensitive configuration?
+[COMMON] How would you investigate high CPU in a Java service? [COMMON]
+How would you investigate memory growth in a long-running service?
+[COMMON] How would you troubleshoot database connection exhaustion?
+[COMMON] How would you implement API rate limiting? [COMMON] How would
+you design pagination for a large table? [COMMON] OFFSET pagination vs
+keyset pagination? [COMMON] How would you handle optimistic locking?
+[COMMON] How would you prevent lost updates? [COMMON] How would you
+design a resilient service calling a slow external API? [COMMON] How
+would you test a Spring Boot REST endpoint? [COMMON] Unit test vs
+integration test in Spring? [COMMON] How would you test transactional
+behavior? [COMMON] How would you monitor a Spring Boot service in
+production? [COMMON] Which Actuator endpoints are useful in production?
+[COMMON] How would you investigate a sudden increase in HTTP 5xx errors?
+[COMMON] How would you diagnose a deadlock involving application
+transactions? [COMMON] How would you safely change a large database
+schema with a zero-downtime deployment? [COMMON] How would you approach
+caching in a Spring Boot application? [COMMON] Redis cache vs database
+cache: what trade-offs matter? [COMMON] How would you design a
+production-ready Java backend?
+
+============================================================ SOURCE
+BASIS ============================================================ 1.
+TCS Java Developer interview experience — GeeksforGeeks. 2. JPMorgan
+Chase Java Developer interview experience — GeeksforGeeks. 3. Volkswagen
+IT Services Java/Spring Boot/Hibernate interview experience —
+GeeksforGeeks. 4. Deloitte Java/Spring Boot/Hibernate interview
+experience — GeeksforGeeks. 5. Tech Mahindra Software Engineer interview
+experience — Naukri Code 360. 6. UST Global Java Spring Boot Developer
+interview experience — GeeksforGeeks. 7. Maybank Senior Developer
+interview experience — GeeksforGeeks. 8. Finzly Trainee Software
+Engineer interview experience — GeeksforGeeks. 9. Current Java
+interview-question reference — GeeksforGeeks.

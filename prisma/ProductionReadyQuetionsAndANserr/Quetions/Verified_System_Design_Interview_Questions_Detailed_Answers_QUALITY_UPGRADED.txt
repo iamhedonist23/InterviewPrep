@@ -1,0 +1,440 @@
+SYSTEM DESIGN INTERVIEW QUESTIONS — CLEAN EDITORIAL EDITION
+
+Category : System Design
+Topics : requirements, APIs, databases, caching, queues, scaling, consistency, resilience and observability
+Audience : Fresher, intermediate and experienced candidates
+Format : Question : / Answer : / Example :
+Editorial standard : Clear, practical interview preparation with concrete examples. Examples are illustrative unless the question explicitly preserves a source/report label.
+
+Question : Design a URL shortening service. What are the requirements, data model, short-key generation strategy, and redirect flow?
+Answer : I would design the service around a write path that creates a unique short key and a read path that resolves that key to the original URL. Store the mapping in a durable database, cache hot mappings, and put the redirect service behind load balancers. The short key can be generated from a unique numeric ID encoded with Base62. Before choosing storage, I would first clarify expiration, abuse protection, analytics, and availability requirements.
+Example : A user submits https://example.com/products/123 and receives /aB7kQ. A later GET /aB7kQ first checks the cache; on a miss it reads the URL mapping from the database, stores the result in cache, and returns an HTTP redirect.
+
+------------------------------------------------------------------------------
+
+Question : How would you generate unique short URLs using sequential IDs, Base62, or hashing? What collision issues arise?
+Answer : A sequential numeric ID followed by Base62 encoding is simple and avoids collisions when the ID is unique. Hashing a long URL can create collisions unless the hash is sufficiently controlled and collision handling is added. Random keys also require uniqueness checks. In an interview, I would compare predictability, key length, coordination, and collision behavior rather than assuming hashing is automatically better.
+Example : If ID 125000 is assigned to a new URL, Base62 encodes that numeric ID into a short key. With a hash-based design, two different URLs producing the same truncated hash would need collision handling rather than silently overwriting the existing mapping.
+
+------------------------------------------------------------------------------
+
+Question : A shortened URL becomes extremely popular. How would you keep redirects fast and protect the database?
+Answer : I would treat a viral URL as a hot key. Cache the short-key-to-long-URL mapping close to the redirect service, use CDN/edge caching where appropriate, and protect the database with cache-aside or read-through behavior. Replicas and horizontal scaling can absorb sustained load; request coalescing can reduce a thundering herd when a hot cache entry expires.
+Example : Suppose a campaign link suddenly receives 200,000 redirects per second. Keep the mapping for that hot key in Redis or an edge cache, let most requests avoid the primary database, and use request coalescing when the cache entry expires.
+
+------------------------------------------------------------------------------
+
+Question : How would you handle duplicate long URLs, URL expiration, and deletion?
+Answer : Decide whether duplicate long URLs should return the same short key or receive separate keys. If deduplication is required, enforce it with a normalized URL representation plus a uniqueness constraint. Expiration can be represented by an expiry timestamp, while deletion should define whether the key is permanently invalid or reusable. Avoid reusing keys casually because stale caches and old links can create ambiguity.
+Example : If the same long URL is submitted twice, the service can either return the existing short key or intentionally create a new one. An expired link can return 410 Gone, while an administrator delete can mark the mapping inactive instead of immediately destroying audit data.
+
+------------------------------------------------------------------------------
+
+Question : Design a rate limiter for an HTTP API. What happens when a client exceeds its limit?
+Answer : A strong answer should begin with requirements and scale assumptions, define APIs/data model, propose the high-level architecture, identify bottlenecks and failure modes, then discuss scaling, consistency, availability, security, observability, and trade-offs.
+Example : For an API limited to 100 requests per minute per user, requests 1–100 are accepted. Request 101 receives a 429 response with a useful retry indication, while the limiter records usage independently of which application server handled the request.
+
+------------------------------------------------------------------------------
+
+Question : How does a token-bucket algorithm work, and how does it handle bursts?
+Answer : A token bucket has a maximum capacity and a refill rate. Each request consumes one or more tokens; if enough tokens exist, the request is allowed, otherwise it is rejected or delayed. Because tokens accumulate up to the bucket capacity, short bursts can be accepted while the long-term average remains bounded.
+Example : A client starts with 10 tokens and sends five requests in a burst. Five tokens are consumed immediately; later requests wait or are rejected until tokens are replenished at the configured rate.
+
+------------------------------------------------------------------------------
+
+Question : Compare token bucket and leaky bucket. When would you choose each?
+Answer : Token bucket controls the allowed rate while permitting bounded bursts; leaky bucket models a queue drained at a relatively fixed rate, which smooths traffic. Choose token bucket when burst tolerance matters and leaky-bucket-style shaping when a steadier output rate is more important.
+Example : For a public API where short bursts are acceptable, token bucket is usually a natural fit. For a worker that must process work at a steady pace, a leaky-bucket-style queue can smooth the output instead of allowing bursts through at once.
+
+------------------------------------------------------------------------------
+
+Question : How would you implement a distributed rate limiter across multiple application servers?
+Answer : Use a shared state store or an algorithm designed for distributed coordination so multiple application servers enforce the same logical quota. Redis is common because atomic commands/Lua scripts can update counters or token-bucket state. Define the consistency expectation and behavior when the shared limiter is unavailable: fail closed for sensitive APIs or fail open for lower-risk traffic.
+Example : With six API servers, all of them consult the same Redis-backed counter for a user such as user-4821. The request is accepted only when the atomic increment keeps the counter within the configured window, so each server sees the same limit.
+
+------------------------------------------------------------------------------
+
+Question : Why might Redis be used for distributed rate limiting, and what happens if Redis is unavailable?
+Answer : Redis provides low-latency shared state and atomic operations suitable for counters, token buckets, and sliding windows. If Redis fails, the design needs an explicit policy: reject requests, temporarily use local limits, or allow traffic with reduced protection. The correct choice depends on the risk of abuse versus the risk of denying legitimate traffic.
+Example : If Redis becomes unavailable, the team must choose deliberately: fail closed for a sensitive login endpoint, fail open for a low-risk read API, or temporarily use a local limiter. The important point is to make the degraded behavior explicit rather than accidentally removing protection.
+
+------------------------------------------------------------------------------
+
+Question : Design a Pastebin-like service. What are the API, data model, and storage choices?
+Answer : Use an API that creates and retrieves pastes, a metadata store for IDs, owners, timestamps, visibility and expiration, and durable storage for content. A short random ID or encoded unique ID identifies each paste. Cache frequently read public pastes and enforce size, rate, retention, and abuse limits.
+Example : A paste service can expose POST /pastes, GET /pastes/{id}, and DELETE /pastes/{id}. Metadata such as owner, created_at, expiry time, and content location can live in a database while the actual text is stored in durable storage when size warrants it.
+
+------------------------------------------------------------------------------
+
+Question : When would you store paste content in a database versus object/blob storage?
+Answer : Small, transactional metadata belongs naturally in a database; large immutable paste bodies are often better suited to object/blob storage. The application can keep metadata and a content object key together, while object storage handles large payload durability and scaling.
+Example : For small snippets such as a 2 KB code sample, a database row may be simplest. For a 20 MB diagnostic log, object storage is a better fit, with the database retaining metadata and a pointer to the object.
+
+------------------------------------------------------------------------------
+
+Question : How would you implement paste expiration and automatic cleanup?
+Answer : Store an expiresAt timestamp and treat expired content as unavailable. A background worker can asynchronously delete or archive expired objects, while reads still enforce expiration immediately. For large systems, partition cleanup work by time ranges rather than scanning the entire dataset.
+Example : A paste created with expires_at=2026-09-20 is served until that time. A background worker periodically finds expired records in batches, deletes or tombstones the content, and removes the associated metadata without requiring a user request to trigger cleanup.
+
+------------------------------------------------------------------------------
+
+Question : How would you prevent users from consuming unlimited storage in Pastebin?
+Answer : Use an API that creates and retrieves pastes, a metadata store for IDs, owners, timestamps, visibility and expiration, and durable storage for content. A short random ID or encoded unique ID identifies each paste. Cache frequently read public pastes and enforce size, rate, retention, and abuse limits.
+Example : Give each account a storage quota, reject uploads that would exceed it, and track usage transactionally. A user with a 100 MB quota who has already stored 96 MB should not be allowed to upload another 10 MB simply because two upload requests arrived at different application servers.
+
+------------------------------------------------------------------------------
+
+Question : Explain CAP theorem using a distributed database during a network partition.
+Answer : CAP states that when a network partition prevents nodes from communicating reliably, a distributed system cannot simultaneously guarantee both strong consistency and availability for every operation. During the partition, the design must choose which guarantee to sacrifice for the affected operation. CAP is about partitioned distributed systems; it is not simply a three-way feature checklist.
+Example : Imagine two database replicas lose network connectivity with each other while clients continue writing. A system that favors consistency may reject or delay some writes until it can establish a valid ordering, while a system that favors availability may accept conflicting updates and reconcile them later.
+
+------------------------------------------------------------------------------
+
+Question : Give an example where consistency is more important than availability and explain why.
+Answer : A financial balance or unique inventory allocation is a typical consistency-first
+Example : For an account balance or inventory reservation, serving stale data can lead to an incorrect business decision. It is reasonable to prefer a consistent read even if a temporary outage means the operation must wait or fail.
+
+------------------------------------------------------------------------------
+
+Question : Explain vertical versus horizontal scaling and the main limitations of each.
+Answer : Vertical scaling increases the capacity of one machine; horizontal scaling adds machines. Vertical scaling is operationally simple but has hardware ceilings and can leave a large failure domain. Horizontal scaling provides more capacity and resilience but introduces distributed coordination, load balancing, data partitioning, and operational complexity.
+Example : Vertical scaling means moving from 8 CPU cores to 32 cores on one machine; it is straightforward but eventually hits hardware and cost limits. Horizontal scaling adds more application servers, which improves capacity and resilience but introduces coordination, routing, and distributed-state concerns.
+
+------------------------------------------------------------------------------
+
+Question : You have one backend server and traffic is growing. How would you scale it?
+Answer : First make the application stateless where practical, place it behind a load balancer, and run multiple instances. Then scale the database, introduce caching, move slow work to queues, add observability, and partition services only when there is a clear bottleneck. Scale based on measured CPU, memory, latency, database load, and traffic rather than adding components prematurely.
+Example : Start by putting the application behind a load balancer and add a second server. Move sessions out of process, externalize shared state, add database connection pooling, and then scale the application tier horizontally as traffic continues to grow.
+
+------------------------------------------------------------------------------
+
+Question : What does a load balancer do when several application servers handle the same API?
+Answer : A load balancer distributes incoming requests across healthy backend instances using an algorithm such as round robin, least connections, or weighted routing. It can terminate TLS, perform health checks, support retries carefully, and route around unhealthy instances. Avoid blind retries for non-idempotent operations.
+Example : A load balancer receives /orders requests and distributes them across app-1, app-2, and app-3. It can perform health checks, TLS termination, connection management, and routing while keeping individual clients from needing to know which server handled a request.
+
+------------------------------------------------------------------------------
+
+Question : How should a load balancer react when one backend server becomes unhealthy?
+Answer : First make the application stateless where practical, place it behind a load balancer, and run multiple instances. Then scale the database, introduce caching, move slow work to queues, add observability, and partition services only when there is a clear bottleneck. Scale based on measured CPU, memory, latency, database load, and traffic rather than adding components prematurely.
+Example : If app-2 stops responding to health checks, the load balancer removes it from rotation. Existing connections may drain or fail according to policy, while new requests are sent to healthy instances until app-2 recovers.
+
+------------------------------------------------------------------------------
+
+Question : Where would you introduce caching in a simple web application and what would you cache?
+Answer : Cache expensive, frequently read, relatively stable data: product details, public profiles, configuration, computed results, or database query results. Define TTL, invalidation, cache-key design, and behavior on cache misses. Do not cache sensitive responses without considering authorization and isolation.
+Example : In an online store, cache product details, configuration, and other read-heavy data that changes infrequently. Do not blindly cache a user's current account balance or another value where stale data could cause a business error.
+
+------------------------------------------------------------------------------
+
+Question : When would you choose SQL over NoSQL for a new system?
+Answer : Choose SQL when relational integrity, joins, transactions, and flexible querying are central. Choose a NoSQL model when the access pattern favors massive horizontal scale, simple key-based access, flexible schema, or specialized distribution characteristics. The decision should start from workload and consistency requirements, not from the popularity of a database brand.
+Example : For an order-management system with transactions, foreign keys, and reporting queries, SQL is a strong default because relationships and transactional guarantees are central. A document or key-value store may be a better fit when access patterns are simple and flexible schema or very large horizontal scale is the dominant requirement.
+
+------------------------------------------------------------------------------
+
+Question : Why replicate a database, and what problems can occur when reads use replicas?
+Answer : Replication improves read capacity and availability and can provide failover options. Read replicas can lag behind the primary, causing stale reads, read-after-write surprises, and inconsistent views across requests. Applications that require read-your-write semantics may route critical reads to the primary or use a consistency mechanism.
+Example : A primary database handles writes while read replicas serve reporting queries. If a user changes their email and immediately refreshes a page that reads from a lagging replica, the old email may briefly appear even though the write succeeded.
+
+------------------------------------------------------------------------------
+
+Question : Compare strong consistency and eventual consistency with practical examples.
+Answer : Strong consistency makes a read reflect the latest committed state according to the system’s consistency contract. Eventual consistency permits temporary divergence but converges if updates stop. A social-media like counter can often tolerate eventual consistency, while a financial authorization decision may require stronger guarantees.
+Example : After a user changes a profile photo, an immediate read from the primary can show the new value, while a replica may still show the previous image URL for a short period. That illustrates why strong and eventual consistency are different application choices, not merely performance settings.
+
+------------------------------------------------------------------------------
+
+Question : Design a Twitter/X-style newsfeed for users following thousands of accounts.
+Answer : Use a post store, follow graph, feed-generation pipeline, ranking service, cache, and durable storage. A common baseline is fan-out-on-write for ordinary users and a hybrid strategy for high-follower accounts. Store feed entries by user and paginate with a cursor rather than repeatedly scanning all followed accounts.
+Example : For a feed with 50 million users, store each user's following relationships separately from feed entries. A home-feed request can combine precomputed recent posts with a smaller amount of on-demand work, rather than scanning every followed account at request time.
+
+------------------------------------------------------------------------------
+
+Question : Compare fan-out-on-write and fan-out-on-read for a social-media feed.
+Answer : Fan-out-on-write creates feed entries when a post is published, making reads fast but making writes expensive for users with many followers. Fan-out-on-read computes the feed at request time, reducing write amplification but increasing read latency and query complexity. A hybrid design uses write fan-out for normal accounts and read-time merging for celebrities.
+Example : Fan-out-on-write pushes a new post into followers' feed storage when the post is created, making reads fast but creating heavy write amplification. Fan-out-on-read stores the post once and assembles feeds when users open the app, reducing write work but making reads more expensive.
+
+------------------------------------------------------------------------------
+
+Question : How would you handle a celebrity with tens of millions of followers?
+Answer : Do not synchronously copy one celebrity’s post into tens of millions of follower feeds. Keep the celebrity’s posts in a separate source and merge them into follower feeds at read time or through an asynchronous prioritized pipeline. Cache popular content and apply backpressure to fan-out workers.
+Example : A celebrity posts a photo to 30 million followers. Instead of writing 30 million feed records synchronously, treat the celebrity as a hot source: keep the post in shared storage/cache and merge it into followers' feeds when they read or through controlled asynchronous fan-out.
+
+------------------------------------------------------------------------------
+
+Question : How would you rank posts instead of simply showing them chronologically?
+Answer : Separate candidate generation from ranking. Candidate sources can include recent posts, followed accounts, and recommended content; a ranking stage scores candidates using freshness, relevance, engagement, relationship signals, and policy constraints. Paginate with a stable cursor and make ranking deterministic enough to avoid excessive reshuffling between requests.
+Example : A feed can rank posts using signals such as recency, relationship strength, predicted engagement, and content quality. For example, a relevant post from a close colleague may appear above an older post with more total likes.
+
+------------------------------------------------------------------------------
+
+Question : Design the backend for a ride-hailing service that finds a nearby available driver.
+Answer : Model riders, drivers, trips, locations, and trip state separately. A location service maintains recent driver positions; a matching service finds nearby eligible drivers; a trip service owns the state machine; and asynchronous events handle notifications and analytics. Use geographic partitioning and a consistent source of truth for assignment.
+Example : When a rider requests a car, the service checks the rider's location, finds nearby available drivers, ranks candidates by distance and other constraints, reserves one driver, and creates the trip. Location updates and trip state changes are handled separately from the initial matching request.
+
+------------------------------------------------------------------------------
+
+Question : How would you find nearby drivers efficiently without scanning every driver?
+Answer : Index driver locations using geohash cells, an R-tree, S2 cells, or another spatial index. Search the rider’s cell and neighboring cells, then filter candidates by exact distance, availability, vehicle type, and other constraints. This avoids scanning every driver in the system.
+Example : Store active driver locations in a geospatial index such as geohash-based cells or another spatial structure. A search for drivers within 2 km examines nearby cells rather than scanning every driver in the city.
+
+------------------------------------------------------------------------------
+
+Question : How would you update driver locations in near real time?
+Answer : Drivers send periodic location updates over a persistent or efficient connection. A location service stores recent positions with short-lived state and publishes changes to matching consumers. Throttle updates based on movement and accuracy requirements, and expire stale driver locations so disconnected drivers are not offered rides.
+Example : A driver app sends location updates every few seconds while a trip is active. The backend writes the latest position to a fast location store, expires stale drivers, and publishes updates needed by matching or tracking services.
+
+------------------------------------------------------------------------------
+
+Question : Two riders request the same driver simultaneously. How do you prevent double assignment?
+Answer : Make driver assignment an atomic state transition. For example, change a driver from AVAILABLE to RESERVED only if the current state is still AVAILABLE, using a transactional conditional update or an equivalent coordination mechanism. The winning request gets the driver; competing requests retry matching.
+Example : Two riders select driver D17 at nearly the same time. Both requests attempt an atomic reservation on D17; only one succeeds, and the other request receives a retry or alternative-driver response instead of creating two active trips.
+
+------------------------------------------------------------------------------
+
+Question : How would you partition a ride-sharing system geographically at large scale?
+Answer : Partition by geography so most matching traffic remains local. Each region can own a set of cells and maintain local driver state, with controlled handoff for boundary areas. Cross-region coordination should be minimized because it adds latency and failure coupling.
+Example : Divide a ride-sharing deployment into geographic partitions such as city or region. Mumbai traffic is handled primarily by the Mumbai partition, while inter-region services share only the data that genuinely needs global visibility.
+
+------------------------------------------------------------------------------
+
+Question : Design one-to-one chat. How does a message travel from sender to recipient?
+Answer : Use a connection gateway for persistent client connections, a message service for validation and sequencing, durable message storage, and asynchronous delivery workers. The sender submits a message, the service assigns an ID/sequence, persists it, and routes it to the recipient’s active connection or offline queue.
+Example : Alice sends 'Can you review this?' to Bob. The chat service authenticates Alice, assigns a message ID, persists the message, publishes it to the delivery layer, and pushes it over Bob's active connection. The message remains durable even if Bob disconnects immediately afterward.
+
+------------------------------------------------------------------------------
+
+Question : Why use WebSockets or another persistent connection for chat?
+Answer : A persistent connection avoids repeatedly opening HTTP connections and allows the server to push messages immediately. WebSockets are a common choice, although other protocols can be appropriate. At scale, connection servers should be horizontally scalable and decoupled from durable message storage.
+Example : A browser-based support chat needs low-latency server-to-client delivery, so a WebSocket can keep one connection open instead of polling every few seconds. The server can push a new message as soon as it is available.
+
+------------------------------------------------------------------------------
+
+Question : How do you deliver messages when the recipient is offline?
+Answer : Persist the message before acknowledging durable acceptance. If the recipient is offline, retain an undelivered state and deliver when the client reconnects. Use message IDs and acknowledgments so reconnects do not create duplicates.
+Example : Bob's phone is offline when Alice sends a message. The service stores the message durably, marks Bob as offline, and delivers it when his client reconnects; a push-notification service can separately alert him that unread messages exist.
+
+------------------------------------------------------------------------------
+
+Question : How would you handle message ordering, retries, and delivery status?
+Answer : Assign a logical sequence or message ID per conversation and make consumers idempotent. Retries can produce duplicates, so the recipient should deduplicate by message ID. Define whether ordering is per conversation, per sender, or globally; global ordering is much more expensive.
+Example : Each message gets a monotonically increasing sequence number within a conversation or partition. If a client receives 42 before 41, it can buffer 42 briefly and request the missing range; duplicate delivery is handled using the message ID.
+
+------------------------------------------------------------------------------
+
+Question : How would you scale a very large group chat?
+Answer : Avoid creating an independent synchronous delivery operation for every member. Persist once, publish through a scalable fan-out mechanism, and deliver according to member presence and device state. For very large groups, separate message persistence from notification fan-out and use batching/backpressure.
+Example : For a 100,000-member group, do not synchronously send one database write per recipient for every message. Persist the message once, partition delivery work, maintain per-user cursors or offsets, and use fan-out strategies appropriate to active versus inactive members.
+
+------------------------------------------------------------------------------
+
+Question : Why introduce a message queue between services instead of synchronous calls?
+Answer : A queue decouples producers from consumers, absorbs traffic spikes, enables asynchronous processing, and provides retry/dead-letter behavior. It also introduces eventual processing, duplicate-delivery considerations, and operational complexity, so it should be used where asynchronous semantics are acceptable.
+Example : An order service should not wait synchronously for email, analytics, and search indexing before returning success. It can publish an OrderCreated event to a durable queue so those consumers process their work independently and can retry failures.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between a task queue and an event stream such as Kafka?
+Answer : A task queue usually represents work that should be processed by workers, such as sending an email or resizing an image. An event stream represents an ordered, durable sequence of events that multiple consumers may independently replay or process. The distinction is conceptual rather than a claim that one specific product can only implement one model.
+Example : A task queue might contain 'generate invoice PDF' jobs where one worker should perform each task. Kafka-style event streaming is better when several independent consumers—billing, analytics, notifications, and auditing—each need to read the same ordered event history.
+
+------------------------------------------------------------------------------
+
+Question : What is consistent hashing and why is it useful when servers are added or removed?
+Answer : A sequential numeric ID followed by Base62 encoding is simple and avoids collisions when the ID is unique. Hashing a long URL can create collisions unless the hash is sufficiently controlled and collision handling is added. Random keys also require uniqueness checks. In an interview, I would compare predictability, key length, coordination, and collision behavior rather than assuming hashing is automatically better.
+Example : Suppose 10 cache nodes serve user profiles. With consistent hashing, adding an 11th node moves only a subset of keys instead of remapping nearly every key, reducing cache churn during scaling events.
+
+------------------------------------------------------------------------------
+
+Question : How would you shard a database and choose a shard key?
+Answer : Choose a shard key that distributes load evenly while keeping common queries targeted. Avoid monotonically hot keys and values that create one overloaded shard. Evaluate cardinality, query patterns, growth, rebalancing, and whether important transactions span shards.
+Example : For a customer database, shard by customer_id if most queries are scoped to one customer. If one customer is far larger than the rest, add a strategy for hot tenants so a single shard does not become the bottleneck.
+
+------------------------------------------------------------------------------
+
+Question : What problems can replication lag create for an application?
+Answer : Lag can cause stale reads, read-after-write failures, incorrect decisions based on old data, and confusing user experiences when requests alternate between primary and replica. Mitigations include primary reads for critical paths, session consistency, bounded-staleness policies, or waiting until a replica catches up.
+Example : A write reaches the primary, but a read immediately goes to a replica that is two seconds behind. The user may see an older order status, so critical read-after-write paths may need a primary read or another consistency mechanism.
+
+------------------------------------------------------------------------------
+
+Question : How would you stop one slow downstream service from blocking every incoming request?
+Answer : Bound downstream work with timeouts, concurrency limits, circuit breakers, bulkheads, queues, and sensible retry policies. Without limits, blocked requests consume threads/connections, causing upstream queues to grow and eventually exhausting resources across the system.
+Example : If a payment service starts responding in 8 seconds instead of 200 ms, the checkout service should not allow every request to wait indefinitely. Set bounded timeouts, isolate the dependency, and return a controlled response while protecting resources for unrelated traffic.
+
+------------------------------------------------------------------------------
+
+Question : What is a cache stampede and how would you prevent it?
+Answer : A cache stampede occurs when many requests miss or simultaneously refresh the same expired key. Use request coalescing/single-flight, jittered TTLs, stale-while-revalidate, early refresh, or a distributed lock when appropriate.
+Example : A popular product expires from cache on 10,000 application servers at once. They all hit the database simultaneously. A lock or single-flight mechanism can let one request refresh the value while others reuse the refreshed result.
+
+------------------------------------------------------------------------------
+
+Question : What is a cache avalanche and how can staggered TTLs help?
+Answer : A cache avalanche occurs when many cache entries expire or become unavailable around the same time, pushing a large load to the backend. Stagger TTLs with jitter, warm critical entries, use layered caches, and protect the origin with rate limits or circuit breakers.
+Example : If a cache cluster loses many keys at once because of a configuration error or mass expiration, traffic can suddenly hit the origin. Staggering TTLs and warming important keys reduces the chance that every key becomes invalid at the same moment.
+
+------------------------------------------------------------------------------
+
+Question : What responsibilities would you put in an API gateway?
+Answer : An API gateway can centralize routing, authentication, authorization checks, rate limiting, request shaping, TLS termination, observability, and sometimes response aggregation. Keep business logic out of the gateway when possible so it does not become a monolithic bottleneck.
+Example : An API gateway can authenticate requests, apply rate limits, route /payments to one service and /catalog to another, enforce request-size limits, and attach tracing information. Business logic such as calculating an order total should remain in the relevant service.
+
+------------------------------------------------------------------------------
+
+Question : What is a reverse proxy and what problems does it solve?
+Answer : A reverse proxy sits in front of backend servers and receives client requests on their behalf. It can provide TLS termination, routing, caching, compression, load balancing, security filtering, and connection management. Unlike a forward proxy, it represents the server side to clients.
+Example : A reverse proxy such as an Nginx-like layer can terminate TLS, route traffic to application servers, compress responses, and serve static content. It gives the application tier a controlled entry point without requiring each app instance to implement those concerns itself.
+
+------------------------------------------------------------------------------
+
+Question : Design a YouTube/Netflix-style video streaming platform from upload through global playback.
+Answer : Separate upload, metadata, transcoding, packaging, object storage, CDN delivery, playback authorization, and analytics. Uploaded content is stored durably, transcoded asynchronously into multiple representations, packaged into streaming segments, and served through a CDN. The origin should not handle every playback byte directly.
+Example : A video upload first lands in durable object storage. A processing pipeline creates multiple encoded renditions, generates thumbnails and manifests, stores metadata, and publishes the video only after required processing completes.
+
+------------------------------------------------------------------------------
+
+Question : Why transcode one uploaded video into multiple resolutions and bitrates?
+Answer : Different devices and networks need different resolutions, codecs, bitrates, and frame characteristics. Multiple representations allow the player to select a suitable stream. Transcoding is CPU/GPU intensive, so it is normally asynchronous and backed by a durable job queue.
+Example : A 4K source might be encoded into 2160p, 1080p, 720p, and lower-bitrate variants. A viewer on a strong connection can receive higher quality, while a phone on a congested network can use a smaller representation without requiring a new upload.
+
+------------------------------------------------------------------------------
+
+Question : How does a CDN reduce video latency and origin load?
+Answer : A CDN caches popular video segments at edge locations near viewers. Requests can be served without traveling to the origin, reducing latency, backbone traffic, and origin bandwidth. Cacheability works especially well for immutable video segments.
+Example : If 100,000 viewers in Singapore request the same movie segment, an edge cache can serve most copies locally instead of sending every request to the origin in the United States. The origin therefore handles far fewer repeated reads.
+
+------------------------------------------------------------------------------
+
+Question : How would adaptive bitrate streaming react to changing network bandwidth?
+Answer : The player measures throughput, buffer health, and sometimes latency, then switches between available bitrate representations. It should avoid selecting a bitrate that the current network cannot sustain, while also avoiding unnecessary quality oscillation.
+Example : A viewer starts on Wi-Fi and receives 1080p segments. Bandwidth drops when the viewer enters a crowded train, so the player measures throughput and buffer health and switches to a lower-bitrate rendition before the buffer runs empty.
+
+------------------------------------------------------------------------------
+
+Question : Design a distributed payment-processing system and prevent duplicate charges.
+Answer : Separate the payment intent/order from the external provider call and maintain a durable transaction state machine. Use idempotency keys, unique transaction identifiers, durable event records, reconciliation, and an auditable ledger. Never rely solely on an HTTP timeout to conclude that a payment failed.
+Example : A checkout request includes an idempotency key such as pay-7f92. The payment service stores the key with the final outcome and provider reference, so a retry with the same key returns the original result instead of creating another charge.
+
+------------------------------------------------------------------------------
+
+Question : How do idempotency keys work in a payment API, and where do you store the result?
+Answer : An idempotency key lets repeated requests represent one logical operation. Persist the key with the request/result and return the same result for safe retries. The uniqueness constraint must be enforced durably, and the stored result should distinguish successful, failed, and in-progress states as required.
+Example : For a payment API, store the idempotency key, request fingerprint, status, provider transaction ID, and response data in durable storage with a uniqueness constraint. A retry can then return the same result without executing the charge again.
+
+------------------------------------------------------------------------------
+
+Question : Payment succeeds at the provider but your service times out. How do you reconcile the transaction?
+Answer : Treat the payment as UNKNOWN rather than automatically failed. Query the provider using a durable provider transaction ID or reconciliation API, and process asynchronous provider notifications where available. A reconciliation job should find transactions stuck in intermediate states and converge them to a final state.
+Example : The provider reports payment P123 as successful, but the client-facing request times out. A reconciliation worker queries the provider or consumes its webhook, finds P123 as successful, and updates the internal payment state rather than charging again.
+
+------------------------------------------------------------------------------
+
+Question : How would payment, order creation, and notification failures recover independently?
+Answer : Use a durable state machine and asynchronous events so payment processing, order creation, and notification delivery can retry independently. Use an outbox/event mechanism so a committed state change is not lost before its event is published. Each consumer should be idempotent.
+Example : If payment succeeds but notification fails, the payment record remains successful while a notification job is retried independently. If order creation fails, a durable workflow or reconciliation process can resume from the known payment state instead of repeating the charge.
+
+------------------------------------------------------------------------------
+
+Question : What consistency and durability requirements differ between a payment ledger and notifications?
+Answer : A payment ledger requires strong integrity, durability, auditability, and carefully controlled updates. Notifications can usually tolerate retries, duplication with deduplication, and eventual delivery. Do not model a financial ledger as if it were an ordinary cache or transient message stream.
+Example : A payment ledger needs durable, auditable state and carefully controlled consistency because money cannot safely disappear during a failover. An email notification can usually tolerate delay and retries, so it can use a more asynchronous delivery model.
+
+------------------------------------------------------------------------------
+
+Question : Design a Google Docs-style collaborative document editor.
+Answer : Use a document service, persistent operation/history storage, and a real-time synchronization layer. Clients maintain local state and send operations to a server that orders or merges them. The system must define conflict resolution, reconnect behavior, authorization, versioning, and durable snapshots.
+Example : Two editors open the same document. Alice changes line 10 while Bob changes line 12; the collaboration layer merges concurrent operations so both users eventually see a coherent document rather than one edit silently overwriting the other.
+
+------------------------------------------------------------------------------
+
+Question : What problem do Operational Transformation and CRDTs solve?
+Answer : Operational Transformation transforms concurrent operations so they can be applied against changing document states while preserving the intended collaborative result. CRDTs use data structures and merge rules designed so replicas can converge without a single central transformation step. Both address concurrent edits; their complexity, metadata costs, and implementation trade-offs differ.
+Example : Operational Transformation can transform concurrent operations against a shared document state. CRDTs structure data so concurrent updates can converge under defined rules. The interview point is that both address concurrent editing; the trade-offs involve algorithms, data models, metadata, and implementation complexity.
+
+------------------------------------------------------------------------------
+
+Question : How do clients receive edits in real time, and how do you handle reconnects?
+Answer : Give each operation a durable sequence/version and let a reconnecting client identify the version it has seen. The server can then send missing operations or a snapshot plus later operations. Clients should retry safely and deduplicate acknowledged operations.
+Example : A document server assigns each edit an operation ID and broadcasts it to connected clients. After a network drop, a reconnecting client sends its last acknowledged operation ID so the server can replay the missing changes before normal live delivery resumes.
+
+------------------------------------------------------------------------------
+
+Question : How would you persist document state and edit history efficiently?
+Answer : Store periodic document snapshots plus compact edit operations rather than reconstructing every version from an unbounded log. Use asynchronous compaction and retain enough history to satisfy product requirements. Separate current-state reads from historical audit/version queries.
+Example : Persist periodic document snapshots plus a compact edit log. If the document has 50,000 edits, a snapshot can avoid replaying the entire history on every open while the edit log remains available for recovery or version history.
+
+------------------------------------------------------------------------------
+
+Question : Why do distributed systems need consensus algorithms such as Raft or Paxos?
+Answer : Consensus lets distributed nodes agree on a value or ordered log despite certain failures and message delays. Raft and Paxos are protocols for reaching agreement under defined failure assumptions. They are useful for replicated state machines, leader election, and metadata that must remain consistent across nodes.
+Example : Three replicas need to agree on which leader is authoritative before accepting a sequence of state changes. A consensus protocol such as Raft provides a defined way to elect a leader and replicate a log despite failures, subject to its fault assumptions.
+
+------------------------------------------------------------------------------
+
+Question : What problem does leader election solve?
+Answer : Leader election selects one node to coordinate writes or other serialized decisions. A robust protocol uses terms/epochs and majority-based agreement so an old leader cannot continue safely after losing authority. The exact mechanics depend on the consensus protocol.
+Example : If the current leader crashes, followers start an election and one eligible node becomes the new leader. Clients then route writes to the new leader instead of allowing multiple nodes to independently accept conflicting commands.
+
+------------------------------------------------------------------------------
+
+Question : How would you design an active-active service across two regions?
+Answer : Both regions accept traffic, with global routing directing users to healthy regions. The design must specify data ownership, replication, conflict resolution, failover, and consistency guarantees. Stateless compute is straightforward to make active-active; multi-writer data is the difficult part.
+Example : Run the service in Region A and Region B with independent compute capacity and replicated data. Global traffic management sends users to a healthy region, while writes use a clearly defined conflict and ownership strategy rather than assuming two independent primaries will always agree.
+
+------------------------------------------------------------------------------
+
+Question : A network partition separates two active regions. What behavior and consistency trade-off do you choose?
+Answer : First define which operations can continue independently and which require cross-region agreement. A consistency-first design may reject conflicting writes during the partition; an availability-first design may accept writes and reconcile conflicts later. The choice should be tied to business semantics rather than a generic preference.
+Example : If Region A and Region B cannot communicate, an active-active design must choose behavior. A low-risk profile update may accept writes in both regions and reconcile later; an inventory reservation may instead reject one side to prevent overselling.
+
+------------------------------------------------------------------------------
+
+Question : How can one slow downstream service cause a cascading failure?
+Answer : Bound downstream work with timeouts, concurrency limits, circuit breakers, bulkheads, queues, and sensible retry policies. Without limits, blocked requests consume threads/connections, causing upstream queues to grow and eventually exhausting resources across the system.
+Example : A checkout service waits on a slow inventory dependency while holding threads and connections. As more requests queue behind it, the checkout service exhausts its own resources, causing unrelated operations to fail—the classic shape of a cascading failure.
+
+------------------------------------------------------------------------------
+
+Question : How do timeouts, retries, circuit breakers, bulkheads, and queues work together?
+Answer : Timeouts cap how long a caller waits. Retries can recover transient failures but amplify load, so they need bounded attempts and backoff with jitter. Circuit breakers stop repeated calls to an unhealthy dependency, bulkheads isolate resource pools, and queues move acceptable work out of the request path. Together they prevent a local slowdown from consuming the entire system.
+Example : Use a short timeout to bound waiting, a circuit breaker to stop repeatedly calling a failing dependency, bulkheads to isolate resource pools, retries only for transient and safe operations, and queues when work can be processed asynchronously.
+
+------------------------------------------------------------------------------
+
+Question : How would you migrate a very large production database without downtime?
+Answer : Use an expand-and-contract migration: introduce backward-compatible schema changes, deploy code that can read/write both old and new representations, backfill incrementally, validate, switch reads/writes, and remove the old representation only after all old application versions are gone. Throttle backfills and monitor replication, locks, latency, and error rates.
+Example : For a multi-terabyte production database, first add backward-compatible schema changes, then copy historical data in batches while production continues. Use change capture or replication to keep the target current, validate it, switch reads/writes gradually, and keep a rollback path.
+
+------------------------------------------------------------------------------
+
+Question : Why is expand-and-contract useful when old and new application versions coexist?
+Answer : Expand adds new schema/code paths while keeping old versions functional. Migrate or backfill data, switch traffic gradually, then contract by removing obsolete columns and code after compatibility is no longer required. This supports rolling deployments where old and new application instances coexist.
+Example : During a column rename, first add the new column, then deploy code that can read/write both old and new columns, backfill existing rows, switch all traffic to the new field, and only later remove the old column after old application versions are gone.
+
+------------------------------------------------------------------------------
+
+Question : How would you design a highly available distributed key-value store?
+Answer : Partition keys across nodes, replicate data for availability, define read/write consistency, detect node failures, and rebalance ownership as membership changes. The core design needs a partitioning strategy, replication protocol, request routing, failure detection, repair/recovery, and durable storage.
+Example : A key-value store can partition keys across nodes, replicate each partition, and route requests using a consistent hashing or partition map. The design must also define what happens when a node fails, a replica is stale, or a partition becomes unavailable.
+
+------------------------------------------------------------------------------
+
+Question : When do you need a distributed lock, and what failure modes must you handle?
+Answer : Use a distributed lock only when mutual exclusion cannot be achieved more simply through an atomic database operation or idempotent workflow. A lock needs ownership, expiration/lease semantics, renewal, safe release, and protection against stale owners. Network partitions and process pauses can cause a client to believe it still owns a lock when it does not, so fencing tokens or equivalent safeguards may be necessary.
+Example : A distributed lock can protect a job so only one worker performs a singleton task. The design must consider lock expiry, worker crashes, network partitions, duplicate execution, and fencing or idempotency so an old lock holder cannot safely continue after its lease should have ended.
+
+------------------------------------------------------------------------------
+
+Question : Design logging, metrics, tracing, and monitoring for a large distributed system. ======================================================================================== TOTAL: 71 QUESTIONS ========================================================================================
+Answer : I would design observability around logs, metrics, and distributed traces. Services should emit structured logs and propagate a correlation or trace ID across service boundaries. Metrics should cover request rate, latency, errors, saturation, and important business signals; traces should show the path of a request across services. I would add SLO-based alerting, dashboards, sampling and cardinality controls, retention policies, access controls, and a failure strategy for the observability pipeline itself. At large scale, cost and data volume are first-class design constraints.
+Example : Instrument an order request with a trace ID and propagate it through the API gateway, checkout, inventory, payment, and database calls. Metrics show latency and error rates, logs provide event details, and traces reveal which downstream span is responsible for a slow request.
+
+------------------------------------------------------------------------------
+
+RELATED INTERVIEW TOPICS
+- Digital Marketing: landing-pages/digital-marketing.md
+- MySQL / SQL / DBMS: landing-pages/mysql-sql-dbms.md
+- Data Science: landing-pages/data-science.md
+- Java: landing-pages/java.md
+- Pre-Sales: landing-pages/pre-sales.md

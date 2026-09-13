@@ -1,0 +1,65 @@
+import { PrismaClient, StudyLevel } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+type TopicSeed = {
+  title: string;
+  slug: string;
+  description: string;
+  estimatedMinutes: number;
+  sections: Array<{ title: string; content: string }>;
+};
+
+async function seed() {
+  const category = await prisma.studyCategory.upsert({
+    where: { slug: "java" },
+    update: { name: "Java", description: "Human-oriented Java curriculum with topic-specific explanations, concrete examples, edge cases, production guidance, and interview preparation.", icon: "JAVA", isPublished: true, sortOrder: 0 },
+    create: { name: "Java", slug: "java", description: "Human-oriented Java curriculum with topic-specific explanations, concrete examples, edge cases, production guidance, and interview preparation.", icon: "JAVA", isPublished: true, sortOrder: 0 },
+  });
+
+  const path = await prisma.studyPath.upsert({
+    where: { categoryId_slug: { categoryId: category.id, slug: "beginner" } },
+    update: { name: "Beginner", description: "Java learning path.", level: StudyLevel.BEGINNER, isPublished: true, sortOrder: 0 },
+    create: { categoryId: category.id, name: "Beginner", slug: "beginner", description: "Java learning path.", level: StudyLevel.BEGINNER, isPublished: true, sortOrder: 0 },
+  });
+
+  const module = await prisma.studyModule.upsert({
+    where: { studyPathId_slug: { studyPathId: path.id, slug: "java-fundamentals" } },
+    update: { title: "Java Fundamentals", description: "Topic-specific Java study.", isPublished: true, sortOrder: 0 },
+    create: { studyPathId: path.id, title: "Java Fundamentals", slug: "java-fundamentals", description: "Topic-specific Java study.", isPublished: true, sortOrder: 0 },
+  });
+
+  const topic: TopicSeed = {
+    title: "LocalDateTime",
+    slug: "localdatetime",
+    description: "Detailed, human-oriented explanation of LocalDateTime. Covers the Java rule or API contract, concrete code, runtime behavior, edge cases, common misconceptions, production considerations, and interview preparation.",
+    estimatedMinutes: 20,
+    sections: [{"title": "What it is and why it matters", "content": "LocalDateTime belongs to the java.time API, which separates human calendar concepts such as dates and periods from machine-oriented timeline concepts such as instants and durations. Choosing the right type is more important than memorizing methods."}, {"title": "A concrete Java example", "content": "LocalDate date = LocalDate.of(2026, 9, 7);\nLocalDate nextWeek = date.plusWeeks(1);\nSystem.out.println(nextWeek); // 2026-09-14"}, {"title": "How the mechanism behaves", "content": "For LocalDateTime, identify whether the value represents a date without time, a local date-time, an instant on the timeline, a duration, or a calendar period. Time-zone conversion can change the local clock representation while preserving the instant."}, {"title": "Edge cases and common mistakes", "content": "Do not use LocalDateTime as a universal timestamp for distributed systems. It has no offset or zone. Do not assume a day is always exactly 24 hours when working with calendar-zone transitions."}, {"title": "Using it in production", "content": "Use Instant for machine timestamps where an absolute timeline point is required, ZonedDateTime when a named zone matters, and explicit formatters for external text. Store and transmit offsets/time zones according to the domain requirements."}, {"title": "Interview-ready explanation", "content": "A strong interview answer for LocalDateTime should start with the precise definition, identify the Java rule or API contract, explain the example, and then mention one edge case and one trade-off. If asked a follow-up, explain the condition under which the original statement changes."}, {"title": "Practice questions", "content": "1. What does LocalDateTime represent?\n2. Which java.time type fits the use case?\n3. What happens around a DST transition?\n4. What is the common mistake?"}],
+  };
+
+  const savedTopic = await prisma.studyTopic.upsert({
+    where: { categoryId_slug: { categoryId: category.id, slug: topic.slug } },
+    update: { title: topic.title, moduleId: module.id, seoDescription: topic.description, estimatedMinutes: topic.estimatedMinutes, isPublished: true, sortOrder: 0 },
+    create: { categoryId: category.id, moduleId: module.id, title: topic.title, slug: topic.slug, seoDescription: topic.description, estimatedMinutes: topic.estimatedMinutes, isPublished: true, sortOrder: 0, prerequisiteIds: [], relatedTopicIds: [] },
+  });
+
+  for (let index = 0; index < topic.sections.length; index += 1) {
+    const section = topic.sections[index];
+    await prisma.studyTopicSection.upsert({
+      where: { id: `${savedTopic.id}-section-${index}` },
+      update: { title: section.title, content: section.content, sortOrder: index },
+      create: { id: `${savedTopic.id}-section-${index}`, topicId: savedTopic.id, title: section.title, content: section.content, sortOrder: index },
+    });
+  }
+
+  console.log(`Seeded: ${topic.title}`);
+}
+
+seed()
+  .catch((error) => {
+    console.error("Java seed failed:", error);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

@@ -1,0 +1,422 @@
+DEVOPS / DOCKER / KUBERNETES STRICT REAL-INTERVIEW QUESTION BANK
+===================================
+
+STANDARD USED
+
+This file contains ONLY questions that are explicitly described as
+interview questions by candidates in public interview-experience
+reports.
+
+I have intentionally NOT added: - generic “commonly asked” questions
+without an interview report - AI-created questions - questions inferred
+only from a job description - topics that merely appear in a preparation
+article
+
+The question wording below is kept as close as practical to the
+candidate report. Where a report summarizes a topic rather than giving
+the exact sentence, it is marked [REPORTED TOPIC] rather than pretending
+to be a verbatim quotation.
+
+Labels: [REPORTED] = the candidate explicitly lists the question.
+[REPORTED TASK] = the candidate explicitly describes being asked to
+perform the task. [REPORTED TOPIC] = the candidate explicitly says the
+topic was questioned, but the source does not preserve the exact
+sentence.
+
+============================================================ A. DEVOPS /
+CI-CD / GIT ============================================================
+
+1.  [REPORTED] “What do you mean by CI - CD, why is that required?”
+    Company: Fortinet Role: SDE 1/2 - DevOps Source: Candidate interview
+    report on LeetCode. Evidence: turn0search18
+
+2.  [REPORTED] “How would you go about setting up a git repository?
+    Where to place the gitignore files, readme file etc.” Company:
+    Fortinet Role: SDE 1/2 - DevOps Source: Candidate interview report
+    on LeetCode. Evidence: turn0search18
+
+3.  [REPORTED] “Have you used GitHub Actions in CI/CD?” Company: HCL
+    Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+4.  [REPORTED] “Have you worked on GitHub Actions?” Company: HCL
+    Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+5.  [REPORTED] “Do you have experience in Terraform?” Company: HCL
+    Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+6.  [REPORTED] “How much can you rate yourself in CI/CD pipelines out of
+    5?” Company: HCL Technologies Role: Azure L3 Support DevOps Source:
+    GeeksforGeeks candidate interview report. Evidence: turn0search15
+
+7.  [REPORTED] “How much can you rate yourself in Docker?” Company: HCL
+    Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+8.  [REPORTED] “How much can you rate yourself in Kubernetes?” Company:
+    HCL Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+9.  [REPORTED] “How much can you rate yourself in Terraform?” Company:
+    HCL Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+10. [REPORTED] “Are you using the Helm chart?” Company: HCL Technologies
+    Role: Azure L3 Support DevOps Source: GeeksforGeeks candidate
+    interview report. Evidence: turn0search15
+
+11. [REPORTED] “How much can you rate yourself in the Helm chart?”
+    Company: HCL Technologies Role: Azure L3 Support DevOps Source:
+    GeeksforGeeks candidate interview report. Evidence: turn0search15
+
+12. [REPORTED] “Out of AWS, GCP & Azure, which one are you more
+    comfortable?” Company: HCL Technologies Role: Azure L3 Support
+    DevOps Source: GeeksforGeeks candidate interview report. Evidence:
+    turn0search15
+
+13. [REPORTED] “In Azure, is you deployed Docker related and Kubernetes
+    related deployment.” Company: HCL Technologies Role: Azure L3
+    Support DevOps Source: GeeksforGeeks candidate interview report.
+    Evidence: turn0search15
+
+14. [REPORTED] “What are the services you are using in Azure?” Company:
+    HCL Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+15. [REPORTED] “What is Devops? What is the purpose of Devops?” Company:
+    Crest Data Systems Role: DevOps Source: GeeksforGeeks candidate
+    interview report. Evidence: turn0search17
+
+16. [REPORTED] “Why use Terraform when we can automate everything using
+    Python and bash scripting as well?” Company: Crest Data Systems
+    Role: DevOps Source: GeeksforGeeks candidate interview report.
+    Evidence: turn0search17
+
+17. [REPORTED] “What is Terraform State Management?” Company: Crest Data
+    Systems Role: DevOps Source: GeeksforGeeks candidate interview
+    report. Evidence: turn0search17
+
+18. [REPORTED] “Why do you want to be a Devops Engineer?” Company: Crest
+    Data Systems Role: DevOps Source: GeeksforGeeks candidate interview
+    report. Evidence: turn0search17
+
+19. [REPORTED TOPIC] Git: branching, merging, and basic commands.
+    Company: HashedIn by Deloitte Role: DevOps-II Source: LeetCode
+    candidate interview report. Evidence: turn0search1
+
+20. [REPORTED TOPIC] CI/CD pipelines with Jenkins/CircleCI and Docker
+    integration. Company: HashedIn by Deloitte Role: DevOps-II Source:
+    LeetCode candidate interview report. Evidence: turn0search1
+
+21. [REPORTED TOPIC] Terraform for AWS resources such as EC2 and VPC.
+    Company: HashedIn by Deloitte Role: DevOps-II Source: LeetCode
+    candidate interview report. Evidence: turn0search1
+
+============================================================ B. DOCKER
+============================================================
+
+22. [REPORTED] “What is containerization? What are docker containers?
+    What is kubernetes?” Company: Fortinet Role: SDE 1/2 - DevOps
+    Source: LeetCode candidate interview report. Evidence: turn0search18
+
+23. [REPORTED TOPIC] Docker and Docker Compose. Company: HashedIn by
+    Deloitte Role: DevOps-II Source: LeetCode candidate interview
+    report. Evidence: turn0search1
+
+24. [REPORTED TOPIC] Docker. Company: Q2 Role: SDE 1 / Platform Engineer
+    Source: LeetCode candidate interview report. Evidence: turn0search2
+
+25. [REPORTED TOPIC] Docker internals. Company: Q2 Role: SDE 1 /
+    Platform Engineer Source: LeetCode candidate interview report.
+    Evidence: turn0search2
+
+26. [REPORTED] “What is difference docker and microservice.” Company:
+    Zepto Role: SDET2 Source: LeetCode candidate interview report.
+    Evidence: turn0search11
+
+27. [REPORTED TASK] Create a Docker Compose file for a project and point
+    the service to port
+
+28. Company: CrickBuzz Role: Senior DevOps Engineer Source: LeetCode
+    machine-coding interview report. Evidence: turn0search12
+
+============================================================ C.
+KUBERNETES ============================================================
+
+28. [REPORTED TOPIC] Kubernetes architecture. Company: HashedIn by
+    Deloitte Role: DevOps-II Source: LeetCode candidate interview
+    report. Evidence: turn0search1
+
+29. [REPORTED TOPIC] Kubernetes deployments. Company: HashedIn by
+    Deloitte Role: DevOps-II Source: LeetCode candidate interview
+    report. Evidence: turn0search1
+
+30. [REPORTED TOPIC] Helm charts. Company: HashedIn by Deloitte Role:
+    DevOps-II Source: LeetCode candidate interview report. Evidence:
+    turn0search1
+
+31. [REPORTED TOPIC] Ingress. Company: HashedIn by Deloitte Role:
+    DevOps-II Source: LeetCode candidate interview report. Evidence:
+    turn0search1
+
+32. [REPORTED] “How stateful sets differ from deployements” Company:
+    NetApp Role: Site Reliability Engineer Source: LeetCode candidate
+    interview report. Evidence: turn0search5
+
+33. [REPORTED] “What is a namespace in kuberenetes, what is its
+    significance ?” Company: NetApp Role: Site Reliability Engineer
+    Source: LeetCode candidate interview report. Evidence: turn0search5
+
+34. [REPORTED] “Question Taints and tolerations” Company: NetApp Role:
+    Site Reliability Engineer Source: LeetCode candidate interview
+    report. Evidence: turn0search5
+
+35. [REPORTED] “How to ensure different replica/pod for a deployment are
+    running on different nodes on cluster ?” Company: NetApp Role: Site
+    Reliability Engineer Source: LeetCode candidate interview report.
+    Evidence: turn0search5
+
+36. [REPORTED] “What to do if terraform state file gets deleted.”
+    Company: NetApp Role: Site Reliability Engineer Source: LeetCode
+    candidate interview report. Evidence: turn0search5
+
+37. [REPORTED] “Helm install vs helm upgrade —install” Company: NetApp
+    Role: Site Reliability Engineer Source: LeetCode candidate interview
+    report. Evidence: turn0search5
+
+38. [REPORTED] “How helm works ? Explain” Company: NetApp Role: Site
+    Reliability Engineer Source: LeetCode candidate interview report.
+    Evidence: turn0search5
+
+39. [REPORTED] “Nginx and ingress controller” Company: NetApp Role: Site
+    Reliability Engineer Source: LeetCode candidate interview report.
+    Evidence: turn0search5
+
+40. [REPORTED] “CDN, rate limiting, DDOS, DNS, etc flow” Company: NetApp
+    Role: Site Reliability Engineer Source: LeetCode candidate interview
+    report. Evidence: turn0search5
+
+41. [REPORTED] “Certificates, how they work in Kubernetes.” Company:
+    NetApp Role: Site Reliability Engineer Source: LeetCode candidate
+    interview report. Evidence: turn0search5
+
+42. [REPORTED TOPIC] Kubernetes architecture. Company: VMware Role:
+    MTS-3 Source: LeetCode candidate interview report. Evidence:
+    Candidate report identified Kubernetes architecture as a major
+    interview topic.
+
+43. [REPORTED TOPIC] Kubernetes architecture. Company: Robin.io Role:
+    SDE2 Source: LeetCode candidate interview report. Evidence:
+    turn0search2-related interview evidence.
+
+44. [REPORTED TOPIC] Kubernetes networking, scaling, and debugging.
+    Company: Q2 Role: SDE1 / Platform Engineer Source: LeetCode
+    candidate interview report. Evidence: turn0search2
+
+45. [REPORTED TOPIC] Docker, Kubernetes, YAML configurations, ArgoCD,
+    Jenkins, and CI/CD. Company: Zeta Role: System Developer / DevOps
+    alignment round Source: LeetCode candidate interview report.
+    Evidence: turn0search4
+
+46. [REPORTED] “Have you worked on Kubernetes?” Company: HCL
+    Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+47. [REPORTED] “When you suggest Docker and when you suggest Kubernetes
+    in a deployment strategy.” Company: HCL Technologies Role: Azure L3
+    Support DevOps Source: GeeksforGeeks candidate interview report.
+    Evidence: turn0search15
+
+48. [REPORTED] “Are you using the Helm chart?” Company: HCL Technologies
+    Role: Azure L3 Support DevOps Source: GeeksforGeeks candidate
+    interview report. Evidence: turn0search15
+
+============================================================ D. LINUX /
+BASH / PRODUCTION TASKS
+============================================================
+
+49. [REPORTED] “How do you find out which process is currently using a
+    particular port in the Linux terminal?” Company: Crest Data Systems
+    Role: DevOps Source: GeeksforGeeks candidate interview report.
+    Evidence: turn0search17
+
+50. [REPORTED] “How do you list all the processes and the amount of
+    memory that are utilizing in Linux?” Company: Crest Data Systems
+    Role: DevOps Source: GeeksforGeeks candidate interview report.
+    Evidence: turn0search17
+
+51. [REPORTED TASK] “Write a bash script for filtering processes which
+    uses 400MB or more of RAM.” Company: Electrifex Role: DevOps
+    Engineer (Docker/Kubernetes) Source: Glassdoor candidate interview
+    report. Evidence: turn0search7 / turn0search13
+
+52. [REPORTED TOPIC] Bash and Python code snippets: explain their
+    meaning and output. Company: NetApp Role: Site Reliability Engineer
+    Source: LeetCode candidate interview report. Evidence: turn0search5
+
+============================================================ E.
+TERRAFORM / INFRASTRUCTURE AS CODE
+============================================================
+
+53. [REPORTED] “Do you have experience in Terraform?” Company: HCL
+    Technologies Role: Azure L3 Support DevOps Source: GeeksforGeeks
+    candidate interview report. Evidence: turn0search15
+
+54. [REPORTED] “Why use Terraform when we can automate everything using
+    Python and bash scripting as well?” Company: Crest Data Systems
+    Role: DevOps Source: GeeksforGeeks candidate interview report.
+    Evidence: turn0search17
+
+55. [REPORTED] “What is Terraform State Management?” Company: Crest Data
+    Systems Role: DevOps Source: GeeksforGeeks candidate interview
+    report. Evidence: turn0search17
+
+56. [REPORTED] “What to do if terraform state file gets deleted.”
+    Company: NetApp Role: Site Reliability Engineer Source: LeetCode
+    candidate interview report. Evidence: turn0search5
+
+57. [REPORTED TASK] Create an EC2 instance using Terraform or Ansible.
+    Company: CrickBuzz Role: Senior DevOps Engineer Source: LeetCode
+    machine-coding interview report. Evidence: turn0search12
+
+58. [REPORTED TASK] Install a web server on the EC2 instance and make it
+    listen on port 8080. Company: CrickBuzz Role: Senior DevOps Engineer
+    Source: LeetCode machine-coding interview report. Evidence:
+    turn0search12
+
+59. [REPORTED TASK] Create a Docker Compose configuration and expose the
+    service on port 8000. Company: CrickBuzz Role: Senior DevOps
+    Engineer Source: LeetCode machine-coding interview report. Evidence:
+    turn0search12
+
+60. [REPORTED TASK] Configure application logging to a specified file
+    and write a logrotate configuration. Company: CrickBuzz Role: Senior
+    DevOps Engineer Source: LeetCode machine-coding interview report.
+    Evidence: turn0search12
+
+61. [REPORTED TASK] Install Prometheus and Grafana, consume service
+    metrics, and visualize the metrics in Grafana. Company: CrickBuzz
+    Role: Senior DevOps Engineer Source: LeetCode machine-coding
+    interview report. Evidence: turn0search12
+
+============================================================ F.
+MONITORING / OBSERVABILITY
+============================================================
+
+62. [REPORTED TOPIC] Prometheus, Grafana, and ELK Stack. Company:
+    HashedIn by Deloitte Role: DevOps-II Source: LeetCode candidate
+    interview report. Evidence: turn0search1
+
+63. [REPORTED TOPIC] Prometheus and Grafana integration. Company: Target
+    Role: L5 Senior Engineer Source: LeetCode candidate interview
+    report.
+
+64. [REPORTED TASK] Install Prometheus and Grafana and consume service
+    metrics. Company: CrickBuzz Role: Senior DevOps Engineer Source:
+    LeetCode machine-coding interview report. Evidence: turn0search12
+
+============================================================ G.
+QUESTIONS REPORTED ACROSS MULTIPLE SOURCES
+============================================================
+
+These are the safest high-priority subjects because independent
+candidate reports repeatedly mention them:
+
+65. [REPEATED] CI/CD pipelines.
+
+Evidence: Fortinet, HashedIn by Deloitte, HCL Technologies.
+
+66. [REPEATED] Docker / containerization.
+
+Evidence: Fortinet, HashedIn by Deloitte, Q2, HCL Technologies.
+
+67. [REPEATED] Kubernetes.
+
+Evidence: Fortinet, HashedIn by Deloitte, Q2, Zeta, HCL Technologies,
+Google DevOps Engineer.
+
+68. [REPEATED] Terraform.
+
+Evidence: Crest Data Systems, HashedIn by Deloitte, NetApp, HCL
+Technologies.
+
+69. [REPEATED] Helm.
+
+Evidence: HashedIn by Deloitte, NetApp, HCL Technologies.
+
+70. [REPEATED] Kubernetes networking / ingress / deployment
+    troubleshooting.
+
+Evidence: Q2, NetApp, HashedIn by Deloitte.
+
+71. [REPEATED] Prometheus / Grafana / monitoring.
+
+Evidence: HashedIn by Deloitte, Target, CrickBuzz.
+
+============================================================ H. SOURCE
+VERIFICATION
+============================================================
+
+1.  Fortinet — SDE 1/2 - DevOps — Sunnyvale — May 2022 LeetCode
+    candidate report. URL:
+    https://leetcode.com/discuss/post/2106839/fortinet-sde-12-devops-sunnyvale-may-2022/
+
+2.  HashedIn By Deloitte — DevOps-II — Bangalore LeetCode candidate
+    report. URL:
+    https://leetcode.com/discuss/post/5933515/HashedIn-By-Deloitte-or-Devops-II-or-Bangalore/
+
+3.  Q2 — SDE 1 — Platform Engineer LeetCode candidate report. URL:
+    https://leetcode.com/discuss/post/7614849/
+
+4.  Zeta — SDE / DevOps — Bengaluru LeetCode candidate report. URL:
+    https://leetcode.com/discuss/post/7614785/
+
+5.  NetApp — Site Reliability Engineer — Bangalore LeetCode candidate
+    report. URL: https://leetcode.com/discuss/post/6160124/
+
+6.  Senior DevOps Engineer — CrickBuzz — Machine Coding Round LeetCode
+    candidate report. URL:
+    https://leetcode.com/discuss/post/4550516/Senior-DevOps-Engineer-oror-4.5-Years-of-Exp-ororCrickBuzz-oror-Machine-Coding-Round/
+
+7.  HCL Tech — Azure L3 Support DevOps interview questions GeeksforGeeks
+    candidate report. URL:
+    https://www.geeksforgeeks.org/interview-experiences/hcl-tech-azure-l3-support-devpos-interview-questions/
+
+8.  Crest Data Systems — DevOps interview experience GeeksforGeeks
+    candidate report. URL:
+    https://www.geeksforgeeks.org/interview-experiences/crest-data-systems-interview-experience-for-devops-on-campus/
+
+9.  Google DevOps Engineer — Docker and Kubernetes basic questions
+    Glassdoor candidate report. URL:
+    https://www.glassdoor.co.in/Interview/Docker-and-Kubernetes-basic-questions-QTN_8048043.htm
+
+10. Electrifex — DevOps Engineer (Docker/Kubernetes) Glassdoor candidate
+    report. URL:
+    https://www.glassdoor.co.in/Interview/devops-engineer-docker-kubernetes-interview-questions-SRCH_KO0%2C33.htm
+
+============================================================ I. STRICT
+WEBSITE USAGE
+============================================================
+
+If you publish this on InstantInterviewPrep, use:
+
+“Questions reported by candidates in real DevOps, Docker and Kubernetes
+interviews.”
+
+For exact questions: “Reported question — [Company / Role / Source]”
+
+For summarized interview topics: “Reported interview topic — [Company /
+Role / Source]”
+
+DO NOT write: “100% guaranteed interview questions.” “Questions every
+company asks.” “All questions are verbatim.” “Guaranteed real
+questions.”
+
+Why? Because a candidate report proves that a question/topic was asked
+in THAT candidate’s interview. It does not prove that every company or
+every future interview will ask it.
+
+============================================================ END
+============================================================

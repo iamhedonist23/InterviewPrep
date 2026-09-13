@@ -1,0 +1,376 @@
+C INTERVIEW QUESTIONS — VERIFIED INTERVIEW-EXPERIENCE-BASED SET
+
+Purpose
+
+This is a smaller, higher-confidence C interview bank built from
+questions and topics explicitly reported in published
+interview-experience reports and widely recurring C interview question
+sets.
+
+Important: - These are NOT presented as questions asked at every
+company. - Where an interview report explicitly described a
+question/task, the question is marked [REPORTED]. - Some wording is
+lightly normalized for clarity rather than copied verbatim. - Questions
+marked [COMMON] are recurring interview questions supported by multiple
+interview-preparation sources, but are not claimed to be tied to one
+specific interview. - No company-specific guarantee is implied.
+
+============================================================ A.
+QUESTIONS DIRECTLY REPORTED IN INTERVIEW EXPERIENCES
+============================================================
+
+1.  [REPORTED] Explain pointers in C and how they work.
+2.  [REPORTED] Explain dynamic memory allocation in C.
+3.  [REPORTED] What is malloc()?
+4.  [REPORTED] What is calloc()?
+5.  [REPORTED] What is free()?
+6.  [REPORTED] What is the difference between malloc() and calloc()?
+7.  [REPORTED] What happens when dynamically allocated memory is not
+    freed?
+8.  [REPORTED] Explain unions in C.
+9.  [REPORTED] Explain functions in C.
+10. [REPORTED] Explain C preprocessor directives.
+11. [REPORTED] Explain static memory allocation.
+12. [REPORTED] Explain dynamic memory allocation.
+13. [REPORTED] Write a program to reverse a linked list.
+14. [REPORTED] Given a sentence and a word, determine whether the word
+    exists in the sentence and return the memory location where it
+    occurs.
+15. [REPORTED] How can you reach the end of a linked list quickly?
+16. [REPORTED] How would you copy a linked list and return a new list?
+17. [REPORTED] Write a program to delete a node when only a pointer to
+    that node is available.
+18. [REPORTED] Reverse a string using pointers.
+19. [REPORTED] Solve a bitmask/bitwise manipulation problem.
+20. [REPORTED] Write a Fibonacci program.
+21. [REPORTED] Solve a linked-list coding problem.
+22. [REPORTED] Solve an array-operation coding problem.
+23. [REPORTED] Explain storage classes and where their variables are
+    mapped.
+24. [REPORTED] What happens if you declare more variables than the
+    processor has available registers?
+25. [REPORTED] Analyze a C code snippet and identify its output or bug.
+26. [REPORTED] Analyze a C code snippet involving pointers and identify
+    the problem.
+27. [REPORTED] Explain the memory map/layout of a C program.
+28. [REPORTED] Explain memory allocation strategies such as best fit and
+    worst fit in the context of memory management.
+29. [REPORTED] What is the difference between static and dynamic memory?
+30. [REPORTED] Write code involving character arrays/pointers to count
+    vowels.
+31. [REPORTED] Reverse a given number.
+32. [REPORTED] Write a function involving a structure and return the
+    structure.
+33. [REPORTED] Explain the difference between C and another programming
+    language, especially around pointers and memory management.
+34. [REPORTED] Explain why pointers are important in low-level
+    programming.
+35. [REPORTED] Explain how memory is allocated for data in C.
+36. [REPORTED] Explain the use of malloc() and dynamic memory in a
+    project you have worked on.
+37. [REPORTED] Explain a pointer-related bug you encountered in a
+    project.
+38. [REPORTED] Explain a C project from your resume and the
+    memory-related decisions you made.
+39. [REPORTED] Debug a C code snippet and explain why it produces the
+    given output.
+40. [REPORTED] Given a pointer-based program, predict the output before
+    executing it.
+
+============================================================ B.
+HIGH-CONFIDENCE COMMON C INTERVIEW QUESTIONS
+============================================================
+
+41. [COMMON] What is a pointer?
+42. [COMMON] What is a NULL pointer?
+43. [COMMON] What is a dangling pointer?
+44. [COMMON] What is a wild pointer?
+45. [COMMON] What is a void pointer?
+46. [COMMON] What is a pointer to a pointer?
+47. [COMMON] What is the difference between an array and a pointer?
+48. [COMMON] Why does an array name usually decay to a pointer?
+49. [COMMON] What is pointer arithmetic?
+50. [COMMON] What happens when you increment an int *?
+51. [COMMON] What is the difference between *p and &p?
+52. [COMMON] Explain const int *p, int *const p, and const int *const p.
+53. [COMMON] What is a function pointer?
+54. [COMMON] Where would you use a function pointer in a real C program?
+55. [COMMON] What is the difference between malloc(), calloc(),
+    realloc(), and free()?
+56. [COMMON] What happens if malloc() fails?
+57. [COMMON] Why should you check the return value of malloc()?
+58. [COMMON] What happens if realloc() fails?
+59. [COMMON] Why can assigning realloc() directly to the original
+    pointer be dangerous?
+60. [COMMON] What is a memory leak?
+61. [COMMON] What is use-after-free?
+62. [COMMON] What is double-free?
+63. [COMMON] How would you debug a memory leak?
+64. [COMMON] What is the difference between stack and heap memory?
+65. [COMMON] What typically lives on the stack?
+66. [COMMON] What typically lives on the heap?
+67. [COMMON] What happens when the stack is exhausted?
+68. [COMMON] What is a segmentation fault?
+69. [COMMON] What are common causes of a segmentation fault?
+70. [COMMON] How would you debug a segmentation fault?
+71. [COMMON] What is undefined behavior?
+72. [COMMON] Give examples of undefined behavior in C.
+73. [COMMON] Why can undefined behavior appear to work in debug builds
+    but fail in release builds?
+74. [COMMON] What is the difference between declaration and definition?
+75. [COMMON] What is the difference between a local and global variable?
+76. [COMMON] What does static mean for a local variable?
+77. [COMMON] What does static mean for a global/file-scope variable?
+78. [COMMON] What does extern mean?
+79. [COMMON] What are C storage classes?
+80. [COMMON] What is the difference between const and #define?
+81. [COMMON] What does volatile mean?
+82. [COMMON] When would you use volatile in embedded C?
+83. [COMMON] Does volatile make a variable thread-safe?
+84. [COMMON] What is a structure?
+85. [COMMON] What is the difference between a structure and a union?
+86. [COMMON] What is structure padding?
+87. [COMMON] What is memory alignment?
+88. [COMMON] Why can the size of a structure be larger than the sum of
+    its members?
+89. [COMMON] How can changing the order of structure members affect
+    size?
+90. [COMMON] What is typedef?
+91. [COMMON] What is an enum?
+92. [COMMON] What is a macro?
+93. [COMMON] Macro versus function: when would you use each?
+94. [COMMON] What can go wrong with an unsafe function-like macro?
+95. [COMMON] What is the purpose of header files?
+96. [COMMON] What is an include guard?
+97. [COMMON] Explain preprocessing, compilation, assembly and linking.
+98. [COMMON] What is a compiler error versus a linker error?
+99. [COMMON] What does an “undefined reference” linker error usually
+    mean?
+100. [COMMON] What is a static library?
+101. [COMMON] What is a shared library?
+102. [COMMON] What is the difference between memcpy() and memmove()?
+103. [COMMON] Why can strcpy() be dangerous?
+104. [COMMON] What is the difference between strlen() and sizeof() for
+     strings?
+105. [COMMON] Why must a C string end with '\0'?
+106. [COMMON] Why is gets() unsafe?
+107. [COMMON] What is the difference between strcmp() and strncmp()?
+108. [COMMON] What happens if memcpy() is used with overlapping regions?
+109. [COMMON] What is recursion?
+110. [COMMON] What can cause stack overflow with recursion?
+111. [COMMON] Why doesn’t C support function overloading?
+112. [COMMON] What is a callback in C?
+113. [COMMON] What is pass-by-value in C?
+114. [COMMON] How can a function modify the caller’s variable?
+115. [COMMON] What happens when an array is passed to a function?
+116. [COMMON] What is a multidimensional array?
+117. [COMMON] How do you pass a two-dimensional array to a function?
+118. [COMMON] What is a linked list?
+119. [COMMON] Array versus linked list: when would you choose each?
+120. [COMMON] How do you reverse a singly linked list?
+121. [COMMON] How do you detect a cycle in a linked list?
+122. [COMMON] How do you find the middle node of a linked list?
+123. [COMMON] How do you merge two sorted linked lists?
+124. [COMMON] What is a race condition?
+125. [COMMON] What is a critical section?
+126. [COMMON] What is a mutex?
+127. [COMMON] What is a semaphore?
+128. [COMMON] What is a deadlock?
+129. [COMMON] How can you prevent deadlocks?
+130. [COMMON] Why is volatile not a substitute for synchronization?
+
+============================================================ C. CODING
+QUESTIONS WITH STRONG INTERVIEW EVIDENCE
+============================================================
+
+131. [REPORTED/CODING] Reverse a singly linked list in place.
+132. [REPORTED/CODING] Reverse a string using pointers.
+133. [REPORTED/CODING] Reverse a number.
+134. [REPORTED/CODING] Count vowels in a character array using a
+     character pointer.
+135. [REPORTED/CODING] Implement Fibonacci.
+136. [REPORTED/CODING] Delete a linked-list node when only a pointer to
+     that node is available.
+137. [REPORTED/CODING] Find whether a word occurs inside a sentence and
+     return its memory location.
+138. [REPORTED/CODING] Copy a linked list and return the new head.
+139. [REPORTED/CODING] Determine how to reach the end of a linked list
+     efficiently.
+140. [REPORTED/CODING] Perform a bitwise/bitmask operation on an
+     integer.
+141. [REPORTED/CODING] Find duplicates in an array.
+142. [REPORTED/CODING] Find the second-largest element in an array.
+143. [REPORTED/CODING] Implement binary search.
+144. [REPORTED/CODING] Reverse an array in place.
+145. [REPORTED/CODING] Find the maximum and minimum values in an array.
+146. [REPORTED/CODING] Check whether a string is a palindrome.
+147. [REPORTED/CODING] Count characters or vowels in a string.
+148. [REPORTED/CODING] Traverse an array using pointers.
+149. [REPORTED/CODING] Swap two values using pointers.
+150. [REPORTED/CODING] Dynamically allocate an array and correctly
+     release it.
+151. [REPORTED/CODING] Resize dynamically allocated memory using
+     realloc().
+152. [REPORTED/CODING] Implement a linked-list insertion operation.
+153. [REPORTED/CODING] Implement linked-list deletion safely.
+154. [REPORTED/CODING] Detect a cycle using the slow/fast pointer
+     approach.
+155. [REPORTED/CODING] Implement a circular queue.
+156. [REPORTED/CODING] Count set bits in an integer.
+157. [REPORTED/CODING] Set, clear and toggle a particular bit.
+158. [REPORTED/CODING] Find the higher and lower nibble of a byte.
+159. [REPORTED/CODING] Debug a short C program and explain its output.
+160. [REPORTED/CODING] Given pointer-heavy code, identify memory or
+     lifetime bugs.
+
+============================================================ D. REAL
+INTERVIEW FOLLOW-UPS
+============================================================
+
+161. [FOLLOW-UP] You said malloc() returns heap memory. What do you do
+     if the allocation fails?
+162. [FOLLOW-UP] You freed the pointer. What happens to another pointer
+     that still points to the same memory?
+163. [FOLLOW-UP] You set the pointer to NULL after free(). Does that fix
+     aliases pointing to the same memory?
+164. [FOLLOW-UP] You said arrays and pointers are different. Why does
+     arr[i] work through pointer arithmetic?
+165. [FOLLOW-UP] Why does sizeof(arr) change when the array is passed to
+     a function?
+166. [FOLLOW-UP] You said int is 4 bytes. Is that guaranteed by C?
+167. [FOLLOW-UP] You said volatile prevents optimization. Does it make
+     counter++ atomic?
+168. [FOLLOW-UP] You said the code is thread-safe. Where exactly is the
+     synchronization?
+169. [FOLLOW-UP] You used a mutex. What prevents two threads from
+     acquiring locks in opposite order?
+170. [FOLLOW-UP] You used strncpy(). How do you guarantee null
+     termination?
+171. [FOLLOW-UP] You used memcpy(). What happens if source and
+     destination overlap?
+172. [FOLLOW-UP] You returned a pointer from a function. Who owns that
+     memory?
+173. [FOLLOW-UP] You allocated memory inside a function. Who is
+     responsible for freeing it?
+174. [FOLLOW-UP] You returned the address of a local variable. What
+     happens after the function returns?
+175. [FOLLOW-UP] You used a static local variable. What happens when the
+     function is called again?
+176. [FOLLOW-UP] You used a global variable. What problems could that
+     introduce in a multithreaded program?
+177. [FOLLOW-UP] You used a union to save memory. How do you know which
+     member is currently valid?
+178. [FOLLOW-UP] You serialized a structure directly to disk. Will the
+     same bytes necessarily work on another architecture?
+179. [FOLLOW-UP] Your program works without optimization but fails with
+     -O2. What classes of bugs would you investigate?
+180. [FOLLOW-UP] The crash occurs in free(). Does that necessarily mean
+     free() is the bug?
+181. [FOLLOW-UP] Your program crashes randomly. How would you determine
+     whether memory corruption happened earlier?
+182. [FOLLOW-UP] You found a memory leak. How would you prove where the
+     leak originates?
+183. [FOLLOW-UP] A pointer looks valid in the debugger but dereferencing
+     it crashes. What would you investigate?
+184. [FOLLOW-UP] You added a print statement and the crash disappeared.
+     What might that indicate?
+185. [FOLLOW-UP] You added more threads and performance became worse.
+     Why?
+186. [FOLLOW-UP] You used dynamic allocation for every small object.
+     What performance and fragmentation problems might appear?
+187. [FOLLOW-UP] You have only 64 KB of RAM. How would you redesign the
+     allocation strategy?
+188. [FOLLOW-UP] You need a fixed-size queue in embedded C. Why might a
+     ring buffer be appropriate?
+189. [FOLLOW-UP] You need to access a hardware register. Why might
+     volatile be required?
+190. [FOLLOW-UP] You need to share data between an ISR and normal code.
+     What synchronization issues do you consider?
+
+============================================================ E.
+HIGH-VALUE C INTERVIEW SET — PREPARE FIRST
+============================================================
+
+191. ⭐ What is a pointer?
+192. ⭐ Array versus pointer?
+193. ⭐ NULL versus dangling versus wild pointer?
+194. ⭐ malloc() versus calloc()?
+195. ⭐ What does realloc() do?
+196. ⭐ What is a memory leak?
+197. ⭐ What is use-after-free?
+198. ⭐ Stack versus heap?
+199. ⭐ What does static mean?
+200. ⭐ What does extern mean?
+201. ⭐ What does volatile mean?
+202. ⭐ Structure versus union?
+203. ⭐ Structure padding and alignment?
+204. ⭐ Function pointers?
+205. ⭐ memcpy() versus memmove()?
+206. ⭐ strlen() versus sizeof()?
+207. ⭐ Why is strcpy() dangerous?
+208. ⭐ What is undefined behavior?
+209. ⭐ How do you debug a segmentation fault?
+210. ⭐ Explain compilation and linking.
+211. 💻 Reverse a linked list.
+212. 💻 Reverse a string using pointers.
+213. 💻 Implement Fibonacci.
+214. 💻 Count vowels using pointers.
+215. 💻 Delete a linked-list node given only its node pointer.
+216. 💻 Detect a linked-list cycle.
+217. 💻 Find duplicates in an array.
+218. 💻 Solve a bitwise/bitmask problem.
+219. 💻 Debug a pointer-heavy C program.
+220. 🏢 Explain a memory bug from a real project.
+
+============================================================ F. WHAT
+“REALLY ASKED” MEANS FOR THIS FILE
+============================================================
+
+The strongest evidence in this bank comes from published interview
+experiences where candidates explicitly reported being asked about:
+
+-   pointers
+-   malloc/calloc/free
+-   dynamic memory
+-   unions
+-   functions
+-   preprocessors
+-   linked-list reversal
+-   linked-list manipulation
+-   string searching using pointers
+-   Fibonacci
+-   bitwise/bitmask operations
+-   memory layout
+-   storage classes
+-   code-output/debugging questions
+-   static versus dynamic memory
+-   project/resume-based C questions
+
+These patterns are supported by multiple published interview reports.
+For example, one reported interview explicitly covered pointers,
+malloc/calloc/free, pseudocode involving pointers, linked-list reversal
+and string searching; another reported malloc/calloc, pointers, unions,
+dynamic memory, free, functions and preprocessor directives; and another
+reported C basics, pointer/memory questions, Fibonacci, linked lists,
+bitwise problems and debugging code snippets.
+
+============================================================ G.
+IMPORTANT WEBSITE WORDING
+============================================================
+
+Recommended title: “Real C Interview Questions — Reported + Commonly
+Asked”
+
+Recommended description: “Practice C questions that candidates have
+reported encountering in technical interviews, combined with recurring C
+interview questions and coding tasks.”
+
+Avoid: “100% guaranteed questions asked by every company.”
+
+Avoid: “These exact questions will be asked in your interview.”
+
+For company-specific pages, only use: “Reported in [company] interview
+experience” when the source actually documents that interview.
+
+============================================================ END
+============================================================

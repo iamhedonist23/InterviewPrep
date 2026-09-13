@@ -1,0 +1,683 @@
+DSA INTERVIEW QUESTIONS — FREQUENTLY ASKED / HIGH-CONFIDENCE
+
+Purpose
+
+This is a practical DSA interview-preparation bank covering questions
+and problem patterns that recur frequently across software engineering
+interviews.
+
+IMPORTANT: These are NOT claimed to be verbatim questions from one
+particular candidate’s interview. They are normalized interview-style
+questions based on recurring DSA interview patterns and established
+interview-question references. Do not market this file as “every
+question was literally asked.”
+
+Recommended website wording: “Curated DSA interview questions based on
+frequently tested interview patterns and established interview-question
+resources.”
+
+=============================================================== 1.
+BEGINNER — FOUNDATIONS, ARRAYS, STRINGS, LINKED LISTS
+===============================================================
+
+1.  What is a data structure? Why are data structures important in
+    software development?
+
+2.  What is the difference between a data structure and a file
+    structure?
+
+3.  What is the difference between a linear and a non-linear data
+    structure?
+
+4.  What is the difference between static and dynamic data structures?
+
+5.  What is an array? What are its advantages and disadvantages?
+
+6.  Why does an array provide O(1) random access?
+
+7.  What is the difference between an array and a linked list?
+
+8.  Compare arrays and linked lists for insertion, deletion, searching,
+    and random access.
+
+9.  Why are array elements stored contiguously in memory?
+
+10. What is a dynamic array? How does it grow when its capacity is
+    exhausted?
+
+11. What is the difference between an array and a dynamic array?
+
+12. What is a singly linked list?
+
+13. What is a doubly linked list?
+
+14. What is a circular linked list?
+
+15. Compare singly, doubly, and circular linked lists.
+
+16. How do you insert a node at the beginning of a linked list?
+
+17. How do you insert a node at the end of a linked list?
+
+18. How do you delete a node from a singly linked list?
+
+19. How do you find the length of a linked list?
+
+20. How do you find the middle element of a linked list?
+
+21. Reverse a singly linked list iteratively.
+
+22. Reverse a singly linked list recursively.
+
+23. How do you detect a cycle in a linked list?
+
+24. Explain Floyd’s cycle detection algorithm.
+
+25. How do you find the starting node of a cycle in a linked list?
+
+26. How do you remove a cycle from a linked list?
+
+27. How do you merge two sorted linked lists?
+
+28. How do you determine whether a linked list is a palindrome?
+
+29. How do you find the nth node from the end of a linked list?
+
+30. How do you find the intersection point of two linked lists?
+
+31. What is a stack? Explain LIFO.
+
+32. What are the common operations on a stack?
+
+33. How can you implement a stack using an array?
+
+34. How can you implement a stack using a linked list?
+
+35. What is a queue? Explain FIFO.
+
+36. What are the common operations on a queue?
+
+37. How can you implement a queue using an array?
+
+38. How can you implement a queue using two stacks?
+
+39. What is a circular queue and why is it useful?
+
+40. What is a deque?
+
+41. What is the difference between a stack and a queue?
+
+42. What is Big O notation?
+
+43. Explain O(1), O(log n), O(n), O(n log n), and O(n²) with examples.
+
+44. What is the difference between time complexity and space complexity?
+
+45. What is the difference between best-case, average-case, and
+    worst-case complexity?
+
+46. What is linear search? What is its time complexity?
+
+47. What is binary search? What is its time complexity?
+
+48. What conditions are required to use binary search?
+
+49. Implement binary search iteratively.
+
+50. Implement binary search recursively.
+
+51. Find the largest element in an array.
+
+52. Find the smallest element in an array.
+
+53. Find the second-largest element in an array.
+
+54. Find the second-smallest element in an array.
+
+55. Find the maximum and minimum values in an array in one traversal.
+
+56. Reverse an array in-place.
+
+57. Check whether an array is sorted.
+
+58. Remove duplicates from a sorted array.
+
+59. Move all zeroes to the end of an array while preserving the relative
+    order of other elements.
+
+60. Rotate an array by k positions.
+
+61. Find the missing number in an array containing numbers from 0 to n.
+
+62. Find a duplicate number in an array.
+
+63. Find all duplicate elements in an array.
+
+64. Find the intersection of two arrays.
+
+65. Find the union of two arrays.
+
+66. Find two numbers whose sum equals a target.
+
+67. Solve the Two Sum problem using a hash map.
+
+68. Find the pair with the closest sum to a target.
+
+69. Find the maximum difference between two elements where the larger
+    element appears after the smaller one.
+
+70. Find the maximum subarray sum.
+
+71. Explain Kadane’s algorithm.
+
+72. Find the majority element in an array.
+
+73. Find the frequency of each element in an array.
+
+74. Find the first repeating element in an array.
+
+75. Find the first non-repeating element in an array.
+
+76. What is a string? How is it represented in memory in your
+    programming language?
+
+77. Reverse a string.
+
+78. Check whether a string is a palindrome.
+
+79. Check whether two strings are anagrams.
+
+80. Find the first non-repeating character in a string.
+
+81. Count the frequency of characters in a string.
+
+82. Remove duplicate characters from a string.
+
+83. Find the longest common prefix among a set of strings.
+
+84. Determine whether one string is a rotation of another.
+
+85. Reverse the words in a sentence.
+
+86. Find the length of the last word in a string.
+
+87. Validate a string containing parentheses, brackets, and braces.
+
+88. Explain how a stack can be used to validate parentheses.
+
+89. What is the difference between a substring and a subsequence?
+
+90. Explain the two-pointer technique with an example.
+
+=============================================================== 2.
+INTERMEDIATE — HASHING, TREES, SORTING, SEARCHING, PATTERNS
+===============================================================
+
+91. What is hashing?
+
+92. What is a hash table/hash map?
+
+93. What is a hash collision?
+
+94. How can hash collisions be handled?
+
+95. Explain separate chaining.
+
+96. Explain open addressing.
+
+97. What is the difference between chaining and open addressing?
+
+98. What is load factor in a hash table?
+
+99. What happens when a hash table needs to resize?
+
+100. What are the average and worst-case complexities of hash-map
+     lookup?
+
+101. When would you choose a hash map over a sorted tree/map?
+
+102. What is a binary tree?
+
+103. What is a binary search tree (BST)?
+
+104. What is the difference between a binary tree and a BST?
+
+105. What are preorder, inorder, and postorder traversals?
+
+106. Implement inorder traversal recursively.
+
+107. Implement inorder traversal iteratively.
+
+108. Implement preorder traversal iteratively.
+
+109. Implement postorder traversal iteratively.
+
+110. Implement level-order traversal.
+
+111. Find the height/depth of a binary tree.
+
+112. Find the maximum depth of a binary tree.
+
+113. Count the number of nodes in a binary tree.
+
+114. Count the number of leaf nodes in a binary tree.
+
+115. Determine whether two binary trees are identical.
+
+116. Determine whether a binary tree is balanced.
+
+117. Determine whether a binary tree is symmetric.
+
+118. Find the diameter of a binary tree.
+
+119. Find the lowest common ancestor of two nodes in a binary tree.
+
+120. Validate whether a binary tree is a valid BST.
+
+121. Search for a value in a BST.
+
+122. Insert a value into a BST.
+
+123. Delete a node from a BST.
+
+124. Find the minimum and maximum value in a BST.
+
+125. Find the kth smallest element in a BST.
+
+126. What is a balanced binary search tree?
+
+127. What is an AVL tree?
+
+128. What is a heap?
+
+129. What is the difference between a min-heap and a max-heap?
+
+130. How is a heap represented using an array?
+
+131. Explain heapify.
+
+132. What is heap sort and what is its complexity?
+
+133. Find the kth largest element in an array.
+
+134. Find the kth smallest element in an array.
+
+135. Find the top k frequent elements.
+
+136. Merge k sorted lists.
+
+137. Find the top k largest elements efficiently.
+
+138. What is a priority queue?
+
+139. How is a priority queue implemented using a heap?
+
+140. Compare merge sort, quicksort, and heapsort.
+
+141. Explain merge sort and its time and space complexity.
+
+142. Explain quicksort and its average and worst-case complexity.
+
+143. What is a stable sorting algorithm?
+
+144. Which common sorting algorithms are stable?
+
+145. What is an in-place sorting algorithm?
+
+146. When would you use counting sort?
+
+147. When would you use radix sort?
+
+148. Find the kth element using quickselect.
+
+149. What is a graph?
+
+150. What are vertices and edges?
+
+151. What is the difference between directed and undirected graphs?
+
+152. What is the difference between weighted and unweighted graphs?
+
+153. How can a graph be represented using an adjacency matrix?
+
+154. How can a graph be represented using an adjacency list?
+
+155. Compare adjacency lists and adjacency matrices.
+
+156. Explain breadth-first search (BFS).
+
+157. Explain depth-first search (DFS).
+
+158. Compare BFS and DFS.
+
+159. When would you choose BFS instead of DFS?
+
+160. Detect a cycle in an undirected graph.
+
+161. Detect a cycle in a directed graph.
+
+162. Determine whether a graph is bipartite.
+
+163. Find the number of connected components in a graph.
+
+164. Find the shortest path in an unweighted graph.
+
+165. Explain topological sorting.
+
+166. What conditions are required for topological sorting?
+
+167. Implement topological sorting using DFS.
+
+168. Implement topological sorting using Kahn’s algorithm.
+
+169. Explain the sliding-window technique.
+
+170. Find the longest substring without repeating characters.
+
+171. Find the longest substring containing at most k distinct
+     characters.
+
+172. Find the minimum window substring containing all required
+     characters.
+
+173. Explain the fast-and-slow pointer technique.
+
+174. Find the middle of a linked list using fast and slow pointers.
+
+175. Detect a linked-list cycle using fast and slow pointers.
+
+176. Explain prefix sums.
+
+177. Answer range-sum queries using prefix sums.
+
+178. Explain the difference between a subsequence, substring, and
+     subarray.
+
+179. Merge overlapping intervals.
+
+180. Insert an interval into a sorted list of non-overlapping intervals.
+
+=============================================================== 3.
+ADVANCED — DYNAMIC PROGRAMMING, GRAPHS, TREES, CACHES
+===============================================================
+
+181. What is dynamic programming?
+
+182. What are the two essential properties of a DP problem?
+
+183. Explain overlapping subproblems.
+
+184. Explain optimal substructure.
+
+185. What is memoization?
+
+186. What is tabulation?
+
+187. Compare top-down and bottom-up dynamic programming.
+
+188. Solve the Fibonacci problem using memoization.
+
+189. Solve the Fibonacci problem using tabulation.
+
+190. Solve the climbing-stairs problem.
+
+191. Solve the house-robber problem.
+
+192. Solve the coin-change problem.
+
+193. Determine whether an amount can be formed using a set of coins.
+
+194. Solve the 0/1 knapsack problem.
+
+195. Solve the unbounded knapsack problem.
+
+196. Find the longest common subsequence of two strings.
+
+197. Find the longest common substring of two strings.
+
+198. Find the edit distance between two strings.
+
+199. Find the longest increasing subsequence.
+
+200. Find the number of distinct ways to reach a target.
+
+201. Solve the word-break problem.
+
+202. Solve the partition-equal-subset-sum problem.
+
+203. Solve the minimum-path-sum problem in a grid.
+
+204. Solve the unique-paths problem.
+
+205. Explain when greedy algorithms can replace dynamic programming.
+
+206. What is Dijkstra’s shortest-path algorithm?
+
+207. What limitation does Dijkstra’s algorithm have with negative edge
+     weights?
+
+208. Explain Bellman-Ford.
+
+209. Compare Dijkstra and Bellman-Ford.
+
+210. Explain Floyd-Warshall.
+
+211. Compare single-source and all-pairs shortest-path algorithms.
+
+212. Find the shortest path in a weighted graph.
+
+213. Detect a negative-weight cycle.
+
+214. What is a minimum spanning tree?
+
+215. Explain Kruskal’s algorithm.
+
+216. Explain Prim’s algorithm.
+
+217. Compare Prim’s and Kruskal’s algorithms.
+
+218. What is a disjoint-set/union-find data structure?
+
+219. Explain path compression.
+
+220. Explain union by rank/size.
+
+221. How can union-find be used for cycle detection?
+
+222. Find the minimum spanning tree of a graph.
+
+223. Explain strongly connected components.
+
+224. What is Kosaraju’s algorithm?
+
+225. What is Tarjan’s algorithm?
+
+226. What is a trie/prefix tree?
+
+227. How do you insert and search a word in a trie?
+
+228. What are the advantages of a trie over a hash map for prefix
+     searches?
+
+229. Find all words with a given prefix.
+
+230. Design an autocomplete structure using a trie.
+
+231. What is serialization of a binary tree?
+
+232. Serialize and deserialize a binary tree.
+
+233. Find the vertical order traversal of a binary tree.
+
+234. Find the right-side view of a binary tree.
+
+235. Find the boundary traversal of a binary tree.
+
+236. Flatten a binary tree into a linked list.
+
+237. Convert a sorted array into a balanced BST.
+
+238. Convert a binary tree into a doubly linked list.
+
+239. Find the maximum path sum in a binary tree.
+
+240. What is an LRU cache?
+
+241. Design an LRU cache with O(1) get and put operations.
+
+242. Why does an LRU cache commonly use a hash map plus a doubly linked
+     list?
+
+243. What is an LFU cache?
+
+244. Compare LRU and LFU caching.
+
+245. Design a data structure supporting insertion, deletion, and
+     retrieving a random element in O(1) average time.
+
+246. Design a min stack supporting getMin in O(1).
+
+247. Implement a queue using two stacks.
+
+248. Implement a stack using two queues.
+
+249. Find the median from a stream of integers.
+
+250. Design a data structure that returns the kth largest element from a
+     stream.
+
+=============================================================== 4.
+VERY-HIGH-PRIORITY QUESTIONS
+===============================================================
+
+If an interview candidate has limited preparation time, prioritize
+these:
+
+251. Explain Big O notation and common time complexities.
+
+252. Array vs linked list.
+
+253. Stack vs queue.
+
+254. Implement binary search.
+
+255. Reverse a linked list.
+
+256. Detect a cycle in a linked list.
+
+257. Find the middle of a linked list.
+
+258. Merge two sorted linked lists.
+
+259. Two Sum.
+
+260. Maximum subarray sum / Kadane’s algorithm.
+
+261. Move zeroes to the end of an array.
+
+262. Find the missing number.
+
+263. Find the majority element.
+
+264. Validate parentheses.
+
+265. Explain hashing and collision handling.
+
+266. Explain hash-map average complexity.
+
+267. Binary tree traversals.
+
+268. Validate a BST.
+
+269. Find the height/depth of a binary tree.
+
+270. Lowest common ancestor.
+
+271. Level-order traversal.
+
+272. BFS vs DFS.
+
+273. Detect a cycle in a graph.
+
+274. Topological sort.
+
+275. Shortest path in an unweighted graph.
+
+276. Dijkstra’s algorithm.
+
+277. Merge overlapping intervals.
+
+278. Longest substring without repeating characters.
+
+279. Sliding window technique.
+
+280. Two-pointer technique.
+
+281. Dynamic programming: memoization vs tabulation.
+
+282. Climbing stairs.
+
+283. Coin change.
+
+284. 0/1 knapsack.
+
+285. Longest common subsequence.
+
+286. Longest increasing subsequence.
+
+287. Word break.
+
+288. Trie and prefix search.
+
+289. Heap and priority queue.
+
+290. Kth largest element.
+
+291. Merge k sorted lists.
+
+292. Minimum spanning tree.
+
+293. Union-find / disjoint set.
+
+294. LRU cache.
+
+295. Serialize and deserialize a binary tree.
+
+=============================================================== 5. HOW
+TO PRESENT THESE ON A WEBSITE
+===============================================================
+
+Recommended title: “DSA Interview Questions — Frequently Asked &
+High-Confidence”
+
+Recommended description: “Practice DSA questions covering arrays,
+strings, linked lists, stacks, queues, hashing, trees, graphs, dynamic
+programming, heaps, tries, and common interview problem-solving
+patterns.”
+
+Recommended disclaimer: “These questions are curated from recurring
+interview patterns and established interview-preparation resources. They
+are not guaranteed to appear in every interview, and the wording may
+differ from an interviewer’s actual wording.”
+
+Do NOT use: - “100% real interview questions” - “Guaranteed questions” -
+“Every company asks these questions” - “Verbatim questions from
+interviews”
+
+=============================================================== 6.
+SOURCE TYPES USED FOR THE QUESTION SELECTION
+===============================================================
+
+The supplied outline referenced established interview-question resources
+including: - GeeksforGeeks DSA interview questions - InterviewBit DSA
+interview questions - Shine / Talent Economy DSA interview questions -
+Indeed DSA interview guidance - LeetCode interview-question
+discussions - Other interview-preparation resources cited in the
+supplied outline
+
+This file intentionally converts recurring themes into a clean,
+non-company-specific preparation bank rather than falsely attributing
+every question to a specific interview.
+
+=============================================================== END
+===============================================================

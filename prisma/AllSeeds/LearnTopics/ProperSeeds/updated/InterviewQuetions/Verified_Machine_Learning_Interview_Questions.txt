@@ -1,0 +1,97 @@
+MACHINE LEARNING INTERVIEW QUESTIONS — VERIFIED + HIGH-CONFIDENCE SET
+
+PURPOSE This is a high-confidence interview bank. It separates questions
+explicitly reported in published interview-experience reports from
+recurring/common interview questions.
+
+LABELS [REPORTED] = a published interview experience explicitly
+describes the question or task. Wording is lightly normalized and is not
+presented as a verbatim quotation. [COMMON] = a recurring interview
+question supported by current interview-question references and multiple
+interview patterns; it is not claimed to be tied to one specific
+interview.
+
+IMPORTANT Do not market this file as ‘questions guaranteed to be asked’.
+Interview questions vary by company, role, seniority, resume and
+interviewer. Recommended website wording: ‘Curated interview questions
+based on reported interview experiences and commonly tested interview
+patterns.’
+
+============================================================ REPORTED
+INTERVIEW QUESTIONS
+============================================================
+
+============================================================ COMMON /
+HIGH-FREQUENCY INTERVIEW QUESTIONS
+============================================================ [COMMON]
+What is machine learning? [COMMON] How is machine learning different
+from traditional rule-based programming? [COMMON] AI vs ML vs deep
+learning? [COMMON] Supervised vs unsupervised learning? [COMMON] What is
+semi-supervised learning? [COMMON] What is reinforcement learning?
+[COMMON] What is overfitting? [COMMON] How do you detect overfitting?
+[COMMON] How can overfitting be reduced? [COMMON] What is underfitting?
+[COMMON] What is the bias-variance tradeoff? [COMMON] Why is linear
+regression not normally used for classification? [COMMON] Precision vs
+recall? [COMMON] When would you prefer high recall over high precision?
+[COMMON] What is F1 score? [COMMON] What is a confusion matrix? [COMMON]
+ROC-AUC vs PR-AUC? [COMMON] What is cross-validation? [COMMON] Why
+should preprocessing be fitted only on training data? [COMMON] What is
+data leakage? [COMMON] What is feature engineering? [COMMON] How do you
+handle missing values? [COMMON] How do you handle categorical variables?
+[COMMON] When should features be standardized? [COMMON] What is
+normalization vs standardization? [COMMON] What is regularization?
+[COMMON] L1 vs L2 regularization? [COMMON] What is gradient descent?
+[COMMON] Batch vs stochastic vs mini-batch gradient descent? [COMMON]
+What is a learning rate? [COMMON] What happens if the learning rate is
+too high? [COMMON] What happens if it is too low? [COMMON] What is
+logistic regression? [COMMON] Decision tree vs random forest? [COMMON]
+Why does random forest reduce variance? [COMMON] What is gradient
+boosting? [COMMON] Random forest vs gradient boosting? [COMMON] What is
+the kernel trick in SVM? [COMMON] What is PCA and why use it? [COMMON]
+When can PCA hurt model performance? [COMMON] What is dimensionality
+reduction? [COMMON] K-means vs hierarchical clustering? [COMMON] How do
+you choose K in K-means? [COMMON] What is the silhouette score? [COMMON]
+What is Naive Bayes based on? [COMMON] What is class imbalance? [COMMON]
+How would you handle severe class imbalance? [COMMON] How would you
+evaluate a fraud-detection model? [COMMON] How would you choose a
+classification threshold? [COMMON] What is calibration? [COMMON] What is
+hyperparameter tuning? [COMMON] Grid search vs random search? [COMMON]
+What is early stopping? [COMMON] Why do tree models not usually require
+feature scaling? [COMMON] Why can highly correlated features be a
+problem for some models? [COMMON] What is multicollinearity? [COMMON]
+How do you select useful features? [COMMON] What is feature importance?
+[COMMON] Permutation importance vs model coefficients? [COMMON] What is
+SHAP used for? [COMMON] How would you explain a model to a non-technical
+stakeholder? [COMMON] What is a neural network? [COMMON] What causes
+vanishing gradients? [COMMON] What causes exploding gradients? [COMMON]
+What is dropout? [COMMON] What is batch normalization? [COMMON] CNN vs
+RNN at a high level? [COMMON] What is attention? [COMMON] What is a
+transformer? [COMMON] How would you debug a model whose training
+accuracy is high but validation accuracy is poor? [COMMON] How would you
+investigate a sudden production drop in model performance? [COMMON] What
+is model drift? [COMMON] Data drift vs concept drift? [COMMON] How would
+you monitor a production ML model? [COMMON] How would you design an ML
+training pipeline? [COMMON] How would you make a model-training pipeline
+reproducible? [COMMON] What belongs in an ML feature pipeline? [COMMON]
+What is the purpose of a train/validation/test split? [COMMON] How would
+you prevent leakage when creating time-based features? [COMMON] How
+would you handle a dataset too large for memory? [COMMON] How would you
+compare two models fairly? [COMMON] How would you decide whether a more
+complex model is worth using? [COMMON] How would you deploy a model
+behind an API? [COMMON] How would you roll back a bad model release?
+[COMMON] How would you handle model versioning? [COMMON] What is A/B
+testing for ML models? [COMMON] How would you investigate duplicate rows
+affecting a model? [COMMON] How would you choose a baseline model?
+[COMMON] What would you do if labels are noisy? [COMMON] How would you
+handle a model with poor recall but good precision? [COMMON] How would
+you handle a model with excellent offline metrics but poor production
+results? [COMMON] How would you explain why a model performs differently
+across user segments?
+
+============================================================ SOURCE
+BASIS ============================================================ 1.
+Motive Applied Scientist interview experience — GeeksforGeeks:
+classification pipeline, duplicate removal, Random Forest behavior,
+overfitting and pipelines. 2. Current Machine Learning
+interview-question reference — GeeksforGeeks. 3. Current AI/ML/Data
+Science interview reference — GeeksforGeeks.

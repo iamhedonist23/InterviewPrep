@@ -1,0 +1,2785 @@
+DSA INTERVIEW QUESTIONS — DETAILED, INTERVIEW-READY ANSWERS
+
+Purpose
+
+This document expands the supplied evidence-based DSA interview bank
+into clear, interview-ready answers and original examples. The source
+states that its questions come from published candidate interview
+experiences and deliberately distinguishes reported, repeated, and
+variant evidence.
+
+Evidence rules
+
+[REPORTED] = explicitly reported by a candidate. [REPEATED] = the same
+problem/topic is reported in multiple interview experiences. [VARIANT] =
+a reported variation of a known problem. The source also warns that
+normalized wording should not be treated as a verbatim transcript and
+that these questions are not guaranteed in every interview.
+
+Recommended website wording: “DSA Interview Questions Actually Reported
+in Interviews”
+
+==============================================================================
+
+1.  [REPEATED] Reverse a singly linked list. Reported by: Amazon SDE1;
+    Microsoft SDE; Samsung Bangalore; other reports. Evidence: Amazon
+    explicitly reported “Reverse a linked list”; Microsoft reported the
+    same problem; Samsung reported reverse a linked list. Sources: -
+    LeetCode Microsoft SDE interview experience - LeetCode Amazon SDE1
+    onsite experience - GeeksforGeeks Samsung Bangalore internship
+    experience
+
+Answer: Use three pointers—prev, current, and next—to reverse the links
+one node at a time. Save current.next before changing it, point
+current.next to prev, then advance prev and current. This gives O(n)
+time and O(1) auxiliary space. The important edge cases are an empty
+list and a single-node list.
+
+Example: Input: 1 -> 2 -> 3 -> 4 -> null Output: 4 -> 3 -> 2 -> 1 ->
+null
+
+C++: ListNode* reverse(ListNode* head) { ListNode* prev = nullptr;
+ListNode* cur = head; while (cur) { ListNode* next = cur->next;
+cur->next = prev; prev = cur; cur = next; } return prev; }
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+2.  [REPORTED] Reverse a linked list in groups of a given size. Reported
+    by: Amazon SDE1; GeeksforGeeks SDE interview. Source: -
+    GeeksforGeeks Amazon SDE-1 interview experience - GeeksforGeeks SDE
+    Android Team interview experience
+
+Answer: Process the list group by group. For each complete group of k
+nodes, reverse its links and connect the previous group’s tail to the
+new head. Decide explicitly what to do with a final group smaller than
+k; the common variant leaves it unchanged. The iterative approach is
+O(n) time and O(1) auxiliary space.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+3.  [REPORTED] Reverse a linked list in groups of three nodes. Reported
+    by: Snapdeal Java interview experience. Source: GeeksforGeeks
+    Snapdeal Interview Experience Set 3.
+
+Answer: Process the list group by group. For each complete group of k
+nodes, reverse its links and connect the previous group’s tail to the
+new head. Decide explicitly what to do with a final group smaller than
+k; the common variant leaves it unchanged. The iterative approach is
+O(n) time and O(1) auxiliary space.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+4.  [REPORTED] Reverse a linked list between positions L and R. Reported
+    by: Amazon SDE1 onsite interview. Source: LeetCode Amazon SDE1
+    Seattle interview experience.
+
+Answer: Locate the node immediately before position L, then reverse only
+the L..R segment using the same three-pointer technique. Reconnect the
+prefix and suffix carefully. A dummy node simplifies the case where L
+= 1. Time is O(n), auxiliary space O(1).
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+5.  [REPORTED] Determine whether a linked list containing characters is
+    a palindrome. Reported by: Amazon interview experience. Source:
+    GeeksforGeeks Amazon Interview Experience Set 250.
+
+Answer: Find the midpoint with slow/fast pointers, reverse the second
+half, and compare both halves node by node. This is O(n) time and O(1)
+extra space if the list is restored afterward. For character nodes,
+compare the character values rather than node addresses.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+6.  [REPORTED] Find the path / process associated with a linked-list
+    problem involving multiple lists and intersections. Reported by:
+    Flipkart SDE II. Source: GeeksforGeeks Flipkart Interview Set 7.
+
+Answer: For intersecting singly linked lists, intersection means the
+same node object, not merely equal values. A standard O(n) solution uses
+two pointers: one traverses A then B, the other B then A. After at most
+m+n steps they align at the intersection or both become null.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+7.  [REPORTED] Solve linked-list coding questions with linear time
+    complexity. Reported by: GeeksforGeeks SDE interview experience.
+    Source: GeeksforGeeks SDE Android Team interview experience.
+    ==================================================== 2. LRU CACHE /
+    HASHING ====================================================
+
+Answer: The key is to avoid repeated scans of the list. Maintain the
+necessary state while traversing each node once. Typical linked-list
+operations such as reversal, cycle detection, or midpoint detection can
+be solved in O(n). Explain why no node is processed a superlinear number
+of times.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+8.  [REPEATED] Implement an LRU cache. Reported by: Amazon, Microsoft,
+    Joveo, OnlineSales AI, Flipkart, OLX Groups and other interview
+    experiences. Sources: - LeetCode Amazon SDE1 onsite - LeetCode
+    Microsoft SDE - LeetCode Joveo SDE1 - LeetCode OnlineSales AI SDE2 -
+    GeeksforGeeks Flipkart SDE II - GeeksforGeeks OLX Groups
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+9.  [REPORTED] Implement an LRU cache with get/put operations in O(1).
+    Reported by: Joveo SDE1. Source: LeetCode Joveo SDE1 interview
+    experience.
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+10. [REPORTED] Implement an LRU cache using a doubly linked list and
+    hash map. Reported by: Microsoft, OnlineSales AI and other
+    interviews. Sources: LeetCode Microsoft and OnlineSales AI interview
+    experiences.
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+11. [REPORTED] Modify an LRU cache to support TTL/expiration. Reported
+    by: Microsoft Senior Software Engineer. Source: LeetCode Microsoft
+    Senior SE interview experience, March 2026.
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+12. [REPORTED] Discuss concurrency/thread safety for an LRU cache.
+    Reported by: Microsoft Senior Software Engineer. Source: LeetCode
+    Microsoft Senior SE interview experience, March 2026.
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+13. [REPORTED] Design a cache with an LRU eviction policy. Reported by:
+    Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida interview
+    experience.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+14. [REPORTED] Implement LRU cache on paper. Reported by: OLX Groups.
+    Source: GeeksforGeeks OLX Groups Interview Experience.
+    ==================================================== 3. ARRAYS
+    ====================================================
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+15. [REPORTED] Find the smallest positive missing number in an array.
+    Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview
+    Experience SDE-1.
+
+Answer: Place each value x in its natural index x-1 whenever 1 <= x <=
+n. After rearrangement, the first index i where nums[i] != i+1
+identifies the smallest missing positive i+1. This runs in O(n) time and
+O(1) extra space, with duplicates and non-positive values ignored.
+
+Example: Input: [3, 4, -1, 1] Output: 2
+
+After placing 1..n values into their natural positions, index 1 is the
+first mismatch.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+16. [REPORTED] Find the largest number that can be formed by
+    concatenating an array of numbers. Reported by: Amazon interview
+    experience. Source: GeeksforGeeks Amazon Interview Experience Set
+    250.
+
+Answer: Convert numbers to strings and sort using the comparator a+b >
+b+a. This ordering puts the pair that creates the larger concatenation
+first. Concatenate the sorted strings; handle the all-zero case so the
+result is ‘0’ rather than many leading zeros. Complexity is O(n log n)
+comparisons, with comparison cost depending on string lengths.
+
+Example: Input: [3, 30, 34, 5, 9] Output: “9534330”
+
+Compare “9”+“34” with “34”+“9” to decide their ordering.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+17. [REPORTED] Find the maximum path/subsequence-style sum. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+18. [REPORTED] Solve the Trapping Rain Water problem. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+Answer: Use two pointers at the ends while tracking leftMax and
+rightMax. The side with the smaller current height determines how much
+water can be finalized, because its opposite boundary is guaranteed to
+be at least as high. Accumulate maxBoundary - currentHeight when
+positive. Time O(n), extra space O(1).
+
+Example: heights = [0,1,0,2,1,0,1,3,2,1,2,1] Answer = 6
+
+The two-pointer solution keeps leftMax and rightMax and accumulates
+trapped water without building prefix/suffix arrays.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+19. [REPORTED] Solve a subarray-related DSA problem. Reported by:
+    Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview
+    experience.
+
+Answer: The exact source only identifies this as a subarray-related
+problem, so the safest interview preparation is to recognize the main
+patterns: sliding window for constrained positive values, prefix sums
+for range/sum conditions, and hash maps for prefix-state frequency or
+earliest-index matching. Do not claim a single exact algorithm without
+the original problem statement.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+20. [REPORTED] Solve a string/array problem involving two pointers.
+    Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida
+    interview experience.
+
+Answer: Two pointers maintain a relationship between two positions while
+avoiding unnecessary rescans. Common forms are left/right pointers on
+sorted arrays or strings, and slow/fast pointers on linked lists. The
+correct invariant depends on the problem; explain what each pointer
+represents and why moving one cannot discard a valid answer.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+21. [REPORTED] Solve a permutation-in-string problem. Reported by:
+    Microsoft SDE2 India. Source: LeetCode Microsoft SDE2 India
+    interview experience.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+22. [REPORTED] Solve Spiral Matrix. Reported by: Joveo SDE1. Source:
+    LeetCode Joveo SDE1 interview experience.
+
+Answer: Maintain four boundaries: top, bottom, left, and right. Traverse
+the top row, right column, bottom row in reverse, and left column
+upward, shrinking the corresponding boundary after each traversal.
+Before traversing the bottom or left boundary, verify that the remaining
+rectangle is still valid to avoid duplicates. O(mn) time and O(1) extra
+space excluding the output.
+
+Example: Input: 1 2 3 4 5 6 7 8 9
+
+Output: 1 2 3 6 9 8 7 4 5
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+23. [REPORTED] Solve Next Permutation. Reported by: Amazon SDE1. Source:
+    LeetCode interview experience by candidate reporting Amazon SDE1.
+
+Answer: Find the rightmost index i with nums[i] < nums[i+1]. If it
+exists, find the rightmost element greater than nums[i], swap them, then
+reverse the suffix i+1..end. If no such i exists, the array is in
+descending order, so reverse the whole array to obtain the smallest
+permutation. O(n) time and O(1) extra space.
+
+Example: Input: [1, 2, 3] Output: [1, 3, 2]
+
+Input: [3, 2, 1] Output: [1, 2, 3]
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+24. [REPORTED] Solve House Robber. Reported by: Amazon SDE1. Source:
+    LeetCode interview experience by candidate reporting Amazon SDE1.
+    ==================================================== 4. STRINGS
+    ====================================================
+
+Answer: Let dp[i] be the maximum amount obtainable from the first i
+houses. At each house, either skip it or rob it and add its value to the
+best result two houses earlier: dp[i] = max(dp[i-1], dp[i-2] + value).
+Only the previous two states are needed, so space can be reduced to
+O(1). Time O(n).
+
+Example: nums = [2, 7, 9, 3, 1] Best = 12
+
+Choose houses with values 2 + 9 + 1 rather than adjacent houses.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Define the state before coding. • Write the
+transition and base cases. • Check whether space can be reduced to O(1).
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+25. [REPORTED] Find the longest palindrome in a string. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+Answer: For longest palindromic substring, expand around every possible
+center—both single characters and gaps between characters. Each
+expansion checks matching characters until the boundary fails. This
+simple method is O(n^2) time and O(1) extra space; Manacher’s algorithm
+can achieve O(n) but is substantially more complex.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+26. [REPORTED] Find the longest palindromic substring. Reported by:
+    Amazon interview experience. Source: GeeksforGeeks Amazon Interview
+    Experience Set 250.
+
+Answer: For longest palindromic substring, expand around every possible
+center—both single characters and gaps between characters. Each
+expansion checks matching characters until the boundary fails. This
+simple method is O(n^2) time and O(1) extra space; Manacher’s algorithm
+can achieve O(n) but is substantially more complex.
+
+Example: Input: “babad” Output: “bab” (or “aba”)
+
+Expand around each center and retain the longest valid palindrome.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+27. [REPORTED] Find whether a string/linked-list sequence is a
+    palindrome. Reported by: Amazon. Source: GeeksforGeeks Amazon
+    Interview Experience Set 250.
+
+Answer: Find the midpoint with slow/fast pointers, reverse the second
+half, and compare both halves node by node. This is O(n) time and O(1)
+extra space if the list is restored afterward. For character nodes,
+compare the character values rather than node addresses.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+28. [REPORTED] Solve Permutation in String. Reported by: Microsoft SDE2
+    India. Source: LeetCode Microsoft SDE2 India interview experience.
+
+Answer: Use a fixed-size sliding window equal to the pattern length and
+maintain character frequencies. A window is valid when its frequency
+vector matches the pattern’s vector. Move the right edge forward and
+remove the character leaving the left edge. For a lowercase English
+alphabet, each update is O(1), giving O(n) time and O(1) auxiliary
+space.
+
+Example: s1 = “ab” s2 = “eidbaooo” Result = true
+
+The window “ba” is a permutation of “ab”.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+29. [REPORTED] Solve a string matching problem using two pointers.
+    Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida
+    interview experience.
+
+Answer: Two pointers maintain a relationship between two positions while
+avoiding unnecessary rescans. Common forms are left/right pointers on
+sorted arrays or strings, and slow/fast pointers on linked lists. The
+correct invariant depends on the problem; explain what each pointer
+represents and why moving one cannot discard a valid answer.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+30. [REPORTED] Process a string containing lowercase letters and blocker
+    characters to find the longest safe path. Reported by: Microsoft
+    SDE1. Source: LeetCode Microsoft SDE1 Noida interview experience.
+    ==================================================== 5. STACKS /
+    QUEUES ====================================================
+
+Answer: The source gives the scenario but not the exact formal
+statement. Treat it as a string/array traversal problem: scan once while
+maintaining the current valid segment, reset when a blocker invalidates
+the segment, and track the maximum valid length. If blockers or
+transitions have additional rules, those rules determine whether a
+sliding window or dynamic programming formulation is required.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+31. [REPORTED] Reverse a stack using recursion. Reported by: PharmEasy
+    SDE1. Source: LeetCode candidate interview experience.
+
+Answer: Recursively pop all elements until the stack is empty, then
+insert each removed element at the bottom while the recursion unwinds.
+The helper for inserting at the bottom is also recursive. This uses O(n)
+call-stack space and O(n^2) time with a standard stack implementation
+because bottom insertion can traverse the stack repeatedly.
+
+Example: Stack bottom -> top: [1, 2, 3] After recursive reversal: [3, 2,
+1]
+
+The recursion removes 3, then 2, then 1, and inserts them back at the
+bottom.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+32. [REPORTED] Solve a stack-based coding problem. Reported by:
+    GeeksforGeeks SDE interview. Source: GeeksforGeeks SDE Android Team
+    interview experience.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+33. [REPORTED] Design a stack that supports getMin in O(1). Reported by:
+    OLX Groups. Source: GeeksforGeeks OLX Groups Interview Experience.
+
+Answer: Maintain the current minimum alongside stack values. A second
+stack can store the minimum seen at each depth, giving O(1) getMin,
+push, and pop. Another approach stores encoded values in one stack, but
+the two-stack design is easier to explain and less error-prone.
+
+Example: Push: 5, 3, 7, 2 getMin() -> 2 pop() getMin() -> 3
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+34. [REPORTED] Implement a queue/cache-like structure using appropriate
+    linked data structures. Reported across coding interviews. Use only
+    when the exact company/source is cited on the website.
+    ==================================================== 6. TREES
+    ====================================================
+
+Answer: For a queue-like structure, use a doubly linked list when
+constant-time insertion/removal at both ends is needed, or a circular
+buffer/deque for array-backed queue behavior. If the requirement also
+includes key lookup or eviction, combine the list with a hash map as in
+an LRU cache. The source does not specify one exact implementation.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+35. [REPORTED] Find the bottom view of a binary tree. Reported by:
+    Amazon. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+
+Answer: Use level-order traversal with a horizontal-distance value for
+each node. For a bottom view, keep the required node for each horizontal
+distance in a map. For bottom view, later nodes at the same distance
+overwrite earlier ones; for top view, the first encountered node is
+retained. A BFS naturally processes nodes level by level. Time O(n),
+auxiliary space O(n).
+
+Example: For a tree with horizontal distances -1, 0, +1, overwrite the
+stored node at each distance as BFS visits later levels.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+36. [REPORTED] Find the top view of a binary tree. Reported by: Amazon
+    SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+
+Answer: Use level-order traversal with a horizontal-distance value for
+each node. For a top view, keep the required node for each horizontal
+distance in a map. For bottom view, later nodes at the same distance
+overwrite earlier ones; for top view, the first encountered node is
+retained. A BFS naturally processes nodes level by level. Time O(n),
+auxiliary space O(n).
+
+Example: For a tree with horizontal distances -1, 0, +1, keep the first
+node encountered at each distance during BFS.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+37. [REPORTED] Find the maximum path sum in a binary tree. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+Answer: Use postorder DFS. For each node, compute the maximum downward
+contribution from its left and right child, ignoring negative
+contributions with max(0, childGain). The best path passing through the
+node is node->value + leftGain + rightGain; update a global maximum,
+while returning only node->value + max(leftGain, rightGain) to the
+parent. O(n) time, O(h) recursion space.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+38. [REPORTED] Find the difference between maximum and minimum values in
+    a binary tree. Reported by: Samsung Bangalore internship. Source:
+    GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+
+Answer: Traverse the tree once while maintaining the minimum and maximum
+values seen. At the end return maxValue - minValue. This is O(n) time
+and O(h) recursive space, or O(n) worst-case auxiliary space with an
+explicit stack.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+39. [REPORTED] Find a value related to GCD across values in a binary
+    tree. Reported by: Samsung Bangalore internship. Source:
+    GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+
+Answer: The exact operation is not fully specified in the source. In a
+tree, a common interpretation is to aggregate node values with gcd:
+initialize an accumulator and update it as gcd(accumulator, nodeValue)
+during traversal. If the original question asks for a path, subtree, or
+pairwise GCD instead, the state and algorithm change; the source does
+not provide enough detail to assert one exact variant.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+40. [REPORTED] Find nodes at distance K from a given binary-tree node.
+    Reported by: Flipkart SDE II. Source: GeeksforGeeks Flipkart
+    Interview Set 7.
+
+Answer: Treat the tree as an undirected graph: each node has edges to
+its children and its parent. First record parent pointers, then run BFS
+from the target node for K levels. Maintain a visited set so you do not
+move back and forth. Nodes reached exactly at distance K are the answer.
+O(n) time and O(n) space.
+
+Example: If target = 5 and K = 2 in a tree, BFS through parent/child
+edges returns every node exactly two edges away from 5.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+41. [REPORTED] Mirror a binary tree. Reported by: Snapdeal. Source:
+    GeeksforGeeks Snapdeal Interview Experience Set 3.
+
+Answer: Recursively or iteratively swap each node’s left and right
+children. For recursion, mirror(left) and mirror(right) and then swap
+the returned subtrees. Every node is visited once: O(n) time and O(h)
+recursion space.
+
+Example: Before: After: 1 1 /   /
+2 3 3 2
+
+Swap left and right recursively at every node.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+42. [REPORTED] Transform a binary tree into a sum tree. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+Answer: For a Sum Tree, recursively compute the sum of each subtree. For
+a node, the transformed value is the sum of values in its left and right
+subtrees, while the original node value is included when returning the
+subtree sum to the parent. Be explicit about whether the target
+definition requires validation or transformation; the source describes
+transformation. A postorder traversal is O(n).
+
+Example: For: 10 /
+4 6
+
+The transformed root value is 10 (4 + 6), while the recursive subtree
+sums are returned upward.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+43. [REPORTED] Determine whether a binary tree satisfies a specified
+    property through traversal. Reported in multiple company
+    experiences. Exact variant should be attributed to its source.
+    ==================================================== 7. GRAPHS /
+    BACKTRACKING ====================================================
+
+Answer: Many binary-tree properties can be checked with DFS or BFS while
+maintaining the required state. Define the invariant first—for example,
+a BST validity check carries lower and upper bounds, while level-order
+properties track nodes by depth. Because the source does not state the
+exact property, the traversal strategy should be selected from the
+formal requirement rather than assumed.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+44. [REPORTED] Solve a graph-based problem in an Amazon DSA round.
+    Reported by: Amazon SDE1. Source: LeetCode candidate interview
+    experience.
+
+Answer: The source confirms a graph-based problem but does not provide
+the exact statement. Prepare BFS, DFS, visited-state handling, shortest
+path in unweighted graphs, and topological ordering. Do not present one
+of these as the exact Amazon question unless the original interview
+report supplies that detail.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify directed vs undirected and weighted vs
+unweighted. • Track visited state where cycles are possible. • Select
+BFS/DFS/Dijkstra/topological sort from the requirements.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+45. [REPORTED] Solve a backtracking problem based on N-Queens. Reported
+    by: PharmEasy SDE1. Source: LeetCode candidate interview experience.
+
+Answer: Use backtracking row by row. A queen can be placed only if its
+column, row-column diagonal, and row+column diagonal are unused. After
+placing a queen, recurse to the next row; on failure, undo the
+placement. The search is exponential in n, commonly described around
+O(n!) time, with O(n) auxiliary state besides the output.
+
+Example: n = 4 One valid placement: . Q . . . . . Q Q . . . . . Q .
+
+Each row, column, and diagonal contains at most one queen.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+46. [REPORTED] Solve a graph problem in an online assessment. Reported
+    by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview
+    experience.
+
+Answer: The source confirms a graph problem but not its exact statement.
+A strong preparation approach is to identify whether the graph is
+directed/undirected, weighted/unweighted, and whether the goal is
+reachability, shortest path, components, cycle detection, or ordering.
+Choose BFS/DFS/Dijkstra/topological sort based on those properties.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify directed vs undirected and weighted vs
+unweighted. • Track visited state where cycles are possible. • Select
+BFS/DFS/Dijkstra/topological sort from the requirements.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+47. [REPORTED] Design Git using a graph-based approach. Reported by:
+    Samsung Bangalore internship. Source: GeeksforGeeks Samsung
+    Bangalore SRIB Internship Experience.
+
+Answer: A graph model is useful for Git because commits form a directed
+acyclic history in the normal model: a commit points to one or more
+parent commits. Branches and tags are references to commits, while
+merges create commits with multiple parents. For a design interview,
+discuss object storage, references, content addressing, traversal of
+commit history, and deduplication.
+
+Example: Commit C3 can point to parent C2, and C2 to C1: C1 <- C2 <- C3
+A merge commit may have two parents: C2a – -> C4 C2b –/
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify directed vs undirected and weighted vs
+unweighted. • Track visited state where cycles are possible. • Select
+BFS/DFS/Dijkstra/topological sort from the requirements.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+48. [REPORTED] Use graph concepts for a tree/data-structure problem.
+    Reported by: Samsung Bangalore internship. Source: GeeksforGeeks
+    Samsung Bangalore SRIB Internship Experience.
+    ==================================================== 8. DYNAMIC
+    PROGRAMMING / GREEDY
+    ====================================================
+
+Answer: Identify a state that captures the smaller subproblem, define
+its transition, establish base cases, and determine the evaluation
+order. Then analyze time and space and reduce space when only recent
+states are needed. The source confirms a DP problem but does not give
+its exact statement, so this answer focuses on the interview method
+rather than inventing a specific problem.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+49. [REPORTED] Solve House Robber. Reported by: Amazon SDE1. Source:
+    LeetCode candidate Amazon interview experience.
+
+Answer: Let dp[i] be the maximum amount obtainable from the first i
+houses. At each house, either skip it or rob it and add its value to the
+best result two houses earlier: dp[i] = max(dp[i-1], dp[i-2] + value).
+Only the previous two states are needed, so space can be reduced to
+O(1). Time O(n).
+
+Example: nums = [2, 7, 9, 3, 1] Best = 12
+
+Choose houses with values 2 + 9 + 1 rather than adjacent houses.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Define the state before coding. • Write the
+transition and base cases. • Check whether space can be reduced to O(1).
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+50. [REPORTED] Solve a dynamic-programming problem in an online
+    assessment. Reported by: Microsoft SDE2. Source: LeetCode Microsoft
+    L61/L62 interview experience.
+
+Answer: Identify a state that captures the smaller subproblem, define
+its transition, establish base cases, and determine the evaluation
+order. Then analyze time and space and reduce space when only recent
+states are needed. The source confirms a DP problem but does not give
+its exact statement, so this answer focuses on the interview method
+rather than inventing a specific problem.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Define the state before coding. • Write the
+transition and base cases. • Check whether space can be reduced to O(1).
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+51. [REPORTED] Solve a greedy problem in an online assessment. Reported
+    by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview
+    experience.
+
+Answer: A greedy algorithm makes the locally best choice while relying
+on a proof that this choice can be part of an optimal solution. In an
+interview, do not stop at the implementation: state the greedy choice,
+prove why it is safe, and give a counterexample if a tempting greedy
+rule fails.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+52. [REPORTED] Solve a Building Bridges problem. Reported by: Amazon.
+    Source: GeeksforGeeks Amazon Interview Experience Set 250.
+
+Answer: Sort bridge endpoints by one coordinate, then find a longest
+increasing subsequence on the other coordinate. For duplicate
+coordinates, use a consistent tie-breaking rule so crossing bridges are
+not incorrectly counted. The classic optimized LIS solution is O(n log
+n) after sorting.
+
+Example: Pairs: (6,2), (4,3), (2,6), (1,5) After sorting by the first
+coordinate, find a longest increasing subsequence on the second
+coordinate.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+53. [REPORTED] Solve a maximum-sum-subsequence variant. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1. ==================================================== 9. HEAPS
+    / OTHER DATA STRUCTURES
+    ====================================================
+
+Answer: A heap is appropriate when the problem repeatedly needs the
+current minimum or maximum. A binary heap supports insertion and removal
+of the root in O(log n), with O(1) access to the root. For top-K
+problems, a heap of size K often gives O(n log k). The source identifies
+a hard heap-related problem but not its exact statement, so the precise
+algorithm cannot be inferred.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+54. [REPORTED] Solve a hard heap-related problem in an online
+    assessment. Reported by: Microsoft SDE1 Noida. Source: LeetCode
+    Microsoft SDE1 Noida interview experience.
+
+Answer: A heap is appropriate when the problem repeatedly needs the
+current minimum or maximum. A binary heap supports insertion and removal
+of the root in O(log n), with O(1) access to the root. For top-K
+problems, a heap of size K often gives O(n log k). The source identifies
+a hard heap-related problem but not its exact statement, so the precise
+algorithm cannot be inferred.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+55. [REPORTED] Find the maximum/minimum-related values in a binary tree.
+    Reported by: Samsung Bangalore internship. Source: GeeksforGeeks
+    Samsung Bangalore SRIB Internship Experience.
+    ==================================================== 10. REPEATED /
+    HIGH-PRIORITY VERIFIED TOPICS
+    ==================================================== The following
+    have particularly strong evidence because they appear in multiple
+    candidate reports:
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Start by restating the problem, confirm constraints,
+discuss a straightforward approach, then optimize. Explain the invariant
+that makes the solution correct.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+56. [REPEATED] Reverse a linked list.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+57. [REPEATED] Reverse a linked list in groups.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Draw the pointers before changing links. •
+Handle null, one-node, and boundary cases. • State time and
+auxiliary-space complexity.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+58. [REPEATED] Implement an LRU cache.
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+59. [REPEATED] Implement LRU cache using a hash map and doubly linked
+    list.
+
+Answer: An LRU cache needs O(1) average-time lookup, insertion, and
+eviction. The standard design combines a hash map from key to a node
+with a doubly linked list ordered from most recently used to least
+recently used. get() moves a found node to the front; put() updates an
+existing node or inserts a new one at the front, and when capacity is
+exceeded removes the tail. Hash-map lookup and constant-time list
+unlink/insert give O(1) average time.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+60. [REPEATED] Palindrome-related string/linked-list problem.
+
+Answer: Find the midpoint with slow/fast pointers, reverse the second
+half, and compare both halves node by node. This is O(n) time and O(1)
+extra space if the list is restored afterward. For character nodes,
+compare the character values rather than node addresses.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+61. [REPEATED] Binary-tree traversal/view/path problems.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Choose DFS/BFS based on the required state. •
+Define what each recursive return value means. • Watch recursion depth
+for highly skewed trees.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+62. [REPEATED] Graph/graph-like coding problems.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify directed vs undirected and weighted vs
+unweighted. • Track visited state where cycles are possible. • Select
+BFS/DFS/Dijkstra/topological sort from the requirements.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+63. [REPEATED] Dynamic programming problems.
+
+Answer: Identify a state that captures the smaller subproblem, define
+its transition, establish base cases, and determine the evaluation
+order. Then analyze time and space and reduce space when only recent
+states are needed. The source confirms a DP problem but does not give
+its exact statement, so this answer focuses on the interview method
+rather than inventing a specific problem.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Define the state before coding. • Write the
+transition and base cases. • Check whether space can be reduced to O(1).
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+64. [REPEATED] Sliding-window/string-matching style problems.
+
+Answer: The source confirms that this problem/topic was reported in an
+interview, but it does not provide enough detail to reconstruct the
+exact original problem statement. In an interview, first clarify the
+inputs, outputs, constraints, and edge cases; then choose the data
+structure/algorithm and justify its complexity. Avoid presenting an
+invented variant as the exact reported question.
+
+Example: Example: Clarify a concrete input/output example from the
+original interview statement before coding. The source does not provide
+enough detail to reproduce one without inventing requirements.
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Clarify constraints before choosing the
+algorithm. • Explain the invariant or reasoning behind each major step.
+• Test empty, minimal, duplicate, boundary, and worst-case inputs.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+65. [REPEATED] Heap-based problems.
+    ==================================================== 11. SOURCE
+    BASIS ==================================================== Primary
+    sources checked for this evidence-based version: 1. Microsoft Senior
+    SE (L63/L64) Interview Experience — LeetCode Reported: LRU cache
+    with TTL and concurrency. 2. Microsoft SDE-2 India Interview
+    Experience — LeetCode Reported: Permutation in String and LRU-style
+    IP management. 3. Microsoft SDE1 Noida Interview Experience —
+    LeetCode Reported: string/two-pointer problem, cache design/LRU,
+    heap-related OA. 4. Microsoft L61/L62 Interview Experience —
+    LeetCode Reported: graph, greedy, DP, linked-list, subarray and
+    LRU-related work. 5. Amazon SDE1 Seattle Interview Experience —
+    LeetCode Reported: LRU cache, reverse linked list, reverse linked
+    list II, Next Permutation, House Robber, graph problem. 6. PharmEasy
+    SDE1 Interview Experience — LeetCode Reported: reverse stack using
+    recursion, reverse linked list in groups, N-Queens variation. 7.
+    Joveo SDE1 Interview Experience — LeetCode Reported: LRU cache with
+    O(1) get/put and Spiral Matrix. 8. GeeksforGeeks Amazon Interview
+    Experience SDE-1 Reported: Longest Palindrome, Transform to Sum
+    Tree, reverse linked list in groups, Trapping Rain Water, Top View,
+    LRU Cache, smallest positive missing number, maximum path sum. 9.
+    GeeksforGeeks Amazon Interview Experience Set 250 Reported:
+    linked-list palindrome, Building Bridges, bottom view, LRU cache,
+    largest concatenated number, longest palindromic substring. 10.
+    GeeksforGeeks Samsung Bangalore SRIB Internship Reported:
+    binary-tree problems, reverse linked list, stack/string problem,
+    Singleton, graph-based Design Git. 11. GeeksforGeeks Flipkart
+    Interview Set 7 Reported: nodes at distance K in binary tree, LRU
+    cache, linked-list maximum-sum path variant, scalable contact
+    list. 12. GeeksforGeeks OLX Groups Interview Experience Reported:
+    getMin stack and LRU cache. 13. GeeksforGeeks Snapdeal Interview
+    Experience Set 3 Reported: mirror binary tree and reverse linked
+    list in groups.
+    ==================================================== 12. WEBSITE
+    USAGE ====================================================
+    Recommended page title: “DSA Interview Questions Actually Reported
+    in Interviews” Recommended description: “Practice DSA problems
+    reported by candidates in real technical interviews. Each question
+    includes its company/interview source where available.” Recommended
+    labels: [REPORTED] = directly reported by a candidate [REPEATED] =
+    independently reported multiple times [VARIANT] = reported variation
+    of a known problem Do NOT claim: - Every question is asked by every
+    company. - The wording is always verbatim. - These questions
+    guarantee an interview result. - All 65 questions were asked in one
+    interview. This distinction is important for accuracy and trust.
+    ==================================================== END
+    ====================================================
+
+Answer: Find the midpoint with slow/fast pointers, reverse the second
+half, and compare both halves node by node. This is O(n) time and O(1)
+extra space if the list is restored afterward. For character nodes,
+compare the character values rather than node addresses.
+
+Example: C++ design: class LRUCache { int cap; list<pair<int,int>> dq;
+// front = most recently used unordered_map<int,
+list<pair<int,int>>::iterator> pos; public: int get(int key) { auto it =
+pos.find(key); if (it == pos.end()) return -1; int value =
+it->second->second; dq.splice(dq.begin(), dq, it->second); return value;
+}
+
+    void put(int key, int value) {
+        if (auto it = pos.find(key); it != pos.end()) {
+            it->second->second = value;
+            dq.splice(dq.begin(), dq, it->second);
+            return;
+        }
+        dq.push_front({key, value});
+        pos[key] = dq.begin();
+        if ((int)dq.size() > cap) {
+            auto last = prev(dq.end());
+            pos.erase(last->first);
+            dq.pop_back();
+        }
+    }
+
+};
+
+Interview Tip: Prioritize this topic because the source identifies
+repeated independent reports. In the interview, explain the approach
+before writing code and state complexity clearly.
+
+What Interviewer Is Testing: Problem decomposition, data-structure
+selection, correctness reasoning, complexity analysis, edge-case
+handling, and the ability to communicate while coding.
+
+Key Points to Remember: • Hash map + doubly linked list is the standard
+O(1)-average design. • Keep map and list state consistent. • Define
+eviction and update semantics explicitly.
+
+Common Follow-up Questions: • Can you improve the time or space
+complexity? • What changes if the input is very large? • What edge cases
+would you test? • Can you implement it iteratively instead of
+recursively (or vice versa)?
+
+Common Mistakes: • Coding before clarifying the problem statement. •
+Giving an incorrect Big-O claim. • Ignoring duplicates, empty input, or
+boundary conditions. • Using a data structure without explaining why it
+provides the required complexity.
+
+------------------------------------------------------------------------
+
+SOURCE-BASED ACCURACY NOTE
+
+The supplied source lists 65 numbered entries, including
+repeated/high-priority evidence summaries. Some entries intentionally
+provide only a broad problem/topic description rather than a complete
+original statement. For those entries, this document does not invent a
+company-specific problem; it explicitly says when the exact variant is
+not supported by the source.
+
+The source itself says not to claim that every question is asked by
+every company, that wording is always verbatim, that the questions
+guarantee an interview result, or that all 65 questions were asked in
+one interview.
+
+END

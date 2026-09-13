@@ -155,6 +155,7 @@ export default async function CategoryPage({ params, searchParams }: Props) {
             <div className="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {subtopics.map((subcategory) => (
                 <Link key={subcategory.id} href={`/interview-questions?category=${item.slug}&subcategory=${subcategory.slug}`} className="rounded-2xl border border-ink/10 bg-white/70 p-5 hover:border-coral">
+                  <h3 className="font-display text-lg font-bold">{subcategory.name}</h3>
                   <p className="mt-2 text-sm text-ink/60">{subcategory._count.questions} published questions with answer guidance.</p>
                   <span className="mt-4 inline-block text-sm font-bold text-coral">Explore this topic</span>
                 </Link>

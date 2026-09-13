@@ -1,0 +1,2706 @@
+MYSQL + SQL + DBMS INTERVIEW QUESTIONS — DETAILED ANSWERS WITH EXAMPLES
+
+Source basis and classification from the supplied verified interview
+bank are retained. The questions are not guaranteed to appear in every
+interview.
+
+Format: Question / Answer / Example / Interview Tip / What Interviewer
+Is Testing / Key Points to Remember / Common Follow-up Questions /
+Common Mistakes / Difficulty / Interview Focus / Best Answer Strategy
+
+================================================================================
+COMMON / HIGH-FREQUENCY INTERVIEW QUESTIONS — ANSWERS
+================================================================================
+
+Question 1: What is the difference between SQL and MySQL? Answer: SQL
+(Structured Query Language) is a standardized language used to define,
+query, manipulate, and control data in relational databases. MySQL is a
+relational database management system (RDBMS) that implements SQL and
+adds its own storage engines, optimizer behavior, administrative
+features, and configuration options. In simple terms, SQL is the
+language; MySQL is a database product that understands that language.
+SQL concepts such as SELECT, JOIN, GROUP BY, constraints, and
+transactions are broadly portable, although exact syntax and features
+can differ between database products.
+
+Example: SQL: SELECT name FROM employees WHERE salary > 50000; MySQL:
+the above statement can be executed against a MySQL database containing
+an employees table. MySQL also provides product-specific features such
+as InnoDB and MySQL-specific functions.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 2: What is a primary key? Answer: A primary key is a column or
+set of columns that uniquely identifies each row in a table. A primary
+key must be unique and cannot contain NULL values. A table has one
+primary-key constraint, although that constraint can contain multiple
+columns as a composite primary key. The primary key is used to enforce
+entity identity and is commonly referenced by foreign keys. In MySQL
+InnoDB, the primary key also has an important physical-storage role
+because table rows are organized around the clustered primary-key index.
+
+Example: CREATE TABLE employees ( employee_id INT PRIMARY KEY, name
+VARCHAR(100) ); Two employees cannot have the same employee_id, and
+employee_id cannot be NULL.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 3: Primary key vs unique key? Answer: Both primary-key and
+UNIQUE constraints enforce uniqueness, but they have different purposes.
+A table has one primary-key constraint, and its columns cannot be NULL.
+A table can have multiple UNIQUE constraints. NULL handling for a UNIQUE
+constraint is database-specific; in MySQL, a UNIQUE index can contain
+multiple NULL values because NULL is not considered equal to another
+NULL. The primary key normally represents the row’s main identity, while
+UNIQUE is useful for alternate identifiers such as email addresses.
+
+Example: employee_id INT PRIMARY KEY, email VARCHAR(255) UNIQUE Here
+employee_id identifies the row, while email prevents two rows from
+having the same non-NULL email.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 4: What is a foreign key? Answer: A foreign key is a constraint
+that links a column or group of columns in one table to a candidate key,
+normally a primary key or UNIQUE key, in another table. It helps prevent
+invalid references and enforces relationships between tables. Depending
+on the design, actions such as ON DELETE CASCADE, RESTRICT, SET NULL, or
+corresponding update behavior can define what happens when the
+referenced row changes.
+
+Example: customers(id, name) and orders(id, customer_id). If
+orders.customer_id is a foreign key referencing customers.id, an order
+cannot normally reference a customer ID that does not exist.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 5: What is referential integrity? Answer: Referential integrity
+means relationships between related tables remain valid. A foreign-key
+value must either match an allowed referenced key or be NULL when the
+relationship permits NULL. This prevents orphaned child rows and
+protects the consistency of relationships. Referential actions such as
+CASCADE or RESTRICT determine what happens when a parent row is updated
+or deleted.
+
+Example: If orders.customer_id references customers.id, deleting
+customer 10 is rejected when dependent orders exist if the relationship
+uses RESTRICT. With CASCADE, the related orders could be deleted
+automatically.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 6: What is a composite key? Answer: A composite key is a key
+made from two or more columns. It is useful when no single column
+naturally identifies a row and the combination represents uniqueness.
+The uniqueness applies to the combination, not necessarily to each
+individual column. Composite keys are common in junction tables
+representing many-to-many relationships.
+
+Example: CREATE TABLE student_course ( student_id INT, course_id INT,
+PRIMARY KEY (student_id, course_id) ); A student can take many courses
+and a course can have many students, but the same student-course pair
+cannot be inserted twice.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 7: NULL vs zero vs empty string? Answer: NULL means the value
+is missing, unknown, or not applicable; it is not the same as zero or an
+empty string. Zero is a numeric value with mathematical meaning. An
+empty string is a character value containing no characters. NULL
+participates in SQL’s three-valued logic, so comparisons such as value =
+NULL do not return TRUE. Correct NULL testing uses IS NULL or IS NOT
+NULL.
+
+Example: salary = 0 means the stored numeric salary is zero. name = ’’
+means a known string with no characters. phone IS NULL means no phone
+value was supplied or the value is unknown.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 8: Why does column = NULL not work? Answer: NULL represents the
+absence or unknown state of a value, so SQL does not treat NULL as an
+ordinary value that can be compared with =. A comparison such as column
+= NULL evaluates to UNKNOWN rather than TRUE. WHERE filters keep rows
+whose condition is TRUE, so those rows are not returned. Use IS NULL or
+IS NOT NULL for NULL checks.
+
+Example: Wrong: SELECT * FROM employees WHERE manager_id = NULL;
+Correct: SELECT * FROM employees WHERE manager_id IS NULL;
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 9: WHERE vs HAVING? Answer: WHERE filters individual rows
+before grouping and aggregation. HAVING filters groups after GROUP BY
+and aggregation. WHERE is generally preferable for conditions that do
+not depend on aggregate results because it can reduce the number of rows
+that must be grouped. HAVING is used for conditions such as COUNT(*) > 5
+or AVG(salary) > 50000.
+
+Example: SELECT department_id, AVG(salary) FROM employees WHERE status =
+‘ACTIVE’ GROUP BY department_id HAVING AVG(salary) > 50000; WHERE
+removes inactive employees first; HAVING keeps only departments whose
+average salary exceeds 50,000.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 10: GROUP BY vs DISTINCT? Answer: DISTINCT removes duplicate
+combinations from the selected result. GROUP BY forms groups and is
+primarily used when you need aggregation such as COUNT, SUM, AVG, MIN,
+or MAX. A GROUP BY query can sometimes produce a distinct-looking
+result, but the concepts have different purposes and grouping becomes
+essential when aggregate calculations are involved.
+
+Example: SELECT DISTINCT department_id FROM employees; returns each
+department once. SELECT department_id, COUNT(*) FROM employees GROUP BY
+department_id; returns one row per department plus its employee count.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 11: INNER JOIN vs LEFT JOIN? Answer: INNER JOIN returns only
+rows that satisfy the join condition on both sides. LEFT JOIN returns
+every row from the left table and matching rows from the right table;
+when no match exists, right-side columns are NULL. Use INNER JOIN when
+unmatched rows should be excluded and LEFT JOIN when the left-side
+entities must be retained even without related records.
+
+Example: customers LEFT JOIN orders can show every customer, including
+customers with no orders. customers INNER JOIN orders shows only
+customers who have at least one matching order.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 12: LEFT JOIN vs RIGHT JOIN? Answer: LEFT JOIN preserves all
+rows from the left table; RIGHT JOIN preserves all rows from the right
+table. They are logically equivalent if the table order is reversed, so
+many teams prefer LEFT JOIN because it is easier to read consistently.
+The important interview point is which side must be preserved.
+
+Example: A LEFT JOIN from departments to employees keeps departments
+with zero employees. The equivalent RIGHT JOIN can be written by placing
+departments on the right side.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 13: JOIN vs subquery? Answer: A JOIN combines rows from
+multiple tables as part of a relational query, while a subquery is a
+query nested inside another query. Both can express many of the same
+requirements. JOINs are often natural for returning columns from related
+tables, while subqueries can be clearer for existence checks, scalar
+calculations, or logically isolated conditions. The optimizer may
+transform equivalent forms, so performance should be evaluated using
+EXPLAIN rather than assumed from syntax alone.
+
+Example: To find employees belonging to active departments, you can JOIN
+employees to departments, or use WHERE department_id IN (SELECT id FROM
+departments WHERE status=‘ACTIVE’).
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 14: UNION vs UNION ALL? Answer: UNION combines result sets and
+removes duplicate rows. UNION ALL combines result sets without removing
+duplicates. Because duplicate elimination requires additional work such
+as sorting or hashing, UNION ALL is usually faster when duplicates are
+valid or impossible by design. Both queries must have compatible numbers
+and types of columns in corresponding positions.
+
+Example: SELECT email FROM customers UNION SELECT email FROM leads;
+removes duplicate emails. UNION ALL keeps every occurrence.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 15: COUNT() vs COUNT(column)? Answer: COUNT() counts rows
+produced by the query, including rows where individual columns are NULL.
+COUNT(column) counts only rows where that expression is non-NULL. This
+distinction is important with LEFT JOINs and nullable columns. COUNT(*)
+answers ‘how many rows?’, while COUNT(column) often answers ‘how many
+rows have a non-NULL value for this expression?’.
+
+Example: For a table with three rows and salaries 50000, NULL, 60000,
+COUNT(*) returns 3 while COUNT(salary) returns 2.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 16: EXISTS vs IN? Answer: EXISTS checks whether the subquery
+returns at least one matching row and is especially natural for
+correlated existence tests. IN compares a value against the set returned
+by a subquery. Modern MySQL can optimize many equivalent forms, so
+neither is universally faster. A major correctness issue is NULL
+behavior with NOT IN: if the subquery can produce NULL, NOT IN can yield
+UNKNOWN and unexpectedly return no rows. NOT EXISTS is often safer for
+anti-joins.
+
+Example: SELECT c.id FROM customers c WHERE EXISTS (SELECT 1 FROM orders
+o WHERE o.customer_id = c.id); returns customers having at least one
+order.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 17: How do you find the second-highest salary? Answer: First
+clarify whether ‘second-highest’ means the second distinct salary or the
+second row after sorting. For the second distinct salary, a common
+approach is to find the maximum salary below the overall maximum. This
+handles duplicate highest salaries correctly. Another robust approach is
+DENSE_RANK over salary and select rank 2.
+
+Example: SELECT MAX(salary) AS second_highest FROM employees WHERE
+salary < (SELECT MAX(salary) FROM employees); If salaries are 100, 100,
+90, 80, the answer is 90.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 18: How do you find the Nth-highest salary? Answer: For the Nth
+distinct salary, DENSE_RANK is often the clearest approach because equal
+salaries receive the same rank without gaps. The query should define how
+ties are treated and what should happen if fewer than N distinct
+salaries exist. In MySQL 8+, window functions make this straightforward.
+
+Example: WITH ranked AS ( SELECT salary, DENSE_RANK() OVER (ORDER BY
+salary DESC) AS rnk FROM employees ) SELECT salary FROM ranked WHERE rnk
+= 3; This returns the third distinct salary.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 19: How do you find duplicate rows? Answer: Identify the
+columns that define a duplicate, then GROUP BY those columns and use
+HAVING COUNT(*) > 1. Do not automatically group by every column if some
+columns are intentionally different. In production, first determine
+whether duplicates are true data errors or legitimate repeated records.
+
+Example: SELECT email, COUNT() AS cnt FROM customers GROUP BY email
+HAVING COUNT() > 1; This finds duplicate email values.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 20: How do you delete duplicate rows safely? Answer: First
+define the duplicate key and the row that should survive. Back up or
+test the operation, preferably inside an appropriate transaction, and
+verify the rows to be deleted with a SELECT before running DELETE. A
+common MySQL pattern is to use ROW_NUMBER() to assign one row to keep
+and delete the others, or use a self-join when a stable unique ID
+exists. After cleanup, add a UNIQUE constraint when business rules
+require uniqueness so the problem cannot recur.
+
+Example: WITH ranked AS ( SELECT id, ROW_NUMBER() OVER (PARTITION BY
+email ORDER BY id) AS rn FROM customers ) DELETE c FROM customers c JOIN
+ranked r ON r.id = c.id WHERE r.rn > 1; Test the corresponding SELECT
+first and adapt the exact DELETE syntax to the MySQL version and
+transaction strategy.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 21: How do you find the highest-paid employee in each
+department? Answer: Use a window function when you need the employee
+row, not only the maximum salary. DENSE_RANK or ROW_NUMBER can rank
+employees within each department. DENSE_RANK returns all employees tied
+for the highest salary; ROW_NUMBER returns one row per department
+according to the chosen tie-breaker.
+
+Example: SELECT FROM ( SELECT e., DENSE_RANK() OVER (PARTITION BY
+department_id ORDER BY salary DESC) rnk FROM employees e ) x WHERE rnk =
+1; If two employees tie for highest salary, both are returned.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 22: How do you find employees earning more than their
+department average? Answer: Calculate the average salary for each
+department and compare each employee’s salary with the average of that
+employee’s department. A correlated subquery is easy to understand; a
+window function can calculate the departmental average in the same
+result set. The window approach is often convenient when the employee
+row and aggregate both need to be returned.
+
+Example: SELECT FROM ( SELECT e., AVG(salary) OVER (PARTITION BY
+department_id) dept_avg FROM employees e ) x WHERE salary > dept_avg;
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 23: How do you find the top three salaries per department?
+Answer: Use a window function partitioned by department and ordered by
+salary descending. Choose ROW_NUMBER when exactly three rows per
+department are required, or DENSE_RANK when ‘top three salaries’ means
+the top three distinct salary levels and ties should be included. State
+the tie requirement explicitly in an interview.
+
+Example: SELECT FROM ( SELECT e., DENSE_RANK() OVER ( PARTITION BY
+department_id ORDER BY salary DESC ) rnk FROM employees e ) x WHERE rnk
+<= 3;
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 24: How do you find rows present in one table but not another?
+Answer: This is an anti-join problem. Common solutions are NOT EXISTS,
+LEFT JOIN with a NULL check, or EXCEPT where supported by the database.
+NOT EXISTS is often a clear and NULL-safe choice when comparing related
+keys. When using LEFT JOIN, make sure the NULL test is on the joined
+table’s key and that additional predicates do not accidentally turn the
+outer join into an inner join.
+
+Example: SELECT c.id FROM customers c WHERE NOT EXISTS ( SELECT 1 FROM
+orders o WHERE o.customer_id = c.id ); This finds customers with no
+orders.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 25: How do you calculate a running total? Answer: A running
+total is a cumulative aggregate ordered by a business-defined sequence
+such as transaction date and ID. A window SUM with ORDER BY is the
+standard approach in MySQL 8+. The ordering must be deterministic when
+multiple rows share the same timestamp; otherwise the cumulative result
+can be ambiguous.
+
+Example: SELECT order_date, order_id, amount, SUM(amount) OVER (ORDER BY
+order_date, order_id) AS running_total FROM orders ORDER BY order_date,
+order_id;
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 26: RANK vs DENSE_RANK vs ROW_NUMBER? Answer: ROW_NUMBER
+assigns a unique sequential number, even when values tie. RANK gives
+tied rows the same rank and leaves gaps after ties. DENSE_RANK also
+gives tied rows the same rank but does not leave gaps. Choose based on
+whether ties should consume positions. This is a frequent interview
+distinction for top-N queries.
+
+Example: For salaries 100, 100, 90: ROW_NUMBER: 1,2,3 RANK: 1,1,3
+DENSE_RANK: 1,1,2.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 27: What is a window function? Answer: A window function
+calculates a value across a related set of rows while keeping the
+individual rows in the result. Unlike GROUP BY, it does not collapse the
+rows into one row per group. Window functions support ranking, running
+totals, moving calculations, and comparisons with group-level values.
+Common functions include ROW_NUMBER, RANK, DENSE_RANK, SUM, AVG, LAG,
+and LEAD.
+
+Example: SELECT employee_id, department_id, salary, AVG(salary) OVER
+(PARTITION BY department_id) AS dept_avg FROM employees; Each employee
+remains visible while the department average is added.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 28: What is a CTE? Answer: A Common Table Expression (CTE) is a
+named temporary result defined with WITH and used by a single SQL
+statement. It improves readability by breaking a complex query into
+logical stages and can support recursive queries. A CTE is a query
+construct, not automatically a permanent table. Its optimization and
+materialization behavior depends on the database and query, so it should
+not be assumed to be faster than an equivalent query.
+
+Example: WITH active_users AS ( SELECT id, name FROM users WHERE status
+= ‘ACTIVE’ ) SELECT * FROM active_users WHERE name LIKE ‘A%’;
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 29: CTE vs subquery? Answer: Both can express an intermediate
+query. A subquery is nested directly inside another query, while a CTE
+gives the intermediate result a name and can make multi-stage logic
+easier to read. CTEs are especially useful when the same logical result
+is referenced or when recursion is required. Performance should be
+measured; choosing a CTE is primarily a clarity and maintainability
+decision unless the optimizer treats the forms differently.
+
+Example: WITH dept_totals AS ( SELECT department_id, SUM(salary)
+total_salary FROM employees GROUP BY department_id ) SELECT * FROM
+dept_totals WHERE total_salary > 1000000;
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 30: When would you use a recursive CTE? Answer: Use a recursive
+CTE when data has a hierarchical or graph-like relationship and the
+depth is not known in advance. It has an anchor query that selects
+starting rows and a recursive query that repeatedly finds the next
+level. Typical cases include organization charts, category trees, folder
+structures, and bill-of-materials relationships. The query must have a
+termination condition to avoid infinite recursion.
+
+Example: WITH RECURSIVE org AS ( SELECT id, manager_id, name, 0 AS level
+FROM employees WHERE manager_id IS NULL UNION ALL SELECT e.id,
+e.manager_id, e.name, o.level + 1 FROM employees e JOIN org o ON
+e.manager_id = o.id ) SELECT * FROM org;
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 31: DELETE vs TRUNCATE vs DROP? Answer: DELETE removes selected
+rows and supports a WHERE clause. It is a DML operation and can be used
+when row-level selection is needed. TRUNCATE removes all rows from a
+table as a DDL-style operation in MySQL and is generally intended for
+quickly emptying the table; its transactional/rollback behavior and
+identity behavior depend on the database engine and version, so do not
+describe it as simply ‘DELETE but faster’ in every database. DROP
+removes the table object itself, including its definition. All three
+should be used carefully in production.
+
+Example: DELETE FROM logs WHERE created_at < ‘2025-01-01’; TRUNCATE
+TABLE staging_logs; DROP TABLE obsolete_logs;
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 32: DDL vs DML vs DCL vs TCL? Answer: DDL defines or changes
+database objects, such as CREATE, ALTER, and DROP. DML changes table
+data, commonly INSERT, UPDATE, and DELETE. DCL controls privileges, such
+as GRANT and REVOKE. TCL refers to transaction-control statements such
+as COMMIT and ROLLBACK, with exact supported commands depending on the
+database. In interviews, emphasize that classification describes the
+purpose of the statement rather than its business meaning.
+
+Example: CREATE TABLE users (…) is DDL. INSERT INTO users … is DML.
+GRANT SELECT ON app_db.users TO ‘reporter’ is DCL. COMMIT is transaction
+control.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 33: What is normalization? Answer: Normalization is the process
+of structuring relational data to reduce unnecessary redundancy and
+prevent update, insert, and delete anomalies. It usually involves
+decomposing tables according to functional dependencies while preserving
+required relationships. Normalization improves consistency, but
+excessive decomposition can increase join complexity, so practical
+designs balance normalization with performance and workload
+requirements.
+
+Example: Instead of storing customer address repeatedly on every order,
+keep customer information in customers and reference it from orders.
+This prevents inconsistent copies of the same customer data.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 34: Explain 1NF, 2NF and 3NF. Answer: 1NF requires atomic
+values and no repeating groups in the relational model. 2NF builds on
+1NF and requires every non-key attribute to depend on the whole
+candidate key, so it mainly matters when a key is composite. 3NF further
+removes transitive dependencies: non-key attributes should not depend on
+another non-key attribute. The goal is to reduce redundancy and
+anomalies, not to blindly split every table.
+
+Example: If Enrollment(student_id, course_id, student_name, course_name)
+has a composite key, student_name depends only on student_id and
+course_name only on course_id, violating 2NF. Split student and course
+details into their own tables.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 35: When would you denormalize? Answer: Denormalization
+intentionally introduces controlled redundancy to improve read
+performance, simplify frequently executed queries, or support reporting
+and analytical workloads. It should be based on measured bottlenecks
+rather than guesswork because duplicated data increases storage, write
+complexity, and consistency risk. Common techniques include summary
+tables, cached aggregates, or storing a frequently needed derived value
+with a defined update strategy.
+
+Example: An order-reporting workload repeatedly joins many tables to
+calculate daily totals. A maintained daily_sales_summary table may
+reduce expensive repeated aggregation.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 36: What is an index? Answer: An index is an auxiliary data
+structure that helps the database locate rows without scanning the
+entire table. Indexes can greatly improve selective lookups, joins,
+ordering, and grouping when the indexed columns match the query pattern.
+They consume storage and must be maintained on writes, so adding indexes
+indiscriminately can hurt INSERT, UPDATE, and DELETE performance.
+
+Example: CREATE INDEX idx_orders_customer_date ON orders(customer_id,
+order_date); A query filtering by customer_id and ordering/filtering by
+date can benefit from this index.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 37: Clustered vs secondary index in InnoDB? Answer: In InnoDB,
+the primary key is the clustered index: the table’s rows are organized
+according to the primary-key B-tree. Secondary indexes contain their
+indexed columns plus the primary-key value used to locate the full row.
+Consequently, a long primary key increases the size of every secondary
+index. If a query can be satisfied entirely from a secondary index, it
+may avoid an additional lookup to the clustered record.
+
+Example: If orders has PRIMARY KEY(order_id) and INDEX(customer_id), the
+secondary index stores customer_id with order_id as the row locator. A
+lookup by customer_id can then use order_id to reach the clustered row
+when needed.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 38: What is a composite index? Answer: A composite index
+contains multiple columns in a defined order. It is useful when queries
+commonly filter, join, or sort by that combination. The order matters
+because B-tree indexes are organized from the first indexed column
+onward. A composite index can sometimes satisfy several query predicates
+and may also act as a covering index if it contains all columns needed
+by the query.
+
+Example: CREATE INDEX idx_orders_customer_status ON orders(customer_id,
+status); This can support queries that start with customer_id and then
+constrain status.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 39: How does column order matter in a composite index? Answer:
+Column order determines which leftmost search patterns the B-tree can
+efficiently use. An index on (customer_id, status, created_at) is
+naturally useful for queries beginning with customer_id, and often
+customer_id plus status. A query filtering only status generally cannot
+use the index as effectively for direct lookup because the first indexed
+column is not constrained. Selectivity, common predicates, sorting, and
+range conditions all influence the best order.
+
+Example: Index (customer_id, status) is well suited to WHERE customer_id
+= 10 AND status = ‘PAID’. It is not equivalent to an index on (status,
+customer_id) for all query patterns.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 40: Why can an index make writes slower? Answer: Every index is
+another structure that must be maintained when indexed data changes.
+INSERT may add entries; DELETE removes them; UPDATE can require old
+index entries to be changed or relocated. Index pages may also need
+splitting and extra I/O. Therefore, indexes trade write cost and storage
+for faster reads. The goal is to maintain useful indexes rather than
+indexing every column.
+
+Example: A table with eight unnecessary indexes can make a high-volume
+INSERT workload significantly more expensive because each insert must
+update those index structures.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 41: Why might MySQL ignore an index? Answer: The optimizer
+chooses the access path it estimates will have the lowest cost. It may
+prefer a table scan when a predicate matches a large percentage of rows,
+when an index is poorly selective, when statistics are inaccurate, or
+when the query applies an expression/function that prevents efficient
+index use. Data type mismatches, leading wildcards, implicit
+conversions, and unsuitable composite-index order can also contribute.
+Use EXPLAIN and current statistics rather than assuming the index must
+be used.
+
+Example: WHERE LOWER(email) = ‘a@x.com’ may not use a normal index on
+email efficiently. A suitable generated/functional indexing strategy,
+where supported, can address the expression.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 42: What is EXPLAIN used for? Answer: EXPLAIN shows how MySQL
+plans to execute a query, including access type, possible and chosen
+indexes, estimated rows, join order, and other optimizer information. It
+is a primary diagnostic tool for slow queries. The estimates are not the
+same as actual runtime behavior, so EXPLAIN ANALYZE can be useful where
+supported to compare estimates with observed execution. Look for
+unnecessary full scans, poor join strategies, large row estimates, and
+missing or ineffective indexes.
+
+Example: EXPLAIN SELECT * FROM orders WHERE customer_id = 42; If the
+plan shows an appropriate index and a small estimated row count, the
+lookup is likely efficient; if it scans millions of rows, investigate
+the predicate, index, and statistics.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 43: How would you troubleshoot a slow query? Answer: Start by
+reproducing and measuring the problem rather than immediately adding an
+index. Inspect EXPLAIN/EXPLAIN ANALYZE, row counts, predicates, joins,
+sorting, grouping, and whether the query scans far more rows than it
+returns. Check indexes and statistics, data growth, lock waits, CPU/I/O
+pressure, and application behavior such as repeated queries. Then make
+one targeted change at a time and compare latency and resource usage.
+For production systems, consider query frequency and impact, not just
+one execution.
+
+Example: A report query joins orders and customers and sorts millions of
+rows. EXPLAIN may reveal a full scan plus filesort; a better predicate,
+composite index, pre-aggregation, or pagination may be more appropriate
+depending on the workload.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 44: What is a covering index? Answer: A covering index contains
+all columns required by a query, so the database can obtain the needed
+result from the index without fetching the full table row. This can
+reduce I/O, especially for large tables. Whether a query is actually
+covered depends on the selected columns and the optimizer’s chosen
+access path. Covering indexes increase index size, so they should be
+justified by important query patterns.
+
+Example: CREATE INDEX idx_orders_customer_date_amount ON
+orders(customer_id, order_date, amount); A query selecting customer_id,
+order_date, amount with matching predicates may be satisfied entirely
+from the index.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 45: What is a transaction? Answer: A transaction is a logical
+unit of database work that should be completed according to the
+database’s transactional guarantees. It typically contains one or more
+statements and ends with COMMIT or ROLLBACK. Transactions are important
+when several changes must remain consistent as a unit, such as
+transferring money by debiting one account and crediting another.
+
+Example: START TRANSACTION; UPDATE accounts SET balance = balance - 100
+WHERE id = 1; UPDATE accounts SET balance = balance + 100 WHERE id = 2;
+COMMIT; If a required step fails, the application can roll back the
+transaction.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 46: Explain ACID. Answer: ACID describes key transaction
+properties. Atomicity means a transaction’s changes are treated as a
+unit. Consistency means committed work preserves defined database
+constraints and invariants. Isolation controls how concurrent
+transactions interact and what intermediate states they can observe.
+Durability means committed changes survive failures according to the
+database’s durability mechanisms. The exact behavior depends on the
+storage engine, isolation level, configuration, and failure model.
+
+Example: In a bank transfer, atomicity prevents only the debit from
+being committed if the credit fails; durability means a successfully
+committed transfer is expected to survive a server restart.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 47: What are transaction isolation levels? Answer: Isolation
+levels define how much one transaction can observe or be affected by
+concurrent transactions. The commonly discussed levels are READ
+UNCOMMITTED, READ COMMITTED, REPEATABLE READ, and SERIALIZABLE. Higher
+isolation generally provides stronger consistency but can increase
+locking or concurrency costs. MySQL InnoDB commonly uses REPEATABLE READ
+by default, but interview answers should distinguish the SQL standard
+concepts from engine-specific implementation details.
+
+Example: At READ UNCOMMITTED, one transaction may see another
+transaction’s uncommitted change. At SERIALIZABLE, concurrent access is
+constrained to provide the strongest standard isolation semantics.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 48: What is a dirty read? Answer: A dirty read occurs when one
+transaction reads data written by another transaction before that other
+transaction commits. If the writer later rolls back, the reader has
+observed a value that was never committed. Dirty reads are possible at
+READ UNCOMMITTED and are prevented by stronger isolation levels.
+
+Example: Transaction A updates balance from 100 to 0 but has not
+committed. Transaction B reads 0. If A rolls back, B read a dirty value.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 49: What is a non-repeatable read? Answer: A non-repeatable
+read occurs when a transaction reads the same existing row twice and
+gets different committed values because another transaction updated and
+committed that row between the reads. The issue concerns changes to an
+existing row, unlike a phantom read, which concerns rows appearing or
+disappearing from a range result.
+
+Example: Transaction A reads salary = 50,000. Transaction B changes it
+to 60,000 and commits. A reads the same employee again and gets 60,000.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 50: What is a phantom read? Answer: A phantom read occurs when
+the same range query is executed twice within a transaction and the
+second execution sees a different set of rows because another
+transaction inserted, deleted, or changed rows into the relevant range
+and committed. It differs from a non-repeatable read, which is typically
+about the value of an already-existing row. Actual behavior depends on
+the database’s isolation and concurrency implementation.
+
+Example: A transaction queries all orders WHERE amount > 100 and gets 20
+rows. Another transaction inserts a qualifying order and commits. A
+later range query may see 21 rows under an isolation level that permits
+that change to become visible.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 51: What is MVCC? Answer: MVCC, or Multi-Version Concurrency
+Control, allows readers and writers to operate with reduced blocking by
+maintaining multiple logical versions of rows. A transaction reads a
+version appropriate to its isolation and snapshot while another
+transaction may create a newer version. InnoDB uses MVCC together with
+locking. MVCC does not mean ‘no locks’; writes and certain locking reads
+can still require locks.
+
+Example: A reporting transaction can read a consistent snapshot while
+another transaction updates an order. The reader can continue using the
+appropriate older version rather than simply waiting for the writer to
+finish.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 52: What is a deadlock? Answer: A deadlock occurs when
+transactions wait for each other in a cycle and none can proceed. For
+example, transaction A holds a lock needed by B while B holds a lock
+needed by A. Databases such as InnoDB detect deadlocks and normally roll
+back one transaction so the other can continue. Applications should be
+prepared to retry safe transactions after a deadlock error.
+
+Example: T1 locks account 1 then requests account 2. T2 locks account 2
+then requests account 1. Neither can proceed until the database detects
+the cycle and aborts one transaction.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 53: How would you investigate a production deadlock? Answer:
+Collect the database deadlock diagnostic information, identify the
+transactions, SQL statements, indexes, and locks involved, and
+reconstruct the wait-for cycle. Then examine application transaction
+boundaries, query order, isolation level, indexes, and whether
+transactions stay open longer than necessary. Fix the underlying
+ordering or access pattern and add safe retry handling. Avoid simply
+increasing timeouts because that does not remove the cycle.
+
+Example: If diagnostics show one code path updates orders then inventory
+while another updates inventory then orders, standardizing both paths to
+lock orders before inventory can remove the cycle.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 54: How can consistent lock ordering reduce deadlocks? Answer:
+If all transactions acquire the same set of resources in the same
+deterministic order, a circular wait becomes much harder or impossible
+to form. For example, always lock the lower account ID before the higher
+account ID. This is a design discipline: transaction code should follow
+the same ordering rule everywhere that the same resources can be
+updated.
+
+Example: Instead of T1 locking account 10 then 20 while T2 locks 20 then
+10, both transactions first lock the smaller ID, 10, and then 20.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 55: What is SELECT … FOR UPDATE? Answer: SELECT … FOR UPDATE is
+a locking read used inside a transaction to lock qualifying rows so
+concurrent transactions cannot modify them in conflicting ways until the
+transaction ends, subject to the storage engine and isolation semantics.
+It is useful when an application reads a value and then intends to
+update it and needs the read-to-update sequence protected. The exact
+locked range can depend on the query, indexes, isolation level, and
+InnoDB locking rules.
+
+Example: START TRANSACTION; SELECT balance FROM accounts WHERE id = 10
+FOR UPDATE; UPDATE accounts SET balance = balance - 50 WHERE id = 10;
+COMMIT;
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 56: What is optimistic locking? Answer: Optimistic locking
+assumes conflicts are relatively uncommon. A row carries a version
+number or comparable token. The application reads the version and
+includes it in the UPDATE condition; if no row is updated, another
+transaction changed the record first and the application detects a
+conflict. It avoids holding database locks throughout the business
+operation and is useful for many web workloads.
+
+Example: UPDATE products SET price = 120, version = version + 1 WHERE id
+= 5 AND version = 7; If affected rows = 0, the application knows version
+7 is no longer current.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 57: What is pessimistic locking? Answer: Pessimistic locking
+assumes conflicts are likely and protects data by acquiring locks before
+making the change. SELECT … FOR UPDATE is a common database technique.
+It can provide strong coordination but reduces concurrency when locks
+are held too long and can contribute to deadlocks. Use it when the
+business operation truly needs serialized access to the selected data.
+
+Example: An inventory service starts a transaction, locks the product
+row, checks stock, decrements it, and commits. Concurrent transactions
+must respect the lock rather than independently consuming the same
+stock.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 58: What is replication? Answer: Replication copies database
+changes from a source to one or more replicas. It can improve read
+scalability, provide a standby for availability, and separate some
+workloads. Replication is not automatically synchronous, so replicas may
+temporarily lag. Applications must understand which reads require the
+freshest data and how failover is handled.
+
+Example: An application writes orders to the primary and sends analytics
+SELECT queries to read replicas. If a user immediately reads their newly
+created order, the system may need a primary read or another consistency
+strategy.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 59: What is replication lag? Answer: Replication lag is the
+delay between a change being committed on the source and becoming
+visible or fully applied on a replica. Causes can include heavy write
+volume, slow replica I/O, long-running transactions, network delays, or
+insufficient replica resources. Lag can produce stale reads and
+complicate failover. Monitoring should track replication health and
+workload, not only a single lag number.
+
+Example: A payment is committed on the primary at 10:00:00, but a
+replica applies the change at 10:00:03. A read routed to that replica
+during the interval may not see the payment.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 60: Why is replication not a backup? Answer: Replication
+primarily creates additional copies of current database state; it does
+not provide protection against every logical error. If an application
+accidentally deletes millions of rows and that delete is replicated,
+replicas can receive the same bad change. Backups provide historical
+recovery points and should be protected, tested, and retained according
+to recovery objectives.
+
+Example: An accidental DELETE runs on the primary and is replicated. A
+replica does not automatically restore the deleted rows. A point-in-time
+backup/recovery strategy is needed.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 61: What is partitioning? Answer: Partitioning divides one
+logical table into multiple physical partitions according to a
+partitioning rule such as RANGE, LIST, HASH, or KEY. It can help manage
+very large tables, make lifecycle operations easier, and enable
+partition pruning for suitable queries. Partitioning is not a substitute
+for good indexing, and it does not automatically make every query
+faster. The partition key and workload must match the intended access
+pattern.
+
+Example: A time-series events table can be RANGE partitioned by month so
+old monthly partitions can be managed independently. Queries restricted
+to a month may benefit from partition pruning.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 62: OFFSET pagination vs keyset pagination? Answer: OFFSET
+pagination asks the database to skip a number of ordered rows and return
+the next page. Keyset pagination uses the last seen ordering key as the
+starting point, such as WHERE id > :last_id ORDER BY id LIMIT 50. OFFSET
+is simple and useful for shallow pages; keyset is generally more
+efficient and stable for deep pagination over large datasets, provided
+an appropriate ordering index exists.
+
+Example: OFFSET: SELECT * FROM orders ORDER BY id LIMIT 50 OFFSET
+500000; Keyset: SELECT * FROM orders WHERE id > 500000 ORDER BY id LIMIT
+50;
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 63: Why can large OFFSET values be slow? Answer: To return a
+deep page, the database may still need to locate and process the
+preceding rows before discarding them. As OFFSET grows, more work can be
+required even though the client receives the same small page size.
+Keyset pagination avoids repeatedly skipping old rows by using the last
+retrieved key as a boundary.
+
+Example: A request for page 10,000 with 50 rows can require processing a
+very large prefix of the ordered result, whereas keyset pagination can
+seek from the last known ID.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 64: What is SQL injection? Answer: SQL injection is an attack
+in which untrusted input changes the structure or meaning of a SQL
+statement. It commonly occurs when application code concatenates user
+input directly into SQL text. Consequences can include unauthorized data
+access, modification, or destructive operations. The primary defense is
+parameterized queries/prepared statements, combined with least-privilege
+database accounts and appropriate validation.
+
+Example: Unsafe: “SELECT * FROM users WHERE name = ’” + input + “’”; If
+input contains SQL syntax, it can alter the query. A prepared statement
+keeps the input as data rather than SQL syntax.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 65: How do parameterized queries prevent SQL injection? Answer:
+Parameterized queries separate SQL code from user-supplied values. The
+SQL statement is parsed with placeholders, and the parameter values are
+transmitted separately, so characters inside a value are not interpreted
+as part of the SQL structure. Parameters should be used for values;
+dynamic identifiers such as column names need controlled allow-listing
+because they generally cannot be safely substituted as ordinary value
+parameters.
+
+Example: SELECT * FROM users WHERE email = ?; The application binds the
+user’s email as the parameter instead of concatenating it into the SQL
+string.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 66: What is a view? Answer: A view is a named query that
+presents data as a virtual table. It can simplify complex queries,
+provide a stable interface over underlying tables, and help expose only
+selected columns or rows. A normal view does not necessarily store its
+result as independent data; its behavior and updatability depend on the
+database and view definition. Views should not be treated as an
+automatic performance optimization.
+
+Example: CREATE VIEW active_customers AS SELECT id, name FROM customers
+WHERE status = ‘ACTIVE’; Applications can query active_customers instead
+of repeating the filter.
+
+Interview Tip: Avoid a one-line definition. Explain what the database
+guarantees and when you would use the feature.
+
+What Interviewer Is Testing: Whether you understand the underlying
+database concept rather than memorizing terminology.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What is the main use case? What is the
+trade-off? How does MySQL/InnoDB implement or behave in this case?
+
+Common Mistakes: Confusing a database product with the SQL language, or
+stating a rule without mentioning important engine-specific behavior.
+
+Difficulty: Beginner / Intermediate Interview Focus: Conceptual Best
+Answer Strategy: Give a precise definition first, explain how it works,
+mention the main use case and limitation, then give a compact example.
+——————————————————————————–
+
+Question 67: When would you use a stored procedure? Answer: A stored
+procedure is database-side programmable logic that can accept parameters
+and execute multiple SQL statements. It can be useful for centralized
+database operations, administrative workflows, or logic that benefits
+from running close to the data. Trade-offs include deployment
+complexity, database-specific code, testing/version-control concerns,
+and coupling application behavior to the database. The choice should
+reflect the team’s architecture rather than a blanket rule that
+procedures are good or bad.
+
+Example: A controlled monthly settlement operation involving several
+related database statements can be implemented as a procedure when
+central database execution and permission boundaries are valuable.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 68: What is a trigger and what trade-offs does it introduce?
+Answer: A trigger is database logic that automatically executes in
+response to events such as INSERT, UPDATE, or DELETE. Triggers can
+enforce certain auditing or derived-data rules close to the data, but
+they also create implicit side effects: application developers may not
+realize extra work occurs, debugging becomes harder, and bulk operations
+can become expensive. Triggers should be used selectively and documented
+clearly.
+
+Example: An AFTER INSERT trigger can write an audit record whenever an
+employee record changes. The application does not need a separate audit
+INSERT, but the hidden side effect must be understood by maintainers.
+
+Interview Tip: State the semantic difference first, then show SQL and
+call out NULL, tie, ordering, or performance edge cases when relevant.
+
+What Interviewer Is Testing: Whether you can distinguish similar SQL
+concepts and apply them correctly.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens with NULLs or duplicates? What
+index would you add? How would you verify the query plan?
+
+Common Mistakes: Giving syntactically valid SQL that has incorrect
+semantics for NULLs, ties, duplicates, or join filtering.
+
+Difficulty: Intermediate Interview Focus: Conceptual / SQL Best Answer
+Strategy: Start with the distinction or rule, explain the
+execution/behavior, then use a small SQL example and mention the
+important edge case. ——————————————————————————–
+
+Question 69: How would you safely add a NOT NULL column to a very large
+table? Answer: On a large production table, avoid assuming that ALTER
+TABLE will be instantaneous or harmless. First determine the MySQL
+version, storage-engine behavior, table size, workload, and whether the
+desired ALTER can use an online/in-place operation. A common safe
+rollout is: add the column in a compatible form, deploy application code
+that can handle it, backfill existing rows in small batches, monitor
+locks/replication/load, then enforce NOT NULL after all rows are valid.
+The exact DDL should be tested on a production-like copy before
+execution.
+
+Example: For a new status column, add it in a way compatible with the
+rollout, deploy code that writes valid values, backfill rows in batches
+such as 10,000 at a time, verify no NULLs remain, and then apply the
+final constraint during an approved change window.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 70: How would you archive hundreds of millions of old rows?
+Answer: Treat archival as a workload and lifecycle problem, not as one
+giant DELETE. Define the retention rule, archive destination, legal
+requirements, indexes, foreign-key dependencies, and recovery plan. Move
+data in controlled batches, verify each batch, throttle the operation,
+monitor replication and transaction-log growth, and remove archived rows
+in manageable chunks. Partitioning by time can make future retention
+operations much easier when the schema and workload support it.
+
+Example: For events older than seven years, copy a bounded date range to
+an archive store, validate counts/checksums as appropriate, then delete
+small batches from the hot table. Repeat while monitoring database and
+replica health.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 71: How would you diagnose database CPU suddenly reaching 100%?
+Answer: First determine whether the CPU is database process CPU, host
+CPU, or another process. Identify queries that became expensive or much
+more frequent, using query monitoring, process lists, performance
+instrumentation, and slow-query information where available. Check for
+plan changes, missing/stale statistics, data growth, inefficient joins,
+scans, sorting, lock-related workload, or a traffic spike. Mitigate
+carefully—such as reducing traffic or disabling a harmful query—then
+address the root cause and verify recovery.
+
+Example: If CPU jumps immediately after a deployment, compare the new
+query patterns with the previous version. EXPLAIN may reveal a plan that
+changed from an indexed lookup to a large scan.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 72: How would you diagnose connection-pool exhaustion when
+database CPU is low? Answer: Low CPU does not mean the database is
+healthy from the application’s perspective. Inspect pool metrics such as
+active, idle, pending, and acquisition wait time; database connection
+counts; long-running or idle-in-transaction sessions; network latency;
+lock waits; and application code that fails to return connections. Also
+check whether pool size is inappropriate for the database’s capacity.
+Increasing the pool blindly can make overload worse.
+
+Example: If the application pool has 100 connections all waiting while
+the database is at low CPU, inspect blocked transactions or network
+waits. A transaction holding a lock can make many requests wait without
+consuming much CPU.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 73: How would you handle a query that is fast for 1,000 rows
+but slow for 100 million? Answer: Small-data performance can hide
+scalability problems. Test with production-like cardinality and inspect
+EXPLAIN/EXPLAIN ANALYZE. Check whether predicates are selective, whether
+indexes match the access path, whether joins multiply rows, and whether
+sorting or grouping requires large temporary work. Consider keyset
+pagination, pre-aggregation, partition pruning, archival, or query
+redesign where appropriate. The goal is to reduce the amount of data
+processed, not merely increase hardware.
+
+Example: A query filtering by customer_id is fast on 1,000 rows but slow
+after growth because the index is missing or poorly ordered. Adding a
+suitable composite index may reduce millions of examined rows to a small
+range.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 74: How would you investigate replication lag after a large
+DELETE? Answer: A large DELETE can generate substantial redo/binlog work
+and cause the replica to spend significant time applying changes. Check
+replication status and lag metrics, source transaction volume, replica
+SQL/applier activity, I/O, long-running transactions, and whether the
+replica is constrained by CPU or disk. Determine whether the delete was
+one huge transaction or smaller batches. For future cleanup, batch
+deletes and schedule them to control write volume, while considering
+partitioning for time-based retention.
+
+Example: Deleting 200 million rows in one transaction can create a large
+replication backlog. Smaller batches with pauses and monitoring can
+reduce the instantaneous pressure on the replica.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 75: How would you design a database for attendance tracking?
+Answer: Start from the business rules: employees/students, dates or
+shifts, attendance events, statuses, corrections, and audit
+requirements. A normalized design could contain person, schedule/shift,
+and attendance tables. Use a stable primary key, foreign keys,
+timestamps, and a uniqueness rule appropriate to the business—for
+example one attendance record per person per shift, if that is truly the
+rule. Index common queries such as person plus date and date plus
+organization. Keep corrections auditable when attendance changes are
+sensitive.
+
+Example: employees(id, name) shifts(id, start_time, end_time)
+attendance(id, employee_id, shift_id, attendance_date, status, check_in,
+check_out) A UNIQUE constraint on (employee_id, shift_id,
+attendance_date) can prevent accidental duplicate records if the
+business rule requires it.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 76: How would you model users, roles and permissions? Answer: A
+common relational model separates users, roles, and permissions and
+connects them with many-to-many junction tables. For example: users,
+roles, permissions, user_roles, and role_permissions. This avoids
+repeating permission lists and allows a role to be assigned to many
+users. If direct user-specific permissions are required, a
+user_permissions table can be added. The design should also address
+unique identifiers, foreign keys, revocation, auditing, and least
+privilege.
+
+Example: users(id, …) roles(id, name) permissions(id, name)
+user_roles(user_id, role_id) role_permissions(role_id, permission_id) A
+user assigned to the ADMIN role receives the permissions associated with
+that role.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+Question 77: How would you prevent lost updates on an account balance?
+Answer: A lost update occurs when concurrent transactions read the same
+old value and then overwrite each other’s changes. For financial
+balances, prefer an atomic database operation or explicit transactional
+locking rather than read-modify-write in application memory. Techniques
+include UPDATE … SET balance = balance + :amount, SELECT … FOR UPDATE
+inside a transaction, or optimistic version checking. Also enforce
+constraints such as preventing invalid balances where required and make
+the operation idempotent when requests can be retried.
+
+Example: Instead of reading balance=100 and later writing 150, use:
+UPDATE accounts SET balance = balance + 50 WHERE id = 1; For more
+complex validation, lock the row in a transaction, validate, update, and
+commit.
+
+Interview Tip: Do not jump directly to code. Clarify assumptions,
+propose the safest approach, and discuss failure modes and monitoring.
+
+What Interviewer Is Testing: Whether you can reason about correctness,
+scalability, concurrency, and operational risk in a real database
+system.
+
+Key Points to Remember: - Answer the exact question before adding
+advanced details. - Explain the behavior, not only the syntax. - Mention
+the most relevant edge case or trade-off.
+
+Common Follow-up Questions: What happens at large scale? How do you
+handle concurrency/failure? How would you monitor and roll out the
+change safely?
+
+Common Mistakes: Using a single giant transaction, adding indexes
+blindly, ignoring concurrency/replication, or proposing a change without
+a rollback/monitoring plan.
+
+Difficulty: Intermediate / Advanced Interview Focus: Problem Solving /
+Design / Scenario Best Answer Strategy: State the goal, explain the
+reasoning, show a safe SQL or design approach, then discuss performance,
+concurrency, edge cases, and operational trade-offs.
+——————————————————————————–
+
+============================================================ SOURCE
+BASIS ============================================================ 1.
+MAQ Software interview experience — GeeksforGeeks: second-highest
+salary, normalization, ACID and SQL/DBMS. 2. Modak Analytics interview
+experience — GeeksforGeeks: nth-highest salary, CTE vs temporary table,
+WHERE vs HAVING, joins and window functions. 3. Loyalty Juggernaut
+interview experience — GeeksforGeeks: highest salary, GROUP BY, INNER vs
+LEFT JOIN and normalization. 4. Database Administrator interview
+questions — GeeksforGeeks: subqueries, AVG salary, second-highest salary
+and HAVING. 5. Current SQL/MySQL interview-question references —
+GeeksforGeeks.

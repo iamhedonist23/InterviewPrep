@@ -1,0 +1,1292 @@
+C PROGRAMMING INTERVIEW QUESTIONS — CLEAN EDITORIAL EDITION
+
+Category : C Programming
+Topics : pointers, memory, arrays, strings, structures, functions and undefined behavior
+Audience : Fresher, intermediate and experienced candidates
+Format : Question : / Answer : / Example :
+Editorial standard : Clear, practical interview preparation with concrete examples. Examples are illustrative unless the question explicitly preserves a source/report label.
+
+Question : Explain pointers in C and how they work.
+Answer : A pointer is an object whose value represents the address of another object or function. Dereferencing a valid object pointer accesses the pointed-to object, which is why pointers are central to arrays, dynamic allocation, linked structures, callbacks, and low-level interfaces. The important interview point is that pointer validity depends on the lifetime and bounds of the referenced object.
+Example : int value=10; int *p=&value; printf("%d",*p); /* dereferencing p reads value */
+
+------------------------------------------------------------------------------
+
+Question : Explain dynamic memory allocation in C.
+Answer : Dynamic allocation obtains storage at runtime using functions such as malloc, calloc, and realloc, and releases it with free. The caller must check allocation failure, stay within the allocated bounds, and ensure every owned allocation has a cleanup path. Unlike an automatic local, allocated storage remains valid until it is released or the program terminates.
+Example : size_t n=10; int *p=malloc(n*sizeof *p); if(!p)return; p[0]=42; free(p);
+
+------------------------------------------------------------------------------
+
+Question : What is malloc()?
+Answer : `malloc` allocates the requested number of bytes of uninitialized storage and returns a suitably aligned pointer or NULL if allocation fails. The caller owns the block and must eventually release it with `free` when it is no longer needed.
+Example : int *p=malloc(10*sizeof *p); if(p){p[0]=42; free(p);}
+
+------------------------------------------------------------------------------
+
+Question : What is calloc()?
+Answer : `calloc(n, size)` allocates storage for n elements and initializes all allocated bytes to zero. It is convenient for arrays and structures that should start with zeroed bytes, but an all-bits-zero representation is not guaranteed by the C standard to equal every type’s semantic zero value.
+Example : int *a=calloc(4,sizeof *a); if(a){printf("%d",a[0]); free(a);}
+
+------------------------------------------------------------------------------
+
+Question : What is free()?
+Answer : `free` releases storage previously returned by an allocation function such as malloc, calloc, or realloc. Passing NULL is safe and does nothing. Passing an invalid pointer, freeing the same allocation twice, or accessing the allocation after free results in undefined behavior.
+Example : int *p=malloc(sizeof *p); if(p){*p=42; free(p); p=NULL;}
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between malloc() and calloc()?
+Answer : `calloc(n, size)` allocates storage for n elements and initializes all allocated bytes to zero. It is convenient for arrays and structures that should start with zeroed bytes, but an all-bits-zero representation is not guaranteed by the C standard to equal every type’s semantic zero value. In a real code review, connect the concept directly to what is the difference between malloc() and calloc() and call out the failure mode you would watch for.
+Example : int *a=calloc(4,sizeof *a); if(a){printf("%d",a[0]); free(a);} Interview variation: apply the same idea specifically to what is the difference between malloc() and calloc() and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What happens when dynamically allocated memory is not freed?
+Answer : If the program loses the pointer to allocated storage without calling free, that storage remains allocated for the lifetime of the allocation and becomes a memory leak. A single short-lived leak may disappear when the process exits, but repeated leaks in a long-running service can grow memory usage and eventually cause failures. The right fix is to establish ownership and cleanup at the point where the resource is acquired.
+Example : void f(void){int *p=malloc(1024); if(!p)return; /* use p */ free(p);}
+
+------------------------------------------------------------------------------
+
+Question : Explain unions in C.
+Answer : A union gives multiple members the same storage region, so its size is based on its largest member plus alignment requirements. It is useful when a value can have one of several representations and only one representation needs to be stored at a time. Because the union itself does not record which member is intended, production code commonly pairs it with a tag or enum.
+Example : enum Kind{K_INT,K_DOUBLE}; struct Value{enum Kind kind; union{int i;double d;}u;};
+
+------------------------------------------------------------------------------
+
+Question : Explain functions in C.
+Answer : A C function has a return type, parameter list, and body; a declaration exposes its interface while a definition provides the implementation. C passes arguments by value, so pointers are used when a function must modify caller-owned objects or work with dynamically sized data. Keeping functions focused and their ownership contracts clear makes C code easier to test and maintain.
+Example : int add(int a,int b); int add(int a,int b){return a+b;}
+
+------------------------------------------------------------------------------
+
+Question : Explain C preprocessor directives.
+Answer : The preprocessor handles directives before the compiler performs normal C translation. It expands macros, includes headers, and selects code with conditional compilation such as #if and #ifdef. Because this stage is largely textual, macros should be used carefully; typed functions and objects are usually safer for ordinary program logic.
+Example : #define MAX_USERS 100 #ifdef DEBUG puts("debug"); #endif
+
+------------------------------------------------------------------------------
+
+Question : Explain static memory allocation.
+Answer : Static storage duration means an object exists for the entire execution of the program. File-scope objects and objects declared with static can have static storage duration; a block-scope static also retains its value between calls. The term “static memory allocation” is often used informally, so an interview answer should distinguish storage duration from the physical memory region chosen by the implementation.
+Example : static int request_count; void f(void){static int calls; ++calls; ++request_count;}
+
+------------------------------------------------------------------------------
+
+Question : Explain dynamic memory allocation.
+Answer : Dynamic allocation obtains storage at runtime using functions such as malloc, calloc, and realloc, and releases it with free. The caller must check allocation failure, stay within the allocated bounds, and ensure every owned allocation has a cleanup path. Unlike an automatic local, allocated storage remains valid until it is released or the program terminates. For this question, the interviewer is looking for a precise explanation of explain dynamic memory allocation, including the main edge case rather than a memorized definition.
+Example : size_t n=10; int *p=malloc(n*sizeof *p); if(!p)return; p[0]=42; free(p); Interview variation: apply the same idea specifically to explain dynamic memory allocation and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Write a program to reverse a linked list.
+Answer : Reverse a singly linked list by walking it once and redirecting each next pointer. Keep `prev`, `cur`, and `next` so changing `cur->next` does not lose the rest of the list. The iterative solution is O(n) time and O(1) extra space.
+Example : Node *prev=NULL,*cur=head; while(cur){Node *next=cur->next; cur->next=prev; prev=cur; cur=next;} head=prev;
+
+------------------------------------------------------------------------------
+
+Question : Given a sentence and a word, determine whether the word exists in the sentence and return the memory location where it occurs.
+Answer : For a substring search, `strstr` returns a pointer to the first matching occurrence inside the original string, or NULL if no match exists. That pointer is a location within the original buffer, so it remains valid only while that buffer is alive and unchanged in ways that invalidate the pointer.
+Example : const char *sentence="C makes pointers useful"; const char *p=strstr(sentence,"pointers"); if(p) printf("%s",p);
+
+------------------------------------------------------------------------------
+
+Question : How can you reach the end of a linked list quickly?
+Answer : For a singly linked list without a tail pointer, reaching the end requires following next pointers and is O(n). If the program frequently appends, maintain a tail pointer as part of the list structure; then appending can be O(1) when the tail is valid.
+Example : struct List{Node *head,*tail;}; /* tail->next is NULL */
+
+------------------------------------------------------------------------------
+
+Question : How would you copy a linked list and return a new list?
+Answer : A deep copy creates a new node for every source node and reproduces the next links so the new list owns its nodes independently. Do not simply copy the head pointer, because that creates another reference to the same list. Handle allocation failure by cleaning up already-created nodes.
+Example : Node *copy=NULL; /* allocate each new node, copy value, and append it; return the new head */
+
+------------------------------------------------------------------------------
+
+Question : Write a program to delete a node when only a pointer to that node is available.
+Answer : If the node is not the last node, copy the next node’s value into the current node and bypass the next node, then free the bypassed node. This does not work for the final node because there is no successor to copy from; a design that owns the previous link is needed for that case.
+Example : Node *next=node->next; node->value=next->value; node->next=next->next; free(next);
+
+------------------------------------------------------------------------------
+
+Question : Reverse a string using pointers.
+Answer : Use two pointers, one at the first character and one at the last character before the null terminator. Swap while the pointers have not crossed. The operation is O(n) time and O(1) extra space for a writable character array.
+Example : char s[]="hello"; char *a=s,*b=s+strlen(s)-1; while(a<b){char t=*a;*a++=*b;*b--=t;}
+
+------------------------------------------------------------------------------
+
+Question : Solve a bitmask/bitwise manipulation problem.
+Answer : Bitwise operations manipulate individual bits. AND is useful for masking, OR for setting bits, XOR for toggling bits, and shifts for moving a bit pattern. Be explicit about unsigned types when doing bit manipulation so signed-shift behavior does not become an unintended portability issue.
+Example : unsigned x=0x2Au; unsigned mask=1u<<3; x|=mask; /* set bit 3 */
+
+------------------------------------------------------------------------------
+
+Question : Write a Fibonacci program.
+Answer : For an iterative Fibonacci implementation, keep the previous two values and update them in a loop. This avoids the exponential repetition of the naive recursive version. Choose an integer type large enough for the expected n and document overflow limits.
+Example : unsigned long long a=0,b=1; for(unsigned n=0;n<10;n++){unsigned long long next=a+b; a=b; b=next;}
+
+------------------------------------------------------------------------------
+
+Question : Solve a linked-list coding problem.
+Answer : Start by drawing the nodes and links before changing any pointer. Identify the invariant you must preserve, handle empty and one-node lists, and state the complexity. In C, also make ownership explicit if the operation allocates or frees nodes.
+Example : For insertion after `cur`: `new_node->next=cur->next; cur->next=new_node;` — the old successor is not lost.
+
+------------------------------------------------------------------------------
+
+Question : Solve an array-operation coding problem.
+Answer : First identify whether the operation is search, insertion, deletion, traversal, or transformation. Arrays give O(1) indexed access, but middle insertion/deletion normally requires shifting elements and therefore costs O(n). Check capacity and bounds before modifying the array.
+Example : Inserting 9 into `[1,3,5]` at index 1 shifts 3 and 5 right, producing `[1,9,3,5]`.
+
+------------------------------------------------------------------------------
+
+Question : Explain storage classes and where their variables are mapped.
+Answer : Traditional C storage-class specifiers include `auto`, `register`, `static`, and `extern`, but modern explanations are clearer when they separate storage duration, scope, and linkage. For example, a block-scope static has static storage duration, while a file-scope static also has internal linkage. `extern` is mainly about linkage to a definition elsewhere.
+Example : static int count; extern int global_value; /* storage/linkage choices should match ownership */
+
+------------------------------------------------------------------------------
+
+Question : What happens if you declare more variables than the processor has available registers?
+Answer : The C language does not promise that a variable declared with or without `register` will occupy a CPU register. The compiler performs register allocation and can keep frequently used values in registers while spilling others to memory when register pressure is high. The number of source variables therefore does not directly determine a fixed hardware limit in portable C.
+Example : A loop may keep `i` and an accumulator in registers while less frequently used values are spilled to memory; the compiler decides this.
+
+------------------------------------------------------------------------------
+
+Question : Analyze a C code snippet and identify its output or bug.
+Answer : First classify the issue: compile error, linker error, defined behavior, implementation-defined behavior, unspecified behavior, or undefined behavior. Then trace execution, checking bounds, integer rules, pointer validity, object lifetime, and evaluation order. If the code has undefined behavior, do not invent a deterministic output; explain why the standard does not define one and show how you would verify the bug with a compiler warning, debugger, or sanitizer.
+Example : If a pointer is freed and later dereferenced, the correct interview answer is “undefined behavior,” not a guessed value. Reproduce it with AddressSanitizer to identify the invalid access.
+
+------------------------------------------------------------------------------
+
+Question : Analyze a C code snippet involving pointers and identify the problem.
+Answer : First classify the issue: compile error, linker error, defined behavior, implementation-defined behavior, unspecified behavior, or undefined behavior. Then trace execution, checking bounds, integer rules, pointer validity, object lifetime, and evaluation order. If the code has undefined behavior, do not invent a deterministic output; explain why the standard does not define one and show how you would verify the bug with a compiler warning, debugger, or sanitizer. In a real code review, connect the concept directly to analyze a c code snippet involving pointers and identify the problem and call out the failure mode you would watch for.
+Example : If a pointer is freed and later dereferenced, the correct interview answer is “undefined behavior,” not a guessed value. Reproduce it with AddressSanitizer to identify the invalid access. Interview variation: apply the same idea specifically to analyze a c code snippet involving pointers and identify the problem and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Explain the memory map/layout of a C program.
+Answer : A typical process image is described using code/text, read-only data, writable global/static data, dynamically allocated storage, and stack frames. This is an operating-system/toolchain model rather than a layout guaranteed by the C standard. Exact addresses, growth directions, and segment arrangement vary by platform.
+Example : A typical process may contain: text/code | read-only data | globals/statics | heap | stack. Treat this as a conceptual model, not a portable address map.
+
+------------------------------------------------------------------------------
+
+Question : Explain memory allocation strategies such as best fit and worst fit in the context of memory management.
+Answer : Best-fit chooses the smallest free block that satisfies an allocation request; worst-fit chooses the largest suitable block. These are allocation-strategy concepts used in memory-management discussions, not guarantees about how a modern C malloc implementation works internally. Compare fragmentation, search cost, and workload before choosing a strategy.
+Example : Free blocks: 100, 300, 500 bytes; a 250-byte request could use 300 with best-fit or 500 with worst-fit.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between static and dynamic memory?
+Answer : Static storage duration applies to objects such as file-scope variables and static locals; their lifetime lasts for the program execution. Dynamic storage is obtained explicitly from allocation functions and lasts until released or until the program ends. Automatic objects have block/function lifetimes and are often associated with stack storage in common implementations.
+Example : static int total; int *p=malloc(sizeof *p); /* total has static storage duration; *p has allocated storage duration */
+
+------------------------------------------------------------------------------
+
+Question : Write code involving character arrays/pointers to count vowels.
+Answer : Traverse the character array until the null terminator and count characters equal to a, e, i, o, or u, considering uppercase letters if required. A character pointer makes the traversal explicit and avoids index arithmetic if that is the interview focus.
+Example : size_t count=0; for(const char *p=s;*p;p++){char c=*p|32; if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') count++;}
+
+------------------------------------------------------------------------------
+
+Question : Reverse a given number.
+Answer : Extract the last digit with `% 10`, append it to the result with `result = result * 10 + digit`, then divide the input by 10. Handle negative values and numeric overflow explicitly if the interview expects production-quality code.
+Example : int n=1234,r=0; while(n){r=r*10+n%10;n/=10;} /* r is 4321 */
+
+------------------------------------------------------------------------------
+
+Question : Write a function involving a structure and return the structure.
+Answer : A function can return a structure by value. The caller receives a structure value containing copies of the returned members according to the implementation ABI. For large or mutable objects, an API may instead accept an output pointer, but returning small structures by value is ordinary C.
+Example : struct Point{int x,y;}; struct Point make_point(int x,int y){return (struct Point){x,y};}
+
+------------------------------------------------------------------------------
+
+Question : Explain the difference between C and another programming language, especially around pointers and memory management.
+Answer : C exposes manual memory management, pointers, object representation, and low-level data layout more directly than many managed languages. That gives precise control and low runtime overhead, but it also puts responsibility for bounds, lifetimes, ownership, and undefined behavior on the programmer. The right comparison depends on the other language, so name the specific contrast instead of making a broad “C is faster” claim.
+Example : In C, a buffer can be allocated with malloc and released with free; in a garbage-collected language, lifetime is normally managed by the runtime.
+
+------------------------------------------------------------------------------
+
+Question : Explain why pointers are important in low-level programming.
+Answer : Pointers allow indirect access to objects and are fundamental to dynamic allocation, arrays, linked data structures, callbacks, and memory-mapped interfaces. They are powerful because they let a function operate on caller-owned storage and let data structures refer to other objects. The same power makes lifetime and bounds errors especially important.
+Example : A linked-list node stores `struct Node *next` so the nodes can be connected without requiring contiguous storage.
+
+------------------------------------------------------------------------------
+
+Question : Explain how memory is allocated for data in C.
+Answer : C objects can have automatic, static, allocated, or thread storage duration. The language defines lifetimes and semantics, while the operating system and implementation decide the concrete memory regions used. For allocated storage, the program requests bytes through functions such as malloc and must manage the lifetime explicitly.
+Example : int local=1; static int global_state; int *p=malloc(sizeof *p); if(p){*p=3;free(p);}
+
+------------------------------------------------------------------------------
+
+Question : Explain the use of malloc() and dynamic memory in a project you have worked on.
+Answer : For a project-based question, use your real project rather than a memorized story. Explain the problem, the C design you chose, why you chose it, the ownership/lifetime rules, what went wrong if there was a bug, and how you verified the fix. A strong answer names the trade-off rather than claiming the design was perfect.
+Example : Example structure: “We received N records, allocated one buffer sized from the input, checked allocation failure, released it in one cleanup path, and used AddressSanitizer during testing to catch a lifetime bug.” Replace the details with your actual project facts.
+
+------------------------------------------------------------------------------
+
+Question : Explain a pointer-related bug you encountered in a project.
+Answer : For a project-based question, use your real project rather than a memorized story. Explain the problem, the C design you chose, why you chose it, the ownership/lifetime rules, what went wrong if there was a bug, and how you verified the fix. A strong answer names the trade-off rather than claiming the design was perfect. The practical point to emphasize here is explain a pointer-related bug you encountered in a project: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : Example structure: “We received N records, allocated one buffer sized from the input, checked allocation failure, released it in one cleanup path, and used AddressSanitizer during testing to catch a lifetime bug.” Replace the details with your actual project facts. Interview variation: apply the same idea specifically to explain a pointer-related bug you encountered in a project and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Explain a C project from your resume and the memory-related decisions you made.
+Answer : For a project-based question, use your real project rather than a memorized story. Explain the problem, the C design you chose, why you chose it, the ownership/lifetime rules, what went wrong if there was a bug, and how you verified the fix. A strong answer names the trade-off rather than claiming the design was perfect. In a real code review, connect the concept directly to explain a c project from your resume and the memory-related decisions you made and call out the failure mode you would watch for.
+Example : Example structure: “We received N records, allocated one buffer sized from the input, checked allocation failure, released it in one cleanup path, and used AddressSanitizer during testing to catch a lifetime bug.” Replace the details with your actual project facts. Interview variation: apply the same idea specifically to explain a c project from your resume and the memory-related decisions you made and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Debug a C code snippet and explain why it produces the given output.
+Answer : First classify the issue: compile error, linker error, defined behavior, implementation-defined behavior, unspecified behavior, or undefined behavior. Then trace execution, checking bounds, integer rules, pointer validity, object lifetime, and evaluation order. If the code has undefined behavior, do not invent a deterministic output; explain why the standard does not define one and show how you would verify the bug with a compiler warning, debugger, or sanitizer. Keep the spoken answer grounded in debug a c code snippet and explain why it produces the given output and avoid turning an implementation detail into a universal rule.
+Example : If a pointer is freed and later dereferenced, the correct interview answer is “undefined behavior,” not a guessed value. Reproduce it with AddressSanitizer to identify the invalid access. Interview variation: apply the same idea specifically to debug a c code snippet and explain why it produces the given output and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Given a pointer-based program, predict the output before executing it.
+Answer : First classify the issue: compile error, linker error, defined behavior, implementation-defined behavior, unspecified behavior, or undefined behavior. Then trace execution, checking bounds, integer rules, pointer validity, object lifetime, and evaluation order. If the code has undefined behavior, do not invent a deterministic output; explain why the standard does not define one and show how you would verify the bug with a compiler warning, debugger, or sanitizer. For this question, the interviewer is looking for a precise explanation of given a pointer-based program, predict the output before executing it, including the main edge case rather than a memorized definition.
+Example : If a pointer is freed and later dereferenced, the correct interview answer is “undefined behavior,” not a guessed value. Reproduce it with AddressSanitizer to identify the invalid access. Interview variation: apply the same idea specifically to given a pointer-based program, predict the output before executing it and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is a pointer?
+Answer : A pointer is an object whose value is used to refer to another object or function. It is not the object itself; it stores a pointer value that can be dereferenced when it points to a live, accessible object. Pointers are central to arrays, dynamic allocation, linked structures, and APIs that modify caller-owned data.
+Example : int x=42; int *p=&x; printf("%d",*p);
+
+------------------------------------------------------------------------------
+
+Question : What is a NULL pointer?
+Answer : A null pointer has a null pointer value and does not point to a valid object. It is commonly used to represent “no object,” but dereferencing it is undefined behavior. Check a pointer before dereferencing when null is a valid state.
+Example : int *p=NULL; if (p) printf("%d", *p);
+
+------------------------------------------------------------------------------
+
+Question : What is a dangling pointer?
+Answer : A dangling pointer is a pointer whose referenced object has already ceased to exist or whose allocated storage has been released. The pointer value may still look non-null, but dereferencing it is undefined behavior. The safest approach is to define ownership clearly and invalidate local pointers after free when that helps prevent accidental reuse.
+Example : int *p=malloc(sizeof *p); if(p){*p=7; free(p); p=NULL;}
+
+------------------------------------------------------------------------------
+
+Question : What is a wild pointer?
+Answer : A wild pointer is an uninitialized pointer whose value is indeterminate. Dereferencing it can access an arbitrary location and cause undefined behavior. Initialize pointers, often to NULL, before using them.
+Example : int *p=NULL; /* initialize before deciding what object it should reference */
+
+------------------------------------------------------------------------------
+
+Question : What is a void pointer?
+Answer : void * is the generic object-pointer type in C. It can hold the address of an object of another type and is commonly used by allocation functions and generic APIs. Before dereferencing it, convert it to an appropriate object-pointer type; pointer arithmetic on void * is not defined by standard C.
+Example : int x=42; void *vp=&x; printf("%d", *(int *)vp);
+
+------------------------------------------------------------------------------
+
+Question : What is a pointer to a pointer?
+Answer : A pointer to a pointer stores the address of another pointer. It is useful when a function must change the caller's pointer, such as updating the head of a linked list. The first * dereference reaches the inner pointer; the second reaches the final object.
+Example : int value=10; int *p=&value; int **pp=&p; **pp=20; /* value is now 20 */
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between an array and a pointer?
+Answer : An array is an object containing a fixed number of elements; a pointer is an object that stores an address. They are closely related because an array expression usually converts to a pointer to its first element, but they are not interchangeable: sizeof(array) gives the whole array size, while sizeof(pointer) gives the pointer size.
+Example : int a[5]; int *p=a; printf("%zu %zu", sizeof a, sizeof p);
+
+------------------------------------------------------------------------------
+
+Question : Why does an array name usually decay to a pointer?
+Answer : In most expressions, an array expression is converted to a pointer to its first element. This conversion is often called array-to-pointer decay. Important exceptions include operands of sizeof, _Alignof, and unary &, where the array remains an array expression.
+Example : int a[3]={10,20,30}; int *p=a; /* p points to a[0] */
+
+------------------------------------------------------------------------------
+
+Question : What is pointer arithmetic?
+Answer : Pointer arithmetic is defined relative to elements of the same array object, including the one-past-the-end position. Adding one to an int * advances by sizeof(int) bytes conceptually, so p+1 points to the next int rather than the next byte. Arithmetic outside the permitted array range is not valid.
+Example : int a[3]={10,20,30}; int *p=a; printf("%d", *(p+1)); /* 20 */
+
+------------------------------------------------------------------------------
+
+Question : What happens when you increment an int *?
+Answer : Pointer arithmetic is defined relative to elements of the same array object, including the one-past-the-end position. Adding one to an int * advances by sizeof(int) bytes conceptually, so p+1 points to the next int rather than the next byte. Arithmetic outside the permitted array range is not valid. In a real code review, connect the concept directly to what happens when you increment an int * and call out the failure mode you would watch for.
+Example : int a[3]={10,20,30}; int *p=a; printf("%d", *(p+1)); /* 20 */ Interview variation: apply the same idea specifically to what happens when you increment an int * and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between *p and &p?
+Answer : *p dereferences p and accesses the object p points to. &p produces the address of the pointer variable p itself, so its type is a pointer-to-pointer when p is an object pointer. They answer opposite questions: “what object does p point to?” versus “where is p stored?”
+Example : int x=5; int *p=&x; printf("%d", *p); printf("%p", (void *)&p);
+
+------------------------------------------------------------------------------
+
+Question : Explain const int p, int const p, and const int *const p.
+Answer : The position of const matters. `const int *p` means the pointed-to int cannot be modified through p, while `int *const p` means p itself cannot be redirected after initialization. `const int *const p` combines both restrictions. `const int p` and `int const p` are equivalent declarations of a const int.
+Example : int x=10,y=20; const int *p=&x; p=&y; /* allowed */ int *const q=&x; *q=11; /* allowed */
+
+------------------------------------------------------------------------------
+
+Question : What is a function pointer?
+Answer : A function pointer stores the address of a function with a compatible signature. It lets code choose behavior at runtime and is widely used for callbacks, sorting comparators, event handlers, and strategy tables. The pointed-to function must be called with a compatible type.
+Example : int cmp(const void *a,const void *b){return *(const int*)a-*(const int*)b;} int (*fn)(const void*,const void*)=cmp;
+
+------------------------------------------------------------------------------
+
+Question : Where would you use a function pointer in a real C program?
+Answer : A function pointer stores the address of a function with a compatible signature. It lets code choose behavior at runtime and is widely used for callbacks, sorting comparators, event handlers, and strategy tables. The pointed-to function must be called with a compatible type. In a real code review, connect the concept directly to where would you use a function pointer in a real c program and call out the failure mode you would watch for.
+Example : int cmp(const void *a,const void *b){return *(const int*)a-*(const int*)b;} int (*fn)(const void*,const void*)=cmp; Interview variation: apply the same idea specifically to where would you use a function pointer in a real c program and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between malloc(), calloc(), realloc(), and free()?
+Answer : `malloc` allocates a requested number of bytes without initializing the contents. `calloc` allocates an array-like block and initializes all allocated bytes to zero. `realloc` resizes an existing allocation and may move it; on failure the original block remains valid. `free` releases allocated storage. C23 also makes `realloc(ptr, 0)` undefined, so use free when the intention is deallocation.
+Example : int *p=calloc(4,sizeof *p); int *tmp=realloc(p,8*sizeof *p); if(tmp) p=tmp; else free(p); if(tmp) free(p);
+
+------------------------------------------------------------------------------
+
+Question : What happens if malloc() fails?
+Answer : If an allocation fails, malloc returns NULL. Code should check the result before dereferencing it and then choose an appropriate recovery path: return an error, reduce the request, clean up other resources, or terminate if recovery is impossible. Treating NULL as a valid object pointer leads to undefined behavior.
+Example : int *p=malloc(count*sizeof *p); if(!p){fprintf(stderr,"allocation failed\n"); return;}
+
+------------------------------------------------------------------------------
+
+Question : Why should you check the return value of malloc()?
+Answer : If an allocation fails, malloc returns NULL. Code should check the result before dereferencing it and then choose an appropriate recovery path: return an error, reduce the request, clean up other resources, or terminate if recovery is impossible. Treating NULL as a valid object pointer leads to undefined behavior. The practical point to emphasize here is why should you check the return value of malloc(): explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : int *p=malloc(count*sizeof *p); if(!p){fprintf(stderr,"allocation failed\n"); return;} Interview variation: apply the same idea specifically to why should you check the return value of malloc() and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why can assigning realloc() directly to the original pointer be dangerous?
+Answer : `realloc` changes the size of an existing allocation. It may extend the block in place or allocate a new block, copy the preserved bytes, and release the old block. If it fails for a nonzero size, it returns NULL and the original allocation is still valid, which is why a temporary pointer is safer than assigning directly to the original pointer.
+Example : int *tmp=realloc(p,new_count*sizeof *p); if(tmp) p=tmp; else { /* p is still valid */ }
+
+------------------------------------------------------------------------------
+
+Question : What is a memory leak?
+Answer : A memory leak occurs when allocated storage remains allocated but the program has lost the pointer needed to release it. Repeated leaks can increase memory usage and eventually cause allocation failures or system pressure. Prevention comes from clear ownership, cleanup paths, and tools such as AddressSanitizer or leak detectors.
+Example : void f(void){int *p=malloc(1024); if(!p)return; /* forgetting free(p) leaks the block */ free(p);}
+
+------------------------------------------------------------------------------
+
+Question : What is use-after-free?
+Answer : After an allocation is freed, every pointer that referred to that storage becomes unusable for accessing that object. Setting one pointer to NULL does not update aliases held elsewhere. Ownership rules and careful lifetime management are required to prevent use-after-free bugs.
+Example : int *p=malloc(sizeof *p); int *alias=p; free(p); p=NULL; /* alias is still dangling */
+
+------------------------------------------------------------------------------
+
+Question : What is double-free?
+Answer : Double-free means releasing the same allocation more than once without a new allocation producing the same pointer value. It is undefined behavior and can corrupt allocator metadata or crash the process. A common defensive practice is to set an owner pointer to NULL after free, while remembering that this does not fix other aliases.
+Example : free(p); p=NULL; /* do not free the same allocation again */
+
+------------------------------------------------------------------------------
+
+Question : How would you debug a memory leak?
+Answer : A memory leak occurs when allocated storage remains allocated but the program has lost the pointer needed to release it. Repeated leaks can increase memory usage and eventually cause allocation failures or system pressure. Prevention comes from clear ownership, cleanup paths, and tools such as AddressSanitizer or leak detectors. In a real code review, connect the concept directly to how would you debug a memory leak and call out the failure mode you would watch for.
+Example : void f(void){int *p=malloc(1024); if(!p)return; /* forgetting free(p) leaks the block */ free(p);} Interview variation: apply the same idea specifically to how would you debug a memory leak and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between stack and heap memory?
+Answer : Stack and heap describe common implementation-level storage areas, not C language guarantees about exact placement. Automatic objects typically have function/block lifetimes and are commonly implemented on a stack; dynamically allocated objects have allocated storage duration and are commonly served from a heap. Their limits and performance characteristics depend on the platform and runtime.
+Example : void f(void){int local=1; int *heap=malloc(sizeof *heap); if(heap){*heap=2; free(heap);} /* local is automatic */}
+
+------------------------------------------------------------------------------
+
+Question : What typically lives on the stack?
+Answer : On common implementations, the stack is used for automatic local variables, function call frames, saved registers, and other call-related state. The C standard does not require a literal stack data structure, so describe this as a common implementation model. Large or variable-size automatic objects can contribute to stack exhaustion.
+Example : void f(void){int local=10; char buffer[256]; /* commonly stack-resident automatic objects */ (void)local;(void)buffer;}
+
+------------------------------------------------------------------------------
+
+Question : What typically lives on the heap?
+Answer : On common implementations, the heap is the region from which dynamic allocation functions obtain storage. Objects created with malloc/calloc/realloc have allocated storage duration and remain valid until released. The exact allocator and virtual-memory layout are implementation and operating-system details.
+Example : int *p=malloc(100*sizeof *p); if(p){p[0]=1; free(p);}
+
+------------------------------------------------------------------------------
+
+Question : What happens when the stack is exhausted?
+Answer : Stack exhaustion occurs when the program needs more automatic storage than the available stack can provide. Deep recursion, very large local arrays, or excessive call depth are common causes. The fix may involve reducing frame size, using iterative logic, moving large data to dynamic storage, or changing the architecture.
+Example : void recurse(int n){char buffer[1024]; (void)buffer; if(n>0) recurse(n-1);} /* very large n can exhaust the stack */
+
+------------------------------------------------------------------------------
+
+Question : What is a segmentation fault?
+Answer : A segmentation fault is an operating-system-level fault commonly caused by an invalid memory access, such as dereferencing an invalid pointer or accessing memory outside a permitted region. It is a symptom, not necessarily the root cause. Debugging should identify the first invalid access rather than only the line where the process finally crashed.
+Example : int *p=NULL; /* dereferencing p would be invalid */
+
+------------------------------------------------------------------------------
+
+Question : What are common causes of a segmentation fault?
+Answer : A segmentation fault is an operating-system-level fault commonly caused by an invalid memory access, such as dereferencing an invalid pointer or accessing memory outside a permitted region. It is a symptom, not necessarily the root cause. Debugging should identify the first invalid access rather than only the line where the process finally crashed. For this question, the interviewer is looking for a precise explanation of what are common causes of a segmentation fault, including the main edge case rather than a memorized definition.
+Example : int *p=NULL; /* dereferencing p would be invalid */ Interview variation: apply the same idea specifically to what are common causes of a segmentation fault and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : How would you debug a segmentation fault?
+Answer : A segmentation fault is an operating-system-level fault commonly caused by an invalid memory access, such as dereferencing an invalid pointer or accessing memory outside a permitted region. It is a symptom, not necessarily the root cause. Debugging should identify the first invalid access rather than only the line where the process finally crashed. The practical point to emphasize here is how would you debug a segmentation fault: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : int *p=NULL; /* dereferencing p would be invalid */ Interview variation: apply the same idea specifically to how would you debug a segmentation fault and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is undefined behavior?
+Answer : Undefined behavior means the C standard places no requirements on what the program does for that execution. Examples include out-of-bounds access, signed integer overflow, dereferencing an invalid pointer, and accessing freed storage. A program appearing to work does not make undefined behavior safe or portable.
+Example : int a[3]={1,2,3}; /* a[3] is an out-of-bounds access and is undefined behavior */
+
+------------------------------------------------------------------------------
+
+Question : Give examples of undefined behavior in C.
+Answer : Undefined behavior means the C standard places no requirements on what the program does for that execution. Examples include out-of-bounds access, signed integer overflow, dereferencing an invalid pointer, and accessing freed storage. A program appearing to work does not make undefined behavior safe or portable. Keep the spoken answer grounded in give examples of undefined behavior in c and avoid turning an implementation detail into a universal rule.
+Example : int a[3]={1,2,3}; /* a[3] is an out-of-bounds access and is undefined behavior */ Interview variation: apply the same idea specifically to give examples of undefined behavior in c and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why can undefined behavior appear to work in debug builds but fail in release builds?
+Answer : Undefined behavior means the C standard places no requirements on what the program does for that execution. Examples include out-of-bounds access, signed integer overflow, dereferencing an invalid pointer, and accessing freed storage. A program appearing to work does not make undefined behavior safe or portable. For this question, the interviewer is looking for a precise explanation of why can undefined behavior appear to work in debug builds but fail in release builds, including the main edge case rather than a memorized definition.
+Example : int a[3]={1,2,3}; /* a[3] is an out-of-bounds access and is undefined behavior */ Interview variation: apply the same idea specifically to why can undefined behavior appear to work in debug builds but fail in release builds and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between declaration and definition?
+Answer : A declaration introduces an identifier and its type to the compiler; a definition provides the entity itself, such as the body of a function or storage for an object. Multiple compatible declarations may exist, but a definition is required where the program needs the actual entity. Headers commonly contain declarations while source files contain definitions.
+Example : int add(int,int); /* declaration */ int add(int a,int b){return a+b;} /* definition */
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between a local and global variable?
+Answer : A local variable is declared inside a function or block and normally has block scope; an ordinary local has automatic storage duration. A file-scope variable has scope extending through the translation unit from its declaration and usually has static storage duration. Adding `static` at file scope also gives internal linkage, which limits visibility to that source file.
+Example : void f(void){int local=1;} int global=2; static int private_global=3;
+
+------------------------------------------------------------------------------
+
+Question : What does static mean for a local variable?
+Answer : A block-scope static variable has static storage duration: it is initialized once and retains its value between function calls. It is not recreated each time control enters the block. This can be useful for persistent state, but it also introduces hidden shared state that can complicate testing and concurrency.
+Example : void f(void){static int calls; printf("%d\n",++calls);} /* prints 1, then 2, then 3 */
+
+------------------------------------------------------------------------------
+
+Question : What does static mean for a global/file-scope variable?
+Answer : At file scope, `static` gives an object or function internal linkage, meaning it is accessible only within that translation unit. This is useful for hiding implementation details and avoiding global symbol collisions. It is different from block-scope static, where the key effect is static storage duration.
+Example : static int cache_count; static void helper(void){ } /* visible only in this source file */
+
+------------------------------------------------------------------------------
+
+Question : What does extern mean?
+Answer : `extern` declares an object or function that is defined elsewhere, allowing multiple source files to share a controlled interface. The definition should exist exactly where storage is actually provided for an external object. Headers often contain extern declarations while one source file contains the definition.
+Example : /* config.h */ extern int timeout_ms; /* config.c */ int timeout_ms=1000;
+
+------------------------------------------------------------------------------
+
+Question : What are C storage classes?
+Answer : Traditional C storage-class specifiers include `auto`, `register`, `static`, and `extern`, but modern explanations are clearer when they separate storage duration, scope, and linkage. For example, a block-scope static has static storage duration, while a file-scope static also has internal linkage. `extern` is mainly about linkage to a definition elsewhere. In a real code review, connect the concept directly to what are c storage classes and call out the failure mode you would watch for.
+Example : static int count; extern int global_value; /* storage/linkage choices should match ownership */ Interview variation: apply the same idea specifically to what are c storage classes and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between const and #define?
+Answer : `const` creates a typed object that cannot be modified through that identifier, while `#define` creates a preprocessor macro substituted before compilation. A const object participates in the type system and debugger information; a macro does not. For constants that need type checking, a const object or enum is often clearer.
+Example : const int max_users=100; #define MAX_USERS 100
+
+------------------------------------------------------------------------------
+
+Question : What does volatile mean?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */
+
+------------------------------------------------------------------------------
+
+Question : When would you use volatile in embedded C?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization. The practical point to emphasize here is when would you use volatile in embedded c: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */ Interview variation: apply the same idea specifically to when would you use volatile in embedded c and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Does volatile make a variable thread-safe?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization. In a real code review, connect the concept directly to does volatile make a variable thread-safe and call out the failure mode you would watch for.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */ Interview variation: apply the same idea specifically to does volatile make a variable thread-safe and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is a structure?
+Answer : A structure is a user-defined type that groups named members, potentially of different types, into one object. Each member has its own storage within the structure, subject to padding and alignment. Structures are useful for representing records, configuration objects, messages, and other related data.
+Example : struct Employee{int id; char name[32]; double salary;};
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between a structure and a union?
+Answer : A structure gives each member its own storage, while a union overlays its members in the same storage region. A structure can hold all members simultaneously; a union is useful when alternative representations are mutually exclusive. The union size is based on its largest member plus alignment requirements.
+Example : struct Point{int x,y;}; union Number{int i; double d;};
+
+------------------------------------------------------------------------------
+
+Question : What is structure padding?
+Answer : Structure padding is unused space inserted so members satisfy their alignment requirements. As a result, `sizeof(struct)` can exceed the sum of member sizes, and changing member order can change the amount of padding. Reordering members from stricter to looser alignment often reduces padding, but measure with sizeof and consider ABI compatibility before changing a public layout.
+Example : struct A{char c; int i;}; struct B{int i; char c;}; /* sizeof may differ */
+
+------------------------------------------------------------------------------
+
+Question : What is memory alignment?
+Answer : Structure padding is unused space inserted so members satisfy their alignment requirements. As a result, `sizeof(struct)` can exceed the sum of member sizes, and changing member order can change the amount of padding. Reordering members from stricter to looser alignment often reduces padding, but measure with sizeof and consider ABI compatibility before changing a public layout. In a real code review, connect the concept directly to what is memory alignment and call out the failure mode you would watch for.
+Example : struct A{char c; int i;}; struct B{int i; char c;}; /* sizeof may differ */ Interview variation: apply the same idea specifically to what is memory alignment and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why can the size of a structure be larger than the sum of its members?
+Answer : Structure padding is unused space inserted so members satisfy their alignment requirements. As a result, `sizeof(struct)` can exceed the sum of member sizes, and changing member order can change the amount of padding. Reordering members from stricter to looser alignment often reduces padding, but measure with sizeof and consider ABI compatibility before changing a public layout. Keep the spoken answer grounded in why can the size of a structure be larger than the sum of its members and avoid turning an implementation detail into a universal rule.
+Example : struct A{char c; int i;}; struct B{int i; char c;}; /* sizeof may differ */ Interview variation: apply the same idea specifically to why can the size of a structure be larger than the sum of its members and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : How can changing the order of structure members affect size?
+Answer : Structure padding is unused space inserted so members satisfy their alignment requirements. As a result, `sizeof(struct)` can exceed the sum of member sizes, and changing member order can change the amount of padding. Reordering members from stricter to looser alignment often reduces padding, but measure with sizeof and consider ABI compatibility before changing a public layout. For this question, the interviewer is looking for a precise explanation of how can changing the order of structure members affect size, including the main edge case rather than a memorized definition.
+Example : struct A{char c; int i;}; struct B{int i; char c;}; /* sizeof may differ */ Interview variation: apply the same idea specifically to how can changing the order of structure members affect size and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is typedef?
+Answer : `typedef` creates an alias for an existing type; it does not create a new distinct type. It can make complex declarations easier to read and can give domain concepts clearer names. Avoid hiding pointers or qualifiers when the alias makes ownership or constness harder to see.
+Example : typedef unsigned long size_type; size_type n=10;
+
+------------------------------------------------------------------------------
+
+Question : What is an enum?
+Answer : An enum defines a set of named integer constants and is useful for representing a finite state or category. The exact representation is implementation-defined, so do not assume a particular underlying size when designing portable binary formats. Enums make code more readable than scattered numeric constants.
+Example : enum State{IDLE,RUNNING,FAILED}; enum State s=RUNNING;
+
+------------------------------------------------------------------------------
+
+Question : What is a macro?
+Answer : A macro is a preprocessor rule that performs textual substitution before compilation. Macros are useful for conditional compilation, include guards, and some generic or compile-time patterns, but they lack normal type checking and scope. Keep macros small and parenthesized, and prefer functions when possible.
+Example : #define ARRAY_LEN(a) (sizeof(a)/sizeof((a)[0]))
+
+------------------------------------------------------------------------------
+
+Question : Macro versus function: when would you use each?
+Answer : A macro is a preprocessor rule that performs textual substitution before compilation. Macros are useful for conditional compilation, include guards, and some generic or compile-time patterns, but they lack normal type checking and scope. Keep macros small and parenthesized, and prefer functions when possible. For this question, the interviewer is looking for a precise explanation of macro versus function: when would you use each, including the main edge case rather than a memorized definition.
+Example : #define ARRAY_LEN(a) (sizeof(a)/sizeof((a)[0])) Interview variation: apply the same idea specifically to macro versus function: when would you use each and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What can go wrong with an unsafe function-like macro?
+Answer : Function-like macros are expanded textually, so arguments can be evaluated more than once and operator precedence can produce surprising results. Parentheses help but cannot make every macro safe. Prefer an inline function when type checking and single evaluation are important.
+Example : #define SQUARE(x) ((x)*(x)) /* still unsafe for SQUARE(i++) because i++ runs twice */
+
+------------------------------------------------------------------------------
+
+Question : What is the purpose of header files?
+Answer : Header files publish declarations, types, macros, and interfaces shared by source files. Include guards prevent the same header contents from being processed more than once in a translation unit. Keeping public declarations in headers and private helpers in source files improves modularity.
+Example : #ifndef USER_H #define USER_H void print_user(void); #endif
+
+------------------------------------------------------------------------------
+
+Question : What is an include guard?
+Answer : Header files publish declarations, types, macros, and interfaces shared by source files. Include guards prevent the same header contents from being processed more than once in a translation unit. Keeping public declarations in headers and private helpers in source files improves modularity. Keep the spoken answer grounded in what is an include guard and avoid turning an implementation detail into a universal rule.
+Example : #ifndef USER_H #define USER_H void print_user(void); #endif Interview variation: apply the same idea specifically to what is an include guard and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Explain preprocessing, compilation, assembly and linking.
+Answer : The preprocessor expands directives and macros, the compiler translates C into lower-level code, the assembler produces object code, and the linker combines object files and libraries into the final executable or shared object. Separating these stages explains why a program can pass compilation but fail during linking.
+Example : gcc -E main.c > main.i; gcc -S main.i -o main.s; gcc -c main.s -o main.o; gcc main.o -o app
+
+------------------------------------------------------------------------------
+
+Question : What is a compiler error versus a linker error?
+Answer : A compiler error occurs while translating a source file, such as a syntax error or incompatible type. A linker error happens later when the linker cannot resolve a required symbol, such as a function declared but never defined. The error message and build stage usually tell you which class of problem you have.
+Example : int add(int,int); int main(void){return add(1,2);} /* compiles, but linking fails if add is never defined */
+
+------------------------------------------------------------------------------
+
+Question : What does an “undefined reference” linker error usually mean?
+Answer : An “undefined reference” message usually means the compiler saw a declaration but the linker could not find a matching definition in the object files or libraries being linked. Common causes are a missing source file, wrong library order, a misspelled symbol, or incompatible linkage.
+Example : /* main.c */ int add(int,int); int main(void){return add(1,2);} /* link with the object containing add */
+
+------------------------------------------------------------------------------
+
+Question : What is a static library?
+Answer : A static library is an archive of object files that the linker can copy required code from into an executable. The resulting executable contains the linked code, so later library changes do not automatically change an already-built executable. It can increase executable size but makes deployment straightforward.
+Example : ar rcs libmathutil.a add.o; gcc main.o -L. -lmathutil -o app
+
+------------------------------------------------------------------------------
+
+Question : What is a shared library?
+Answer : A shared library is loaded and linked at runtime or startup rather than copied completely into each executable. It can reduce duplication and allow compatible library updates, but deployment must provide the correct library version and search path. ABI compatibility becomes an important concern.
+Example : gcc -fPIC -shared add.c -o libmathutil.so
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between memcpy() and memmove()?
+Answer : `memcpy` copies a specified number of bytes but requires the source and destination regions not to overlap. `memmove` is designed for overlapping regions and preserves the original bytes correctly. Use memmove when overlap is possible.
+Example : char s[]="abcdef"; memmove(s+2,s,4); /* safe even though regions overlap */
+
+------------------------------------------------------------------------------
+
+Question : Why can strcpy() be dangerous?
+Answer : `strcpy` copies until the source null terminator without knowing the destination capacity. If the destination is too small, it can write beyond the object boundary and cause memory corruption. Prefer a size-aware design, such as explicit length checks or an API that takes destination capacity.
+Example : char dst[8]; const char *src="hello"; if(strlen(src)<sizeof dst) strcpy(dst,src);
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between strlen() and sizeof() for strings?
+Answer : `strlen` scans a valid null-terminated C string and returns the number of characters before ` `. `sizeof` is an operator that reports the size of an object or type at compile time in the ordinary case; for a char array containing a string literal, it includes the terminating byte. When an array has decayed to a pointer, sizeof gives the pointer size instead.
+Example : char s[]="hello"; printf("%zu %zu",strlen(s),sizeof s); /* 5 and 6 */
+
+------------------------------------------------------------------------------
+
+Question : Why must a C string end with ‘\0’?
+Answer : A C string is a sequence of characters terminated by a null character ` `. Library functions such as strlen and printf with `%s` use that terminator to know where the string ends. If the terminator is missing, the function may read beyond the intended array, causing undefined behavior.
+Example : char s[6]={'h','e','l','l','o','\0'};
+
+------------------------------------------------------------------------------
+
+Question : Why is gets() unsafe?
+Answer : `gets` was removed from the C standard because it cannot limit how many characters are read into the destination buffer. That makes buffer overflow unavoidable when the input is longer than the buffer. Use fgets with an explicit buffer size and handle the retained newline when needed.
+Example : char buf[32]; if(fgets(buf,sizeof buf,stdin)){ /* safely bounded input */ }
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between strcmp() and strncmp()?
+Answer : strcmp compares two null-terminated strings until a difference or terminator is found. strncmp compares at most n characters, which is useful when the input may not be trusted to contain a complete string, but it still requires valid accessible memory for the bytes examined and should not be treated as a universal security check.
+Example : if(strncmp("admin:123","admin",5)==0) puts("prefix matches");
+
+------------------------------------------------------------------------------
+
+Question : What happens if memcpy() is used with overlapping regions?
+Answer : `memcpy` requires the source and destination regions not to overlap. If they overlap, the behavior is undefined; use `memmove` when overlap is possible because it handles the copy safely. This distinction is a common C interview test because the functions look similar but have different contracts.
+Example : char s[]="abcdef"; memmove(s+2,s,4); /* use memmove, not memcpy, for overlap */
+
+------------------------------------------------------------------------------
+
+Question : What is recursion?
+Answer : Recursion is when a function calls itself with a smaller or simpler subproblem until a base case stops the recursion. It can make tree and divide-and-conquer algorithms natural to express, but each call consumes stack space. Missing or incorrect base cases can cause unbounded recursion and stack exhaustion.
+Example : int fact(int n){if(n<=1)return 1; return n*fact(n-1);}
+
+------------------------------------------------------------------------------
+
+Question : What can cause stack overflow with recursion?
+Answer : Stack exhaustion occurs when the program needs more automatic storage than the available stack can provide. Deep recursion, very large local arrays, or excessive call depth are common causes. The fix may involve reducing frame size, using iterative logic, moving large data to dynamic storage, or changing the architecture. The practical point to emphasize here is what can cause stack overflow with recursion: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : void recurse(int n){char buffer[1024]; (void)buffer; if(n>0) recurse(n-1);} /* very large n can exhaust the stack */ Interview variation: apply the same idea specifically to what can cause stack overflow with recursion and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why doesn’t C support function overloading?
+Answer : C does not support function overloading because one function name maps to one external identifier within a scope/linkage context; the language has no parameter-type based overload resolution like C++. Common alternatives are distinct function names, structs, callbacks, macros used carefully, or `_Generic` in newer C.
+Example : int add_int(int a,int b); double add_double(double a,double b);
+
+------------------------------------------------------------------------------
+
+Question : What is a callback in C?
+Answer : A function pointer stores the address of a function with a compatible signature. It lets code choose behavior at runtime and is widely used for callbacks, sorting comparators, event handlers, and strategy tables. The pointed-to function must be called with a compatible type. Keep the spoken answer grounded in what is a callback in c and avoid turning an implementation detail into a universal rule.
+Example : int cmp(const void *a,const void *b){return *(const int*)a-*(const int*)b;} int (*fn)(const void*,const void*)=cmp; Interview variation: apply the same idea specifically to what is a callback in c and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is pass-by-value in C?
+Answer : C passes function arguments by value. To modify caller-owned data, pass the address of that data and dereference the pointer inside the function. This is often described as “pass a pointer by value,” not true pass-by-reference.
+Example : void set_zero(int *p){*p=0;} int x=5; set_zero(&x);
+
+------------------------------------------------------------------------------
+
+Question : How can a function modify the caller’s variable?
+Answer : C passes function arguments by value. To modify caller-owned data, pass the address of that data and dereference the pointer inside the function. This is often described as “pass a pointer by value,” not true pass-by-reference. The practical point to emphasize here is how can a function modify the caller’s variable: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : void set_zero(int *p){*p=0;} int x=5; set_zero(&x); Interview variation: apply the same idea specifically to how can a function modify the caller’s variable and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What happens when an array is passed to a function?
+Answer : When an array parameter is declared in a function parameter list, it is adjusted to a pointer parameter. That is why sizeof on the parameter gives the pointer size rather than the caller’s full array size. Pass the element count separately or use a parameter form that carries the size where supported.
+Example : void f(int a[],size_t n){printf("%zu",sizeof a);} /* a is adjusted to int * here */
+
+------------------------------------------------------------------------------
+
+Question : What is a multidimensional array?
+Answer : A multidimensional array in C is an array whose elements are themselves arrays. A declaration such as `int a[3][4]` contains three rows of four ints, stored contiguously in row-major order. When passing it to a function, the compiler needs the trailing dimension to calculate element addresses.
+Example : int a[2][3]={{1,2,3},{4,5,6}}; printf("%d",a[1][2]); /* 6 */
+
+------------------------------------------------------------------------------
+
+Question : How do you pass a two-dimensional array to a function?
+Answer : A two-dimensional array is an array of arrays. For a parameter with a runtime row count, the compiler still needs the column bound to calculate the address of element [i][j]. Use a VLA parameter when the language mode supports it, or pass a pointer with the correct stride.
+Example : void print(int rows,int cols,int a[rows][cols]){for(int i=0;i<rows;i++)for(int j=0;j<cols;j++)printf("%d ",a[i][j]);}
+
+------------------------------------------------------------------------------
+
+Question : What is a linked list?
+Answer : A linked list stores nodes connected by pointers rather than requiring contiguous elements. A singly linked list usually has a data field and a next pointer. It supports O(1) insertion at a known link but O(n) traversal and random access, so it is useful when structural updates matter more than indexed access.
+Example : struct Node{int value; struct Node *next;};
+
+------------------------------------------------------------------------------
+
+Question : Array versus linked list: when would you choose each?
+Answer : Choose an array when fast indexed access, contiguous storage, and good cache locality matter. Choose a linked list when frequent insertion/removal at known links matters and contiguous storage is inconvenient. In practice, arrays or dynamic arrays are often preferable unless the list’s specific update pattern justifies its pointer overhead.
+Example : For 1,000,000 indexed records, an array gives direct O(1) access; a linked list requires traversal for the same index.
+
+------------------------------------------------------------------------------
+
+Question : How do you reverse a singly linked list?
+Answer : Reverse the list iteratively with three pointers: previous, current, and next. Save current->next before changing it, point current back to previous, then advance both pointers. The algorithm is O(n) time and O(1) extra space.
+Example : Node *prev=NULL,*cur=head; while(cur){Node *next=cur->next; cur->next=prev; prev=cur; cur=next;} head=prev; Interview variation: apply the same idea specifically to how do you reverse a singly linked list and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : How do you detect a cycle in a linked list?
+Answer : Use Floyd’s tortoise-and-hare algorithm. Move one pointer one node at a time and another two nodes at a time; if they ever meet, a cycle exists. The method runs in O(n) time and O(1) extra space.
+Example : Node *slow=head,*fast=head; while(fast&&fast->next){slow=slow->next; fast=fast->next->next; if(slow==fast) return true;} return false;
+
+------------------------------------------------------------------------------
+
+Question : How do you find the middle node of a linked list?
+Answer : Use slow and fast pointers. Slow advances one node while fast advances two; when fast reaches the end, slow is at the middle. For an even-length list, define whether you want the first or second middle and adjust the stopping condition accordingly.
+Example : Node *slow=head,*fast=head; while(fast&&fast->next){slow=slow->next; fast=fast->next->next;} return slow;
+
+------------------------------------------------------------------------------
+
+Question : How do you merge two sorted linked lists?
+Answer : Maintain a dummy node and repeatedly attach the smaller current node from the two lists. Advance the chosen list and continue until one is empty, then append the remainder. This is O(n+m) time and can be done without allocating new nodes.
+Example : while(a&&b){if(a->value<=b->value){tail->next=a;a=a->next;}else{tail->next=b;b=b->next;}tail=tail->next;} tail->next=a?a:b;
+
+------------------------------------------------------------------------------
+
+Question : What is a critical section?
+Answer : A critical section is a region of code that accesses shared state and must satisfy the program’s synchronization requirements. Usually only the smallest necessary region should be protected, because holding a lock too long increases contention and can create deadlock opportunities.
+Example : lock(m); /* critical section */ shared_count++; unlock(m);
+
+------------------------------------------------------------------------------
+
+Question : What is a mutex?
+Answer : A mutex provides mutual exclusion: at most one participating thread owns the lock at a time. It is appropriate when multiple threads must safely update shared state or protect an invariant. Correct lock ordering and short critical sections are important for performance and deadlock avoidance.
+Example : pthread_mutex_lock(&m); balance+=amount; pthread_mutex_unlock(&m);
+
+------------------------------------------------------------------------------
+
+Question : What is a semaphore?
+Answer : A semaphore is a synchronization primitive with a counter. A counting semaphore can represent available units of a resource, while a binary semaphore can coordinate certain signaling patterns. It differs from a mutex because ownership semantics are different: the thread that waits is not necessarily the one that must release a semaphore.
+Example : sem_wait(&slots); /* consume one available slot */ produce(); sem_post(&slots);
+
+------------------------------------------------------------------------------
+
+Question : How can you prevent deadlocks?
+Answer : Deadlock occurs when threads or processes wait forever for resources held by each other. Common conditions include mutual exclusion, hold-and-wait, no preemption, and circular wait. Prevention strategies include consistent lock ordering, minimizing lock scope, avoiding nested locks where possible, and using timeouts or higher-level designs. For this question, the interviewer is looking for a precise explanation of how can you prevent deadlocks, including the main edge case rather than a memorized definition.
+Example : lock(A); lock(B); /* require every code path to acquire A before B */ Interview variation: apply the same idea specifically to how can you prevent deadlocks and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why is volatile not a substitute for synchronization?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization. The practical point to emphasize here is why is volatile not a substitute for synchronization: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */ Interview variation: apply the same idea specifically to why is volatile not a substitute for synchronization and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Reverse a singly linked list in place.
+Answer : Reverse the list iteratively with three pointers: previous, current, and next. Save current->next before changing it, point current back to previous, then advance both pointers. The algorithm is O(n) time and O(1) extra space. In a real code review, connect the concept directly to reverse a singly linked list in place and call out the failure mode you would watch for.
+Example : Node *prev=NULL,*cur=head; while(cur){Node *next=cur->next; cur->next=prev; prev=cur; cur=next;} head=prev; Interview variation: apply the same idea specifically to reverse a singly linked list in place and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Reverse a number.
+Answer : Extract the last digit with `% 10`, append it to the result with `result = result * 10 + digit`, then divide the input by 10. Handle negative values and numeric overflow explicitly if the interview expects production-quality code. Keep the spoken answer grounded in reverse a number and avoid turning an implementation detail into a universal rule.
+Example : int n=1234,r=0; while(n){r=r*10+n%10;n/=10;} /* r is 4321 */ Interview variation: apply the same idea specifically to reverse a number and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Count vowels in a character array using a character pointer.
+Answer : Traverse the character array until the null terminator and count characters equal to a, e, i, o, or u, considering uppercase letters if required. A character pointer makes the traversal explicit and avoids index arithmetic if that is the interview focus. For this question, the interviewer is looking for a precise explanation of count vowels in a character array using a character pointer, including the main edge case rather than a memorized definition.
+Example : size_t count=0; for(const char *p=s;*p;p++){char c=*p|32; if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') count++;} Interview variation: apply the same idea specifically to count vowels in a character array using a character pointer and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Implement Fibonacci.
+Answer : For an iterative Fibonacci implementation, keep the previous two values and update them in a loop. This avoids the exponential repetition of the naive recursive version. Choose an integer type large enough for the expected n and document overflow limits. The practical point to emphasize here is implement fibonacci: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : unsigned long long a=0,b=1; for(unsigned n=0;n<10;n++){unsigned long long next=a+b; a=b; b=next;} Interview variation: apply the same idea specifically to implement fibonacci and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Delete a linked-list node when only a pointer to that node is available.
+Answer : If the node is not the tail, copy the successor’s data into the current node, bypass the successor, and free the successor. The trick fails for the last node because there is no successor to copy from. If the API must support deleting any node, including the tail, it should provide access to the previous link or redesign the list operation.
+Example : Node *next=node->next; node->value=next->value; node->next=next->next; free(next); Interview variation: apply the same idea specifically to delete a linked-list node when only a pointer to that node is available and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Find whether a word occurs inside a sentence and return its memory location.
+Answer : For a substring search, `strstr` returns a pointer to the first matching occurrence inside the original string, or NULL if no match exists. That pointer is a location within the original buffer, so it remains valid only while that buffer is alive and unchanged in ways that invalidate the pointer. Keep the spoken answer grounded in find whether a word occurs inside a sentence and return its memory location and avoid turning an implementation detail into a universal rule.
+Example : const char *sentence="C makes pointers useful"; const char *p=strstr(sentence,"pointers"); if(p) printf("%s",p); Interview variation: apply the same idea specifically to find whether a word occurs inside a sentence and return its memory location and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Copy a linked list and return the new head.
+Answer : A deep copy creates a new node for every source node and reproduces the next links so the new list owns its nodes independently. Do not simply copy the head pointer, because that creates another reference to the same list. Handle allocation failure by cleaning up already-created nodes. For this question, the interviewer is looking for a precise explanation of copy a linked list and return the new head, including the main edge case rather than a memorized definition.
+Example : Node *copy=NULL; /* allocate each new node, copy value, and append it; return the new head */ Interview variation: apply the same idea specifically to copy a linked list and return the new head and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Determine how to reach the end of a linked list efficiently.
+Answer : For a singly linked list without a tail pointer, reaching the end requires following next pointers and is O(n). If the program frequently appends, maintain a tail pointer as part of the list structure; then appending can be O(1) when the tail is valid. The practical point to emphasize here is determine how to reach the end of a linked list efficiently: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : struct List{Node *head,*tail;}; /* tail->next is NULL */ Interview variation: apply the same idea specifically to determine how to reach the end of a linked list efficiently and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Perform a bitwise/bitmask operation on an integer.
+Answer : Bitwise operations manipulate individual bits. AND is useful for masking, OR for setting bits, XOR for toggling bits, and shifts for moving a bit pattern. Be explicit about unsigned types when doing bit manipulation so signed-shift behavior does not become an unintended portability issue. In a real code review, connect the concept directly to perform a bitwise/bitmask operation on an integer and call out the failure mode you would watch for.
+Example : unsigned x=0x2Au; unsigned mask=1u<<3; x|=mask; /* set bit 3 */ Interview variation: apply the same idea specifically to perform a bitwise/bitmask operation on an integer and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Find duplicates in an array.
+Answer : The best approach depends on constraints. A hash/set gives expected O(n) time with extra memory; sorting gives O(n log n) time and can then scan adjacent values; if the value range is small and known, a frequency array can be O(n+k). State the trade-off before coding.
+Example : qsort(a,n,sizeof *a,cmp); for(size_t i=1;i<n;i++) if(a[i]==a[i-1]) printf("duplicate: %d\n",a[i]);
+
+------------------------------------------------------------------------------
+
+Question : Find the second-largest element in an array.
+Answer : Scan the array once while maintaining the largest and second-largest distinct values. Decide how to handle duplicates and the case where no distinct second-largest value exists. This gives O(n) time and O(1) extra space.
+Example : for(size_t i=0;i<n;i++){if(a[i]>max){second=max;max=a[i];}else if(a[i]<max&&a[i]>second){second=a[i];}}
+
+------------------------------------------------------------------------------
+
+Question : Implement binary search.
+Answer : Binary search requires a sorted array. Compare the target with the middle element and discard half the remaining range each iteration, giving O(log n) time and O(1) iterative space. Use a midpoint calculation that avoids integer overflow in languages/contexts where the index range can be large.
+Example : size_t lo=0,hi=n; while(lo<hi){size_t mid=lo+(hi-lo)/2; if(a[mid]<key)lo=mid+1; else hi=mid;}
+
+------------------------------------------------------------------------------
+
+Question : Reverse an array in place.
+Answer : Use two indices or pointers at the ends, swap the values, and move inward until they meet. This is O(n) time and O(1) extra space.
+Example : for(size_t i=0,j=n-1;i<j;i++,j--){int t=a[i];a[i]=a[j];a[j]=t;}
+
+------------------------------------------------------------------------------
+
+Question : Find the maximum and minimum values in an array.
+Answer : Initialize both values from the first valid element and scan the remaining elements once. Avoid initializing them to zero because that fails for arrays containing only negative values. The complexity is O(n) time and O(1) extra space.
+Example : int min=a[0],max=a[0]; for(size_t i=1;i<n;i++){if(a[i]<min)min=a[i]; if(a[i]>max)max=a[i];}
+
+------------------------------------------------------------------------------
+
+Question : Check whether a string is a palindrome.
+Answer : Compare characters from the beginning and end moving inward. For a case-insensitive or punctuation-insensitive palindrome, normalize or skip characters according to the stated requirement before comparing. The basic check is O(n) time and O(1) extra space.
+Example : size_t i=0,j=strlen(s); if(j)j--; while(i<j&&s[i]==s[j]){i++;j--;} bool ok=i>=j;
+
+------------------------------------------------------------------------------
+
+Question : Count characters or vowels in a string.
+Answer : Traverse the character array until the null terminator and count characters equal to a, e, i, o, or u, considering uppercase letters if required. A character pointer makes the traversal explicit and avoids index arithmetic if that is the interview focus. The practical point to emphasize here is count characters or vowels in a string: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : size_t count=0; for(const char *p=s;*p;p++){char c=*p|32; if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') count++;} Interview variation: apply the same idea specifically to count characters or vowels in a string and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Traverse an array using pointers.
+Answer : A pointer can traverse an array from its first element to the one-past-the-end position. Incrementing an `int *` advances by one int, not one byte. Keep the pointer within the same array object and never dereference the one-past pointer.
+Example : for(int *p=a;p<a+n;p++) printf("%d ",*p);
+
+------------------------------------------------------------------------------
+
+Question : Swap two values using pointers.
+Answer : Pass both addresses to the function and exchange the pointed-to values through temporary storage. This demonstrates how C uses pointers to let a function modify caller-owned objects.
+Example : void swap(int *a,int *b){int t=*a;*a=*b;*b=t;}
+
+------------------------------------------------------------------------------
+
+Question : Dynamically allocate an array and correctly release it.
+Answer : Compute the allocation size using the element type, check for failure, use the array only within its allocated bounds, and free it exactly once on every ownership path. Prefer `sizeof *p` so the type is not repeated in the allocation expression.
+Example : int *a=malloc(n*sizeof *a); if(!a) return; /* use a[0..n-1] */ free(a);
+
+------------------------------------------------------------------------------
+
+Question : Resize dynamically allocated memory using realloc().
+Answer : `realloc` changes the size of an existing allocation. It may extend the block in place or allocate a new block, copy the preserved bytes, and release the old block. If it fails for a nonzero size, it returns NULL and the original allocation is still valid, which is why a temporary pointer is safer than assigning directly to the original pointer. The practical point to emphasize here is resize dynamically allocated memory using realloc(): explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : int *tmp=realloc(p,new_count*sizeof *p); if(tmp) p=tmp; else { /* p is still valid */ } Interview variation: apply the same idea specifically to resize dynamically allocated memory using realloc() and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Implement a linked-list insertion operation.
+Answer : For insertion after a known node, allocate the new node, initialize its value, point it at the old successor, and then update the predecessor link. The order matters: save the existing link before overwriting it. Check allocation failure before modifying the list.
+Example : Node *n=malloc(sizeof *n); if(n){n->value=7; n->next=cur->next; cur->next=n;}
+
+------------------------------------------------------------------------------
+
+Question : Implement linked-list deletion safely.
+Answer : Deletion must preserve the predecessor link, detach the node, and free exactly the node that is no longer part of the list. Handle deletion of the head separately or use a pointer-to-pointer technique. Also define what happens when the list is empty or the requested node is not found.
+Example : Node **pp=&head; while(*pp && (*pp)->value!=key) pp=&(*pp)->next; if(*pp){Node *dead=*pp; *pp=dead->next; free(dead);}
+
+------------------------------------------------------------------------------
+
+Question : Detect a cycle using the slow/fast pointer approach.
+Answer : Use Floyd’s tortoise-and-hare algorithm. Move one pointer one node at a time and another two nodes at a time; if they ever meet, a cycle exists. The method runs in O(n) time and O(1) extra space. For this question, the interviewer is looking for a precise explanation of detect a cycle using the slow/fast pointer approach, including the main edge case rather than a memorized definition.
+Example : Node *slow=head,*fast=head; while(fast&&fast->next){slow=slow->next; fast=fast->next->next; if(slow==fast) return true;} return false; Interview variation: apply the same idea specifically to detect a cycle using the slow/fast pointer approach and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Implement a circular queue.
+Answer : A ring buffer uses a fixed array plus head/tail indices that wrap around when they reach the capacity. Keep a clear rule for distinguishing full from empty, such as tracking a count or reserving one slot. Enqueue and dequeue are O(1) and the memory usage is fixed.
+Example : size_t next=(tail+1)%capacity; if(next!=head){buf[tail]=value; tail=next;}
+
+------------------------------------------------------------------------------
+
+Question : Count set bits in an integer.
+Answer : A common efficient approach is to repeatedly clear the lowest set bit with `x &= x-1`; the number of iterations equals the number of set bits. This is often called Brian Kernighan’s method. For fixed-width data, hardware popcount instructions may be even faster when the compiler can use them.
+Example : unsigned x=29,count=0; while(x){x&=x-1;count++;} /* count is 4 */
+
+------------------------------------------------------------------------------
+
+Question : Set, clear and toggle a particular bit.
+Answer : To set bit n, OR with 1u<<n. To clear it, AND with the inverse mask `~(1u<<n)`. To toggle it, XOR with the mask. Use an unsigned integer type and validate that the bit index is within the type width.
+Example : x |= 1u<<n; x &= ~(1u<<n); x ^= 1u<<n;
+
+------------------------------------------------------------------------------
+
+Question : Find the higher and lower nibble of a byte.
+Answer : A byte has two 4-bit nibbles. The lower nibble is obtained with `x & 0x0F`; the higher nibble is obtained with `(x >> 4) & 0x0F`. Use an unsigned 8-bit type such as uint8_t when the exact width matters.
+Example : uint8_t x=0xAB; uint8_t hi=(x>>4)&0x0F, lo=x&0x0F; /* A and B */
+
+------------------------------------------------------------------------------
+
+Question : Debug a short C program and explain its output.
+Answer : Do not start by guessing the output. First check whether the program is valid C and whether its behavior is defined; then trace the values and control flow. If the code has undefined behavior, explain that the standard does not define one output and use warnings, a debugger, or sanitizers to investigate.
+Example : Compile with `-Wall -Wextra -fsanitize=address,undefined -g` and then trace the smallest failing input.
+
+------------------------------------------------------------------------------
+
+Question : Given pointer-heavy code, identify memory or lifetime bugs.
+Answer : First classify the issue: compile error, linker error, defined behavior, implementation-defined behavior, unspecified behavior, or undefined behavior. Then trace execution, checking bounds, integer rules, pointer validity, object lifetime, and evaluation order. If the code has undefined behavior, do not invent a deterministic output; explain why the standard does not define one and show how you would verify the bug with a compiler warning, debugger, or sanitizer. In a real code review, connect the concept directly to given pointer-heavy code, identify memory or lifetime bugs and call out the failure mode you would watch for.
+Example : If a pointer is freed and later dereferenced, the correct interview answer is “undefined behavior,” not a guessed value. Reproduce it with AddressSanitizer to identify the invalid access. Interview variation: apply the same idea specifically to given pointer-heavy code, identify memory or lifetime bugs and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You said malloc() returns heap memory. What do you do if the allocation fails?
+Answer : If malloc fails, it returns NULL. Do not dereference it; propagate an error or choose a controlled recovery path, and release any resources already acquired on that path. Also avoid stating that malloc “always returns heap memory” as a C-language guarantee—the heap is a common implementation model.
+Example : int *p=malloc(n*sizeof *p); if(!p){return ERROR_NO_MEMORY;}
+
+------------------------------------------------------------------------------
+
+Question : You freed the pointer. What happens to another pointer that still points to the same memory?
+Answer : After an allocation is freed, every pointer that referred to that storage becomes unusable for accessing that object. Setting one pointer to NULL does not update aliases held elsewhere. Ownership rules and careful lifetime management are required to prevent use-after-free bugs. For this question, the interviewer is looking for a precise explanation of you freed the pointer. what happens to another pointer that still points to the same memory, including the main edge case rather than a memorized definition.
+Example : int *p=malloc(sizeof *p); int *alias=p; free(p); p=NULL; /* alias is still dangling */ Interview variation: apply the same idea specifically to you freed the pointer. what happens to another pointer that still points to the same memory and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You set the pointer to NULL after free(). Does that fix aliases pointing to the same memory?
+Answer : `free` releases storage previously returned by an allocation function such as malloc, calloc, or realloc. Passing NULL is safe and does nothing. Passing an invalid pointer, freeing the same allocation twice, or accessing the allocation after free results in undefined behavior. The practical point to emphasize here is you set the pointer to null after free(). does that fix aliases pointing to the same memory: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : int *p=malloc(sizeof *p); if(p){*p=42; free(p); p=NULL;} Interview variation: apply the same idea specifically to you set the pointer to null after free(). does that fix aliases pointing to the same memory and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You said arrays and pointers are different. Why does arr[i] work through pointer arithmetic?
+Answer : An array is an object containing a fixed number of elements; a pointer is an object that stores an address. They are closely related because an array expression usually converts to a pointer to its first element, but they are not interchangeable: sizeof(array) gives the whole array size, while sizeof(pointer) gives the pointer size. In a real code review, connect the concept directly to you said arrays and pointers are different. why does arr[i] work through pointer arithmetic and call out the failure mode you would watch for.
+Example : int a[5]; int *p=a; printf("%zu %zu", sizeof a, sizeof p); Interview variation: apply the same idea specifically to you said arrays and pointers are different. why does arr[i] work through pointer arithmetic and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why does sizeof(arr) change when the array is passed to a function?
+Answer : When an array parameter is declared in a function parameter list, it is adjusted to a pointer parameter. That is why sizeof on the parameter gives the pointer size rather than the caller’s full array size. Pass the element count separately or use a parameter form that carries the size where supported. Keep the spoken answer grounded in why does sizeof(arr) change when the array is passed to a function and avoid turning an implementation detail into a universal rule.
+Example : void f(int a[],size_t n){printf("%zu",sizeof a);} /* a is adjusted to int * here */ Interview variation: apply the same idea specifically to why does sizeof(arr) change when the array is passed to a function and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You said int is 4 bytes. Is that guaranteed by C?
+Answer : No. C does not guarantee that `int` is four bytes. Its size is implementation-defined within the constraints of the standard, so portable code should use `sizeof(int)` when the implementation size matters or a fixed-width type such as `int32_t` when an exact width is required and available.
+Example : printf("%zu ",sizeof(int));
+
+------------------------------------------------------------------------------
+
+Question : You said volatile prevents optimization. Does it make counter++ atomic?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization. The practical point to emphasize here is you said volatile prevents optimization. does it make counter++ atomic: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */ Interview variation: apply the same idea specifically to you said volatile prevents optimization. does it make counter++ atomic and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You said the code is thread-safe. Where exactly is the synchronization?
+Answer : Volatile does not make an operation such as `counter++` atomic. That operation is a read, modification, and write, and multiple threads can interleave those steps. Use C11 atomics or a mutex/other synchronization mechanism when threads share mutable state.
+Example : atomic_fetch_add(&counter,1); /* use <stdatomic.h>, not volatile, for a shared counter */
+
+------------------------------------------------------------------------------
+
+Question : You used a mutex. What prevents two threads from acquiring locks in opposite order?
+Answer : A mutex provides mutual exclusion: at most one participating thread owns the lock at a time. It is appropriate when multiple threads must safely update shared state or protect an invariant. Correct lock ordering and short critical sections are important for performance and deadlock avoidance. Keep the spoken answer grounded in you used a mutex. what prevents two threads from acquiring locks in opposite order and avoid turning an implementation detail into a universal rule.
+Example : pthread_mutex_lock(&m); balance+=amount; pthread_mutex_unlock(&m); Interview variation: apply the same idea specifically to you used a mutex. what prevents two threads from acquiring locks in opposite order and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You used strncpy(). How do you guarantee null termination?
+Answer : A C string is a sequence of characters terminated by a null character ` `. Library functions such as strlen and printf with `%s` use that terminator to know where the string ends. If the terminator is missing, the function may read beyond the intended array, causing undefined behavior. For this question, the interviewer is looking for a precise explanation of you used strncpy(). how do you guarantee null termination, including the main edge case rather than a memorized definition.
+Example : char s[6]={'h','e','l','l','o','\0'}; Interview variation: apply the same idea specifically to you used strncpy(). how do you guarantee null termination and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You used memcpy(). What happens if source and destination overlap?
+Answer : `memcpy` requires the source and destination regions not to overlap. If they overlap, the behavior is undefined; use `memmove` when overlap is possible because it handles the copy safely. This distinction is a common C interview test because the functions look similar but have different contracts. The practical point to emphasize here is you used memcpy(). what happens if source and destination overlap: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : char s[]="abcdef"; memmove(s+2,s,4); /* use memmove, not memcpy, for overlap */ Interview variation: apply the same idea specifically to you used memcpy(). what happens if source and destination overlap and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You returned a pointer from a function. Who owns that memory?
+Answer : Ownership must be part of the API contract. Returning a pointer to dynamically allocated storage can transfer ownership to the caller, while returning a pointer to static or caller-owned storage does not transfer ownership. Never return the address of an automatic local object because its lifetime ends when the function returns.
+Example : char *make_name(void){char *p=malloc(32); if(p) strcpy(p,"Ada"); return p;} /* caller owns p and must free it */
+
+------------------------------------------------------------------------------
+
+Question : You allocated memory inside a function. Who is responsible for freeing it?
+Answer : The owner is determined by the API contract, not by the function in which malloc was called. A function can transfer ownership to its caller by returning the allocated pointer, or it can retain ownership and free it before returning. Document the rule so callers neither leak nor double-free the resource.
+Example : char *make_buffer(size_t n){return malloc(n);} /* if ownership is transferred, the caller must free the result */
+
+------------------------------------------------------------------------------
+
+Question : You returned the address of a local variable. What happens after the function returns?
+Answer : A local automatic object ceases to exist when its block ends. Returning its address produces a dangling pointer, and using that pointer afterward is undefined behavior. Return a value, use caller-provided storage, or allocate storage whose lifetime is long enough and define who frees it.
+Example : int *bad(void){int x=10; return &x;} /* invalid lifetime: x no longer exists after return */
+
+------------------------------------------------------------------------------
+
+Question : You used a static local variable. What happens when the function is called again?
+Answer : A block-scope static variable has static storage duration: it is initialized once and retains its value between function calls. It is not recreated each time control enters the block. This can be useful for persistent state, but it also introduces hidden shared state that can complicate testing and concurrency. The practical point to emphasize here is you used a static local variable. what happens when the function is called again: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : void f(void){static int calls; printf("%d\n",++calls);} /* prints 1, then 2, then 3 */ Interview variation: apply the same idea specifically to you used a static local variable. what happens when the function is called again and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You used a global variable. What problems could that introduce in a multithreaded program?
+Answer : Global mutable state creates hidden coupling and can become shared state across threads. Concurrent reads/writes can require synchronization, and initialization/cleanup order can become difficult to reason about. Prefer narrower ownership and pass dependencies explicitly when practical.
+Example : static int shared; /* protect updates to shared with a mutex or atomic operation as appropriate */
+
+------------------------------------------------------------------------------
+
+Question : You used a union to save memory. How do you know which member is currently valid?
+Answer : A union does not itself record which member the program intends to use. A common design is a tagged union: store an enum discriminator beside the union and inspect the tag before reading a member. This makes the active representation explicit and easier to validate.
+Example : enum Kind{K_INT,K_DOUBLE}; struct Value{enum Kind kind; union{int i;double d;}u;}; Interview variation: apply the same idea specifically to you used a union to save memory. how do you know which member is currently valid and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You serialized a structure directly to disk. Will the same bytes necessarily work on another architecture?
+Answer : Writing a structure directly to disk with fwrite can capture padding, alignment, endianness, representation, and potentially implementation-specific details. Those bytes are not automatically a portable file format. For portable serialization, define field widths and encoding explicitly and serialize each field according to the format.
+Example : uint32_t id=42; /* write a defined byte order and field format rather than dumping an arbitrary struct */
+
+------------------------------------------------------------------------------
+
+Question : Your program works without optimization but fails with -O2. What classes of bugs would you investigate?
+Answer : Optimization-dependent failures strongly suggest undefined behavior, data races, uninitialized reads, lifetime errors, strict-aliasing violations, or code that accidentally relies on timing or layout. Start with compiler warnings and sanitizers, then minimize the failing case. Do not “fix” the problem by simply disabling optimization.
+Example : gcc -Wall -Wextra -fsanitize=address,undefined -g app.c -o app
+
+------------------------------------------------------------------------------
+
+Question : The crash occurs in free(). Does that necessarily mean free() is the bug?
+Answer : `free` releases storage previously returned by an allocation function such as malloc, calloc, or realloc. Passing NULL is safe and does nothing. Passing an invalid pointer, freeing the same allocation twice, or accessing the allocation after free results in undefined behavior. In a real code review, connect the concept directly to the crash occurs in free(). does that necessarily mean free() is the bug and call out the failure mode you would watch for.
+Example : int *p=malloc(sizeof *p); if(p){*p=42; free(p); p=NULL;} Interview variation: apply the same idea specifically to the crash occurs in free(). does that necessarily mean free() is the bug and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Your program crashes randomly. How would you determine whether memory corruption happened earlier?
+Answer : Random or timing-sensitive crashes often point to undefined behavior, data races, uninitialized data, use-after-free, or memory corruption. A print statement changes timing, stack layout, register allocation, or optimization enough to hide the symptom; it does not prove the bug is gone. Reproduce under sanitizers and reduce the program to the smallest failing case.
+Example : Run the same test with AddressSanitizer/UBSan and a debugger rather than relying on added printf calls.
+
+------------------------------------------------------------------------------
+
+Question : You found a memory leak. How would you prove where the leak originates?
+Answer : A memory leak occurs when allocated storage remains allocated but the program has lost the pointer needed to release it. Repeated leaks can increase memory usage and eventually cause allocation failures or system pressure. Prevention comes from clear ownership, cleanup paths, and tools such as AddressSanitizer or leak detectors. For this question, the interviewer is looking for a precise explanation of you found a memory leak. how would you prove where the leak originates, including the main edge case rather than a memorized definition.
+Example : void f(void){int *p=malloc(1024); if(!p)return; /* forgetting free(p) leaks the block */ free(p);} Interview variation: apply the same idea specifically to you found a memory leak. how would you prove where the leak originates and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : A pointer looks valid in the debugger but dereferencing it crashes. What would you investigate?
+Answer : A pointer value can look plausible while the object it once referred to is already freed, out of scope, out of bounds, or otherwise inaccessible. Check object lifetime, allocation boundaries, aliases, structure offsets, and whether another thread changed the object. Sanitizers often reveal the first invalid access more reliably than visual inspection.
+Example : int *p=malloc(sizeof *p); int *alias=p; free(p); /* alias may still display a non-NULL address but is invalid */
+
+------------------------------------------------------------------------------
+
+Question : You added a print statement and the crash disappeared. What might that indicate?
+Answer : Random or timing-sensitive crashes often point to undefined behavior, data races, uninitialized data, use-after-free, or memory corruption. A print statement changes timing, stack layout, register allocation, or optimization enough to hide the symptom; it does not prove the bug is gone. Reproduce under sanitizers and reduce the program to the smallest failing case. In a real code review, connect the concept directly to you added a print statement and the crash disappeared. what might that indicate and call out the failure mode you would watch for.
+Example : Run the same test with AddressSanitizer/UBSan and a debugger rather than relying on added printf calls. Interview variation: apply the same idea specifically to you added a print statement and the crash disappeared. what might that indicate and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You added more threads and performance became worse. Why?
+Answer : More threads can reduce performance when work is too small, synchronization becomes a bottleneck, cache contention increases, or the scheduler spends more time managing threads than doing useful work. Shared mutable data can also cause cache-line contention. Measure before and after with a profiler rather than assuming more threads means more throughput.
+Example : If all threads increment one shared counter under one mutex, the mutex can become the bottleneck.
+
+------------------------------------------------------------------------------
+
+Question : You used dynamic allocation for every small object. What performance and fragmentation problems might appear?
+Answer : Many tiny allocations can add allocator metadata overhead, increase fragmentation, hurt cache locality, and increase allocation/free contention in multithreaded programs. If objects have similar lifetimes, a pool or arena can reduce overhead and make ownership easier to manage. Measure before optimizing because allocator behavior is workload-dependent.
+Example : struct Node *pool=malloc(capacity*sizeof *pool); /* one allocation can back many fixed-size nodes */
+
+------------------------------------------------------------------------------
+
+Question : You have only 64 KB of RAM. How would you redesign the allocation strategy?
+Answer : With a small memory budget, prefer fixed-size buffers, bounded queues, compact representations, streaming instead of loading entire datasets, and predictable allocation. Avoid unbounded recursion and per-item heap allocation when a pool or arena-like strategy is appropriate. Measure peak memory, not just average usage.
+Example : Use a fixed `uint8_t buffer[4096]` and process an input stream in chunks instead of allocating the whole file.
+
+------------------------------------------------------------------------------
+
+Question : You need a fixed-size queue in embedded C. Why might a ring buffer be appropriate?
+Answer : A ring buffer is a good fixed-size queue for embedded systems because it uses a bounded amount of memory and provides O(1) enqueue/dequeue operations. Head and tail indices wrap around the buffer. It is especially useful for producer/consumer data such as serial bytes, but concurrency rules must be explicit.
+Example : uint8_t buf[64]; size_t head=0,tail=0; /* wrap indices with % 64 */
+
+------------------------------------------------------------------------------
+
+Question : You need to access a hardware register. Why might volatile be required?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization. Keep the spoken answer grounded in you need to access a hardware register. why might volatile be required and avoid turning an implementation detail into a universal rule.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */ Interview variation: apply the same idea specifically to you need to access a hardware register. why might volatile be required and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : You need to share data between an ISR and normal code. What synchronization issues do you consider?
+Answer : Data shared between an interrupt service routine and normal code needs both visibility and atomicity appropriate to the platform. Volatile may be needed for hardware/ISR-visible objects, but it does not by itself make multi-step updates safe. Use atomic operations, short critical sections, interrupt masking, or a lock-free/ring-buffer design according to the target system.
+Example : volatile sig_atomic_t flag=0; /* for signal-style cases; embedded ISR synchronization is platform-specific */
+
+------------------------------------------------------------------------------
+
+Question : Array versus pointer?
+Answer : An array is a complete object containing its elements; a pointer is a separate object containing an address. In most expressions an array converts to a pointer to its first element, which makes indexing look similar, but sizeof and assignment demonstrate the difference. Arrays cannot be assigned as a whole, while pointers can be redirected.
+Example : int a[4]; int *p=a; printf("%zu %zu",sizeof a,sizeof p);
+
+------------------------------------------------------------------------------
+
+Question : NULL versus dangling versus wild pointer?
+Answer : A wild pointer is an uninitialized pointer whose value is indeterminate. Dereferencing it can access an arbitrary location and cause undefined behavior. Initialize pointers, often to NULL, before using them. In a real code review, connect the concept directly to null versus dangling versus wild pointer and call out the failure mode you would watch for.
+Example : int *p=NULL; /* initialize before deciding what object it should reference */ Interview variation: apply the same idea specifically to null versus dangling versus wild pointer and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : malloc() versus calloc()?
+Answer : `calloc(n, size)` allocates storage for n elements and initializes all allocated bytes to zero. It is convenient for arrays and structures that should start with zeroed bytes, but an all-bits-zero representation is not guaranteed by the C standard to equal every type’s semantic zero value. Keep the spoken answer grounded in malloc() versus calloc() and avoid turning an implementation detail into a universal rule.
+Example : int *a=calloc(4,sizeof *a); if(a){printf("%d",a[0]); free(a);} Interview variation: apply the same idea specifically to malloc() versus calloc() and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What does realloc() do?
+Answer : `realloc` changes the size of an existing allocation. It may extend the block in place or allocate a new block, copy the preserved bytes, and release the old block. If it fails for a nonzero size, it returns NULL and the original allocation is still valid, which is why a temporary pointer is safer than assigning directly to the original pointer. For this question, the interviewer is looking for a precise explanation of what does realloc() do, including the main edge case rather than a memorized definition.
+Example : int *tmp=realloc(p,new_count*sizeof *p); if(tmp) p=tmp; else { /* p is still valid */ } Interview variation: apply the same idea specifically to what does realloc() do and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Stack versus heap?
+Answer : Automatic objects are commonly implemented using stack frames, while dynamically allocated objects are commonly obtained from a heap allocator. The important C distinction is actually storage duration and ownership: automatic objects end with their block, allocated objects end when released. Neither “stack” nor “heap” is a complete guarantee made by the C language.
+Example : void f(void){int local=1; int *p=malloc(sizeof *p); if(p){*p=2;free(p);}}
+
+------------------------------------------------------------------------------
+
+Question : What does static mean?
+Answer : `static` has different effects depending on where it appears. At block scope it gives the object static storage duration; at file scope it gives internal linkage to an object or function. A strong interview answer always states the scope because “static means one thing” is incomplete.
+Example : void f(void){static int calls; ++calls;} static int file_private;
+
+------------------------------------------------------------------------------
+
+Question : Structure versus union?
+Answer : A structure allocates storage for all members, while a union overlays its members in the same storage region. Use a structure when several fields must exist simultaneously; use a union when alternative representations share the same storage and the program tracks which one is active.
+Example : struct Result{int code; double value;}; union Payload{int i; double d;};
+
+------------------------------------------------------------------------------
+
+Question : Structure padding and alignment?
+Answer : Structure padding is unused space inserted so members satisfy their alignment requirements. As a result, `sizeof(struct)` can exceed the sum of member sizes, and changing member order can change the amount of padding. Reordering members from stricter to looser alignment often reduces padding, but measure with sizeof and consider ABI compatibility before changing a public layout. For this question, the interviewer is looking for a precise explanation of structure padding and alignment, including the main edge case rather than a memorized definition.
+Example : struct A{char c; int i;}; struct B{int i; char c;}; /* sizeof may differ */ Interview variation: apply the same idea specifically to structure padding and alignment and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Function pointers?
+Answer : A function pointer stores the address of a function with a compatible signature. It lets code choose behavior at runtime and is widely used for callbacks, sorting comparators, event handlers, and strategy tables. The pointed-to function must be called with a compatible type. The practical point to emphasize here is function pointers: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : int cmp(const void *a,const void *b){return *(const int*)a-*(const int*)b;} int (*fn)(const void*,const void*)=cmp; Interview variation: apply the same idea specifically to function pointers and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : memcpy() versus memmove()?
+Answer : `memcpy` copies a specified number of bytes but requires the source and destination regions not to overlap. `memmove` is designed for overlapping regions and preserves the original bytes correctly. Use memmove when overlap is possible. In a real code review, connect the concept directly to memcpy() versus memmove() and call out the failure mode you would watch for.
+Example : char s[]="abcdef"; memmove(s+2,s,4); /* safe even though regions overlap */ Interview variation: apply the same idea specifically to memcpy() versus memmove() and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : strlen() versus sizeof()?
+Answer : `strlen` scans a valid null-terminated C string and returns the number of characters before ` `. `sizeof` is an operator that reports the size of an object or type at compile time in the ordinary case; for a char array containing a string literal, it includes the terminating byte. When an array has decayed to a pointer, sizeof gives the pointer size instead. Keep the spoken answer grounded in strlen() versus sizeof() and avoid turning an implementation detail into a universal rule.
+Example : char s[]="hello"; printf("%zu %zu",strlen(s),sizeof s); /* 5 and 6 */ Interview variation: apply the same idea specifically to strlen() versus sizeof() and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Why is strcpy() dangerous?
+Answer : `strcpy` copies until the source null terminator without knowing the destination capacity. If the destination is too small, it can write beyond the object boundary and cause memory corruption. Prefer a size-aware design, such as explicit length checks or an API that takes destination capacity. For this question, the interviewer is looking for a precise explanation of why is strcpy() dangerous, including the main edge case rather than a memorized definition.
+Example : char dst[8]; const char *src="hello"; if(strlen(src)<sizeof dst) strcpy(dst,src); Interview variation: apply the same idea specifically to why is strcpy() dangerous and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Explain compilation and linking.
+Answer : The preprocessor expands directives and macros, the compiler translates C into lower-level code, the assembler produces object code, and the linker combines object files and libraries into the final executable or shared object. Separating these stages explains why a program can pass compilation but fail during linking. The practical point to emphasize here is explain compilation and linking: explain what the program guarantees, what it does not guarantee, and how you would verify it.
+Example : gcc -E main.c > main.i; gcc -S main.i -o main.s; gcc -c main.s -o main.o; gcc main.o -o app Interview variation: apply the same idea specifically to explain compilation and linking and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Count vowels using pointers.
+Answer : Traverse the character array until the null terminator and count characters equal to a, e, i, o, or u, considering uppercase letters if required. A character pointer makes the traversal explicit and avoids index arithmetic if that is the interview focus. Keep the spoken answer grounded in count vowels using pointers and avoid turning an implementation detail into a universal rule.
+Example : size_t count=0; for(const char *p=s;*p;p++){char c=*p|32; if(c=='a'||c=='e'||c=='i'||c=='o'||c=='u') count++;} Interview variation: apply the same idea specifically to count vowels using pointers and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Delete a linked-list node given only its node pointer.
+Answer : For a non-tail node, copy the successor into the current node, bypass the successor, and free the successor. The operation cannot correctly remove the final node without access to the previous link, so the API must state that limitation. This is a common interview question because it tests whether the candidate notices the tail edge case.
+Example : Node *next=node->next; node->value=next->value; node->next=next->next; free(next); Interview variation: apply the same idea specifically to delete a linked-list node given only its node pointer and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Detect a linked-list cycle.
+Answer : Use two pointers moving at different speeds. If the fast pointer and slow pointer meet, a cycle exists; if fast reaches NULL, the list is acyclic. This is O(n) time and O(1) extra space.
+Example : Node *slow=head,*fast=head; while(fast&&fast->next){slow=slow->next;fast=fast->next->next;if(slow==fast)return true;} return false;
+
+------------------------------------------------------------------------------
+
+Question : Solve a bitwise/bitmask problem.
+Answer : Bitwise operations manipulate individual bits. AND is useful for masking, OR for setting bits, XOR for toggling bits, and shifts for moving a bit pattern. Be explicit about unsigned types when doing bit manipulation so signed-shift behavior does not become an unintended portability issue. In a real code review, connect the concept directly to solve a bitwise/bitmask problem and call out the failure mode you would watch for.
+Example : unsigned x=0x2Au; unsigned mask=1u<<3; x|=mask; /* set bit 3 */ Interview variation: apply the same idea specifically to solve a bitwise/bitmask problem and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : Debug a pointer-heavy C program.
+Answer : Start with lifetime and ownership: identify who created each pointer target, who can free it, and how long it remains valid. Then check bounds, pointer arithmetic, aliasing, null handling, and writes through each pointer. Reproduce the failure under AddressSanitizer and UndefinedBehaviorSanitizer before changing code based only on the crash location.
+Example : clang -g -fsanitize=address,undefined -fno-omit-frame-pointer main.c -o app
+
+------------------------------------------------------------------------------
+
+Question : Explain a memory bug from a real project.
+Answer : Use a real incident and explain it chronologically: what the program was doing, what the incorrect lifetime or bounds assumption was, how you reproduced it, how you fixed ownership or cleanup, and how you verified the fix. Do not invent a production story or metric. Interviewers usually learn more from the debugging method and lesson than from a dramatic failure.
+Example : Example structure: “A buffer was freed on an error path but another component retained its pointer. We reproduced it with ASan, moved ownership to one module, and added a regression test.” Replace this with your actual experience.
+
+------------------------------------------------------------------------------
+
+Question : What is the restrict qualifier and when can it help optimization?
+Answer : `restrict` tells the implementation that, for a particular execution of a block, accesses through a restrict-qualified pointer are intended to be the relevant way of accessing the referenced objects. When the programmer satisfies that contract, the compiler can use it to optimize alias analysis. Violating the restrict contract can produce undefined behavior, so it should only be used when the aliasing assumptions are true.
+Example : void add(size_t n,int *restrict dst,const int *restrict src){for(size_t i=0;i<n;i++)dst[i]+=src[i];}
+
+------------------------------------------------------------------------------
+
+Question : What are C11/C17/C23 atomics and why are they preferable to volatile for shared data?
+Answer : `volatile` tells the compiler that accesses to the object are observable and should not be optimized away as ordinary redundant accesses. It is useful for memory-mapped I/O and certain signal/interrupt scenarios. It does not make compound operations atomic and does not provide mutual exclusion or general thread synchronization. In a real code review, connect the concept directly to what are c11/c17/c23 atomics and why are they preferable to volatile for shared data and call out the failure mode you would watch for.
+Example : volatile unsigned int *status=(volatile unsigned int *)0x40000000u; /* hardware-specific address */ Interview variation: apply the same idea specifically to what are c11/c17/c23 atomics and why are they preferable to volatile for shared data and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is _Static_assert and how can it improve C code?
+Answer : `_Static_assert` checks a compile-time condition and causes a diagnostic when the condition is false. It is useful for assumptions about type sizes, structure layout, array capacities, and configuration constants. In modern C it helps turn silent portability assumptions into build-time failures.
+Example : _Static_assert(sizeof(uint32_t)==4,"uint32_t must be 4 bytes");
+
+------------------------------------------------------------------------------
+
+Question : What is _Generic and where can it be useful?
+Answer : `_Generic` performs compile-time selection based on the type of an expression. It can support type-generic interfaces without evaluating the controlling expression. It is useful for small, well-defined generic wrappers, but complex macro machinery can reduce readability.
+Example : #define type_name(x) _Generic((x), int:"int", double:"double", default:"other")
+
+------------------------------------------------------------------------------
+
+Question : What changed in C23 that an experienced C developer should know?
+Answer : C23 is the current revision of the C standard. An experienced developer should know that it modernizes the language and library, including features such as `nullptr`, `true`/`false` as keywords, `constexpr` for certain objects, attributes, `typeof`/`typeof_unqual`, and changes around old features such as zero-size realloc behavior. Availability still depends on the compiler and standard-library implementation, so production code should verify toolchain support.
+Example : Compile with the project's supported standard, for example `cc -std=c23 file.c`, and verify the target compiler actually implements the features you use.
+
+------------------------------------------------------------------------------
+
+Question : How would you use AddressSanitizer and UndefinedBehaviorSanitizer to debug C code?
+Answer : AddressSanitizer instruments memory accesses to catch errors such as out-of-bounds access and use-after-free; UndefinedBehaviorSanitizer instruments many classes of undefined behavior. They are debugging/testing tools, not replacements for correct code. Enable them in test builds, reproduce the smallest failing case, and fix the first reported invalid access.
+Example : clang -g -fsanitize=address,undefined -fno-omit-frame-pointer main.c -o app Interview variation: apply the same idea specifically to how would you use addresssanitizer and undefinedbehaviorsanitizer to debug c code and verify the boundary case before claiming the result.
+
+------------------------------------------------------------------------------
+
+Question : What is the difference between size_t, ptrdiff_t, and the fixed-width integer types?
+Answer : `size_t` is the unsigned type used for object sizes and array counts returned by sizeof. `ptrdiff_t` is the signed type suitable for the difference between pointers into the same array. Fixed-width types such as `uint32_t` are provided when the implementation supports an integer type with exactly that width; use them when the representation width is part of the interface.
+Example : size_t n=sizeof buffer; ptrdiff_t d=&buffer[8]-&buffer[2]; uint32_t id=42;
+
+------------------------------------------------------------------------------
+
+Question : How would you design a C module with a clear ownership and cleanup contract?
+Answer : A good C module documents who creates, owns, borrows, transfers, and destroys each resource. Pair allocation and cleanup paths, return errors without leaking partially initialized state, and make ownership visible in function names or API documentation. A single cleanup path using `goto` can be clearer than duplicated cleanup code when several resources must be released in reverse order.
+Example : int init(Resource **out); void resource_free(Resource *r); /* document that init transfers ownership on success */
+
+------------------------------------------------------------------------------
+
+RELATED INTERVIEW TOPICS
+- Digital Marketing: landing-pages/digital-marketing.md
+- MySQL / SQL / DBMS: landing-pages/mysql-sql-dbms.md
+- Data Science: landing-pages/data-science.md
+- System Design: landing-pages/system-design.md
+- Java: landing-pages/java.md

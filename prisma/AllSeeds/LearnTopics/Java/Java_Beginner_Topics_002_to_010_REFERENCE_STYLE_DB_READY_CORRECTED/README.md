@@ -1,0 +1,1 @@
+Corrected standalone Prisma seeds 002–010 using the supplied Java reference structure. Code fences are safely escaped inside TypeScript template literals. Run from project root with npx tsx .../run-all.ts.

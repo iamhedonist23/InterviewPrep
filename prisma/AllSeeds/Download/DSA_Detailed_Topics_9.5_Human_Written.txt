@@ -1,0 +1,2846 @@
+
+DSA — DETAILED TOPIC NOTES
+============================================================
+TABLE OF CONTENTS
+============================================================
+
+PART I — DATA STRUCTURES
+
+1. Introduction
+   1.1 What this guide is and is not
+   1.2 Assumed knowledge
+       1.2.1 Big-O notation
+       1.2.2 Imperative programming
+       1.2.3 Object-oriented concepts
+   1.3 Pseudocode
+   1.4 Working through examples
+   1.5 Guide structure and how to study it
+   1.6 Testing
+   1.7 Code / implementation notes
+   1.8 Final study guidance
+
+2. Linked Lists
+   2.1 Singly linked list
+       2.1.1 Insertion
+       2.1.2 Searching
+       2.1.3 Deletion
+       2.1.4 Traversal
+       2.1.5 Reverse traversal
+   2.2 Doubly linked list
+       2.2.1 Insertion
+       2.2.2 Deletion
+       2.2.3 Reverse traversal
+   2.3 Summary and when to use linked lists
+
+3. Binary Search Tree
+   3.1 Insertion
+   3.2 Searching
+   3.3 Deletion
+   3.4 Finding a parent
+   3.5 Getting a reference to a node
+   3.6 Smallest and largest values
+   3.7 Tree traversals
+       3.7.1 Preorder
+       3.7.2 Postorder
+       3.7.3 Inorder
+       3.7.4 Breadth-first
+   3.8 Summary
+
+4. Heap
+   4.1 Insertion
+   4.2 Deletion
+   4.3 Searching
+   4.4 Traversal
+   4.5 Summary
+
+5. Sets
+   5.1 Set fundamentals and operations
+   5.1.1 Unordered set and insertion
+   5.2 Ordered set
+   5.3 Summary
+
+6. Queues
+   6.1 Standard queue
+   6.2 Priority queue
+   6.3 Double-ended queue (deque)
+   6.4 Summary
+
+7. AVL Tree
+   7.1 Tree rotations
+   7.2 Tree rebalancing
+   7.3 Insertion
+   7.4 Deletion
+   7.5 Summary
+
+PART II — ALGORITHMS
+
+8. Sorting
+   8.1 Bubble sort
+   8.2 Merge sort
+   8.3 Quick sort
+   8.4 Insertion sort
+   8.5 Shell sort
+   8.6 Radix sort
+   8.7 Summary
+
+9. Numeric Algorithms
+   9.1 Primality test
+   9.2 Base conversion
+   9.3 Greatest common divisor
+   9.4 Maximum value for N digits in base B
+   9.5 Factorial
+   9.6 Summary
+
+10. Searching
+   10.1 Sequential search
+   10.2 Probability search
+   10.3 Summary
+
+11. Strings
+   11.1 Reverse word order
+   11.2 Palindrome detection
+   11.3 Word counting
+   11.4 Repeated-word counting
+   11.5 First matching character between strings
+   11.6 Summary
+
+APPENDICES
+A. Algorithm walkthrough
+   A.1 Iterative algorithms
+   A.2 Recursive algorithms
+   A.3 Summary
+B. Translation walkthrough
+   B.1 Summary
+C. Recursive vs iterative solutions
+   C.1 Activation records
+   C.2 Naturally recursive problems
+   C.3 Summary
+D. Testing
+   D.1 Unit tests
+   D.2 When to write tests / TDD
+   D.3 Treating tests as production assets
+   D.4 Three A’s
+   D.5 Test structure
+   D.6 Code coverage
+   D.7 Summary
+E. Pseudocode symbol definitions
+
+============================================================
+HOW TO USE THESE NOTES
+============================================================
+
+If you are learning DSA for interviews, do not try to memorize every line.
+
+For each topic, first understand the idea. Then draw the structure, trace a
+small example by hand, and only after that look at implementation details.
+
+A good routine is:
+
+    Understand -> Draw -> Trace -> Implement -> Analyze -> Practice
+
+When you finish a topic, you should be able to explain it without looking at
+your notes. In an interview, being able to explain why an algorithm works is
+usually more valuable than remembering a particular syntax.
+
+For every data structure, ask:
+
+    - What does it store?
+    - How is it organized?
+    - Which operation is fast?
+    - Which operation is expensive?
+    - What edge cases can break the implementation?
+
+For every algorithm, ask:
+
+    - What is the input?
+    - What is the main idea?
+    - Why does the algorithm make progress?
+    - What is the stopping condition?
+    - What is the time complexity?
+    - What is the space complexity?
+    - What happens on the worst input?
+
+============================================================
+1. INTRODUCTION
+============================================================
+
+
+The discussion is primarily an annotated implementation reference. Its focus is on
+understanding how common data structures and algorithms behave and how their
+pseudocode can be translated into imperative languages. It is not presented as
+a complete theoretical treatment containing formal proofs for every algorithm.
+
+The most important mindset introduced in this guide is this:
+
+    Do not select a data structure or algorithm only because it works.
+    Select it because its behavior, runtime, memory requirements, and
+    operational characteristics fit the problem.
+
+For example, a linked list may be excellent when frequent insertion at the ends
+is required, but poor when frequent indexed access is required. A BST can make
+lookup fast when reasonably balanced, but the same BST can degrade to linear
+behavior when it becomes highly unbalanced. An AVL tree adds balancing rules
+to address that problem.
+
+------------------------------------------------------------
+1.1 WHAT THIS GUIDE COVERS
+------------------------------------------------------------
+
+These notes provide implementations and explanations in language-independent
+pseudocode. The pseudocode is intended to be portable to mainstream imperative
+languages such as C++, C#, and Java.
+
+The discussion deliberately uses Big-O notation as an abstract way of discussing
+runtime. This lets the reader reason about how an algorithm scales without
+depending on a particular processor, compiler, or machine.
+
+A useful distinction is:
+
+    Correctness: Does the algorithm produce the intended result?
+    Efficiency: How does its work grow as the input grows?
+    Space: How much additional storage does it require?
+    Suitability: Is the data structure/algorithm appropriate for the workload?
+
+The discussion also emphasizes that implementation details can affect actual
+performance. Compiler optimization, runtime behavior, memory management,
+and language implementation can change observed execution time even when
+two algorithms have the same theoretical complexity.
+
+------------------------------------------------------------
+1.2 ASSUMED KNOWLEDGE
+------------------------------------------------------------
+
+Before going further, it helps to be comfortable with with:
+
+1. Big-O notation
+2. An imperative programming language
+3. Basic object-oriented concepts
+
+The target style is especially compatible with C++, C#, and Java.
+
+------------------------------------------------------------
+1.2.1 BIG-O NOTATION
+------------------------------------------------------------
+
+Big-O describes the growth of an algorithm as input size increases.
+
+Important classes discussed in the discussion:
+
+O(1) — Constant
+    The amount of work does not depend on input size.
+
+    Example:
+    Adding to the tail of a linked list when a tail reference is maintained.
+
+O(log n) — Logarithmic
+    The problem is repeatedly reduced to a smaller portion.
+
+    Example:
+    Searching a reasonably balanced BST.
+
+O(n) — Linear
+    Work grows proportionally with the number of input elements.
+
+    Example:
+    Scanning every element of a list.
+
+O(n log n)
+    Common for divide-and-conquer sorting approaches.
+
+O(n^2) — Quadratic
+    Work grows roughly with the square of input size.
+
+    Example:
+    Bubble sort and insertion sort in their expensive cases.
+
+O(n^3) — Cubic
+    Usually undesirable except for very small problem sizes.
+
+O(2^n) — Exponential
+    Growth is extremely fast and is generally unsuitable for large inputs.
+
+The key idea is growth rate. For sufficiently large n, an algorithm with a
+slower-growing complexity can outperform one with a faster-growing complexity
+even when the latter initially appears competitive on small inputs.
+
+Big-O is also a communication tool. Saying “this solution is O(n log n)”
+communicates an important scalability property much more quickly than describing
+every implementation detail.
+
+The discussion strongly encourages reviewing loops and recursive calls when trying
+to improve runtime.
+
+------------------------------------------------------------
+1.2.2 IMPERATIVE PROGRAMMING
+------------------------------------------------------------
+
+The algorithms use imperative thinking: variables are changed, loops are
+executed, branches are selected, and procedures operate on mutable data.
+
+When translating the pseudocode:
+
+    - references in a managed language may correspond to pointers in C++;
+    - memory-management behavior differs between languages;
+    - language syntax must be adapted;
+    - the underlying algorithmic logic should remain recognizable.
+
+One important practical point is that that Java and C# normally execute on managed
+runtimes with garbage collection, whereas C++ commonly requires explicit
+attention to pointer and memory management.
+
+------------------------------------------------------------
+1.2.3 OBJECT-ORIENTED CONCEPTS
+------------------------------------------------------------
+
+Before going further, it helps to be comfortable with with:
+
+    - inheritance
+    - encapsulation
+    - polymorphism
+    - interfaces
+
+These concepts are especially useful when translating data-structure designs
+into object-oriented implementations.
+
+------------------------------------------------------------
+1.3 PSEUDOCODE
+------------------------------------------------------------
+
+These notes use a consistent pseudocode style.
+
+A typical algorithm has:
+
+    algorithm AlgorithmName(arguments)
+        Pre: conditions that must be true before execution
+        Post: result/state expected after execution
+        ...
+    end AlgorithmName
+
+Important rules:
+
+Preconditions
+    State what must be true before the algorithm starts. Examples include
+    non-null input or a collection containing enough elements.
+
+Postconditions
+    Describe what the algorithm guarantees after it completes.
+
+Parameter types
+    Are often inferred from context instead of being written explicitly.
+
+Explicit block endings
+    Constructs such as loops are explicitly ended, making nested algorithms
+    easier to read.
+
+“yield”
+    Should be understood as returning successive values as part of a sequence,
+    rather than terminating the algorithm in the same way as a normal return.
+
+When translating an algorithm into production code, preconditions should not be
+ignored. They must be validated or represented using the target language’s
+error-handling approach.
+
+------------------------------------------------------------
+1.4 WORKING THROUGH EXAMPLES
+------------------------------------------------------------
+
+A major study technique recommended by this guide is tracing algorithms manually.
+
+For an iterative algorithm:
+
+1. Identify every important variable.
+2. Create a trace table.
+3. Give each variable its own column.
+4. Execute the algorithm statement by statement.
+5. Record every meaningful mutation.
+
+For data structures, also draw the structure. For example:
+
+    Linked list:
+    HEAD -> [value | next] -> [value | next] -> NULL
+
+    Tree:
+              root
+             /    \
+          left    right
+
+For recursive algorithms, additionally record:
+
+    - which method calls which;
+    - the input passed to each call;
+    - where each call returns;
+    - what value is returned.
+
+This is more reliable than attempting to hold a complicated sequence of state
+changes entirely in your head.
+
+------------------------------------------------------------
+1.5 GUIDE STRUCTURE AND STUDY ORDER
+------------------------------------------------------------
+
+The discussion divides its material into:
+
+PART I — Data Structures
+PART II — Algorithms
+
+Data-structure chapters concentrate on operations such as insertion, deletion,
+and searching.
+
+Algorithm chapters cover sorting, numeric problems, searching, and strings.
+
+The chapters are sufficiently independent that they do not have to be read in
+a strict linear order. However, understanding the basic structures before the
+algorithms makes many later examples easier to follow.
+
+------------------------------------------------------------
+1.6 TESTING
+------------------------------------------------------------
+
+Unit testing is treated here as as an important part of algorithm development.
+
+A good algorithm should be tested against:
+
+    - normal cases;
+    - empty cases;
+    - boundary cases;
+    - unusual cases;
+    - failure cases;
+    - cases that exercise tricky branches.
+
+A useful approach is to break a difficult problem into smaller problems and
+test those pieces systematically.
+
+------------------------------------------------------------
+1.7 CODE / IMPLEMENTATION NOTES
+------------------------------------------------------------
+
+The section describes its algorithms in pseudocode and discusses a corresponding
+adapt details to the target language.
+
+The central goal is not to copy syntax. The goal is to preserve:
+
+    input assumptions
+    state transitions
+    algorithmic invariants
+    output guarantees
+    complexity characteristics
+
+------------------------------------------------------------
+1.8 FINAL STUDY GUIDANCE
+------------------------------------------------------------
+
+The strongest study rule in the discussion is:
+
+    Understand the algorithm abstractly first, then trace it manually.
+
+Do not start by memorizing code. First understand:
+
+    What problem does this solve?
+    Why does this data structure fit the problem?
+    What state does the algorithm maintain?
+    What happens at each iteration/recursive call?
+    What happens in edge cases?
+    What is the runtime?
+
+============================================================
+2. LINKED LISTS
+============================================================
+
+A linked list is a sequence of nodes connected by references.
+
+A singly linked node contains:
+
+    value
+    next reference
+
+Conceptually:
+
+    [10 | next] -> [20 | next] -> [30 | NULL]
+
+The section’s linked-list implementation keeps references to both the head and tail.
+
+Important characteristics stated in the discussion:
+
+    insertion at the head/tail: O(1)
+    searching: O(n)
+    general deletion: O(n)
+    random insertion in a singly linked list: O(n)
+
+The reason insertion at an end can be constant time is that the list already
+maintains a reference to the appropriate endpoint.
+
+A linked list grows dynamically. Unlike a fixed-size array, it does not require
+moving the entire collection simply because the number of elements increased.
+
+------------------------------------------------------------
+2.1 SINGLY LINKED LIST
+------------------------------------------------------------
+
+Each node knows only the next node.
+
+Example:
+
+    HEAD
+      |
+      v
+    [10] -> [45] -> [60] -> [12] -> NULL
+                                      ^
+                                     TAIL
+
+The structure is naturally forward-oriented.
+
+------------------------------------------------------------
+2.1.1 INSERTION
+------------------------------------------------------------
+
+To append a value:
+
+Case 1 — Empty list
+    The new node becomes both head and tail.
+
+Case 2 — Non-empty list
+    Connect the old tail to the new node and move tail to the new node.
+
+Conceptual algorithm:
+
+    newNode = Node(value)
+
+    if head is null:
+        head = newNode
+        tail = newNode
+    else:
+        tail.next = newNode
+        tail = newNode
+
+Complexity:
+    O(1) when inserting at the maintained head/tail positions.
+
+Random insertion is different. If the required insertion point is in the
+middle and its predecessor is not already known, the list must be traversed.
+
+------------------------------------------------------------
+2.1.2 SEARCHING
+------------------------------------------------------------
+
+Search is performed by starting at head and moving through next references.
+
+Example:
+
+    10 -> 45 -> 60 -> 12
+
+Searching for 60:
+
+    compare 10
+    compare 45
+    compare 60
+    match
+
+Searching for a missing value requires reaching NULL.
+
+Complexity:
+    O(n)
+
+There is no direct indexed access comparable to an array because finding the
+element at position i requires walking through earlier nodes.
+
+------------------------------------------------------------
+2.1.3 DELETION
+------------------------------------------------------------
+
+Deletion must handle several cases:
+
+1. Empty list.
+2. Only one node exists.
+3. Removing the head.
+4. Removing the tail.
+5. Removing an interior node.
+6. Requested value is absent.
+
+For a singly linked list, removing an interior node requires access to the
+predecessor because the predecessor’s next reference must be changed.
+
+Example:
+
+    Before:
+    A -> B -> C -> D
+
+    Remove C:
+
+    A -> B -> D
+
+The B node must be found so that:
+
+    B.next = C.next
+
+If deletion is always from the head, it becomes O(1).
+
+General value-based deletion remains O(n) because locating the target/predecessor
+may require traversal.
+
+------------------------------------------------------------
+2.1.4 TRAVERSAL
+------------------------------------------------------------
+
+Forward traversal starts at head.
+
+    current = head
+    while current != null:
+        process current.value
+        current = current.next
+
+The traversal ends when current becomes null.
+
+Complexity:
+    O(n)
+
+These notes use the idea of “yielding” each value while traversing so that the
+caller can consume the sequence.
+
+------------------------------------------------------------
+2.1.5 REVERSE TRAVERSAL
+------------------------------------------------------------
+
+A singly linked list does not have backward references.
+
+Therefore, if we start at tail and want to move backward, we repeatedly have
+to search from head for the node whose next reference points to the current
+node.
+
+That makes the operation expensive:
+
+    finding one predecessor: O(n)
+    doing it repeatedly: O(n^2)
+
+This is one of the main motivations for a doubly linked list when reverse
+navigation is important.
+
+------------------------------------------------------------
+2.2 DOUBLY LINKED LIST
+------------------------------------------------------------
+
+A doubly linked node has:
+
+    value
+    next
+    previous
+
+Conceptually:
+
+    NULL <- [10] <-> [45] <-> [60] <-> [12] -> NULL
+
+The additional previous reference consumes more memory, but it provides
+bidirectional navigation.
+
+Searching and forward traversal are conceptually similar to singly linked lists.
+
+------------------------------------------------------------
+2.2.1 INSERTION
+------------------------------------------------------------
+
+When adding to the tail, the new node must be connected in both directions.
+
+Conceptually:
+
+    new.previous = oldTail
+    oldTail.next = new
+    tail = new
+
+For the first node, head and tail both reference the new node.
+
+Insertion at an endpoint remains O(1) with maintained head/tail references.
+
+------------------------------------------------------------
+2.2.2 DELETION
+------------------------------------------------------------
+
+The same broad cases apply as with singly linked lists, but removing an
+interior node is easier because the node already knows its predecessor and
+successor.
+
+For:
+
+    A <-> B <-> C
+
+removing B means reconnecting:
+
+    A.next = C
+    C.previous = A
+
+Removing the head also requires setting the new head’s previous reference to
+null. Removing the tail requires setting the new tail’s next reference to null.
+
+------------------------------------------------------------
+2.2.3 REVERSE TRAVERSAL
+------------------------------------------------------------
+
+Reverse traversal is straightforward:
+
+    current = tail
+
+    while current != null:
+        process current.value
+        current = current.previous
+
+Complexity:
+    O(n)
+
+This is substantially simpler than reverse traversal of a singly linked list.
+
+------------------------------------------------------------
+2.3 LINKED-LIST SUMMARY
+------------------------------------------------------------
+
+Use a linked list when:
+
+    - the number of elements is not known in advance;
+    - frequent endpoint insertion/deletion is required;
+    - dynamic growth is useful;
+    - random indexed access is not the primary requirement.
+
+Avoid relying on linked lists when:
+
+    - indexed access is frequent;
+    - searching is frequent and no additional indexing structure exists;
+    - random insertion requires repeated traversal.
+
+Singly linked lists are appropriate for simpler forward-only operations.
+Doubly linked lists are more flexible when both forward and backward traversal
+are required.
+
+============================================================
+3. BINARY SEARCH TREE
+============================================================
+
+A Binary Search Tree (BST) is a tree organized around an ordering rule.
+
+For a node with value x, this guide defines the ordering as:
+
+    left subtree: values < x
+    right subtree: values >= x
+
+The same rule applies recursively to every node.
+
+Example:
+
+             23
+            /  \
+          14    31
+         /  \
+        7   17
+         \
+          9
+
+The major attraction is efficient ordered searching when the tree remains
+reasonably balanced.
+
+Expected/ideal behavior discussed by the discussion:
+
+    insertion: O(log n)
+    lookup: O(log n)
+    deletion: O(log n)
+
+But this is conditional on tree shape.
+
+A pathological tree can become:
+
+    1
+     \
+      2
+       \
+        3
+         \
+          4
+
+This is effectively a linked list and operations become O(n).
+
+------------------------------------------------------------
+3.1 INSERTION
+------------------------------------------------------------
+
+Insertion follows the ordering rule.
+
+Starting at the root:
+
+    if value < current.value:
+        go left
+    otherwise:
+        go right
+
+When the required child reference is empty, create the node there.
+
+The section presents insertion using a small outer operation plus a recursive
+node-insertion routine.
+
+Why recursion fits:
+    A subtree is itself a tree, so the same insertion rule can be applied to
+    the selected subtree.
+
+At every node the algorithm makes a binary choice:
+
+    left OR right
+
+This is the “binary chop” idea responsible for logarithmic behavior in a
+reasonably balanced tree.
+
+------------------------------------------------------------
+3.2 SEARCHING
+------------------------------------------------------------
+
+Search has four fundamental cases:
+
+1. Empty tree:
+       value does not exist.
+
+2. Current node equals target:
+       value found.
+
+3. Target is smaller:
+       search left subtree.
+
+4. Target is larger:
+       search right subtree.
+
+Because each comparison eliminates one side of the current tree, a balanced
+tree can search in O(log n).
+
+In an unbalanced tree the number of visited nodes may be O(n).
+
+------------------------------------------------------------
+3.3 DELETION
+------------------------------------------------------------
+
+BST deletion is more complicated because removing a node must preserve the
+ordering property.
+
+Important cases:
+
+Case 1 — Leaf node
+    A node with no children can simply be disconnected from its parent.
+
+Case 2 — Only right child
+    Replace the deleted node with its right subtree.
+
+Case 3 — Only left child
+    Replace the deleted node with its left subtree.
+
+Case 4 — Two children
+    A replacement value must be chosen so the BST ordering remains valid.
+    The section’s approach uses the largest value from the left subtree.
+
+For the two-child case:
+
+    1. Find the largest node in the left subtree.
+    2. Copy its value into the node being deleted.
+    3. Remove the original occurrence of that replacement value.
+
+This works because the largest value in the left subtree is still smaller than
+the deleted node’s right-subtree values.
+
+------------------------------------------------------------
+3.4 FINDING THE PARENT
+------------------------------------------------------------
+
+Some tree operations require the parent of a node.
+
+Starting from the root:
+
+    if target belongs to left subtree:
+        current parent becomes current node
+        move left
+
+    otherwise:
+        current parent becomes current node
+        move right
+
+The parent is therefore the node immediately above the target in the search
+path.
+
+------------------------------------------------------------
+3.5 ATTAINING A REFERENCE TO A NODE
+------------------------------------------------------------
+
+Sometimes an algorithm needs the actual node reference instead of only knowing
+whether a value exists.
+
+The search process can be adapted to return the node encountered when:
+
+    current.value == target
+
+If traversal reaches an empty reference, no such node exists.
+
+------------------------------------------------------------
+3.6 SMALLEST AND LARGEST VALUES
+------------------------------------------------------------
+
+Because the BST is ordered:
+
+    smallest = repeatedly follow left children
+    largest  = repeatedly follow right children
+
+For a non-empty tree, the smallest value is at the leftmost node and the largest
+value is at the rightmost node.
+
+Complexity is proportional to tree height.
+
+------------------------------------------------------------
+3.7 TREE TRAVERSALS
+------------------------------------------------------------
+
+Traversal means visiting all nodes in a defined order.
+
+All complete traversals visit n nodes, so their basic runtime is O(n).
+
+------------------------------------------------------------
+3.7.1 PREORDER
+------------------------------------------------------------
+
+Order:
+
+    Root
+    Left subtree
+    Right subtree
+
+For each node:
+
+    process current
+    traverse left
+    traverse right
+
+Useful when the root must be handled before its descendants.
+
+------------------------------------------------------------
+3.7.2 POSTORDER
+------------------------------------------------------------
+
+Order:
+
+    Left subtree
+    Right subtree
+    Root
+
+For each node:
+
+    traverse left
+    traverse right
+    process current
+
+This naturally supports operations where children must be processed before
+their parent.
+
+------------------------------------------------------------
+3.7.3 INORDER
+------------------------------------------------------------
+
+Order:
+
+    Left subtree
+    Root
+    Right subtree
+
+For a BST, inorder traversal produces the values in sorted order.
+
+This property is especially important for ordered sets backed by a tree.
+
+------------------------------------------------------------
+3.7.4 BREADTH-FIRST
+------------------------------------------------------------
+
+Breadth-first traversal visits one depth level at a time.
+
+Typical order:
+
+    root
+    all nodes at depth 1
+    all nodes at depth 2
+    ...
+
+A queue is used to remember nodes that still need to be visited.
+
+Process:
+
+    1. Start with root.
+    2. Visit it.
+    3. Enqueue its left child if present.
+    4. Enqueue its right child if present.
+    5. Dequeue the next node.
+    6. Repeat.
+
+from shallow levels to deeper levels.
+
+------------------------------------------------------------
+3.8 BST SUMMARY
+------------------------------------------------------------
+
+BSTs are useful when data has an ordering relation and you need insertion,
+lookup, and deletion.
+
+The critical warning is balance.
+
+    Balanced-ish BST:
+        operations can be O(log n)
+
+    Highly unbalanced BST:
+        operations can become O(n)
+
+These notes use AVL trees later as the self-balancing alternative.
+
+============================================================
+4. HEAP
+============================================================
+
+A heap is a tree-shaped structure with a special parent/child ordering rule.
+
+Two forms are emphasized:
+
+MIN HEAP
+    Parent value <= child values.
+    The smallest value is at the root.
+
+MAX HEAP
+    Parent value >= child values.
+    The largest value is at the root.
+
+The discussion primarily assumes a min-heap unless stated otherwise.
+
+A major difference from a BST is representation. A heap is generally represented
+using an array.
+
+For a node at array index i:
+
+    parent index = (i - 1) / 2
+    left child   = 2*i + 1
+    right child  = 2*i + 2
+
+Integer division is assumed when computing an index.
+
+Example concept:
+
+    array index:
+       0
+      / \
+     1   2
+    / \ / \
+   3  4 5  6
+
+This allows a complete binary-tree shape to be represented without explicit
+node objects and child references.
+
+------------------------------------------------------------
+4.1 INSERTION
+------------------------------------------------------------
+
+Insertion has two conceptual phases:
+
+1. Put the new value into the next free array position.
+2. Restore heap ordering.
+
+For a min heap, if the inserted value is smaller than its parent, swap them.
+
+Continue moving upward until:
+
+    - the value reaches the root, or
+    - its parent is smaller/equal.
+
+This is often called “bubble up” or “heapify upward”.
+
+Runtime:
+    O(log n)
+
+The initial placement is O(1); the possible upward correction traverses at most
+the tree height.
+
+For a max heap, the comparison is reversed.
+
+------------------------------------------------------------
+4.2 DELETION
+------------------------------------------------------------
+
+Deletion requires maintaining the heap property after removing an element.
+
+The section describes a general value-removal process:
+
+1. Find the index of the requested value.
+2. Reduce the logical count.
+3. Move the last heap value into the removed value’s position.
+4. Restore heap ordering.
+
+For a min heap, if the replacement value is greater than one of its children,
+the smaller child is promoted.
+
+Continue downward until heap order is restored.
+
+Important memory note:
+If the backing array contains references to objects, a removed slot should not
+unnecessarily retain a reference to the removed object. In a garbage-collected
+environment, clearing an obsolete reference can allow the object to become
+eligible for collection.
+
+------------------------------------------------------------
+4.3 SEARCHING
+------------------------------------------------------------
+
+A heap is not ordered enough to support ordinary BST-style logarithmic lookup.
+
+Therefore, searching for an arbitrary value generally means scanning the
+array.
+
+Runtime:
+    O(n)
+
+The discussion relates this to a breadth-first view of the heap because the array
+stores the tree in level order.
+
+------------------------------------------------------------
+4.4 TRAVERSAL
+------------------------------------------------------------
+
+Traversal is naturally supported by walking the array or interpreting the
+array as a level-order representation of the tree.
+
+The important distinction is:
+
+    Heap ordering gives fast access to the extreme element
+    but does NOT provide arbitrary-value search in O(log n).
+
+------------------------------------------------------------
+4.5 HEAP SUMMARY
+------------------------------------------------------------
+
+Heaps are useful when you need quick access to the smallest or largest element
+depending on heap type.
+
+Typical characteristics:
+
+    insertion: O(log n)
+    search for arbitrary value: O(n)
+    removal of a located element: requires repair and may take O(log n)
+    root/extreme access: O(1)
+
+Heaps are particularly useful as the backing structure for priority queues.
+
+============================================================
+5. SETS
+============================================================
+
+A set is a collection of unique objects.
+
+The defining property is uniqueness:
+
+    {6, 2, 9}
+
+contains each member only once.
+
+Sets can be:
+
+    unordered
+    ordered
+
+The key implementation requirement is that membership checking must be efficient
+because insertion first needs to determine whether the value already exists.
+
+------------------------------------------------------------
+5.1 SET FUNDAMENTALS AND OPERATIONS
+------------------------------------------------------------
+
+The discussion discusses set operations including union and intersection.
+
+UNION
+    The union of two sets contains every distinct item present in either set.
+
+Example:
+
+    A = {1,2,3}
+    B = {3,4,5}
+
+    A union B = {1,2,3,4,5}
+
+INTERSECTION
+    The intersection contains values present in both sets.
+
+    A intersection B = {3}
+
+The section’s intersection algorithm deliberately iterates through the smaller
+set. This is an important optimization: once all elements of the smaller set
+have been checked, no additional intersection members can exist.
+
+The stated runtime is linear in the size of the smaller set, assuming membership
+checks and insertion have favorable complexity.
+
+------------------------------------------------------------
+5.1.1 UNORDERED SET AND INSERTION
+------------------------------------------------------------
+
+An unordered set does not promise a meaningful ordering of its members.
+
+A hash table is a natural backing structure because it provides:
+
+    insertion: approximately O(1)
+    lookup: approximately O(1)
+
+The exact performance depends on the quality of hashing and collision behavior.
+
+Set insertion works conceptually as:
+
+    if item is not already present:
+        add item
+    otherwise:
+        do nothing
+
+Uniqueness is therefore enforced by the membership check.
+
+------------------------------------------------------------
+5.2 ORDERED SET
+------------------------------------------------------------
+
+An ordered set still contains unique elements, but it additionally maintains
+an ordering relation.
+
+The section describes an ordered set as being backed by a tree. In the version
+described in this guide, the implementation moved from a BST to an AVL tree because
+AVL trees maintain balance.
+
+The ordered output can be produced using inorder traversal.
+
+Because inorder traversal of a BST-like ordered tree yields values in sorted
+order, the set can expose members in their defined order.
+
+------------------------------------------------------------
+5.3 SET SUMMARY
+------------------------------------------------------------
+
+Use an unordered set when:
+
+    - uniqueness matters;
+    - order does not matter;
+    - fast membership is important.
+
+Use an ordered set when:
+
+    - uniqueness matters;
+    - ordered iteration is also important.
+
+The backing data structure should be chosen based on the operations the
+application performs most frequently.
+
+============================================================
+6. QUEUES
+============================================================
+
+A queue follows FIFO:
+
+    First In, First Out
+
+The first item inserted is the first item removed.
+
+Core operations:
+
+    Enqueue
+        Add to the back.
+
+    Dequeue
+        Remove and return the front.
+
+    Peek
+        Return the front without removing it.
+
+Example:
+
+    Enqueue(10)
+    Enqueue(12)
+    Enqueue(9)
+
+    Queue:
+    front -> 10, 12, 9 <- back
+
+    Dequeue() returns 10.
+
+------------------------------------------------------------
+6.1 STANDARD QUEUE
+------------------------------------------------------------
+
+A standard queue can be efficiently implemented using a singly linked list.
+
+Why?
+
+    Enqueue:
+        add at tail -> O(1)
+
+    Dequeue:
+        remove at head -> O(1)
+
+Searching remains:
+
+    O(n)
+
+because the queue does not provide direct arbitrary-value lookup.
+
+The queue abstraction intentionally restricts access to the front for removal
+and inspection.
+
+------------------------------------------------------------
+6.2 PRIORITY QUEUE
+------------------------------------------------------------
+
+A priority queue changes the rule.
+
+A standard queue orders by arrival time.
+
+A priority queue orders by a comparison rule representing priority.
+
+The item with the highest priority is served first.
+
+A heap is a natural implementation.
+
+For example:
+
+    min-priority queue:
+        smaller value = higher priority
+
+    max-priority queue:
+        larger value = higher priority
+
+With a heap, the highest-priority element is at the root, allowing efficient
+access and insertion/removal operations.
+
+------------------------------------------------------------
+6.3 DOUBLE-ENDED QUEUE (DEQUE)
+------------------------------------------------------------
+
+A deque allows operations at both ends.
+
+Common operations:
+
+    EnqueueFront
+    EnqueueBack
+    DequeueFront
+    DequeueBack
+    PeekFront
+    PeekBack
+
+Unlike a priority queue, a deque does not reorder elements according to a
+priority comparison. The programmer chooses which end to use.
+
+A doubly linked list is a natural backing structure because both endpoints can
+be manipulated efficiently.
+
+Endpoint operations can be O(1).
+
+An array can also back a deque, but dynamic resizing can introduce O(n) work
+when the array needs to grow or shrink.
+
+------------------------------------------------------------
+6.4 QUEUE SUMMARY
+------------------------------------------------------------
+
+Standard queue:
+    FIFO
+    enqueue at back
+    dequeue at front
+    endpoint operations can be O(1)
+
+Priority queue:
+    service order is determined by priority
+    heap is a suitable backing structure
+
+Deque:
+    operations available at both front and back
+    doubly linked list is a natural dynamic backing structure
+
+============================================================
+7. AVL TREE
+============================================================
+
+An AVL tree is a self-balancing binary search tree.
+
+The main motivation is the weakness of a normal BST: insertion order can produce
+a very tall tree.
+
+AVL maintains a height-balance condition:
+
+    the heights of left and right subtrees differ by no more than 1
+
+If an operation breaks this condition, rotations are used to restore balance.
+
+This keeps the tree height logarithmic and allows efficient ordered operations.
+
+------------------------------------------------------------
+7.1 TREE ROTATIONS
+------------------------------------------------------------
+
+A rotation changes tree shape while preserving BST ordering.
+
+There are two basic rotations:
+
+    LEFT ROTATION
+    RIGHT ROTATION
+
+A left rotation promotes the node’s right child and moves the old node beneath
+it as the new left child.
+
+A right rotation is the mirror image: the left child is promoted and the old
+node becomes the new right child.
+
+Only references/pointers need to change.
+
+The discussion emphasizes that rotation itself is O(1).
+
+Rotations are important because they reduce excessive tree height without
+destroying the sorted relationship between nodes.
+
+------------------------------------------------------------
+7.2 TREE REBALANCING
+------------------------------------------------------------
+
+For every node, compare:
+
+    height(left subtree) - height(right subtree)
+
+Valid AVL balance:
+
+    -1, 0, +1
+
+If the difference is greater than +1, the tree is too heavy on the left.
+
+If the difference is less than -1, the tree is too heavy on the right.
+
+These notes use four conceptual imbalance patterns:
+
+    LEFT-LEFT
+        repaired with a right rotation
+
+    RIGHT-RIGHT
+        repaired with a left rotation
+
+    LEFT-RIGHT
+        repaired with a left rotation on the child,
+        followed by a right rotation
+
+    RIGHT-LEFT
+        repaired with a right rotation on the child,
+        followed by a left rotation
+
+The double rotations are combinations of the two basic rotations.
+
+------------------------------------------------------------
+7.3 INSERTION
+------------------------------------------------------------
+
+AVL insertion starts exactly like BST insertion.
+
+Steps:
+
+1. Descend through the tree using the BST ordering rule.
+2. Insert the new node.
+3. Travel back toward the root.
+4. Recalculate heights.
+5. Detect any balance violation.
+6. Apply the required rotation(s).
+
+The section’s recursive insertion calls the balancing check as it unwinds.
+
+This is a useful pattern:
+
+    descend to modify structure
+    then unwind to repair structure
+
+Because AVL maintains balance, insertion remains logarithmic with respect to
+tree size.
+
+------------------------------------------------------------
+7.4 DELETION
+------------------------------------------------------------
+
+AVL deletion begins like BST deletion.
+
+Cases include:
+
+    - leaf;
+    - only left child;
+    - only right child;
+    - two children.
+
+After removal, the algorithm must walk back through the affected path and check
+balance.
+
+Unlike a normal BST, deletion may create imbalance farther up the tree.
+
+Therefore:
+
+    remove node
+    update affected structure
+    move upward
+    recalculate heights
+    rotate if necessary
+
+The discussion tracks the path so it can perform balance checks while moving back
+toward the root.
+
+------------------------------------------------------------
+7.5 AVL SUMMARY
+------------------------------------------------------------
+
+AVL is a “smarter” BST in the sense that it actively controls height.
+
+Important distinction:
+
+    BST:
+        ordering guaranteed
+        balance not guaranteed
+
+    AVL:
+        ordering guaranteed
+        balance actively maintained
+
+This difference is why AVL can preserve logarithmic behavior for search,
+insertion, and deletion rather than allowing a pathological linear chain.
+
+============================================================
+PART II — ALGORITHMS
+============================================================
+
+============================================================
+8. SORTING
+============================================================
+
+Sorting rearranges a collection into a chosen order, such as ascending order.
+
+The section presents multiple approaches because no single sorting algorithm is
+best for every situation.
+
+Important factors include:
+
+    - runtime;
+    - memory behavior;
+    - implementation complexity;
+    - recursion;
+    - input characteristics;
+    - key structure.
+
+------------------------------------------------------------
+8.1 BUBBLE SORT
+------------------------------------------------------------
+
+Bubble sort repeatedly compares elements and swaps them when they are in the
+wrong relative order.
+
+A simple conceptual form uses nested loops.
+
+For every outer pass:
+
+    compare pairs
+    swap out-of-order elements
+
+The section presents it as a very simple but inefficient sorting technique.
+
+Typical complexity:
+    O(n^2)
+
+Why quadratic?
+    There can be approximately n comparisons for each of approximately n
+    outer iterations.
+
+Use:
+    Mostly educational or for very small/simple cases.
+
+Do not select it for large datasets when a more efficient method is available.
+
+------------------------------------------------------------
+8.2 MERGE SORT
+------------------------------------------------------------
+
+Merge sort uses divide and conquer.
+
+High-level process:
+
+1. Split the list into two roughly equal parts.
+2. Recursively sort the left part.
+3. Recursively sort the right part.
+4. Merge the two sorted parts.
+
+The base case is a list of one element because a single element is already
+sorted.
+
+Example:
+
+    [4,75,74,2,54]
+
+Split:
+
+    [4,75]       [74,2,54]
+
+Continue splitting until single elements exist.
+
+Then merge sorted pieces:
+
+    [4] + [75] -> [4,75]
+
+    [2] + [54] -> [2,54]
+
+    [74] + [2,54] -> [2,54,74]
+
+Finally:
+
+    [4,75] + [2,54,74]
+    -> [2,4,54,74,75]
+
+The important operation is merging two already ordered sequences.
+
+Complexity:
+    O(n log n)
+
+The logarithmic factor comes from repeatedly halving the input. The linear
+factor comes from processing/merging elements at each level.
+
+------------------------------------------------------------
+8.3 QUICK SORT
+------------------------------------------------------------
+
+Quick sort is another divide-and-conquer approach.
+
+Core idea:
+
+1. Choose a pivot.
+2. Partition values into:
+       less than pivot
+       equal to pivot
+       greater than pivot
+3. Recursively sort the less and greater groups.
+4. Concatenate:
+       sorted less + equal + sorted greater
+
+The section demonstrates a median-style pivot strategy.
+
+Pivot selection matters greatly.
+
+Good partitioning:
+    subproblems remain reasonably balanced
+    -> approximately O(n log n)
+
+Poor partitioning:
+    one side contains almost everything
+    -> can degrade toward O(n^2)
+
+Therefore pivot selection is a major practical consideration.
+
+------------------------------------------------------------
+8.4 INSERTION SORT
+------------------------------------------------------------
+
+Insertion sort can be understood by imagining sorting playing cards in your
+hand.
+
+Maintain a sorted prefix.
+
+For each next value:
+
+    1. Hold the current value.
+    2. Move larger values to the right.
+    3. Insert the held value into the correct gap.
+
+Example:
+
+    [4, 75, 74, 2, 54]
+
+After considering 4 and 75:
+    [4,75]
+
+Insert 74:
+    move 75
+    [4,74,75]
+
+Insert 2:
+    shift larger values
+    [2,4,74,75]
+
+Continue with 54:
+    [2,4,54,74,75]
+
+Typical worst-case complexity:
+    O(n^2)
+
+Insertion sort is conceptually simple and can be attractive for small or
+nearly ordered collections, even though its general worst-case complexity is
+quadratic.
+
+------------------------------------------------------------
+8.5 SHELL SORT
+------------------------------------------------------------
+
+Shell sort can be viewed as an improvement over insertion sort.
+
+Instead of initially comparing only neighboring positions, it compares values
+separated by a gap.
+
+The gap is gradually reduced.
+
+Approach:
+
+    initial increment = list size / 2
+    perform gap-based insertion-style sorting
+    reduce increment
+    repeat until increment becomes zero
+
+The section gives a complexity of approximately:
+
+    O(n log^2 n)
+
+for its discussed approach.
+
+The key intuition is that distant elements can be moved closer to their correct
+locations before the final small-gap insertion pass.
+
+------------------------------------------------------------
+8.6 RADIX SORT
+------------------------------------------------------------
+
+Radix sort is different from comparison sorting.
+
+It groups values into buckets based on individual digits/keys.
+
+For decimal integers there are ten possible digit keys:
+
+    0 through 9
+
+The section describes processing keys from the least significant digit upward.
+
+For example, for:
+
+    102
+
+the digit keys are:
+
+    ones      = 2
+    tens      = 0
+    hundreds  = 1
+
+To isolate a digit:
+
+    key = (number / keyPosition) % 10
+
+For tens:
+
+    keyPosition = 10
+
+For 1290:
+
+    (1290 / 10) % 10 = 9
+
+The algorithm repeatedly:
+
+1. places each value into the bucket corresponding to the current digit;
+2. reads buckets from smallest key to largest;
+3. reconstructs the list;
+4. moves to the next digit position.
+
+The section’s basic version works on positive integers and requires knowledge of
+the largest key/digit position.
+
+A queue is a natural bucket representation because values can be retained in
+their arrival order during each digit pass.
+
+------------------------------------------------------------
+8.7 SORTING SUMMARY
+------------------------------------------------------------
+
+Comparison:
+
+    Bubble sort      -> simple, O(n^2)
+    Merge sort       -> divide/conquer, O(n log n)
+    Quick sort       -> divide/conquer, typically O(n log n), pivot-sensitive
+    Insertion sort   -> simple, O(n^2) worst case
+    Shell sort       -> gap-based insertion improvement
+    Radix sort       -> digit/key based bucket approach
+
+The important lesson is not simply “memorize the fastest algorithm”.
+
+Instead ask:
+
+    What kind of data do I have?
+    What operations are available?
+    How large can the input become?
+    Is the algorithm recursive?
+    What memory does it need?
+    What happens in the worst case?
+
+============================================================
+9. NUMERIC ALGORITHMS
+============================================================
+
+This chapter demonstrates that algorithmic thinking is useful for mathematical
+problems as well as data structures.
+
+------------------------------------------------------------
+9.1 PRIMALITY TEST
+------------------------------------------------------------
+
+A prime number has no positive divisors other than the relevant trivial factors.
+
+Examples of primes include:
+
+    2, 5, 7, 13
+
+The discussion points out the usefulness of sqrt(n) as a divisor-search boundary:
+if a number has a non-trivial factorization, one of the factors is at most
+sqrt(n).
+
+The conceptual optimization is therefore:
+
+    test possible factors only up to sqrt(n)
+
+The section’s pseudocode explores products involving the input and values up to
+this square-root bound.
+
+Important edge case:
+    values below 2 are not prime.
+
+------------------------------------------------------------
+9.2 BASE CONVERSION
+------------------------------------------------------------
+
+The section demonstrates conversion from decimal to binary and notes analogous
+conversion ideas for octal and hexadecimal.
+
+For decimal-to-binary conversion:
+
+1. Divide n by 2.
+2. Record the remainder.
+3. Replace n with integer quotient.
+4. Repeat until n becomes zero.
+5. Reverse the collected remainders.
+
+Why reverse?
+
+The first remainder is the least significant digit, while the last remainder
+collected is the most significant digit.
+
+Example structure:
+
+    n
+    remainder = n % 2
+    n = n / 2
+
+The section’s trace uses 742 as an example and shows the successive quotients and
+remainders.
+
+This technique generalizes:
+
+    base B:
+    digit = n % B
+    n = n / B
+
+Then reverse the collected digits.
+
+------------------------------------------------------------
+9.3 GREATEST COMMON DIVISOR
+------------------------------------------------------------
+
+These notes use Euclid’s algorithm.
+
+For integers m and n:
+
+    if n == 0:
+        answer = m
+    otherwise:
+        GCD(m,n) = GCD(n, m % n)
+
+Example:
+
+    GCD(15,9)
+    -> GCD(9,6)
+    -> GCD(6,3)
+    -> GCD(3,0)
+    -> 3
+
+The power of the algorithm is that the problem becomes smaller after each
+remainder operation.
+
+Note:
+These notes use the phrase “greatest common denominator” in places, but the
+mathematical operation described is the greatest common divisor (GCD).
+
+------------------------------------------------------------
+9.4 MAXIMUM VALUE FOR N DIGITS IN BASE B
+------------------------------------------------------------
+
+For a base B number containing N digits, the maximum representable value is:
+
+    B^N - 1
+
+Examples:
+
+Base 10, four digits:
+
+    10^4 - 1 = 9999
+
+Base 2, four digits:
+
+    2^4 - 1 = 15
+    binary representation: 1111
+
+Base 16, six digits:
+
+    16^6 - 1
+    representation: FFFFFF
+
+These notes use a base enumeration concept:
+
+    Binary      = 2
+    Octal       = 8
+    Decimal     = 10
+    Hexadecimal = 16
+
+Using named enumeration values makes algorithms easier to understand than
+scattering raw numeric constants throughout the code.
+
+------------------------------------------------------------
+9.5 FACTORIAL
+------------------------------------------------------------
+
+Factorial is written:
+
+    n!
+
+For non-negative integers:
+
+    n! = n * (n-1) * ... * 2 * 1
+
+The base cases are:
+
+    0! = 1
+    1! = 1
+
+The section presents an iterative solution.
+
+Conceptual algorithm:
+
+    factorial = 1
+
+    for i from 2 to n:
+        factorial = factorial * i
+
+    return factorial
+
+Example:
+
+    5!
+    = 1 * 2 * 3 * 4 * 5
+    = 120
+
+The discussion chooses iteration even though factorial has a naturally recursive
+mathematical definition because the iterative form avoids recursive-call
+overhead.
+
+------------------------------------------------------------
+9.6 NUMERIC SUMMARY
+------------------------------------------------------------
+
+The main lesson is that algorithms are domain-independent problem-solving tools.
+
+The same ideas used for data structures—loops, recursion, reduction of problem
+size, state tracking, complexity analysis—also solve mathematical problems.
+
+============================================================
+10. SEARCHING
+============================================================
+
+Searching means locating a requested item in a collection.
+
+The discussion emphasizes that search performance is heavily influenced by the
+underlying data structure.
+
+Examples:
+
+    linked list -> generally O(n)
+    array scan  -> O(n)
+    hash table  -> approximately O(1) lookup
+    balanced BST/AVL -> O(log n)
+
+Therefore, improving search often means changing the data representation rather
+than merely changing the search loop.
+
+------------------------------------------------------------
+10.1 SEQUENTIAL SEARCH
+------------------------------------------------------------
+
+Sequential search examines elements from the beginning until:
+
+    - a match is found; or
+    - the collection ends.
+
+Conceptual algorithm:
+
+    index = 0
+
+    while index < count and list[index] != target:
+        index++
+
+    if index < count:
+        return index
+
+    return -1
+
+Complexity:
+    O(n)
+
+Best case:
+    target is near the beginning.
+
+Worst case:
+    target is absent or at the end.
+
+It requires no ordering assumption.
+
+------------------------------------------------------------
+10.2 PROBABILITY SEARCH
+------------------------------------------------------------
+
+Probability search is a variation of sequential search for non-uniform access
+patterns.
+
+The idea:
+
+    Frequently requested values should gradually move toward the beginning.
+
+After finding an item, swap it with its predecessor if it is not already first.
+
+Example:
+
+Before:
+
+    [A, B, C, D]
+
+Search for C:
+
+    [A, B, C, D]
+
+After successful search:
+
+    [A, C, B, D]
+
+Search for C again:
+
+    [C, A, B, D]
+
+The theoretical worst-case complexity remains O(n), but when some items are
+requested much more frequently than others, the average scanning effort can
+improve because popular values migrate toward earlier positions.
+
+------------------------------------------------------------
+10.3 SEARCHING SUMMARY
+------------------------------------------------------------
+
+The most important lesson is:
+
+    Search complexity is not independent of data structure.
+
+If an application performs searches constantly, selecting the right structure
+can be more important than micro-optimizing a linear scan.
+
+============================================================
+11. STRINGS
+============================================================
+
+The discussion treats strings as a major algorithmic area because string operations
+are extremely common in software.
+
+A string can be viewed conceptually as an indexed sequence of characters:
+
+    index:  0 1 2 3
+    value:  T E S T
+
+This makes many string algorithms similar to array-processing algorithms.
+
+------------------------------------------------------------
+11.1 REVERSING THE ORDER OF WORDS
+------------------------------------------------------------
+
+This algorithm is NOT simply character reversal.
+
+For:
+
+    "one two three"
+
+the desired result is conceptually:
+
+    "three two one"
+
+The discussion assumes words are separated by whitespace.
+
+A right-to-left scan can identify each word:
+
+1. Start from the end.
+2. Skip whitespace.
+3. Find the start of the current word.
+4. Append that word to a result buffer.
+5. Continue toward the beginning.
+
+This approach is useful because the operation is about word boundaries, not
+individual character order.
+
+These notes use markers such as start/last positions and a string buffer.
+
+Important edge considerations:
+
+    - leading whitespace;
+    - trailing whitespace;
+    - multiple whitespace characters;
+    - punctuation attached to words.
+
+------------------------------------------------------------
+11.2 PALINDROME DETECTION
+------------------------------------------------------------
+
+A palindrome reads the same forward and backward after applying the discussion’s
+normalization rules.
+
+The section demonstrates:
+
+    - removing whitespace/punctuation;
+    - normalizing case;
+    - comparing characters from both ends.
+
+Two pointers are used:
+
+    left  = first character
+    right = last character
+
+Repeat:
+
+    compare word[left] and word[right]
+    move left toward the center
+    move right toward the center
+
+If a mismatch occurs, the string is not a palindrome.
+
+Example:
+
+    "Never odd or even"
+
+After normalization:
+
+    "NEVERODDOREVEN"
+
+The left/right comparison proceeds inward.
+
+Complexity:
+    O(n)
+
+This two-pointer pattern is a very important general string/array technique.
+
+------------------------------------------------------------
+11.3 WORD COUNTING
+------------------------------------------------------------
+
+Counting words is more subtle than simply counting spaces.
+
+The discussion identifies three useful state variables:
+
+    index
+    wordCount
+    inWord
+
+The algorithm must handle:
+
+    - leading whitespace;
+    - multiple spaces between words;
+    - trailing whitespace;
+    - an input containing only whitespace;
+    - the final word not being followed by whitespace.
+
+Core idea:
+
+    whitespace separates words.
+
+When transitioning from being inside a word to whitespace, a word has just
+ended, so the count is increased.
+
+The boolean state avoids counting multiple whitespace characters as multiple
+words.
+
+Example:
+
+    "  Ben   ate   hay  "
+
+still contains:
+
+    3 words
+
+not a count based simply on the number of spaces.
+
+------------------------------------------------------------
+11.4 REPEATED-WORD COUNTING
+------------------------------------------------------------
+
+The discussion combines string splitting with an unordered set.
+
+Process:
+
+1. Split the sentence into words.
+2. Normalize/strip punctuation from each word.
+3. Insert normalized words into a set.
+4. Count total words.
+5. Count unique words.
+6. Difference:
+
+       repeated count = total words - unique words
+
+Example:
+
+    "test test test"
+
+total = 3
+unique = 1
+repeated count = 2
+
+The discussion specifically strips punctuation so that values such as:
+
+    "test"
+    "test!"
+
+can be treated as the same word.
+
+This example demonstrates how one data structure can simplify another algorithm:
+the set provides uniqueness automatically.
+
+------------------------------------------------------------
+11.5 FIRST MATCHING CHARACTER BETWEEN TWO STRINGS
+------------------------------------------------------------
+
+The problem is to determine whether any character from one string occurs in
+the other string.
+
+The basic approach uses nested loops:
+
+    for each character in word:
+        for each character in match:
+            compare them
+
+Whitespace/punctuation handling is considered so the comparison is performed
+on meaningful characters.
+
+If a match is found, return the corresponding index.
+
+If the complete comparison finishes without a match:
+
+    return -1
+
+Complexity:
+    O(n^2)
+
+This is a straightforward baseline approach. Faster approaches could be
+constructed using additional data structures, but this guide presents the simple
+double-loop design.
+
+------------------------------------------------------------
+11.6 STRING SUMMARY
+------------------------------------------------------------
+
+String algorithms often reduce to:
+
+    - indexed character access;
+    - pointer movement;
+    - state tracking;
+    - normalization;
+    - sets;
+    - nested scanning.
+
+The broader lesson is to inspect the exact structure of the input and identify
+the smallest amount of state required to solve the problem cleanly.
+
+============================================================
+APPENDIX A — ALGORITHM WALKTHROUGH
+============================================================
+
+The discussion recommends tracing algorithms rather than merely reading them.
+
+A trace combines:
+
+    1. a visual representation of the data structure;
+    2. a table containing important variable values.
+
+------------------------------------------------------------
+A.1 ITERATIVE ALGORITHMS
+------------------------------------------------------------
+
+For an iterative algorithm:
+
+1. Draw the input structure.
+2. Identify variables that change.
+3. Create one table column for each important variable.
+4. Execute statements in order.
+5. Record state after each important mutation.
+
+The section demonstrates this using palindrome detection.
+
+For a palindrome example, the trace tracks variables such as:
+
+    value
+    word
+    left
+    right
+
+A table might conceptually look like:
+
+    word                  left    right
+    NEVERODDOREVEN          0       13
+                            1       12
+                            2       11
+                            ...
+
+The exact point is not the table format itself. The point is to make hidden
+state changes visible.
+
+------------------------------------------------------------
+A.2 RECURSIVE ALGORITHMS
+------------------------------------------------------------
+
+Recursive algorithms require tracking call relationships.
+
+The section demonstrates Fibonacci.
+
+A recursive algorithm normally has:
+
+    base case(s)
+    recursive case
+
+For Fibonacci, the recursive case creates multiple calls.
+
+The important trace is a call tree:
+
+    Fibonacci(n)
+      -> Fibonacci(n-1)
+      -> Fibonacci(n-2)
+
+Each call eventually reaches a base case and returns a value to its caller.
+
+When tracing recursion, record:
+
+    call order
+    parameters
+    base-case returns
+    return destination
+    resulting value
+
+Drawing the call tree is often clearer than trying to fit every recursive
+state into one flat table.
+
+------------------------------------------------------------
+A.3 SUMMARY
+------------------------------------------------------------
+
+Use trace tables for iterative algorithms.
+
+Use call diagrams plus trace information for recursive algorithms.
+
+This technique helps with:
+
+    correctness
+    debugging
+    understanding variable mutations
+    identifying repeated work
+    spotting opportunities for optimization
+
+============================================================
+APPENDIX B — TRANSLATION WALKTHROUGH
+============================================================
+
+The section demonstrates how pseudocode can be translated into an imperative
+language using a primality-testing example.
+
+The translation process is generally mechanical:
+
+    pseudocode algorithm
+          |
+          v
+    identify variables
+          |
+          v
+    translate conditions
+          |
+          v
+    translate loops
+          |
+          v
+    translate method calls
+          |
+          v
+    enforce preconditions
+          |
+          v
+    produce target-language implementation
+
+Important considerations:
+
+    - pseudocode types may be implicit;
+    - target languages require explicit syntax;
+    - utility methods may have to be supplied;
+    - preconditions may need validation;
+    - exception handling may be required.
+
+The discussion emphasizes that the algorithm’s conceptual structure should survive
+translation even though syntax changes.
+
+============================================================
+APPENDIX C — RECURSIVE VS ITERATIVE SOLUTIONS
+============================================================
+
+Recursion means a method calls itself.
+
+A recursive algorithm generally has:
+
+    1. one or more base cases;
+    2. a recursive case.
+
+Every recursive call must make progress toward a base case.
+
+If it does not, recursion may continue indefinitely until stack resources are
+exhausted.
+
+Iteration uses loops instead:
+
+    for
+    while
+    do-while
+    etc.
+
+------------------------------------------------------------
+C.1 ACTIVATION RECORDS
+------------------------------------------------------------
+
+Each method invocation requires runtime state.
+
+The section describes an activation record as information placed on the call
+stack to support a method call.
+
+Conceptually it contains information such as:
+
+    - actual parameters;
+    - return address;
+    - space for local variables;
+    - execution context.
+
+When a method returns, this state is unwound.
+
+With recursion:
+
+    call 1
+      -> call 2
+          -> call 3
+              -> call 4
+                  ...
+
+many activation records can exist simultaneously.
+
+Therefore recursive algorithms can consume significant stack space.
+
+These notes use Fibonacci to illustrate this.
+
+Naive recursive Fibonacci performs repeated work and grows very rapidly.
+An iterative Fibonacci implementation can compute the sequence in linear time
+instead of the much faster-growing naive recursive behavior.
+
+The lesson is not “never use recursion”.
+
+The lesson is:
+
+    Understand the cost of recursive calls before using them.
+
+------------------------------------------------------------
+C.2 NATURALLY RECURSIVE PROBLEMS
+------------------------------------------------------------
+
+Some structures are inherently recursive.
+
+Trees are the clearest example:
+
+    a node contains references to child nodes,
+    and each child is itself another tree/subtree.
+
+Therefore recursive tree algorithms are often natural and readable.
+
+Merge sort and quick sort are also naturally recursive because they repeatedly
+solve smaller versions of the same problem.
+
+By contrast, a simple linked-list traversal does not necessarily benefit from
+recursion; an iterative loop may be shorter and easier to control.
+
+------------------------------------------------------------
+C.3 SUMMARY
+------------------------------------------------------------
+
+Recursion can improve readability when the problem itself is recursive.
+
+Iteration often provides:
+
+    - lower call overhead;
+    - easier control of stack usage;
+    - predictable loop-based execution.
+
+Use recursion deliberately, especially for algorithms with large branching
+or poor growth characteristics.
+
+Compiler/runtime optimizations may change the practical behavior, so actual
+performance should be measured where important.
+
+============================================================
+APPENDIX D — TESTING
+============================================================
+
+Testing is presented as an essential part of software development.
+
+Unit tests provide a safety net. When an algorithm changes, existing tests can
+reveal regressions.
+
+------------------------------------------------------------
+D.1 WHAT CONSTITUTES A UNIT TEST?
+------------------------------------------------------------
+
+A unit test should focus on one atomic behavior.
+
+Good unit test:
+
+    - small;
+    - focused;
+    - understandable;
+    - fast;
+    - explicit about expected behavior.
+
+If a test verifies many unrelated properties simultaneously, failures become
+harder to diagnose.
+
+Tests should also execute quickly because a very slow suite is less likely to
+be run frequently.
+
+------------------------------------------------------------
+D.2 WHEN SHOULD I WRITE TESTS?
+------------------------------------------------------------
+
+The discussion discusses Test-Driven Development (TDD).
+
+The core TDD cycle is:
+
+    RED
+        Write a test that fails.
+
+    GREEN
+        Write enough implementation to make it pass.
+
+    REFACTOR
+        Improve structure/readability while keeping the test passing.
+
+This encourages incremental development because each step has a small,
+explicit objective.
+
+------------------------------------------------------------
+D.3 HOW SERIOUSLY SHOULD I VIEW MY TEST SUITE?
+------------------------------------------------------------
+
+Tests should be treated as real project assets.
+
+That means:
+
+    - clean naming;
+    - maintainable structure;
+    - source control;
+    - clear intent;
+    - consistent quality.
+
+A test suite is not disposable code.
+
+------------------------------------------------------------
+D.4 THE THREE A’S
+------------------------------------------------------------
+
+A popular structure described by the discussion is:
+
+ASSEMBLE
+    Create the objects and input state required by the test.
+
+ACT
+    Perform the operation being tested.
+
+ASSERT
+    Verify the expected result/state.
+
+Example concept:
+
+    Assemble:
+        create object
+
+    Act:
+        call method
+
+    Assert:
+        verify expected property/value
+
+This gives tests a predictable and readable structure.
+
+------------------------------------------------------------
+D.5 STRUCTURING TESTS
+------------------------------------------------------------
+
+Test organization should resemble good production-code organization.
+
+For example:
+
+    Person
+    PersonTest
+
+Tests can be separated from production code and placed in their own test
+project/module.
+
+The important point is that test code deserves deliberate architecture too.
+
+------------------------------------------------------------
+D.6 CODE COVERAGE
+------------------------------------------------------------
+
+Code coverage indicates how much production code is executed by tests.
+
+High coverage can be useful, but coverage is an indicator rather than a proof
+that software is correct.
+
+A test suite can execute many lines without checking the right outcomes.
+
+Therefore:
+
+    coverage helps measure testing breadth,
+    assertions and test quality determine whether behavior is actually verified.
+
+------------------------------------------------------------
+D.7 TESTING SUMMARY
+------------------------------------------------------------
+
+Testing protects software against regressions and edge-case failures.
+
+For algorithmic code, tests should deliberately include:
+
+    - empty input;
+    - one-element input;
+    - minimum/maximum values;
+    - duplicates;
+    - missing values;
+    - boundary positions;
+    - unusual ordering;
+    - invalid input where applicable.
+
+============================================================
+APPENDIX E — PSEUDOCODE SYMBOL DEFINITIONS
+============================================================
+
+These notes use the following important symbols/keywords:
+
+    <-       Assignment
+    =        Equality
+    <=       Less than or equal to
+    <        Less than
+    >=       Greater than or equal to
+    >        Greater than
+    !=       Inequality
+    NULL/∅   Null / no reference
+    and      Logical AND
+    or       Logical OR
+    whitespace
+             One occurrence of whitespace
+    yield    Produce a value as part of a returned sequence
+
+When reading the pseudocode, distinguish assignment from comparison.
+
+Example:
+
+    x <- 10
+
+means:
+
+    assign 10 to x
+
+whereas:
+
+    x = 10
+
+means:
+
+    compare x with 10 for equality.
+
+============================================================
+MASTER COMPLEXITY CHEAT SHEET
+============================================================
+
+Linked List
+    endpoint insertion with head/tail references: O(1)
+    search: O(n)
+    general deletion by value: O(n)
+    random insertion when predecessor is unknown: O(n)
+    singly linked reverse traversal using predecessor search: O(n^2)
+
+BST
+    search: O(log n) when reasonably balanced; O(n) worst shape
+    insertion: O(log n) when reasonably balanced; O(n) worst shape
+    deletion: O(log n) when reasonably balanced; O(n) worst shape
+    traversal: O(n)
+
+Heap
+    root/extreme access: O(1)
+    insertion: O(log n)
+    arbitrary search: O(n)
+    repair after deletion: O(log n) after target position is known
+
+Unordered Set
+    lookup: approximately O(1)
+    insertion: approximately O(1)
+
+Ordered Set / AVL-backed
+    lookup: O(log n)
+    insertion: O(log n)
+    deletion: O(log n)
+    traversal/output: O(n)
+
+Queue
+    enqueue: O(1)
+    dequeue: O(1)
+    peek: O(1)
+    search: O(n)
+
+Deque
+    front insertion: O(1)
+    back insertion: O(1)
+    front deletion: O(1)
+    back deletion: O(1)
+
+Sorting
+    Bubble sort: O(n^2)
+    Merge sort: O(n log n)
+    Quick sort: typically O(n log n), can degrade toward O(n^2)
+    Insertion sort: O(n^2) worst case
+    Shell sort: approximately O(n log^2 n) for the approach discussed here
+    Radix sort: depends on number of digits/keys and bucket processing
+
+Searching
+    Sequential: O(n)
+    Probability search: O(n) worst case, can improve practical access for
+                     frequently searched values
+
+Strings
+    Palindrome two-pointer method: O(n)
+    Repeated-word counting: dependent on splitting/set implementation
+    First matching character using nested loops: O(n^2)
+
+============================================================
+INTERVIEW-FOCUSED TAKEAWAYS
+============================================================
+
+1. Why can linked-list insertion be O(1)?
+   Because the structure can maintain direct references to the head and tail.
+   Random insertion can still be O(n) when the predecessor must be located.
+
+2. Why can a BST be O(log n)?
+   A reasonably balanced tree eliminates roughly half of the remaining search
+   space at each level.
+
+3. Why can a BST become O(n)?
+   If nodes become arranged as a long chain, tree height becomes n.
+
+4. Why use AVL instead of a plain BST?
+   AVL explicitly maintains balance so tree height stays logarithmic.
+
+5. Why is heap search O(n)?
+   Heap order only guarantees a parent/child relationship. It does not provide
+   the complete left-smaller/right-larger ordering of a BST.
+
+6. Why is a heap good for a priority queue?
+   The highest-priority item can be maintained at the root while insertion and
+   removal repair the heap in logarithmic time.
+
+7. Why is inorder traversal special for a BST?
+   It visits values in sorted order.
+
+8. Why does merge sort achieve O(n log n)?
+   There are logarithmically many levels of splitting and linear work per level
+   during merging.
+
+9. Why can quick sort become O(n^2)?
+   Poor pivot choices can create highly unbalanced partitions repeatedly.
+
+10. Why does radix sort not work like comparison sorting?
+    It groups values by digit/key rather than repeatedly comparing arbitrary
+    pairs of values.
+
+11. Why can sequential search not beat O(n) in the general case?
+    Without additional structure, a missing target may require inspecting every
+    element.
+
+12. What is the advantage of probability search?
+    It adapts the list order so frequently accessed values tend to appear
+    earlier.
+
+13. Why does palindrome detection use two pointers?
+    A palindrome is defined by matching symmetric positions, so the two ends
+    can move toward the center.
+
+14. Why is a set useful for repeated-word counting?
+    A set automatically stores unique normalized words.
+
+15. Why should recursive algorithms have a base case?
+    The base case terminates recursion and prevents unbounded calls.
+
+16. What is the cost of recursive calls?
+    Each call requires runtime call state/activation-record information and
+    consumes stack space while the call chain remains active.
+
+17. What is the Red-Green-Refactor cycle?
+    Red = failing test, Green = make it pass, Refactor = improve structure
+    without changing the tested behavior.
+
+18. What is the Three A’s pattern?
+    Assemble -> Act -> Assert.
+
+============================================================
+INTERVIEW-READY DSA CHECKLIST
+============================================================
+
+Before considering a topic complete, make sure you can answer these questions
+in your own words:
+
+    1. What problem does this data structure or algorithm solve?
+    2. What is the core idea behind it?
+    3. What is the simplest example?
+    4. What is the best, average, and worst-case behavior when relevant?
+    5. What edge cases should be tested?
+    6. What alternative could be used?
+    7. Why would you choose one approach over another?
+    8. Can you implement the basic version without copying code?
+
+A strong interview answer usually has this shape:
+
+    Problem
+       ->
+    Idea
+       ->
+    Example
+       ->
+    Implementation
+       ->
+    Complexity
+       ->
+    Edge cases
+       ->
+    Trade-offs
+
+============================================================
+FINAL REVISION CHECKLIST
+============================================================
+
+Before publishing or using these notes for interview preparation:
+
+    [ ] I can explain each topic without reading the definition.
+    [ ] I can draw linked lists, BSTs, heaps, queues, and AVL trees.
+    [ ] I can trace recursive calls on paper.
+    [ ] I know the important complexity trade-offs.
+    [ ] I can explain why an algorithm works, not just what it does.
+    [ ] I know the important edge cases.
+    [ ] I can implement the basic algorithms in my target language.
+    [ ] I can compare two approaches and justify the choice.
+
+The goal is not to memorize DSA. The goal is to develop the habit of looking
+at a problem, identifying the important operations, choosing a suitable
+structure or algorithm, and explaining the trade-off clearly.

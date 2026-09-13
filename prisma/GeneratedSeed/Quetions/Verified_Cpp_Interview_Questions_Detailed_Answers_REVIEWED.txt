@@ -1,0 +1,638 @@
+QUALITY-REVIEWED INTERVIEW CONTENT
+C++ INTERVIEW QUESTIONS — DETAILED INTERVIEW-READY ANSWERS
+
+These are general C++ interview questions spanning language fundamentals,
+memory management, polymorphism, move semantics, templates, the STL, and
+common coding/output-prediction problems. Where the original source material
+labeled a question as reported from a specific interview, that could not be
+independently verified here, so questions are presented as general,
+commonly-asked C++ interview questions.
+
+==============================================================================
+
+
+
+FUNDAMENTALS & OOP BASICS
+
+==============================================================================
+
+
+
+1. Question : What is the difference between C and C++?
+   Level : Beginner
+
+Answer : C is a procedural language giving direct, low-level control over memory and data layout, with no built-in support for object-oriented concepts. C++ is largely a superset that adds classes, inheritance, polymorphism, templates, exceptions, RAII, operator overloading, and a large standard library (containers, algorithms, smart pointers), while still retaining C's low-level capability — raw pointers, manual memory management, and compatibility with most C code. This is why C++ is used when a project wants both strong abstraction (for maintainability at scale) and performance close to C.
+
+Example : A C codebase manages a resizable array with manual malloc/realloc/free calls and function pointers for polymorphic behavior. The equivalent C++ code can use std::vector for automatic memory management and virtual functions for polymorphism, while still dropping down to raw pointers where performance requires it.
+
+--------------------------------------------------------------------------
+
+2. Question : What is a constructor, and what is the difference between using a member initializer list and assigning members inside the constructor body?
+   Level : Beginner
+
+Answer : A constructor is a special member function that initializes an object when it's created, matching the class name with no return type, and can be overloaded to support different ways of constructing an object. A member initializer list (after the colon, before the constructor body) directly initializes members as part of construction; assigning inside the body first default-constructs the member, then immediately assigns a new value to it, which is wasted work for non-trivial types and is required — not just preferred — for members that are references, const, or lack a default constructor, since those can't be assigned after the fact.
+
+Example : class Point {
+    const int x;
+    std::string label;
+public:
+    // Initializer list: x is directly initialized (required, since it's const)
+    Point(int x_, std::string label_) : x(x_), label(std::move(label_)) {}
+};
+// Doing 'x = x_;' in the body would fail to compile since x is const.
+
+--------------------------------------------------------------------------
+
+3. Question : What is a copy assignment operator, and when does the compiler generate one automatically?
+   Level : Beginner
+
+Answer : The copy assignment operator (operator=(const T&)) defines how an already-constructed object is assigned the contents of another object of the same type, as opposed to a copy constructor, which builds a brand-new object from an existing one. The compiler implicitly generates a member-wise copy assignment operator if the class doesn't declare one, doesn't have a user-declared move operation, and all its members are themselves copy-assignable. This implicit version is dangerous for classes that manage a resource directly (a raw pointer to allocated memory, a file handle) because it performs a shallow copy, leading to double-free or use-after-free bugs — which is exactly the problem the Rule of Three/Five addresses.
+
+Example : class Buffer {
+    int* data;
+    size_t size;
+public:
+    Buffer& operator=(const Buffer& other) {
+        if (this == &other) return *this;  // guard against self-assignment
+        delete[] data;
+        size = other.size;
+        data = new int[size];
+        std::copy(other.data, other.data + size, data);
+        return *this;
+    }
+};
+
+--------------------------------------------------------------------------
+
+4. Question : What is const correctness, and why does the compiler treat a const member function differently from a non-const one?
+   Level : Beginner
+
+Answer : Const correctness means using const consistently to express which data isn't meant to change — const parameters, const member functions, and const references — so the compiler can catch accidental mutation at compile time rather than it becoming a runtime bug. A const member function promises not to modify the object's observable state (technically, the implicit this pointer becomes a pointer-to-const inside that function), which matters because it's the only way to call a member function on a const object or through a const reference; the compiler enforces this by rejecting non-const member calls or member modification inside a function marked const, except for members explicitly marked mutable.
+
+Example : class Account {
+    double balance;
+public:
+    double getBalance() const { return balance; }  // can be called on a const Account&
+    void deposit(double amt) { balance += amt; }    // cannot be called on a const Account&
+};
+void printBalance(const Account& acc) {
+    std::cout << acc.getBalance();  // OK; acc.deposit(10) here would fail to compile
+}
+
+--------------------------------------------------------------------------
+
+5. Question : What is the difference between passing an argument by value and by reference in C++?
+   Level : Beginner
+
+Answer : A by-value parameter receives its own independent copy of the argument, so modifications inside the function don't affect the caller's object, at the cost of a copy (which can be expensive for large objects). A reference parameter (T&) aliases the caller's actual object, so the function can read and modify it directly without copying, and const T& gives the efficiency of avoiding a copy while still preventing the function from modifying the caller's object — which is why const T& is the conventional choice for passing large objects that shouldn't be modified.
+
+Example : void byValue(std::vector<int> v) { v.push_back(1); }         // caller's vector unaffected
+void byRef(std::vector<int>& v) { v.push_back(1); }          // modifies caller's vector
+void byConstRef(const std::vector<int>& v) { /* read v, no copy, no mutation allowed */ }
+
+--------------------------------------------------------------------------
+
+6. Question : What does the inline keyword actually do in modern C++, and what is a common misconception about it?
+   Level : Intermediate
+
+Answer : The primary, guaranteed effect of inline today is exempting a function from the One Definition Rule violation that would otherwise occur if it's defined (not just declared) identically in multiple translation units — which is exactly why functions defined directly in headers need to be inline (or a template, or constexpr, which implies inline). The common misconception is that inline forces the compiler to substitute the function's body at each call site to avoid call overhead; modern compilers make that inlining decision independently based on their own heuristics and optimization level, regardless of whether the keyword is present, so inline is best understood as a linkage rule, not a performance guarantee.
+
+Example : // Defined directly in a header, included in multiple .cpp files:
+inline int square(int x) { return x * x; }
+// Without 'inline' here, multiple translation units defining this function
+// would violate the One Definition Rule at link time.
+
+--------------------------------------------------------------------------
+
+
+
+MEMORY MANAGEMENT
+
+==============================================================================
+
+
+
+7. Question : What is the difference between malloc and calloc?
+   Level : Beginner
+
+Answer : Both allocate raw, uninitialized-by-default heap memory and return a void*, but malloc(size) allocates a single block of the requested size with unspecified (garbage) contents, while calloc(num, size) allocates space for num elements of size bytes each and explicitly zero-initializes the entire block. calloc is the natural choice when you specifically need zeroed memory (like a fresh array of counters) without a separate memset call, and its two-argument form also helps guard against a multiplication overflow that a manual num * size passed to malloc could silently produce.
+
+Example : int* a = (int*)malloc(10 * sizeof(int));   // 10 ints, indeterminate values
+int* b = (int*)calloc(10, sizeof(int));    // 10 ints, all zero-initialized
+free(a); free(b);
+
+--------------------------------------------------------------------------
+
+8. Question : What is the difference between new and malloc, and why should they never be mixed with free or delete respectively?
+   Level : Intermediate
+
+Answer : malloc/free are C library functions that only allocate/release raw memory; they know nothing about C++ objects and never call constructors or destructors. new/delete are C++ operators: new allocates memory and then invokes the object's constructor, and delete invokes the destructor and then releases the memory. Mixing them is undefined behavior: calling free() on memory obtained from new skips the destructor entirely (leaking any resources the object owned, like heap memory or file handles), and calling delete on memory obtained from malloc can crash or corrupt the heap, because the two allocators may use entirely different internal bookkeeping and delete additionally attempts to run a destructor on memory that was never properly constructed as that C++ type.
+
+Example : MyClass* a = new MyClass();  // allocates memory AND calls the constructor
+delete a;                     // calls the destructor AND deallocates
+
+MyClass* b = (MyClass*)malloc(sizeof(MyClass));  // allocates raw memory only
+// b's constructor never ran — using b as a MyClass object here is already unsafe
+free(b);  // correct pairing for malloc, but the object was never properly constructed
+
+--------------------------------------------------------------------------
+
+9. Question : What happens if you use delete on memory that was allocated with malloc, or free on memory allocated with new?
+   Level : Intermediate
+
+Answer : Both are undefined behavior, not just bad style. delete on malloc'd memory will attempt to invoke a destructor on memory that was never constructed as that type, and its deallocation logic assumes the C++ runtime's own allocator bookkeeping, which malloc's implementation may lay out completely differently — this can crash immediately, corrupt the heap silently, or appear to work by luck depending on the platform and allocator, which makes it a particularly dangerous class of bug. free on new'd memory never runs the destructor, so any resources the object's destructor would have released (further heap allocations, file handles, locks) leak, and it similarly risks heap corruption from mismatched allocator bookkeeping.
+
+Example : // Both of the following are undefined behavior and should never appear in real code:
+int* a = (int*)malloc(sizeof(int));
+delete a;      // WRONG: delete expects new's allocation bookkeeping
+
+int* b = new int(5);
+free(b);       // WRONG: skips no-op destructor here, but wrong for class types generally
+               // and still mismatches new's allocator bookkeeping
+
+--------------------------------------------------------------------------
+
+10. Question : What is virtual memory, and why does it matter for how a C++ program's memory layout works?
+   Level : Intermediate
+
+Answer : Virtual memory is an abstraction provided by the operating system and CPU's memory management unit that gives each process its own private, contiguous-looking address space, which the OS maps to physical RAM (or disk-backed swap/page files) transparently via page tables. This is why a program can be compiled and linked assuming fixed addresses without knowing what else is running on the machine, why one process can't directly read another's memory, and why a program can appear to use more memory than the machine physically has installed, with the OS paging less-used memory out to disk as needed. Within a C++ process's virtual address space, memory is conventionally organized into segments — the stack (function call frames, grows and shrinks automatically), the heap (dynamic allocations via new/malloc, must be explicitly managed), and static/global storage and the code segment (fixed at load time).
+
+Example : // Two separate running instances of the same program can each believe their
+// heap-allocated pointer lives at, say, address 0x0000... — virtual memory maps
+// each process's identical-looking virtual addresses to different physical RAM.
+
+--------------------------------------------------------------------------
+
+11. Question : Explain how memory is typically allocated for a running C++ program: stack, heap, and static storage.
+   Level : Intermediate
+
+Answer : The stack holds function call frames — local variables, function parameters, return addresses — and is managed automatically by the compiler-generated code: entering a function pushes a frame, returning pops it, which makes stack allocation extremely fast but limited in size and lifetime (a local variable's memory is invalid the moment its scope ends). The heap holds memory explicitly requested with new or malloc, which persists until explicitly freed with delete or free (or managed automatically via a smart pointer); heap allocation is slower than stack allocation and is the programmer's (or smart pointer's) responsibility to release, making it the primary source of memory leaks and dangling-pointer bugs. Static/global storage holds variables with program-length lifetime (global variables, static local variables, string literals), allocated once when the program loads and persisting for the program's entire run.
+
+Example : void f() {
+    int local = 5;              // stack: destroyed when f() returns
+    static int counter = 0;     // static storage: persists across calls to f()
+    int* heapVal = new int(10); // heap: persists until explicitly deleted
+    ++counter;
+    delete heapVal;
+}
+
+--------------------------------------------------------------------------
+
+12. Question : Why is RAII (Resource Acquisition Is Initialization) considered central to idiomatic modern C++?
+   Level : Intermediate
+
+Answer : RAII ties a resource's lifetime to an object's lifetime: acquiring the resource (memory, a file handle, a mutex lock, a socket) happens in the constructor, and releasing it happens in the destructor, which C++ guarantees runs automatically when the object goes out of scope — including when an exception unwinds the stack. This makes resource cleanup deterministic and exception-safe without needing manual cleanup code at every possible exit point (early returns, exceptions, breaks), which is exactly the problem manual malloc/free or lock/unlock pairing is prone to getting wrong. std::unique_ptr, std::shared_ptr, std::lock_guard, and std::fstream are all standard-library RAII wrappers built on this idea.
+
+Example : void process() {
+    std::lock_guard<std::mutex> lock(mtx);  // mutex acquired here
+    doWorkThatMightThrow();                  // if this throws...
+}  // ...the mutex is still released automatically as 'lock' is destroyed during unwinding
+
+--------------------------------------------------------------------------
+
+13. Question : Why should a polymorphic base class usually declare a virtual destructor?
+   Level : Intermediate
+
+Answer : If a base class is deleted through a base-class pointer without a virtual destructor, only the base class's destructor runs, not the derived class's — leaving any resources the derived part of the object owns (heap memory, file handles) leaked, and technically making the deletion undefined behavior according to the standard. Declaring the base destructor virtual ensures that deleting through a base pointer correctly runs the full destructor chain, starting with the most-derived class's destructor and proceeding up to the base. This only matters for classes actually intended to be used polymorphically through base pointers/references; a class not designed for inheritance and polymorphic deletion doesn't need a virtual destructor and paying for the vtable overhead would be unnecessary.
+
+Example : struct Base { virtual ~Base() = default; virtual void speak() { } };
+struct Derived : Base { std::vector<int> data; void speak() override { } };
+
+Base* b = new Derived();
+delete b;  // With a virtual destructor: Derived's destructor runs, 'data' is properly freed.
+           // Without it: only Base's destructor would run — undefined behavior, and a leak.
+
+--------------------------------------------------------------------------
+
+14. Question : What is the Rule of Five (and how does it relate to the older Rule of Three)?
+   Level : Intermediate
+
+Answer : The Rule of Three says that if a class needs a user-defined destructor, copy constructor, or copy assignment operator, it almost certainly needs all three, because needing one usually means the class manages a resource that the compiler's default member-wise copy/destroy logic would handle incorrectly (like a raw owned pointer). The Rule of Five extends this for C++11 and later: if you need any of those three, you should also consider defining a move constructor and move assignment operator, since without them the compiler either won't generate move operations at all (falling back to copying, which is correct but misses a performance opportunity) or, in some cases, won't generate them because a user-declared destructor is present, silently disabling moves. In modern C++, many classes should instead follow the 'Rule of Zero' — hold resources exclusively through RAII types like unique_ptr/vector/string that already manage the five operations correctly, so the class itself needs to declare none of them.
+
+Example : class Buffer {
+    int* data; size_t size;
+public:
+    Buffer(size_t n) : data(new int[n]), size(n) {}
+    ~Buffer() { delete[] data; }
+    Buffer(const Buffer& other);              // copy constructor
+    Buffer& operator=(const Buffer& other);    // copy assignment
+    Buffer(Buffer&& other) noexcept;           // move constructor
+    Buffer& operator=(Buffer&& other) noexcept; // move assignment
+};
+// A 'Rule of Zero' alternative would replace the raw pointer with std::vector<int>
+// or std::unique_ptr<int[]>, needing none of these five declared manually.
+
+--------------------------------------------------------------------------
+
+15. Question : What is the difference between std::unique_ptr and std::shared_ptr, and when would you choose each?
+   Level : Intermediate
+
+Answer : std::unique_ptr expresses exclusive ownership of a heap resource — it can't be copied, only moved, and its destructor deletes the owned object, making ownership transfer explicit and the cost essentially free compared to a raw pointer. std::shared_ptr expresses shared ownership using an atomically-updated reference count; the resource is deleted only when the last shared_ptr owning it is destroyed, which costs a small amount of overhead for the control block and atomic increments/decrements. Prefer unique_ptr as the default whenever a resource genuinely has one clear owner (which is most of the time), and reach for shared_ptr only when multiple independent parts of the code legitimately need to share ownership and the resource's lifetime should extend until all of them are done with it.
+
+Example : std::unique_ptr<Widget> makeWidget() { return std::make_unique<Widget>(); }
+// ownership transfers on return, no copying of the Widget occurs
+
+std::shared_ptr<Cache> cache = std::make_shared<Cache>();
+auto worker1 = cache; // shared ownership; refcount now 2
+auto worker2 = cache; // refcount now 3 — Cache is destroyed once all three go out of scope
+
+--------------------------------------------------------------------------
+
+16. Question : What is a std::weak_ptr, and how does it break a shared_ptr reference cycle?
+   Level : Advanced
+
+Answer : A std::weak_ptr holds a non-owning reference to an object managed by a shared_ptr, without incrementing the reference count, and must be converted to a temporary shared_ptr (via .lock()) before the object can actually be accessed, which safely returns an empty/null result if the object has already been destroyed. This solves the classic reference-cycle problem: if two objects hold shared_ptrs to each other (A owns a shared_ptr to B, B owns a shared_ptr to A), neither reference count ever reaches zero even after all external references are gone, so neither object is ever destroyed — a memory leak. Replacing one direction of that cycle (typically the 'back-reference,' like a child pointing back to its parent) with a weak_ptr breaks the cycle, since a weak_ptr doesn't keep the object alive.
+
+Example : struct Child; 
+struct Parent { std::shared_ptr<Child> child; };
+struct Child { std::weak_ptr<Parent> parent; };  // weak_ptr avoids the ownership cycle
+
+auto p = std::make_shared<Parent>();
+auto c = std::make_shared<Child>();
+p->child = c;
+c->parent = p;  // no cycle: Child doesn't keep Parent alive
+
+--------------------------------------------------------------------------
+
+
+
+POLYMORPHISM & VIRTUAL FUNCTIONS
+
+==============================================================================
+
+
+
+17. Question : What are virtual functions, and how do they enable runtime polymorphism?
+   Level : Intermediate
+
+Answer : A virtual function is a member function that a derived class can override, and a call to it through a base-class pointer or reference resolves at runtime to the override matching the object's actual (dynamic) type, rather than the static type of the pointer/reference used to call it. The language specifies this dispatch behavior; it's commonly implemented by compilers using a vtable (a per-class table of function pointers) and a hidden vptr member added to each polymorphic object, though the standard doesn't mandate this specific implementation. This is the standard C++ mechanism for runtime polymorphism — writing code against a base-class interface that correctly invokes derived-class-specific behavior without the caller needing to know the concrete type.
+
+Example : struct Base { virtual void speak() { std::cout << "Base"; } };
+struct Derived : Base { void speak() override { std::cout << "Derived"; } };
+
+Base& b = derivedInstance;
+b.speak(); // prints "Derived" — resolved at runtime based on the object's actual type
+
+--------------------------------------------------------------------------
+
+18. Question : What is a pure virtual function, and how does it make a class abstract?
+   Level : Beginner
+
+Answer : A pure virtual function is declared with = 0 instead of a body (though it can optionally still provide a base implementation that derived classes call explicitly via Base::method()), and declaring at least one pure virtual function makes the class abstract — it can no longer be instantiated directly, only through a derived class that overrides every pure virtual function. This is how C++ expresses an interface or a required-to-implement contract: the base class defines the shape of the operation without dictating its implementation, forcing any concrete subclass to supply one.
+
+Example : struct Shape {
+    virtual double area() const = 0;  // pure virtual: makes Shape abstract
+    virtual ~Shape() = default;
+};
+struct Circle : Shape {
+    double radius;
+    double area() const override { return 3.14159 * radius * radius; }
+};
+// Shape s; would fail to compile — Shape is abstract
+
+--------------------------------------------------------------------------
+
+19. Question : What is virtual inheritance, and what problem does it solve?
+   Level : Advanced
+
+Answer : Virtual inheritance addresses the 'diamond problem': if class D inherits from both B and C, and both B and C inherit from a common base A, then without virtual inheritance D ends up containing two separate subobjects of A (one via B, one via C), which is ambiguous and wasteful when only one logical A is intended. Declaring the inheritance from A as virtual in both B and C ensures D contains exactly one shared A subobject, at the cost of a somewhat more complex and slightly slower object layout (an extra level of indirection to locate the shared base), and the requirement that the most-derived class is responsible for initializing the virtual base directly, bypassing the intermediate classes' own initialization of it.
+
+Example : struct A { int value; };
+struct B : virtual A { };
+struct C : virtual A { };
+struct D : B, C { };  // D has exactly one A subobject, not two, because of virtual inheritance
+
+--------------------------------------------------------------------------
+
+20. Question : How does runtime polymorphism actually work under a typical compiler implementation — what is a vtable and a vptr?
+   Level : Advanced
+
+Answer : While the C++ standard only specifies the observable behavior of virtual dispatch and not its implementation, most compilers implement it with a vtable — a static, per-class array of function pointers, one entry per virtual function, pointing to the correct override for that class — and a vptr, a hidden pointer added to each object of a polymorphic class, set during construction to point to its class's vtable. A virtual call through a base pointer follows the object's vptr to its actual class's vtable and calls the function pointer at the appropriate slot, which is what allows the same call syntax to invoke different code depending on the object's dynamic type, at the cost of one extra pointer indirection compared to a non-virtual (statically resolved) call.
+
+Example : // Conceptual layout for: struct Base { virtual void f(); virtual void g(); };
+//                        struct Derived : Base { void f() override; };
+// Derived object layout: [ vptr -> Derived's vtable ] [ Base's other data members ] ...
+// Derived's vtable: [ slot 0: Derived::f ] [ slot 1: Base::g (inherited, not overridden) ]
+
+--------------------------------------------------------------------------
+
+21. Question : What is the Rule of Five's relevance for a base class specifically — why is a defaulted or explicitly-declared virtual destructor still needed even when using = default?
+   Level : Advanced
+
+Answer : A base class intended for polymorphic use needs its destructor to be virtual so deletion through a base pointer runs the correct derived destructor, as covered earlier — but declaring any destructor (even `~Base() = default;`) is still a user declaration for Rule-of-Five purposes, which by itself suppresses the compiler's automatically-generated move constructor and move assignment operator (though copy operations are still generated, just with a deprecation warning in some compilers). If a base class needs to remain movable, the move operations may need to be explicitly defaulted alongside the virtual destructor, or the class should rely on Rule-of-Zero design so it never needs a user-declared destructor in the first place.
+
+Example : struct Base {
+    virtual ~Base() = default;         // needed for correct polymorphic deletion
+    Base(Base&&) = default;             // must be explicitly restored:
+    Base& operator=(Base&&) = default;  // declaring ~Base() suppressed the implicit ones
+};
+
+--------------------------------------------------------------------------
+
+
+
+VALUE CATEGORIES & MOVE SEMANTICS
+
+==============================================================================
+
+
+
+22. Question : What is an lvalue, and how does it differ from an rvalue?
+   Level : Intermediate
+
+Answer : An lvalue refers to an object that has an identifiable, persistent location in memory and can generally appear on the left side of an assignment (a named variable, a dereferenced pointer, an element accessed via subscript). An rvalue is typically a temporary value without a persistent, addressable identity beyond the current expression (a literal, the result of most non-reference-returning function calls, an arithmetic expression's result). This distinction is what move semantics is built on: an rvalue reference (T&&) can bind to an rvalue specifically because it's safe to 'steal' resources from something about to be discarded anyway, which wouldn't be safe to do to an lvalue that the rest of the program might still use.
+
+Example : int x = 5;      // x is an lvalue; 5 is an rvalue (a literal)
+int y = x + 1;  // (x + 1) is an rvalue — a temporary with no persistent address
+int& refX = x;      // OK: lvalue reference binds to an lvalue
+int&& refTemp = x + 1; // OK: rvalue reference binds to an rvalue temporary
+
+--------------------------------------------------------------------------
+
+23. Question : Does calling std::move on an object actually move it?
+   Level : Intermediate
+
+Answer : No — std::move performs no operation on the object itself; it's purely a cast that converts its argument to an rvalue reference (technically std::remove_reference<T>::type&&), which signals to the compiler and to overload resolution that this object is eligible to be moved from. Whether an actual move happens at all depends on what the resulting rvalue reference is subsequently used for: if it's passed to a move constructor or move assignment operator, that function's implementation is what actually transfers the resource. If nothing consumes the moved-from rvalue reference, or the type has no move constructor and falls back to copying, std::move has effectively done nothing productive, and the object it was applied to should still be treated as being in a valid but unspecified state afterward regardless.
+
+Example : std::string a = "hello";
+std::string b = std::move(a);
+// std::move(a) itself just casts 'a' to an rvalue reference.
+// The actual transfer of a's internal buffer to b happens inside std::string's
+// move constructor, which is selected because of that cast.
+// 'a' is now in a valid but unspecified state — safe to reassign, unsafe to assume empty.
+
+--------------------------------------------------------------------------
+
+24. Question : What is a constant reference (const T&), and why is it commonly used for function parameters?
+   Level : Beginner
+
+Answer : A const T& parameter binds to the caller's argument without copying it (unlike a plain by-value T parameter) while preventing the function from modifying it (unlike a plain T& parameter), which makes it the conventional choice for passing objects that are potentially expensive to copy — strings, vectors, user-defined classes — when the function only needs to read them. An added benefit is that a const reference can bind to a temporary (an rvalue), extending that temporary's lifetime for the duration of the reference, which a plain non-const reference cannot do.
+
+Example : void printName(const std::string& name) {  // no copy of the caller's string is made
+    std::cout << name;
+}
+printName("literal");  // OK: const& can bind to a temporary; a plain std::string& could not
+
+--------------------------------------------------------------------------
+
+25. Question : Predict the output: a base class and derived class each have constructors and destructors that print a message, and an object of the derived type is created and then destroyed. In what order do the constructors and destructors run?
+   Level : Intermediate
+
+Answer : Construction runs base-to-derived: the base class's constructor completes fully before the derived class's constructor body begins, because the derived part of the object logically depends on the base part already existing. Destruction runs in the exact reverse order, derived-to-base: the derived destructor runs first, then the base destructor, ensuring the derived part is torn down while its base subobject is still valid, in case the derived destructor needs to reference base members.
+
+Example : struct Base { Base(){std::cout<<"Base ctor\n";} ~Base(){std::cout<<"Base dtor\n";} };
+struct Derived : Base { Derived(){std::cout<<"Derived ctor\n";} ~Derived(){std::cout<<"Derived dtor\n";} };
+int main() { Derived d; }
+// Output:
+// Base ctor
+// Derived ctor
+// Derived dtor
+// Base dtor
+
+--------------------------------------------------------------------------
+
+26. Question : Predict the output: code that calls a virtual function through a base-class pointer, where the derived class overrides it, versus calling it from inside the base class's own constructor.
+   Level : Advanced
+
+Answer : Called through a base pointer/reference after construction is complete, a virtual function correctly dispatches to the derived override, as expected. But if a virtual function is called from within the base class's own constructor (or destructor), dynamic dispatch does not reach the derived override — the object's dynamic type is treated as the base class during its own construction, because the derived part of the object hasn't been constructed yet (and, symmetrically, is already destroyed during base destruction), so the base class's own version of the function runs instead, which surprises many C++ programmers coming from languages where this isn't the case.
+
+Example : struct Base {
+    Base() { init(); }              // calls Base::init(), NOT Derived::init()
+    virtual void init() { std::cout << "Base::init\n"; }
+};
+struct Derived : Base {
+    void init() override { std::cout << "Derived::init\n"; }
+};
+int main() { Derived d; }
+// Output: Base::init  (not Derived::init, even though d is a Derived object)
+
+--------------------------------------------------------------------------
+
+27. Question : Predict the behavior: a function parameter is declared as a pointer to const (const int*) versus a const pointer (int* const), and code attempts to modify the pointer or the pointee in each case.
+   Level : Intermediate
+
+Answer : const int* p means p points to data that must be treated as const through p — you can reassign p to point elsewhere, but can't modify *p through p. int* const p means p itself is const — it must always point to the same address, but the data it points to can be modified through it (unless that data is separately const). Reading these declarations right-to-left from the const keyword's position is the standard trick: const int* reads as 'pointer to const int,' while int* const reads as 'const pointer to int.'
+
+Example : int x = 5, y = 10;
+const int* p1 = &x;
+p1 = &y;        // OK: p1 can be reassigned
+// *p1 = 20;    // ERROR: can't modify *p1 through a pointer-to-const
+
+int* const p2 = &x;
+*p2 = 20;       // OK: the pointee can be modified
+// p2 = &y;     // ERROR: p2 itself is const, can't be reassigned
+
+--------------------------------------------------------------------------
+
+
+
+TEMPLATES & GENERIC PROGRAMMING
+
+==============================================================================
+
+
+
+28. Question : What is a function template, and how does the compiler generate code from it?
+   Level : Intermediate
+
+Answer : A function template lets you write a single generic definition parameterized by one or more types (or, with C++20, constrained by concepts), and the compiler generates ('instantiates') a concrete function for each distinct set of template arguments actually used in the program, at compile time. This gives the performance of a hand-written type-specific function (no runtime type dispatch overhead) with the reusability of writing the logic once, at the cost of longer compile times and potential code bloat if the same template is instantiated for many distinct types.
+
+Example : template <typename T>
+T maxOf(T a, T b) { return (a > b) ? a : b; }
+
+maxOf(3, 7);       // instantiates maxOf<int>
+maxOf(3.5, 2.1);   // instantiates maxOf<double>, a separate generated function
+
+--------------------------------------------------------------------------
+
+29. Question : Why use templates instead of just writing separate overloaded functions or using runtime polymorphism for each type?
+   Level : Intermediate
+
+Answer : Separate overloads for each type duplicate the same logic by hand and don't scale to types the author didn't anticipate; templates express the logic once and let the compiler generate the type-specific versions automatically, including for types defined later by other code (like user-defined classes), as long as those types support the operations the template uses. Compared to runtime polymorphism (virtual functions), templates resolve which code to run at compile time rather than runtime, avoiding virtual-call overhead and enabling more aggressive compiler optimization (since the concrete type is known at each call site), at the cost of needing the type to be known at compile time and potentially larger binaries from multiple instantiations.
+
+Example : // Runtime polymorphism: one function, dynamic dispatch cost, needs a common base class
+void render(Shape* s) { s->draw(); }
+
+// Template: compiler generates a separate, directly-callable version per type,
+// with no virtual-call overhead and no requirement that types share a base class
+template <typename T> void render(const T& shape) { shape.draw(); }
+
+--------------------------------------------------------------------------
+
+30. Question : What is the difference between full template specialization and partial template specialization?
+   Level : Advanced
+
+Answer : Full specialization provides a completely separate implementation for one specific, fully-determined combination of template arguments, overriding the generic template entirely for that exact case. Partial specialization (available for class templates, not function templates, which instead use overloading for a similar effect) provides a separate implementation that still has some template parameters left generic, matching a pattern of arguments rather than one exact combination — most commonly used to specialize a template differently for pointer types, or for a fixed number of parameters, while still leaving the underlying type generic.
+
+Example : template <typename T> struct Container { /* generic version */ };
+
+template <> struct Container<bool> { /* full specialization: entirely custom for bool */ };
+
+template <typename T> struct Container<T*> { /* partial specialization: any pointer type */ };
+
+--------------------------------------------------------------------------
+
+31. Question : What is type deduction in C++, and how does auto differ from decltype?
+   Level : Intermediate
+
+Answer : Type deduction lets the compiler infer a type from context rather than requiring it to be spelled out explicitly — most visibly with auto for variable declarations and function return types, and with template argument deduction for function templates. auto deduces a type the same way template argument deduction does, generally dropping top-level const/reference qualifiers unless explicitly requested (auto&, const auto&), and is evaluated from the initializer's value. decltype instead inspects the exact declared type of an expression, including references and const-ness, without evaluating it, which makes it useful when you need to preserve a type's exact form (e.g., writing a function template whose return type should exactly match an expression involving its parameters).
+
+Example : const int& getRef();
+auto a = getRef();        // a is deduced as 'int' — top-level const/reference stripped
+decltype(getRef()) b = getRef();  // b is 'const int&' — decltype preserves the exact type
+
+--------------------------------------------------------------------------
+
+32. Question : When would you prefer templates over runtime polymorphism (virtual functions) for a given design, and vice versa?
+   Level : Advanced
+
+Answer : Prefer templates when the set of types is known and fixed at compile time, performance is critical enough that virtual-call overhead and lack of inlining matter, and the types involved don't need to share a common base class (duck typing based purely on supported operations, as with STL algorithms operating over any iterator type). Prefer runtime polymorphism when the concrete type genuinely isn't known until runtime (plugins, heterogeneous collections of objects processed uniformly, a factory returning different subclasses based on runtime input), when binary size matters more than raw call overhead (templates can bloat code size with many instantiations), or when the interface needs to be usable across a dynamically-loaded library boundary, where template instantiation visibility becomes awkward.
+
+Example : // Templates: type known at compile time, used generically without inheritance
+std::sort(container.begin(), container.end());  // works on any container's iterators
+
+// Virtual functions: type only known at runtime, from user input or a plugin
+std::unique_ptr<Shape> s = ShapeFactory::create(userSelectedType);
+s->draw();  // which draw() runs depends on runtime input, not compile-time knowledge
+
+--------------------------------------------------------------------------
+
+
+
+STL: CONTAINERS & ALGORITHMS
+
+==============================================================================
+
+
+
+33. Question : What is the difference between std::vector and std::list, and when would you choose one over the other?
+   Level : Intermediate
+
+Answer : std::vector stores elements contiguously in memory, giving O(1) random-access indexing and excellent cache locality (which usually dominates in practice for anything but pathological access patterns), but inserting or removing in the middle is O(n) because subsequent elements must shift, and growing beyond capacity requires reallocating and copying/moving all elements. std::list is a doubly-linked list, giving O(1) insertion/removal anywhere once you have an iterator to the position, but O(n) access to an arbitrary index (no random access), worse cache locality due to non-contiguous nodes, and per-element memory overhead for the link pointers. In practice, std::vector is the default choice for most use cases due to cache performance; std::list is chosen specifically when frequent insertion/removal in the middle of a large sequence is the dominant operation and iterator stability across those operations matters (vector iterators can be invalidated by insertion/reallocation; list iterators to unaffected elements remain valid).
+
+Example : std::vector<int> v = {1,2,3};
+v.insert(v.begin()+1, 99); // O(n): elements after index 1 shift right
+
+std::list<int> l = {1,2,3};
+auto it = std::next(l.begin());
+l.insert(it, 99);          // O(1): just relinks pointers, no shifting
+
+--------------------------------------------------------------------------
+
+34. Question : What is the difference between std::set and std::multiset?
+   Level : Intermediate
+
+Answer : Both maintain elements in sorted order, typically implemented as a balanced binary search tree (red-black tree) giving O(log n) insertion, deletion, and lookup. std::set enforces uniqueness — inserting a duplicate value is a no-op that doesn't add a second copy — while std::multiset explicitly allows multiple elements comparing equal, and operations like count() or equal_range() are meant to work with that multiplicity rather than assuming at most one match.
+
+Example : std::set<int> s = {1, 2, 2, 3};        // stored as {1, 2, 3} — duplicate silently ignored
+std::multiset<int> ms = {1, 2, 2, 3};  // stored as {1, 2, 2, 3} — duplicate kept
+ms.count(2);  // returns 2
+
+--------------------------------------------------------------------------
+
+35. Question : What is the difference between push_back and emplace_back on a std::vector?
+   Level : Intermediate
+
+Answer : push_back takes an already-constructed object (or something implicitly convertible to one) and copies or moves it into the container's storage. emplace_back instead forwards its arguments directly to the element type's constructor, constructing the new element in place within the container's storage, which avoids an extra temporary object and a subsequent copy/move for types constructed from multiple arguments. For a type with a cheap or already-existing object to insert, the difference is negligible or nonexistent (particularly with move semantics); the benefit of emplace_back is clearest when constructing a new object directly from constructor arguments.
+
+Example : std::vector<std::pair<int, std::string>> v;
+v.push_back(std::make_pair(1, "a"));  // constructs a temporary pair, then moves it in
+v.emplace_back(1, "a");                // constructs the pair directly in place, no temporary
+
+--------------------------------------------------------------------------
+
+36. Question : What is the difference between std::lower_bound and std::upper_bound?
+   Level : Intermediate
+
+Answer : Both perform binary search on a sorted range and run in O(log n) comparisons (though O(n) if used on a non-random-access iterator range, since advancing the iterator itself becomes linear). std::lower_bound returns an iterator to the first element not less than (i.e., ≥) the given value — the earliest valid insertion point that keeps the range sorted while placing the new element before any equal elements. std::upper_bound returns an iterator to the first element strictly greater than the given value — the insertion point after any equal elements. Together, [lower_bound, upper_bound) delimits exactly the range of elements equal to the given value, which is how std::equal_range is implemented.
+
+Example : std::vector<int> v = {1, 2, 2, 2, 5};
+auto lo = std::lower_bound(v.begin(), v.end(), 2);  // points to first '2' (index 1)
+auto hi = std::upper_bound(v.begin(), v.end(), 2);  // points to '5' (index 4)
+// hi - lo == 3, the count of elements equal to 2
+
+--------------------------------------------------------------------------
+
+37. Question : How would you find duplicate elements in a collection using the STL, and what's the time/space trade-off between different approaches?
+   Level : Intermediate
+
+Answer : A hash-set-based approach (std::unordered_set) gives expected O(n) time and O(n) extra space: iterate once, and if an element is already present in the set when you try to insert it, it's a duplicate. A sort-based approach (std::sort followed by a linear scan with std::adjacent_find, or comparing each element to the previous one) gives O(n log n) time but O(1) extra space (aside from sorting itself, which can be in-place), and also has the side effect of leaving the data sorted, which may or may not be desirable. The hash-based approach is generally preferred when extra memory is acceptable and preserving the original order matters; the sort-based approach is preferred when memory is constrained or the data needs to be sorted anyway.
+
+Example : std::vector<int> v = {4, 2, 5, 2, 8, 4};
+std::unordered_set<int> seen;
+for (int x : v) {
+    if (!seen.insert(x).second) {
+        std::cout << x << " is a duplicate\n";  // insert().second is false if already present
+    }
+}
+
+--------------------------------------------------------------------------
+
+
+
+POINTERS & CODING PROBLEMS
+
+==============================================================================
+
+
+
+38. Question : What is a pointer, and what is the difference between a pointer and a reference in C++?
+   Level : Beginner
+
+Answer : A pointer is a variable that stores a memory address, can be reassigned to point to different objects over its lifetime, can be null, and requires explicit dereferencing (*p) to access the pointed-to object. A reference is an alias for an existing object established at initialization, cannot be reassigned to refer to a different object afterward, cannot be null (a reference must be bound to a valid object when declared, at least in well-defined code — a dangling reference from a destroyed object is possible but is itself undefined behavior to use), and is used with the same syntax as the object itself, no explicit dereference needed. References are generally preferred for function parameters when null isn't a meaningful state and reseating isn't needed, since they're syntactically simpler and their non-null invariant makes calling code slightly safer to reason about.
+
+Example : int x = 10;
+int* p = &x;   // p holds x's address; can be reassigned: p = &otherVar;
+int& r = x;    // r is an alias for x; r = otherVar; would assign otherVar's VALUE to x, not reseat r
+*p = 20;       // modifies x through the pointer
+r = 30;        // modifies x directly through the reference
+
+--------------------------------------------------------------------------
+
+39. Question : Design a simple Array class in C++ that manages its own dynamically allocated storage. What does it need to get right?
+   Level : Advanced
+
+Answer : A hand-rolled dynamic array needs to correctly implement the Rule of Five (or Rule of Three at minimum): a destructor releasing the allocated buffer, a copy constructor and copy assignment operator that perform a deep copy (not copying the raw pointer, which would cause a double-free), and ideally move operations to avoid unnecessary deep copies when the source is a temporary. It should also handle self-assignment safely in operator=, use bounds-checked access (or clearly document that operator[] is unchecked while at() throws, matching std::vector's convention), and correctly manage the distinction between size (elements in use) and capacity (allocated slots) if it needs to support efficient growth, similar to std::vector's amortized-O(1) push_back.
+
+Example : class Array {
+    int* data; size_t size_;
+public:
+    explicit Array(size_t n) : data(new int[n]()), size_(n) {}
+    ~Array() { delete[] data; }
+    Array(const Array& other) : data(new int[other.size_]), size_(other.size_) {
+        std::copy(other.data, other.data + size_, data);
+    }
+    Array& operator=(const Array& other) {
+        if (this == &other) return *this;
+        int* newData = new int[other.size_];
+        std::copy(other.data, other.data + other.size_, newData);
+        delete[] data;
+        data = newData; size_ = other.size_;
+        return *this;
+    }
+    int& operator[](size_t i) { return data[i]; }
+    size_t size() const { return size_; }
+};
+
+--------------------------------------------------------------------------
+
+40. Question : Write a function to reverse a singly linked list in C++, and discuss ownership if the list is built from raw pointers versus smart pointers.
+   Level : Intermediate
+
+Answer : The standard iterative approach walks the list once, re-pointing each node's next to the previous node as it goes, in O(n) time and O(1) extra space. With raw pointers, reversing is purely a matter of re-linking — no allocation or deallocation is needed, and the caller retains responsibility for eventually deleting all nodes. If the list is instead built from std::unique_ptr<Node> for owned links, reversing is more involved because a unique_ptr can't simply be reassigned to point elsewhere without transferring ownership explicitly (std::move), and naive re-linking can accidentally destroy nodes prematurely if ownership isn't moved correctly at each step — which is worth mentioning explicitly if the interviewer specifies smart-pointer-based nodes.
+
+Example : struct Node { int val; Node* next; };
+
+Node* reverse(Node* head) {
+    Node* prev = nullptr;
+    Node* current = head;
+    while (current) {
+        Node* next = current->next;
+        current->next = prev;
+        prev = current;
+        current = next;
+    }
+    return prev;  // new head
+}
+
+--------------------------------------------------------------------------

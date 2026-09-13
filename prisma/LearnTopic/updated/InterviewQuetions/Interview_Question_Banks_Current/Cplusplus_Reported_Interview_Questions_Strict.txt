@@ -1,0 +1,390 @@
+C++ INTERVIEW QUESTIONS — STRICTLY EVIDENCE-BASED
+
+Purpose
+
+This bank is intentionally strict. It contains questions that are
+explicitly reported in published candidate interview experiences. The
+wording has been lightly normalized for clarity; the underlying
+question/topic is taken from the cited interview report. This is NOT a
+synthetic “commonly asked” question bank.
+
+Evidence labels
+
+[REPORTED] = Explicitly described in a published candidate interview
+report. [REPEATED] = The same or substantially the same topic appears in
+multiple independent interview reports. [CODING] = A coding/task
+question explicitly reported in an interview.
+
+IMPORTANT
+
+Do not market every question as a verbatim transcript. The wording below
+is normalized from candidate reports. Company/source attribution is
+included so users can verify the evidence.
+
+==================================================== 1. D.E. SHAW —
+REPORTED C++ QUESTIONS
+====================================================
+
+[REPORTED] What are virtual functions? Source: D.E. Shaw interview
+experience.
+
+[REPEATED] What is a virtual destructor? Source: D.E. Shaw interview
+experiences; also reported by Synopsys and Cadence.
+
+[REPORTED] What is a copy constructor? Source: D.E. Shaw interview
+experience.
+
+[REPORTED] What is an initializer list? Source: D.E. Shaw interview
+experience.
+
+[REPORTED] What is virtual inheritance? Source: D.E. Shaw interview
+experience.
+
+[REPORTED] What are inner classes in C++? Source: D.E. Shaw interview
+experience.
+
+[REPORTED] What is a pure virtual function and what is its use? Source:
+D.E. Shaw interview experience.
+
+[REPORTED] Explain how a virtual table works, including multiple
+inheritance. Source: D.E. Shaw interview experience.
+
+[REPORTED] What is runtime polymorphism? Implement it. Source: D.E. Shaw
+interview experience.
+
+[REPORTED] What is polymorphism? Implement it. Source: D.E. Shaw
+interview experience.
+
+[REPORTED] Implement operator overloading for the << operator. Source:
+D.E. Shaw interview experience.
+
+[REPORTED] Implement operator overloading for the + operator. Source:
+D.E. Shaw interview experience.
+
+[REPORTED] Implement a copy constructor for a class containing a
+character array. Source: D.E. Shaw interview experience.
+
+[REPORTED] Implement the assignment operator for a class containing a
+character array. Source: D.E. Shaw interview experience.
+
+[REPORTED] What are smart pointers? Source: D.E. Shaw interview
+experience.
+
+[REPORTED] What is upcasting and downcasting? Source: D.E. Shaw
+interview experience.
+
+[REPORTED] Where should the virtual keyword be used? Source: D.E. Shaw
+interview experience.
+
+[REPORTED] How do you call the constructor of the base class from a
+derived class? Source: D.E. Shaw interview experience.
+
+[REPORTED] What is data encapsulation? Give an example and explain its
+C++ implementation. Source: D.E. Shaw interview experience.
+
+[REPORTED] What are dangling pointers? Source: D.E. Shaw interview
+experience.
+
+[REPORTED] What is a memory leak? How do you handle it? Source: D.E.
+Shaw interview experience.
+
+[REPORTED] Does C++ have automatic garbage collection? Source: D.E. Shaw
+interview experience.
+
+[REPORTED] What is the use of free/delete in C++? Source: D.E. Shaw
+interview experience.
+
+[REPORTED] What causes a segmentation fault/core dump? Source: D.E. Shaw
+interview experience.
+
+[REPORTED] What is a virtual constructor? Is it possible in C++? Source:
+D.E. Shaw interview experience. Candidate report states that a virtual
+constructor is not possible.
+
+[REPORTED] Why is a virtual destructor possible when a virtual
+constructor is not? Source: D.E. Shaw interview experience.
+
+==================================================== 2. SYNOPSYS —
+REPORTED C++ QUESTIONS
+====================================================
+
+[REPORTED] What is a virtual destructor? Source: Synopsys R&D 2 Engineer
+interview experience.
+
+[REPORTED] Can static be used with the const qualifier? Source: Synopsys
+R&D 2 Engineer interview experience.
+
+[REPORTED] Can the value of a const variable be changed in C++? Source:
+Synopsys R&D 2 Engineer interview experience.
+
+[REPORTED] What is a constant reference? Source: Synopsys R&D 2 Engineer
+interview experience.
+
+[REPEATED] What is the difference between call by reference and call by
+value? Source: Synopsys R&D 2 Engineer interview experience.
+
+[REPORTED] How would you make an object non-copyable? Source: Synopsys
+R&D 2 Engineer interview experience.
+
+[REPORTED] Explain the implementation of the virtual keyword using vptr
+and vtable. Source: Synopsys R&D 2 Engineer interview experience.
+
+[REPORTED] What changes when the virtual keyword is moved between
+different declarations in code? Source: Synopsys R&D 2 Engineer
+interview experience.
+
+[REPORTED] What is the difference between function overloading and
+function overriding? Source: Synopsys R&D 2 Engineer interview
+experience.
+
+[REPEATED] Explain deep copy versus shallow copy. Source: Synopsys R&D 2
+Engineer interview experience.
+
+[REPORTED] What are references in C++? Source: Synopsys R&D 2 Engineer
+interview experience.
+
+[CODING] Design an Array class using C++ features. Source: Synopsys R&D
+2 Engineer interview experience.
+
+[CODING] Reverse a linked list. Source: Synopsys R&D 2 Engineer
+interview experience.
+
+[CODING] Implement Fibonacci using both iterative and recursive
+approaches. Source: Synopsys R&D 2 Engineer interview experience.
+
+[CODING] Determine whether a binary tree is a BST. Source: Synopsys R&D
+2 Engineer interview experience.
+
+[REPORTED] Explain BFS and DFS. Source: Synopsys R&D 2 Engineer
+interview experience.
+
+[CODING] Copy a linked list with next and random pointers. Source:
+Synopsys R&D 2 Engineer interview experience.
+
+[REPORTED] Design C++ classes for a circuit and explain which C++
+features you would use. Source: Synopsys R&D 2 Engineer interview
+experience.
+
+==================================================== 3. ZSCALER —
+REPORTED C++ QUESTIONS
+====================================================
+
+[REPORTED] Explain the four pillars of object-oriented programming.
+Source: Zscaler C++ developer interview experience.
+
+[REPEATED] What is a virtual function? Source: Zscaler C++ developer
+interview experience.
+
+[REPEATED] What is polymorphism? Source: Zscaler C++ developer interview
+experience.
+
+[REPORTED] What is a friend function? Source: Zscaler C++ developer
+interview experience.
+
+[REPORTED] What is deadlock? Source: Zscaler C++ developer interview
+experience.
+
+[REPORTED] Explain pointers in C++. Source: Zscaler C++ interview
+experiences.
+
+[REPORTED] Explain void pointers. Source: Zscaler C++ developer
+interview experience.
+
+[REPORTED] Explain smart pointers. Source: Zscaler C++ developer
+interview experience.
+
+[REPORTED] Explain type casting in C++. Source: Zscaler C++ developer
+interview experience.
+
+[REPEATED] What happens when the virtual keyword is used? Source:
+Zscaler C++ developer interview experience.
+
+[REPORTED] Explain operator overloading. Source: Zscaler C++ developer
+interview experience.
+
+[REPORTED] Write code for operator overloading. Source: Zscaler C++
+developer interview experience.
+
+[REPORTED] Explain dynamic memory allocation. Source: Zscaler C++
+developer interview experience.
+
+[REPORTED] Where is memory allocated when code is executed? Source:
+Zscaler C++ developer interview experience.
+
+[REPORTED] What is cache and where is it located? Source: Zscaler C++
+developer interview experience.
+
+[REPORTED] Explain the stack and heap in relation to memory allocation.
+Source: Zscaler C++ interview experience.
+
+[REPORTED] Explain pointer output questions involving different pointer
+types. Source: Zscaler C++ developer interview experience.
+
+[REPORTED] Explain vtables and when they are created. Source: Zscaler
+C++ interview experience.
+
+[REPORTED] Explain virtual destructors. Source: Zscaler C++ interview
+experience.
+
+[REPORTED] Explain runtime polymorphism and implement it. Source:
+Zscaler C++ interview experience.
+
+[REPORTED] Explain C++ pointers including void pointers, pointer
+arithmetic, constant pointers and pointers to constants. Source: Zscaler
+C++ Developer / ASE interview experiences.
+
+[CODING] Write a function to determine whether a system is little-endian
+or big-endian. Source: Zscaler ASE C++ interview experience.
+
+[CODING] Implement logic to determine whether two IPv4 addresses belong
+to the same network given IPs and subnet masks. Source: Zscaler ASE C++
+interview experience.
+
+==================================================== 4. CADENCE —
+REPORTED C++ QUESTIONS
+====================================================
+
+[REPORTED] How does std::map work internally? Source: Cadence C++
+Software Developer interview experience.
+
+[REPORTED] What is the time complexity of std::map? Source: Cadence C++
+Software Developer interview experience.
+
+[REPORTED] How does the red-black tree used by map work? Source: Cadence
+C++ Software Developer interview experience.
+
+[REPORTED] What are the properties of a red-black tree? Source: Cadence
+C++ Software Developer interview experience.
+
+[REPEATED] What is a const member function? Source: Cadence C++ Software
+Developer interview experience.
+
+[REPEATED] What is polymorphism and how can it be achieved in C++?
+Source: Cadence C++ Software Developer interview experience.
+
+[REPEATED] Explain virtual functions and vtable. Source: Cadence C++
+Software Developer interview experience.
+
+[REPEATED] Why is a virtual destructor required? Source: Cadence C++
+Software Developer interview experience.
+
+[REPORTED] Explain memory allocation for a parent object and child
+object in a polymorphic hierarchy. Source: Cadence C++ Software
+Developer interview experience.
+
+[REPORTED] What are functors in C++? Source: Cadence C++ Software
+Developer interview experience.
+
+==================================================== 5. D.E. SHAW —
+MODERN C++ QUESTIONS REPORTED IN ANOTHER CANDIDATE REPORT
+====================================================
+
+[REPORTED] What are unique_ptr and shared_ptr? Source: D.E. Shaw
+internship interview experience.
+
+[REPORTED] What are the functions/operations associated with unique_ptr
+and shared_ptr? Source: D.E. Shaw internship interview experience.
+
+[REPEATED] Explain virtual functions using vptr and vtable. Source: D.E.
+Shaw internship interview experience.
+
+[REPORTED] Explain multiple inheritance and the diamond problem. Source:
+D.E. Shaw internship interview experience.
+
+[REPORTED] How can the diamond problem be solved? Source: D.E. Shaw
+internship interview experience.
+
+[REPORTED] Explain the different ways to call a constructor and
+destructor. Source: D.E. Shaw internship interview experience.
+
+[REPORTED] Explain copy constructor behavior when pointers are members
+of a class. Source: D.E. Shaw internship interview experience.
+
+[REPORTED] How do you handle pointer members during copying? Source:
+D.E. Shaw internship interview experience.
+
+==================================================== 6.
+VERY-HIGH-CONFIDENCE REPEATED QUESTIONS
+====================================================
+
+The following themes occur in multiple independent reports and should be
+prioritized on the website.
+
+[REPEATED] What is a virtual function?
+
+[REPEATED] What is a virtual destructor and why is it required?
+
+[REPEATED] Explain vptr and vtable.
+
+[REPEATED] What is runtime polymorphism? How do you implement it?
+
+[REPEATED] What is a copy constructor?
+
+[REPEATED] Explain deep copy versus shallow copy.
+
+[REPEATED] What are smart pointers?
+
+[REPEATED] What is operator overloading?
+
+[REPEATED] What is polymorphism and how is it achieved?
+
+[REPEATED] What are references in C++?
+
+[REPEATED] Explain pointers and pointer-related memory behavior.
+
+[REPEATED] What is a const member function?
+
+[REPEATED] What is function overloading versus function overriding?
+
+[REPEATED] What is virtual inheritance?
+
+[REPEATED] What is a pure virtual function?
+
+[REPEATED] What is a friend function?
+
+[REPEATED] Explain dynamic memory allocation.
+
+[REPEATED] Explain stack versus heap memory.
+
+==================================================== 7. SOURCE BASIS
+====================================================
+
+The questions above were compiled only from published candidate
+interview experiences checked during preparation.
+
+Primary evidence: 1. D.E. Shaw Interview | Set 1 — GeeksforGeeks 2. DE
+Shaw Interview Experience — GeeksforGeeks 3. DE Shaw Interview
+Experience — SDE Internship — GeeksforGeeks 4. D.E. Shaw Internship
+Interview Experience (On-Campus) — GeeksforGeeks 5. Synopsys Interview
+Experience — R&D 2 Engineer — GeeksforGeeks 6. Zscaler Interview
+Experience for C++ Developer — GeeksforGeeks 7. Zscaler Interview
+Experience for ASE (On-Campus) — GeeksforGeeks 8. Zscaler Interview
+Experience for SDE Summer Intern — GeeksforGeeks 9. Cadence Interview
+Experience — Software Developer C++ — GeeksforGeeks
+
+Verification links: -
+https://www.geeksforgeeks.org/interview-experiences/d-e-shaw-interview-set-1/ -
+https://www.geeksforgeeks.org/interview-experiences/de-shaw-interview-experience-6/ -
+https://www.geeksforgeeks.org/interview-experiences/de-shaw-interview-experience-sde-internship/ -
+https://www.geeksforgeeks.org/interview-experiences/d-e-shaw-internship-interview-experience-on-campus/ -
+https://www.geeksforgeeks.org/interview-experiences/synopsys-interview-experience-r-d-2-engineer/ -
+https://www.geeksforgeeks.org/interview-experiences/zscaler-interview-experience-for-c-developer/ -
+https://www.geeksforgeeks.org/interview-experiences/zscaler-interview-experience-for-ase-on-campus/ -
+https://www.geeksforgeeks.org/interview-experiences/zscaler-interview-experience-for-sde-summer-intern-on-campus/ -
+https://www.geeksforgeeks.org/interview-experiences/cadence-interview-experience-software-developer-c/
+
+==================================================== 8. IMPORTANT
+WEBSITE CLAIM ====================================================
+
+Recommended page wording:
+
+“These C++ interview questions are curated from published candidate
+interview experiences. The wording may be normalized for readability,
+but each question/topic is backed by a reported interview source.
+Questions marked REPEATED appeared across multiple reports.”
+
+Do NOT claim: - “Every question is guaranteed to be asked.” - “These are
+verbatim transcripts.” - “These questions will definitely be asked by
+the company.”
+
+This distinction keeps the content evidence-based and trustworthy.

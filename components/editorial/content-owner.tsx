@@ -14,7 +14,7 @@ export function ContentOwner({ publishedAt, updatedAt, showPolicyLink = true }: 
       <p className="mt-1">Suresh maintains the site and its interview-preparation content.</p>
       {formattedPublishedDate && <p className="mt-1"><span className="font-semibold text-ink">Published:</span> {formattedPublishedDate}</p>}
       {formattedUpdatedDate && <p className="mt-1"><span className="font-semibold text-ink">Last modified:</span> {formattedUpdatedDate}</p>}
-      {showPolicyLink && <p className="mt-2">Learn how this content is created and maintained in our <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">editorial policy</Link>.</p>}
+      {showPolicyLink && <p className="mt-2">Learn how this content is created and maintained in our <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">editorial policy</Link>, or <Link href="/contact" className="font-semibold text-coral hover:underline">report a correction</Link>.</p>}
     </div>
   );
 }

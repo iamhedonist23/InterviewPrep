@@ -1,0 +1,96 @@
+SPRING BOOT + HIBERNATE/JPA INTERVIEW QUESTIONS — VERIFIED +
+HIGH-CONFIDENCE SET
+
+PURPOSE This is a high-confidence interview bank. It separates questions
+explicitly reported in published interview-experience reports from
+recurring/common interview questions.
+
+LABELS [REPORTED] = a published interview experience explicitly
+describes the question or task. Wording is lightly normalized and is not
+presented as a verbatim quotation. [COMMON] = a recurring interview
+question supported by current interview-question references and multiple
+interview patterns; it is not claimed to be tied to one specific
+interview.
+
+IMPORTANT Do not market this file as ‘questions guaranteed to be asked’.
+Interview questions vary by company, role, seniority, resume and
+interviewer. Recommended website wording: ‘Curated interview questions
+based on reported interview experiences and commonly tested interview
+patterns.’
+
+============================================================ REPORTED
+INTERVIEW QUESTIONS
+============================================================ [REPORTED]
+Tech Mahindra: What is dependency injection? [REPORTED] Tech Mahindra:
+What is a Spring Boot starter dependency? [REPORTED] Tech Mahindra: What
+is Hibernate caching? [REPORTED] Tech Mahindra: What is @ComponentScan
+used for? [REPORTED] UST Global: How do you connect multiple databases
+through a Spring Boot application? [REPORTED] UST Global: What does
+@SpringBootApplication do? [REPORTED] UST Global: Compare
+@RestController and @Controller. [REPORTED] UST Global: Why use
+Hibernate? [REPORTED] UST Global: Explain Spring bean scopes and their
+use cases. [REPORTED] Deloitte: Compare setter and constructor
+injection. [REPORTED] Finzly: Write demo APIs in Spring Boot. [REPORTED]
+Finzly: Explain HTTP status codes and the difference between 401 and
+403. [REPORTED] Finzly: Explain JWT authentication and authorization
+flow. [REPORTED] Finzly: Explain inversion of control and dependency
+injection. [REPORTED] Finzly: Explain getter/setter injection.
+[REPORTED] Finzly: Explain the Singleton pattern. [REPORTED] Volkswagen
+IT Services: What are Spring Boot features? [REPORTED] Volkswagen IT
+Services: What is dependency injection? [REPORTED] Volkswagen IT
+Services: What is ORM? [REPORTED] Volkswagen IT Services: What is
+@Entity used for? [REPORTED] Volkswagen IT Services: What is circular
+dependency? [REPORTED] Chetu / Naukri Code 360: What is dependency
+injection? [REPORTED] Chetu / Naukri Code 360: What is @ComponentScan
+used for? [REPORTED] Chetu / Naukri Code 360: What is a Spring Boot
+starter dependency? [REPORTED] Chetu / Naukri Code 360: Can embedded
+Tomcat be replaced in Spring Boot? [REPORTED] Dassault Systemes / Naukri
+Code 360: What basic annotations does Spring Boot provide? [REPORTED]
+Dassault Systemes / Naukri Code 360: What does @RestController do?
+
+============================================================ COMMON /
+HIGH-FREQUENCY INTERVIEW QUESTIONS
+============================================================ [COMMON]
+What does @SpringBootApplication combine? [COMMON] How does Spring Boot
+auto-configuration work? [COMMON] What is dependency injection and why
+is constructor injection preferred? [COMMON] What is inversion of
+control? [COMMON] What are singleton, prototype, request and session
+bean scopes? [COMMON] @Component vs @Service vs @Repository? [COMMON]
+@RestController vs @Controller? [COMMON] @RequestParam vs @PathVariable?
+[COMMON] @Configuration vs @Bean? [COMMON] @Value vs
+@ConfigurationProperties? [COMMON] What are Spring profiles? [COMMON]
+How would you manage secrets in Spring Boot? [COMMON] What is Spring
+AOP? [COMMON] JDK dynamic proxy vs CGLIB proxy? [COMMON] Why might an
+AOP advice not run? [COMMON] What is @Transactional? [COMMON] Why might
+@Transactional not work because of self-invocation? [COMMON] How do
+propagation settings affect transactions? [COMMON] How do isolation
+levels affect transactions? [COMMON] How would you implement centralized
+exception handling? [COMMON] What is Spring Security? [COMMON] How does
+JWT authentication work in Spring Security? [COMMON] How would you
+secure a REST endpoint? [COMMON] How would you implement API rate
+limiting? [COMMON] What is Spring Boot Actuator? [COMMON] Which Actuator
+endpoints should be exposed carefully? [COMMON] How would you diagnose a
+slow Spring Boot endpoint? [COMMON] How would you diagnose HikariCP
+connection exhaustion? [COMMON] What causes N+1 queries in JPA? [COMMON]
+LAZY vs EAGER fetching? [COMMON] What causes
+LazyInitializationException? [COMMON] JPA vs Hibernate? [COMMON] What is
+the entity lifecycle? [COMMON] What are cascade types? [COMMON] What
+does orphanRemoval do? [COMMON] First-level vs second-level cache?
+[COMMON] JPQL vs native SQL? [COMMON] How does Spring Data query
+derivation work? [COMMON] What does @Modifying do? [COMMON] How do
+Pageable and Sort work? [COMMON] How would you prevent duplicate order
+creation when a client retries a POST? [COMMON] How would you design a
+zero-downtime database migration for a Spring Boot service? [COMMON] How
+would you monitor a Spring Boot service in production? [COMMON] How
+would you investigate a sudden increase in 5xx responses?
+
+============================================================ SOURCE
+BASIS ============================================================ 1.
+Tech Mahindra Software Engineer interview experience — Naukri Code 360.
+2. Chetu Software Developer interview experience — Naukri Code 360. 3.
+Dassault Systemes Solutions Lab interview experience — Naukri Code 360.
+4. UST Global Java Spring Boot Developer interview experience —
+GeeksforGeeks. 5. Volkswagen IT Services Java/Spring Boot/Hibernate
+interview experience — GeeksforGeeks. 6. Finzly Trainee Software
+Engineer interview experience — GeeksforGeeks. 7. Deloitte Java/Spring
+Boot/Hibernate interview experience — GeeksforGeeks.

@@ -1,0 +1,1675 @@
+VERIFIED DATA SCIENCE INTERVIEW QUESTIONS — DETAILED INTERVIEW ANSWERS
+
+Source classification preserved: [REPORTED] and [REPORTED TOPIC]. The
+supplied source is evidence-first and explicitly states that reported
+topics are not presented as verbatim interviewer wording and that no
+question is guaranteed.
+
+Answer format: Question / Level / Answer / Example / Interview Tip /
+What Interviewer Is Testing / Key Points to Remember / Common Follow-up
+Questions / Common Mistakes / Source Evidence
+
+==============================================================================
+
+1.  [REPORTED] Question : What do you understand by p-value? Level :
+    Fresher / Entry-Level
+
+Answer : A p-value is the probability, assuming the null hypothesis is
+true, of observing a test statistic at least as extreme as the one
+obtained from the sample. It measures how incompatible the observed data
+are with the null hypothesis.
+
+A small p-value means the observed result would be relatively unusual if
+the null hypothesis were true, so we have evidence against the null
+hypothesis. It does not mean that the probability that the null
+hypothesis is true is small.
+
+The p-value must be interpreted together with the significance level,
+effect size, confidence interval, study design, and practical
+importance. A statistically significant result can still have a tiny
+business impact, while a practically important effect may fail to reach
+significance with a small sample.
+
+Example : Suppose an A/B test compares two conversion rates and produces
+p = 0.02. With α = 0.05, the result is statistically significant under
+the test assumptions, so we reject the null hypothesis. We still need to
+examine the effect size and confidence interval to decide whether the
+change is practically valuable.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : A p-value is evidence against H0 under H0; it
+is not the probability that H0 is true.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Meesho Data Scientist-1 interview,
+Bangalore, April 2025.
+
+------------------------------------------------------------------------
+
+2.  [REPORTED] Question : If we fail to reject the null hypothesis, do
+    we accept the alternate hypothesis? Level : Fresher / Entry-Level
+
+Answer : Failing to reject the null hypothesis does not mean that we
+accept the alternate hypothesis. It means the evidence in the sample is
+insufficient to reject the null hypothesis at the chosen significance
+level.
+
+In a simple two-hypothesis test, the alternative may be the logical
+complement of the null, but statistically we should still phrase the
+conclusion as “there is insufficient evidence to reject H0” rather than
+“H1 is false” or “H0 is proven true.”
+
+This distinction matters because a non-significant result can arise from
+a genuinely small effect, high variance, inadequate sample size, or low
+statistical power.
+
+Example : If a test produces p = 0.30 with α = 0.05, we fail to reject
+H0. We should say “the data do not provide sufficient evidence against
+H0,” not “H0 has been proven true.”
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : A p-value is evidence against H0 under H0; it
+is not the probability that H0 is true.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Meesho Data Scientist-1 interview,
+Bangalore, April 2025.
+
+------------------------------------------------------------------------
+
+3.  [REPORTED TOPIC] Question : Basic statistics and mathematics
+    questions for machine learning. Level : Fresher / Entry-Level
+
+Answer : For machine learning, core statistics and mathematics include
+probability, conditional probability, expectation, variance, covariance,
+correlation, distributions, sampling, hypothesis testing, confidence
+intervals, linear algebra, derivatives, gradients, and basic
+optimization.
+
+The practical goal is to connect the mathematics to modeling. For
+example, variance helps describe uncertainty, covariance appears in
+multivariate relationships, derivatives support gradient-based
+optimization, and matrix operations are fundamental to many ML
+algorithms.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Meesho Data Scientist-1 interview, Round
+1.
+
+------------------------------------------------------------------------
+
+4.  [REPORTED TOPIC] Question : Basic Python, Pandas and Matplotlib
+    questions and coding exercises. Level : Fresher / Entry-Level
+
+Answer : Python questions in data science commonly test data structures,
+functions, comprehensions, iteration, exceptions, modules, and
+computational reasoning. Pandas questions test DataFrame/Series
+manipulation, filtering, grouping, joins, missing values, duplicates,
+sorting, and transformations. Matplotlib tests basic data visualization
+and interpretation.
+
+A strong answer demonstrates the operation on a small dataset and
+explains why the chosen operation is appropriate.
+
+Example : A DataFrame with
+full_name = ["Ada Lovelace", "Alan Turing", None] can be split with
+str.split(..., expand=True) and then missing values handled according to
+the data contract.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: ION Group Data Scientist interview,
+August 2024.
+
+------------------------------------------------------------------------
+
+5.  [REPORTED TOPIC] Question : Basic SQL questions and a medium-level
+    SQL query. Level : Fresher / Entry-Level
+
+Answer : SQL for data science typically focuses on SELECT, WHERE, GROUP
+BY, HAVING, ORDER BY, JOINs, subqueries, CASE expressions, NULL
+handling, aggregation, and window functions.
+
+The important skill is translating a business question into a precise
+query. Before writing SQL, identify the required grain, tables, join
+keys, filters, aggregation level, and expected output.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: ION Group Data Scientist interview,
+August 2024.
+
+------------------------------------------------------------------------
+
+6.  [REPORTED TOPIC] Question : Machine learning questions covering
+    basic ML concepts. Level : Fresher / Entry-Level
+
+Answer : Basic machine learning concepts include supervised versus
+unsupervised learning, regression versus classification,
+training/validation/test splits, overfitting and underfitting,
+regularization, feature engineering, model evaluation, cross-validation,
+and common algorithms.
+
+An interview-ready answer should connect the concept to a modeling
+decision. For example, model selection depends on target type, data
+size, feature characteristics, interpretability requirements, latency,
+and business cost of errors.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: ION Group Data Scientist interview,
+August 2024.
+
+------------------------------------------------------------------------
+
+7.  [REPORTED TOPIC] Question : SQL and Python questions together with
+    statistics and machine-learning questions. Level : Fresher /
+    Entry-Level
+
+Answer : When SQL and Python are tested together, expect the interviewer
+to assess the full data workflow: extracting data with SQL, cleaning and
+transforming it in Python/Pandas, analyzing it statistically, and
+communicating results.
+
+The strongest approach is to explain where each tool is most
+appropriate. Push filtering and aggregation to the database when
+practical, then use Python for analysis and modeling that would be
+awkward or inefficient in SQL.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Amazon Data Scientist interview report.
+
+------------------------------------------------------------------------
+
+8.  [REPORTED TOPIC] Question : Regression and classification, Python
+    and SQL basics. Level : Fresher / Entry-Level
+
+Answer : Regression predicts a continuous target, such as revenue or
+delivery time, while classification predicts a categorical outcome, such
+as churn versus no churn.
+
+The distinction affects algorithms, loss functions, evaluation metrics,
+and output interpretation. Regression may use MAE, MSE, RMSE, or R²;
+classification may use precision, recall, F1, ROC-AUC, PR-AUC, log loss,
+or calibration depending on the problem and class imbalance.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Cognizant Data Scientist interview
+report.
+
+------------------------------------------------------------------------
+
+9.  [REPORTED TOPIC] Question : Basic statistics, SQL, Python and
+    machine-learning questions. Level : Fresher / Entry-Level
+
+Answer : For this reported topic, begin with the precise business or
+technical objective, define the relevant concepts, explain the reasoning
+step by step, and connect the answer to a concrete data-science example.
+Because the source preserves a topic rather than exact wording, do not
+claim that the expanded wording is verbatim.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: TechVantage Systems Data Scientist
+interview.
+
+------------------------------------------------------------------------
+
+10. [REPORTED TOPIC] Question : Questions on supervised and unsupervised
+    machine learning. Level : Fresher / Entry-Level
+
+Answer : Supervised learning uses labeled examples to learn a mapping
+from features to a target, such as predicting churn. Unsupervised
+learning works without a target label and seeks structure in the data,
+such as customer clusters.
+
+Examples include linear/logistic regression and decision trees for
+supervised learning, and clustering or dimensionality-reduction methods
+for unsupervised learning. The choice depends on whether a reliable
+target exists and what business question must be answered.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: public analytics/data-science interview
+preparation experience from an Amazon analytics/data-science candidate.
+============================================================
+INTERMEDIATE — MACHINE LEARNING, SQL & CODING
+============================================================
+
+------------------------------------------------------------------------
+
+11. [REPORTED] Question : What is your favourite machine-learning
+    algorithm? Level : Intermediate
+
+Answer : A good answer should not simply name an algorithm; it should
+explain why you like it and where it works well.
+
+For example, Gradient Boosted Decision Trees are a strong choice for
+many structured/tabular datasets because they capture nonlinear
+relationships and feature interactions with limited preprocessing. Their
+trade-offs include tuning complexity, training cost, and the need for
+careful validation to avoid overfitting. I would still select an
+algorithm based on the data and business requirements rather than
+personal preference.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: TechVantage Systems Data Scientist
+interview.
+
+------------------------------------------------------------------------
+
+12. [REPORTED] Question : How would you implement mean, median and mode
+    in core Python without using library functions? Level : Intermediate
+
+Answer : Mean is the arithmetic average, median is the middle value
+after sorting, and mode is the most frequent value.
+
+For an unsorted list, a mean requires one pass and a running sum. A
+median can be obtained by sorting, typically O(n log n), then selecting
+the middle element(s). Mode can be computed with a frequency dictionary
+in expected O(n) time.
+
+Median is generally more robust to extreme outliers than mean, while
+mode is especially useful for categorical or discrete data.
+
+Example :
+
+    def stats(values):
+        if not values:
+            raise ValueError("empty input")
+        mean = sum(values) / len(values)
+        ordered = sorted(values)
+        n = len(ordered)
+        median = ordered[n // 2] if n % 2 else (ordered[n//2 - 1] + ordered[n//2]) / 2
+
+        counts = {}
+        for x in values:
+            counts[x] = counts.get(x, 0) + 1
+        mode = max(counts, key=counts.get)
+
+        return mean, median, mode
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nykaa Data Scientist 2 interview, May
+2026.
+
+------------------------------------------------------------------------
+
+13. [REPORTED] Question : How would you implement a Decision Tree from
+    scratch in Python? Level : Intermediate
+
+Answer : A Decision Tree recursively partitions the training data into
+subsets that make the target values more homogeneous. For
+classification, a common split criterion is Gini impurity or entropy;
+for regression, variance or squared-error reduction can be used.
+
+A from-scratch implementation needs to: evaluate candidate features and
+thresholds, calculate split quality, choose the best split, recursively
+create child nodes, stop according to conditions such as maximum
+depth/minimum samples, and assign a prediction at a leaf.
+
+The expensive part is evaluating many feature/threshold candidates. A
+production implementation uses optimized algorithms and data structures,
+but the from-scratch version is useful for understanding the learning
+process.
+
+Example :
+
+    # Conceptual split scoring
+    def gini(labels):
+        n = len(labels)
+        counts = {}
+        for y in labels:
+            counts[y] = counts.get(y, 0) + 1
+        return 1 - sum((c / n) ** 2 for c in counts.values())
+
+    # A full implementation would enumerate candidate feature thresholds,
+    # compare weighted child impurity, then recurse until stopping criteria.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Split quality, threshold selection, stopping
+criteria, overfitting, and complexity are central.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nykaa Data Scientist 2 interview, May
+2026.
+
+------------------------------------------------------------------------
+
+14. [REPORTED TOPIC] Question : Explain Gini impurity, threshold
+    selection, tree depth and other Decision Tree parameters. Level :
+    Intermediate
+
+Answer : Gini impurity measures how mixed the classes are in a node. For
+class probabilities p₁…pₖ, Gini is:
+
+Gini = 1 − Σ pᵢ²
+
+It is zero when every sample belongs to one class and larger when
+classes are mixed. A tree evaluates candidate splits and prefers splits
+that reduce weighted impurity.
+
+Threshold selection means testing candidate cut points for a numeric
+feature. Maximum depth controls tree complexity; larger depth can fit
+more complex patterns but can also overfit. Minimum samples per
+split/leaf and pruning can also control complexity.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Split quality, threshold selection, stopping
+criteria, overfitting, and complexity are central.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nykaa Data Scientist 2 interview, May
+2026.
+
+------------------------------------------------------------------------
+
+15. [REPORTED] Question : Write SQL to find the third-highest salary.
+    Level : Intermediate
+
+Answer : There are multiple correct SQL interpretations depending on
+whether “third-highest” means the third distinct salary or the third row
+after sorting.
+
+For the third distinct salary, a window-function solution is explicit:
+
+    SELECT salary
+    FROM (
+        SELECT salary,
+               DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+        FROM employees
+    ) x
+    WHERE rnk = 3;
+
+DENSE_RANK() handles duplicate salaries correctly when distinct salary
+levels are required.
+
+Example :
+
+    SELECT salary
+    FROM (
+        SELECT salary,
+               DENSE_RANK() OVER (ORDER BY salary DESC) AS rnk
+        FROM employees
+    ) ranked
+    WHERE rnk = 3;
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+16. [REPORTED TOPIC] Question : Write SQL queries involving name
+    filtering and GROUP BY operations. Level : Intermediate
+
+Answer : Name filtering can use WHERE, LIKE, or other string predicates,
+while GROUP BY aggregates rows into groups.
+
+    SELECT department, COUNT(*) AS employee_count
+    FROM employees
+    WHERE name LIKE 'A%'
+    GROUP BY department;
+
+The key distinction is that WHERE filters rows before grouping, while
+HAVING filters groups after aggregation.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+17. [REPORTED] Question : Write a Python program to find the index of
+    the maximum number without using NumPy. Level : Intermediate
+
+Answer : Track both the maximum value and its index while scanning the
+list once. This avoids NumPy and requires O(n) time and O(1) extra
+space.
+
+    def max_index(values):
+        if not values:
+            raise ValueError("empty sequence")
+
+        best_index = 0
+        for i in range(1, len(values)):
+            if values[i] > values[best_index]:
+                best_index = i
+        return best_index
+
+This returns the first index of the maximum value. The behavior for an
+empty list should be specified explicitly.
+
+Example :
+
+    values = [4, 12, 7, 12, 3]
+    # max_index(values) -> 1
+    # The function returns the first maximum index.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+18. [REPORTED] Question : Write a Pandas operation to separate first and
+    last names from a full-name column, remove duplicate columns and
+    handle missing values. Level : Intermediate
+
+Answer : Pandas provides vectorized string and missing-value operations
+for this task.
+
+    parts = df["full_name"].str.split(n=1, expand=True)
+    df["first_name"] = parts[0]
+    df["last_name"] = parts[1]
+    df = df.drop(columns=["unwanted_column"])
+    df["age"] = df["age"].fillna(df["age"].median())
+    df = df.drop_duplicates()
+
+The exact missing-value strategy depends on the meaning and distribution
+of the column. For names, splitting rules should also account for
+single-name records and unusual formats.
+
+Example : A DataFrame with
+full_name = ["Ada Lovelace", "Alan Turing", None] can be split with
+str.split(..., expand=True) and then missing values handled according to
+the data contract.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+19. [REPORTED TOPIC] Question : Explain precision and recall. Level :
+    Intermediate
+
+Answer : Precision answers: among the items predicted positive, how many
+were actually positive?
+
+Precision = TP / (TP + FP)
+
+Recall answers: among all actual positive items, how many did the model
+find?
+
+Recall = TP / (TP + FN)
+
+Use precision when false positives are particularly costly, and recall
+when false negatives are particularly costly. In many applications, the
+threshold should be selected according to business costs rather than
+automatically choosing 0.5.
+
+Example : If a fraud model flags 100 transactions and 80 are actually
+fraud, precision is 80%. If there are 200 fraudulent transactions in
+total, recall is 40%.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Precision focuses on false positives; recall
+focuses on false negatives.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+20. [REPORTED TOPIC] Question : How can variance be reduced in an
+    ensemble model? Level : Intermediate
+
+Answer : Variance can be reduced by making a model less sensitive to
+fluctuations in the training sample. Ensemble methods such as bagging
+and Random Forests reduce variance by averaging predictions from
+multiple diverse models trained on different samples or feature subsets.
+
+For example, a single deep decision tree can have high variance, while a
+Random Forest averages many decorrelated trees. Cross-validation,
+regularization, pruning, and reducing unnecessary model complexity can
+also help.
+
+Example : A single deep tree may change substantially when the training
+sample changes. A Random Forest averages many randomized trees, reducing
+prediction variance.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+21. [REPORTED] Question : Reverse a linked list. Level : Intermediate
+
+Answer : An iterative linked-list reversal changes each node’s next
+pointer to point to the previous node. Maintain three references:
+previous, current, and next.
+
+    def reverse(head):
+        prev = None
+        cur = head
+
+        while cur:
+            nxt = cur.next
+            cur.next = prev
+            prev = cur
+            cur = nxt
+
+        return prev
+
+Time complexity is O(n) and auxiliary space is O(1). The critical edge
+cases are an empty list and a single-node list.
+
+Example : For 1 -> 2 -> 3 -> None, reversing produces
+3 -> 2 -> 1 -> None.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: BusinessNEXT Data Scientist interview
+experience.
+
+------------------------------------------------------------------------
+
+22. [REPORTED] Question : Write SQL involving joins and a subquery.
+    Level : Intermediate
+
+Answer : A JOIN combines rows across tables using a relationship, while
+a subquery computes an intermediate result that can be used for
+filtering or comparison.
+
+    SELECT e.name, e.salary
+    FROM employees e
+    JOIN departments d
+      ON d.id = e.department_id
+    WHERE e.salary > (
+        SELECT AVG(salary)
+        FROM employees
+    );
+
+A strong answer explains join cardinality, NULL behavior, duplicate
+rows, and whether a window function or CTE would make the logic clearer.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: BusinessNEXT Data Scientist interview
+experience.
+
+------------------------------------------------------------------------
+
+23. [REPORTED] Question : Solve a valid-parentheses programming problem.
+    Level : Intermediate
+
+Answer : Use a stack. Push opening brackets; for each closing bracket,
+verify that the stack is non-empty and that its top matches the closing
+bracket.
+
+    def valid_parentheses(s):
+        pairs = {')': '(', ']': '[', '}': '{'}
+        stack = []
+
+        for ch in s:
+            if ch in pairs:
+                if not stack or stack.pop() != pairs[ch]:
+                    return False
+            else:
+                stack.append(ch)
+
+        return not stack
+
+Time is O(n) and auxiliary space is O(n) in the worst case.
+
+Example : {[()]} is valid because every closing bracket matches the most
+recent unmatched opening bracket. {[(])} is invalid because ] does not
+match the top (.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Axtria Data Scientist interview process.
+
+------------------------------------------------------------------------
+
+24. [REPORTED] Question : Find the longest increasing subsequence. Level
+    : Intermediate
+
+Answer : The Longest Increasing Subsequence (LIS) asks for the longest
+subsequence whose values are strictly increasing; the selected elements
+do not need to be adjacent.
+
+A straightforward dynamic-programming solution defines dp[i] as the
+length of the longest increasing subsequence ending at index i, giving
+O(n²) time and O(n) space.
+
+A more advanced solution maintains a tails array and uses binary search,
+achieving O(n log n) time. The latter is usually the stronger interview
+solution when only the length is required.
+
+Example : For [10, 9, 2, 5, 3, 7, 101, 18], one LIS is [2, 3, 7, 101],
+so the length is 4.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Axtria Data Scientist interview process.
+
+------------------------------------------------------------------------
+
+25. [REPORTED TOPIC] Question : Explain technical questions related to
+    your machine-learning and SQL work. Level : Intermediate
+
+Answer : For this reported topic, begin with the precise business or
+technical objective, define the relevant concepts, explain the reasoning
+step by step, and connect the answer to a concrete data-science example.
+Because the source preserves a topic rather than exact wording, do not
+claim that the expanded wording is verbatim.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Axtria Data Scientist interview process.
+
+------------------------------------------------------------------------
+
+26. [REPORTED TOPIC] Question : Answer a medium-level SQL problem during
+    a technical assessment. Level : Intermediate
+
+Answer : A medium-level SQL assessment commonly requires combining
+several concepts rather than using a single clause. A robust process is:
+determine the required output grain, identify tables and keys, join
+carefully, filter rows, aggregate, apply HAVING/window logic if needed,
+and validate duplicates and NULLs.
+
+Before optimizing, make the query correct and readable. Then consider
+indexes, predicate pushdown, join strategy, and whether the query can
+accidentally multiply rows.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: ION Group Data Scientist interview.
+
+------------------------------------------------------------------------
+
+27. [REPORTED TOPIC] Question : Given a dataset, build a
+    machine-learning solution in a Jupyter notebook and submit
+    prediction values as a CSV file. Level : Intermediate
+
+Answer : Treat the assessment as an end-to-end modeling task. Inspect
+the train/test schema, identify the target, understand missing values
+and categorical/numeric features, establish a baseline, split or
+validate appropriately, engineer features, train candidate models,
+evaluate using the correct metric, and generate predictions in the
+required CSV format.
+
+Avoid leakage: any transformation learned from data must be fitted using
+training data only. Also verify the prediction file schema, row count,
+ordering/identifier column, and missing values before submission.
+
+Example :
+
+    pred = model.predict(X_test)
+
+    submission = test[["id"]].copy()
+    submission["prediction"] = pred
+    submission.to_csv("predictions.csv", index=False)
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: ION Group Data Scientist interview
+assessment. ============================================================
+ADVANCED — STATISTICS, CASE STUDIES & ML DEPTH
+============================================================
+
+------------------------------------------------------------------------
+
+28. [REPORTED TOPIC] Question : Explain statistical methods, curve
+    properties and optimization problems. Level : Advanced
+
+Answer : This broad reported topic covers deeper statistical reasoning
+and mathematical optimization. Be prepared to discuss distributions and
+estimators, hypothesis tests, confidence intervals, likelihood,
+derivatives/gradients, convexity, local versus global optima, and how an
+optimization objective is minimized.
+
+The strongest response connects the mathematics to a concrete modeling
+problem—for example, explaining how a loss function is differentiated
+and optimized rather than merely defining a derivative.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Fanatics Data Scientist interview.
+
+------------------------------------------------------------------------
+
+29. [REPORTED TOPIC] Question : Solve complex SQL questions and discuss
+    analytics and predictive-modeling case studies. Level : Advanced
+
+Answer : Complex SQL problems often combine multi-table joins,
+aggregation, subqueries/CTEs, window functions, conditional logic, date
+handling, and duplicate control. Analytics case studies additionally
+require defining the business metric and validating that the SQL
+represents the intended population.
+
+For predictive-modeling cases, separate descriptive analytics from
+prediction: first establish what happened and why, then define the
+prediction target, features, validation strategy, metric, and business
+action.
+
+Example : Example: To find departments with more than five employees,
+group by department and use HAVING COUNT(*) > 5 rather than putting the
+aggregate condition in WHERE.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Always define row grain, join keys, aggregation
+level, NULL behavior, and duplicate risk.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Fanatics Data Scientist interview.
+
+------------------------------------------------------------------------
+
+30. [REPORTED TOPIC] Question : Explain machine-learning concepts in
+    greater depth during an ML-depth interview round. Level : Advanced
+
+Answer : For this reported topic, begin with the precise business or
+technical objective, define the relevant concepts, explain the reasoning
+step by step, and connect the answer to a concrete data-science example.
+Because the source preserves a topic rather than exact wording, do not
+claim that the expanded wording is verbatim.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Meesho Data Scientist-1 interview.
+
+------------------------------------------------------------------------
+
+31. [REPORTED TOPIC] Question : Solve an ML case study involving the
+    choice and application of models. Level : Advanced
+
+Answer : Start with the business objective and translate it into a
+precise ML problem. Define the target, prediction horizon, unit of
+prediction, available features, constraints, and cost of errors. Then
+choose a baseline, validation strategy, metric, candidate models, and
+deployment/monitoring plan.
+
+For example, a churn case requires defining what counts as churn and
+ensuring that features are available before the prediction cutoff. A
+model with excellent offline accuracy but leakage or no actionable
+intervention is not a successful solution.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Business objective → ML formulation → data →
+baseline → validation → model → metric → deployment/monitoring.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Meesho Data Scientist-1 interview, ML
+breadth round.
+
+------------------------------------------------------------------------
+
+32. [REPORTED TOPIC] Question : Discuss an end-to-end data-science
+    project and answer follow-up questions about the technical
+    decisions. Level : Advanced
+
+Answer : Explain the project from problem definition through deployment
+or business use: data source, data quality, exploration, feature
+engineering, modeling, validation, metric selection, experimentation,
+deployment, monitoring, and outcome.
+
+For every major decision, be ready to explain alternatives and
+trade-offs. Interviewers commonly probe why a particular model was
+selected, how leakage was prevented, how missing data was handled, why
+the metric was appropriate, and what happened when the model failed.
+
+Example : Example project explanation: “I predicted customer churn. I
+defined churn over a 30-day window, built features using only
+information available before the cutoff, compared a baseline with
+tree-based models, selected a threshold using the cost of false
+negatives, and monitored post-deployment drift.”
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Know the data, target, leakage controls,
+feature engineering, validation, metric, model choice, and business
+outcome.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Nielsen Data Scientist interview.
+
+------------------------------------------------------------------------
+
+33. [REPORTED TOPIC] Question : Explain deep-learning architectures and
+    the number/layers of those architectures. Level : Advanced
+
+Answer : Deep-learning architecture questions can cover how layers
+transform representations and why an architecture is suited to a data
+type. Examples include multilayer perceptrons for general tabular/vector
+inputs, CNNs for spatial/local patterns, RNN-family models for
+sequential data, and Transformer architectures based on attention for
+sequence modeling.
+
+The exact number of layers is not a universal property of an
+architecture; it depends on the specific implementation. A good answer
+explains what each major block contributes rather than memorizing one
+fixed layer count.
+
+Example : A Transformer encoder can be viewed conceptually as repeated
+blocks containing self-attention, feed-forward transformation, residual
+connections, and normalization. The exact depth depends on the model
+configuration.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Bridgei2i on-campus interview experience.
+
+------------------------------------------------------------------------
+
+34. [REPORTED TOPIC] Question : Given a business scenario, explain how
+    AI could be incorporated into the solution. Level : Advanced
+
+Answer : Start with the business problem, not the AI technique. Identify
+the decision to improve, available data, target outcome, constraints,
+and how success will be measured. Then determine whether AI is actually
+appropriate.
+
+For example, for customer-support ticket routing, AI could classify
+incoming tickets into categories and prioritize urgent cases. Success
+should be measured through routing accuracy, handling time, escalation
+rate, and business impact—not simply model accuracy.
+
+Example : Example: For a retailer trying to reduce stockouts, predict
+demand for each product/store/time window, evaluate with a
+business-relevant error metric, and use the forecast to improve
+replenishment decisions.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: Bridgei2i on-campus interview experience.
+
+------------------------------------------------------------------------
+
+35. [REPORTED TOPIC] Question : Explain why a particular
+    machine-learning approach is appropriate for a problem. Level :
+    Advanced
+
+Answer : Justify model choice using the problem’s target, data type,
+sample size, nonlinear relationships, interpretability requirements,
+latency, training cost, robustness, and business objective.
+
+For example, tree-based boosting may be preferred for structured tabular
+data because it captures nonlinear interactions with limited feature
+scaling. A linear model may be preferable when interpretability and a
+stable linear relationship matter. The best answer compares alternatives
+instead of claiming one algorithm is universally best.
+
+Example : Example: Take a small business dataset, define the target and
+grain, perform a baseline analysis, then demonstrate the requested
+statistical/SQL/Python/ML technique on that dataset.
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Definition, assumptions, practical application,
+trade-offs, edge cases, and validation.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: multiple reported Data Scientist
+interview experiences.
+
+------------------------------------------------------------------------
+
+36. [REPORTED TOPIC] Question : Explain a machine-learning project from
+    your resume and answer detailed technical follow-up questions. Level
+    : Advanced
+
+Answer : Explain the project from problem definition through deployment
+or business use: data source, data quality, exploration, feature
+engineering, modeling, validation, metric selection, experimentation,
+deployment, monitoring, and outcome.
+
+For every major decision, be ready to explain alternatives and
+trade-offs. Interviewers commonly probe why a particular model was
+selected, how leakage was prevented, how missing data was handled, why
+the metric was appropriate, and what happened when the model failed.
+
+Example : Example project explanation: “I predicted customer churn. I
+defined churn over a 30-day window, built features using only
+information available before the cutoff, compared a baseline with
+tree-based models, selected a threshold using the cost of false
+negatives, and monitored post-deployment drift.”
+
+Interview Tip : Start with the direct answer, show the reasoning, then
+give a small example. For coding/SQL questions, state complexity and
+important edge cases. For case studies, clarify the business objective
+before choosing a model.
+
+What Interviewer Is Testing : Whether you can apply data-science
+concepts correctly, reason about assumptions and trade-offs, and turn a
+business or coding problem into a reliable solution.
+
+Key Points to Remember : Know the data, target, leakage controls,
+feature engineering, validation, metric, model choice, and business
+outcome.
+
+Common Follow-up Questions : Why? What are the assumptions? What are the
+edge cases? How would you test or validate it? What alternative approach
+would you consider?
+
+Common Mistakes : Giving a memorized definition without reasoning;
+ignoring assumptions; using the wrong metric; overlooking
+NULLs/duplicates in SQL; ignoring leakage or validation in ML; or
+failing to state complexity for coding questions.
+
+Source Evidence : Reported in: ION Group, Nielsen, Axtria and Data Axle
+interview reports.
+
+------------------------------------------------------------------------
+
+SOURCE-ACCURACY NOTE The supplied source explicitly distinguishes
+[REPORTED] from [REPORTED TOPIC]. [REPORTED] entries preserve a specific
+reported question or coding task. [REPORTED TOPIC] entries identify a
+tested area where the public report does not preserve the exact
+interviewer wording. The detailed answer is therefore an
+interview-preparation expansion, not a claim that the expanded wording
+was asked verbatim.
+
+Recommended website wording: “Curated Data Science Interview Questions
+collected from publicly reported interview experiences.”
+
+Avoid: “100% guaranteed Data Science interview questions.”

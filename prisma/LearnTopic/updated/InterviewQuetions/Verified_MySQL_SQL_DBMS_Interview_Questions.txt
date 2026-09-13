@@ -1,0 +1,88 @@
+MYSQL + SQL + DBMS INTERVIEW QUESTIONS — VERIFIED + HIGH-CONFIDENCE SET
+
+PURPOSE This is a high-confidence interview bank. It separates questions
+explicitly reported in published interview-experience reports from
+recurring/common interview questions.
+
+LABELS [REPORTED] = a published interview experience explicitly
+describes the question or task. Wording is lightly normalized and is not
+presented as a verbatim quotation. [COMMON] = a recurring interview
+question supported by current interview-question references and multiple
+interview patterns; it is not claimed to be tied to one specific
+interview.
+
+IMPORTANT Do not market this file as ‘questions guaranteed to be asked’.
+Interview questions vary by company, role, seniority, resume and
+interviewer. Recommended website wording: ‘Curated interview questions
+based on reported interview experiences and commonly tested interview
+patterns.’
+
+============================================================ REPORTED
+INTERVIEW QUESTIONS
+============================================================
+
+============================================================ COMMON /
+HIGH-FREQUENCY INTERVIEW QUESTIONS
+============================================================ [COMMON]
+What is the difference between SQL and MySQL? [COMMON] What is a primary
+key? [COMMON] Primary key vs unique key? [COMMON] What is a foreign key?
+[COMMON] What is referential integrity? [COMMON] What is a composite
+key? [COMMON] NULL vs zero vs empty string? [COMMON] Why does column =
+NULL not work? [COMMON] WHERE vs HAVING? [COMMON] GROUP BY vs DISTINCT?
+[COMMON] INNER JOIN vs LEFT JOIN? [COMMON] LEFT JOIN vs RIGHT JOIN?
+[COMMON] JOIN vs subquery? [COMMON] UNION vs UNION ALL? [COMMON]
+COUNT(*) vs COUNT(column)? [COMMON] EXISTS vs IN? [COMMON] How do you
+find the second-highest salary? [COMMON] How do you find the Nth-highest
+salary? [COMMON] How do you find duplicate rows? [COMMON] How do you
+delete duplicate rows safely? [COMMON] How do you find the highest-paid
+employee in each department? [COMMON] How do you find employees earning
+more than their department average? [COMMON] How do you find the top
+three salaries per department? [COMMON] How do you find rows present in
+one table but not another? [COMMON] How do you calculate a running
+total? [COMMON] RANK vs DENSE_RANK vs ROW_NUMBER? [COMMON] What is a
+window function? [COMMON] What is a CTE? [COMMON] CTE vs subquery?
+[COMMON] When would you use a recursive CTE? [COMMON] DELETE vs TRUNCATE
+vs DROP? [COMMON] DDL vs DML vs DCL vs TCL? [COMMON] What is
+normalization? [COMMON] Explain 1NF, 2NF and 3NF. [COMMON] When would
+you denormalize? [COMMON] What is an index? [COMMON] Clustered vs
+secondary index in InnoDB? [COMMON] What is a composite index? [COMMON]
+How does column order matter in a composite index? [COMMON] Why can an
+index make writes slower? [COMMON] Why might MySQL ignore an index?
+[COMMON] What is EXPLAIN used for? [COMMON] How would you troubleshoot a
+slow query? [COMMON] What is a covering index? [COMMON] What is a
+transaction? [COMMON] Explain ACID. [COMMON] What are transaction
+isolation levels? [COMMON] What is a dirty read? [COMMON] What is a
+non-repeatable read? [COMMON] What is a phantom read? [COMMON] What is
+MVCC? [COMMON] What is a deadlock? [COMMON] How would you investigate a
+production deadlock? [COMMON] How can consistent lock ordering reduce
+deadlocks? [COMMON] What is SELECT … FOR UPDATE? [COMMON] What is
+optimistic locking? [COMMON] What is pessimistic locking? [COMMON] What
+is replication? [COMMON] What is replication lag? [COMMON] Why is
+replication not a backup? [COMMON] What is partitioning? [COMMON] OFFSET
+pagination vs keyset pagination? [COMMON] Why can large OFFSET values be
+slow? [COMMON] What is SQL injection? [COMMON] How do parameterized
+queries prevent SQL injection? [COMMON] What is a view? [COMMON] When
+would you use a stored procedure? [COMMON] What is a trigger and what
+trade-offs does it introduce? [COMMON] How would you safely add a NOT
+NULL column to a very large table? [COMMON] How would you archive
+hundreds of millions of old rows? [COMMON] How would you diagnose
+database CPU suddenly reaching 100%? [COMMON] How would you diagnose
+connection-pool exhaustion when database CPU is low? [COMMON] How would
+you handle a query that is fast for 1,000 rows but slow for 100 million?
+[COMMON] How would you investigate replication lag after a large DELETE?
+[COMMON] How would you design a database for attendance tracking?
+[COMMON] How would you model users, roles and permissions? [COMMON] How
+would you prevent lost updates on an account balance? [COMMON] How would
+you handle eventual consistency between services?
+
+============================================================ SOURCE
+BASIS ============================================================ 1.
+MAQ Software interview experience — GeeksforGeeks: second-highest
+salary, normalization, ACID and SQL/DBMS. 2. Modak Analytics interview
+experience — GeeksforGeeks: nth-highest salary, CTE vs temporary table,
+WHERE vs HAVING, joins and window functions. 3. Loyalty Juggernaut
+interview experience — GeeksforGeeks: highest salary, GROUP BY, INNER vs
+LEFT JOIN and normalization. 4. Database Administrator interview
+questions — GeeksforGeeks: subqueries, AVG salary, second-highest salary
+and HAVING. 5. Current SQL/MySQL interview-question references —
+GeeksforGeeks.

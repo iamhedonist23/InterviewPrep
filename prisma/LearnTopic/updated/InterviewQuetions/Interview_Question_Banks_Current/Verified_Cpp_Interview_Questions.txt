@@ -1,0 +1,309 @@
+C++ INTERVIEW QUESTIONS — VERIFIED, HIGH-CONFIDENCE AND INTERVIEW-REALISTIC
+
+PURPOSE This bank is intentionally smaller than a generic 500+ question
+dump. It prioritizes questions that are explicitly reported in published
+C++ interview experiences plus recurring high-frequency questions that
+appear across established C++ interview references.
+
+LABELS [REPORTED] = a published interview experience explicitly reports
+that this question/topic was asked. The wording below is lightly
+normalized and is not presented as a verbatim quotation. [COMMON] =
+repeatedly recurring C++ interview question supported by established
+interview-question references. It is not claimed to have been asked by
+one specific company.
+
+IMPORTANT Do not describe every [COMMON] question as “really asked by a
+company.” For your website, use: “Curated from reported interview
+experiences and commonly tested C++ interview patterns.”
+
+==========================================================================
+
+1. BEGINNER — C++ / C++ OOP FUNDAMENTALS
+
+[REPORTED] D E Shaw: What are virtual functions? [REPORTED] D E Shaw:
+What is a virtual destructor? [REPORTED] D E Shaw: What is a copy
+constructor? [REPORTED] D E Shaw: What is an initializer list?
+[REPORTED] D E Shaw: What is virtual inheritance? [REPORTED] D E Shaw:
+What are inner classes in C++? [REPORTED] Synopsys: What is a virtual
+destructor? [REPORTED] Synopsys: What is a constant reference?
+[REPORTED] Synopsys: What is the difference between call by reference
+and call by value? [REPORTED] Intel: What is a virtual function?
+[REPORTED] Intel: What is an inline function? [REPORTED] Intel: What is
+an abstract class and what is its use? [REPORTED] Zscaler: Explain
+friend functions, virtual functions and polymorphism. [REPORTED]
+Zscaler: Explain operator overloading and write code for it. [REPORTED]
+Zscaler: Explain pointers, void pointers, smart pointers and type
+casting. [REPORTED] Zscaler: Explain what happens when code involving
+pointers is executed; determine the output. [REPORTED] Zscaler: What
+happens when the virtual keyword is used? [REPORTED] Zscaler: Explain
+dynamic memory allocation. [REPORTED] Zscaler: How is memory allocated
+when a program runs? [REPORTED] Zscaler: What is cache and where is it
+located? [REPORTED] Zscaler: Explain friend functions. [REPORTED]
+Zscaler: Explain polymorphism. [REPORTED] Zscaler: Solve a
+bit-manipulation problem involving shifting bits. [REPORTED] Intel: What
+is the difference between new and malloc? [REPORTED] Intel: What is the
+difference between int* const p and const int* p? [REPORTED] Intel: What
+are storage classes and how are they related to memory allocation?
+
+[COMMON] What is the difference between C and C++? [COMMON] What are the
+four pillars of OOP and how are they implemented in C++? [COMMON] What
+is encapsulation? [COMMON] What is abstraction? [COMMON] What is
+inheritance? [COMMON] What is polymorphism? [COMMON] Compile-time vs
+run-time polymorphism? [COMMON] What is function overloading? [COMMON]
+What is operator overloading? [COMMON] What is a virtual function?
+[COMMON] What is a pure virtual function? [COMMON] What is an abstract
+class? [COMMON] What is the difference between a class and an object?
+[COMMON] What is a constructor? [COMMON] What is a destructor? [COMMON]
+Can a destructor be overloaded? [COMMON] What is a copy constructor?
+[COMMON] What is a copy assignment operator? [COMMON] What is the
+difference between a constructor and a destructor? [COMMON] What is an
+initializer list? [COMMON] What is a friend function? [COMMON] What is a
+friend class? [COMMON] What is the difference between public, protected
+and private? [COMMON] What is a namespace? [COMMON] What is the std
+namespace? [COMMON] What is the difference between a pointer and a
+reference? [COMMON] Can a reference be null? [COMMON] Can a reference be
+reseated? [COMMON] What is nullptr and why is it preferred over NULL?
+[COMMON] What is const correctness? [COMMON] What is the difference
+between const int* and int* const? [COMMON] What is static_cast,
+dynamic_cast, const_cast and reinterpret_cast? [COMMON] What is the
+difference between call by value and call by reference? [COMMON] What is
+multiple inheritance? [COMMON] What is virtual inheritance and why is it
+used? [COMMON] What is the diamond problem? [COMMON] What is an inline
+function? [COMMON] Does inline guarantee inlining by the compiler?
+
+==========================================================================
+
+2. MEMORY MANAGEMENT / OBJECT LIFETIME
+
+[REPORTED] Intel: What is the difference between malloc and calloc?
+[REPORTED] Intel: What is the difference between new and malloc?
+[REPORTED] Intel: What is virtual memory? [REPORTED] Synopsys: Explain
+dynamic C++ memory and pointer-related behavior. [REPORTED] Zscaler:
+Explain dynamic memory allocation and pointer behavior through
+code/output questions. [REPORTED] Zscaler: Explain smart pointers.
+[REPORTED] Zscaler: Explain how memory is allocated when code runs.
+[REPORTED] D E Shaw: Explain copy constructors and object copying.
+
+[COMMON] What is the difference between new/delete and malloc/free?
+[COMMON] Why must new be paired with delete and malloc with free?
+[COMMON] What happens if you use delete on memory allocated with malloc?
+[COMMON] What happens if you use free on memory allocated with new?
+[COMMON] What is the difference between new and new[]? [COMMON] What is
+the difference between delete and delete[]? [COMMON] What is a memory
+leak? [COMMON] What is a dangling pointer? [COMMON] What is a wild
+pointer? [COMMON] What is a double delete? [COMMON] What is
+use-after-free? [COMMON] What is stack memory vs heap memory? [COMMON]
+What is object lifetime in C++? [COMMON] When is a destructor called?
+[COMMON] Why should a polymorphic base class usually have a virtual
+destructor? [COMMON] What happens when delete is called through a
+base-class pointer without a virtual destructor? [COMMON] What is RAII?
+[COMMON] Why is RAII important in modern C++? [COMMON] What are smart
+pointers? [COMMON] unique_ptr vs shared_ptr? [COMMON] When should
+weak_ptr be used? [COMMON] Why can shared_ptr create reference cycles?
+[COMMON] How does weak_ptr break a shared_ptr cycle? [COMMON] What is a
+custom deleter? [COMMON] What is placement new? [COMMON] When would
+placement new be used? [COMMON] What is shallow copy? [COMMON] What is
+deep copy? [COMMON] When is a deep copy required? [COMMON] What is the
+Rule of Three? [COMMON] What is the Rule of Five? [COMMON] What is the
+Rule of Zero? [COMMON] What is copy elision? [COMMON] What is virtual
+memory? [COMMON] What is alignment? [COMMON] Why does structure padding
+exist?
+
+==========================================================================
+
+3. COPY / MOVE SEMANTICS AND MODERN C++
+
+[COMMON] What is an lvalue? [COMMON] What is an rvalue? [COMMON] What is
+an rvalue reference? [COMMON] What is move semantics? [COMMON] Why was
+move semantics introduced? [COMMON] What does std::move actually do?
+[COMMON] Is std::move itself moving an object? [COMMON] What is a move
+constructor? [COMMON] What is a move assignment operator? [COMMON] What
+state is a moved-from object in? [COMMON] Why should move constructors
+often be noexcept? [COMMON] How does move semantics improve vector
+performance? [COMMON] What is perfect forwarding? [COMMON] What is a
+forwarding reference? [COMMON] What is std::forward? [COMMON] Copy
+constructor vs move constructor? [COMMON] Copy assignment vs move
+assignment? [COMMON] When does the compiler generate copy and move
+operations? [COMMON] When should you explicitly delete copy operations?
+[COMMON] What is the Rule of Five? [COMMON] What is the Rule of Zero?
+
+==========================================================================
+
+4. VIRTUAL FUNCTIONS / POLYMORPHISM
+
+[REPORTED] D E Shaw: Questions focused mainly on virtual functions and
+virtual destructors. [REPORTED] Synopsys: What is a virtual destructor?
+[REPORTED] Zscaler: What happens when the virtual keyword is used?
+[REPORTED] Zscaler: Explain polymorphism. [REPORTED] Zscaler: Explain
+friend functions and operator overloading. [REPORTED] Intel: What is a
+virtual function? [REPORTED] Intel: What is an abstract class and what
+is its use?
+
+[COMMON] How does runtime polymorphism work? [COMMON] What is a virtual
+function? [COMMON] What is a pure virtual function? [COMMON] What makes
+a class abstract? [COMMON] Why is a base destructor virtual? [COMMON]
+Can a constructor be virtual? [COMMON] Can a destructor be pure virtual?
+[COMMON] What is a vtable? [COMMON] What is a vptr? [COMMON] What is the
+runtime cost of virtual dispatch? [COMMON] When can virtual calls be
+devirtualized? [COMMON] What happens when a virtual function is called
+from a constructor? [COMMON] What happens when a virtual function is
+called from a destructor? [COMMON] What is object slicing? [COMMON] How
+can object slicing be avoided? [COMMON] What does override do? [COMMON]
+What does final do? [COMMON] Why should override be used instead of
+relying on matching signatures?
+
+==========================================================================
+
+5. STL / STANDARD LIBRARY
+
+[COMMON] vector vs list? [COMMON] vector vs deque? [COMMON] map vs
+unordered_map? [COMMON] set vs unordered_set? [COMMON] map vs multimap?
+[COMMON] set vs multiset? [COMMON] When would you choose vector as the
+default sequence container? [COMMON] What is the time complexity of
+vector push_back? [COMMON] What happens when vector capacity is
+exceeded? [COMMON] size() vs capacity()? [COMMON] reserve() vs resize()?
+[COMMON] emplace_back() vs push_back()? [COMMON] What invalidates vector
+iterators? [COMMON] What is an iterator? [COMMON] What is iterator
+invalidation? [COMMON] What is an algorithm in the STL? [COMMON] How
+does unordered_map handle collisions? [COMMON] What happens when an
+unordered_map rehashes? [COMMON] What is the load factor of
+unordered_map? [COMMON] How does map maintain ordering? [COMMON] What is
+the complexity of map lookup? [COMMON] What is the complexity of
+unordered_map lookup? [COMMON] Why is unordered_map not guaranteed O(1)?
+[COMMON] What is the difference between lower_bound and upper_bound?
+[COMMON] How would you find duplicates using STL? [COMMON] How would you
+sort objects using a custom comparator? [COMMON] What is a lambda
+expression? [COMMON] How do lambda captures work?
+
+==========================================================================
+
+6. TEMPLATES / GENERIC PROGRAMMING
+
+[COMMON] What is a function template? [COMMON] What is a class template?
+[COMMON] Why use templates? [COMMON] What is template specialization?
+[COMMON] Full specialization vs partial specialization? [COMMON] What is
+SFINAE? [COMMON] What are C++20 concepts? [COMMON] How are concepts
+different from SFINAE? [COMMON] What is template instantiation? [COMMON]
+What is a variadic template? [COMMON] What is parameter-pack expansion?
+[COMMON] What is type deduction? [COMMON] What does auto type deduction
+do? [COMMON] What is decltype? [COMMON] decltype vs auto? [COMMON] What
+is type erasure? [COMMON] How does std::function use type erasure?
+[COMMON] When would you prefer templates over runtime polymorphism?
+
+==========================================================================
+
+7. CONST / REFERENCES / POINTERS
+
+[REPORTED] Synopsys: What is a constant reference? [REPORTED] Synopsys:
+Difference between call by reference and call by value. [REPORTED]
+Synopsys: Can a const variable be changed? [REPORTED] Intel: Difference
+between int* const p and const int* p. [REPORTED] Zscaler: Extensive
+pointer questions including void pointers, smart pointers and type
+casting.
+
+[COMMON] What is a pointer? [COMMON] What is a reference? [COMMON]
+Pointer vs reference? [COMMON] Can a reference be null? [COMMON] What is
+a pointer to pointer? [COMMON] What is a void pointer? [COMMON] What is
+a const pointer? [COMMON] What is a pointer to const? [COMMON] What is a
+const pointer to const? [COMMON] What is nullptr? [COMMON] NULL vs
+nullptr? [COMMON] What is pointer arithmetic? [COMMON] What is an
+invalid pointer? [COMMON] What is a dangling pointer? [COMMON] What is a
+function pointer? [COMMON] What is a pointer-to-member? [COMMON] What
+happens when you dereference a null pointer? [COMMON] Why is returning a
+pointer to a local variable dangerous? [COMMON] How would you diagnose a
+pointer-related crash?
+
+==========================================================================
+
+8. INTERVIEW CODING / OUTPUT QUESTIONS
+
+[REPORTED] Synopsys: Design an Array class using C++ features.
+[REPORTED] Synopsys: Reverse a linked list. [REPORTED] Zscaler: Solve
+pointer/output questions by reasoning about code execution. [REPORTED]
+Zscaler: Solve a bit-manipulation problem. [REPORTED] D E Shaw: Find two
+numbers in a sorted array whose difference equals K. [REPORTED] Zscaler:
+Search in a rotated sorted array. [REPORTED] Zscaler: Solve a string
+manipulation problem. [REPORTED] Zscaler: Solve a bit-shifting problem
+involving set bits. [REPORTED] D E Shaw: Answer C++ OOP/output questions
+in a rapid-fire round.
+
+[COMMON] Reverse a singly linked list. [COMMON] Implement a stack using
+an array. [COMMON] Implement a queue using an array. [COMMON] Find
+duplicate elements in an array. [COMMON] Find the first non-repeating
+character in a string. [COMMON] Reverse a string. [COMMON] Check whether
+a string is a palindrome. [COMMON] Implement binary search. [COMMON]
+Find the second-largest element. [COMMON] Find the missing number in an
+array. [COMMON] Merge two sorted arrays. [COMMON] Detect a cycle in a
+linked list. [COMMON] Remove a cycle from a linked list. [COMMON] Find
+the middle node of a linked list. [COMMON] Implement an LRU cache using
+STL containers. [COMMON] Write code showing the difference between
+shallow and deep copy. [COMMON] Write a class with correct copy and move
+operations. [COMMON] Write a class that follows RAII. [COMMON]
+Demonstrate virtual dispatch with a base pointer and derived object.
+[COMMON] Predict the output of code involving constructors/destructors.
+[COMMON] Predict the output of code involving virtual functions.
+[COMMON] Predict the output of code involving pointer/reference and
+const combinations.
+
+==========================================================================
+
+9. WHAT TO PRIORITIZE FOR INTERVIEWS
+
+TOP 25 — VERY HIGH PRIORITY
+
+1.  C vs C++
+2.  Four OOP pillars
+3.  Pointer vs reference
+4.  const int* vs int* const
+5.  Constructor vs destructor
+6.  Copy constructor
+7.  Copy assignment operator
+8.  Shallow vs deep copy
+9.  Virtual function
+10. Pure virtual function
+11. Virtual destructor
+12. vtable/vptr
+13. Object slicing
+14. new/delete vs malloc/free
+15. new[]/delete[]
+16. Stack vs heap
+17. Memory leak / dangling pointer / use-after-free
+18. RAII
+19. unique_ptr vs shared_ptr vs weak_ptr
+20. Rule of Three/Five/Zero
+21. lvalue/rvalue and move semantics
+22. vector vs list
+23. map vs unordered_map
+24. unordered_map collision/rehashing
+25. STL coding + pointer/output questions
+
+==========================================================================
+
+SOURCE BASIS
+
+1.  D E Shaw Interview Experience — GeeksforGeeks: reports C++ OOP
+    questions including virtual functions, virtual destructor, copy
+    constructor, initializer list and virtual inheritance.
+2.  Synopsys R&D 2 Engineer Interview Experience — GeeksforGeeks:
+    reports virtual destructor, const reference, call by
+    reference/value, and C++/DSA coding.
+3.  Intel Interview Experience — GeeksforGeeks: reports virtual
+    function, inline function, malloc/calloc, storage classes, const
+    pointer forms, virtual memory, abstract class, new vs malloc, cache
+    and TLB.
+4.  Zscaler C++ Developer Interview Experience — GeeksforGeeks: reports
+    friend function, virtual function, polymorphism, dynamic memory,
+    pointers, smart pointers, type casting, virtual keyword, operator
+    overloading, memory allocation and bit questions.
+5.  Current C++ interview references: GeeksforGeeks C++ interview
+    questions; TechPrep C++ interview questions; GoLinuxCloud C/C++
+    interview questions; Toolmingo C++ interview questions.
+6.  The recurring/common section is intentionally not presented as
+    company-specific evidence. It represents high-frequency C++
+    interview topics found across multiple interview-preparation
+    references.
+
+FINAL WEBSITE CLAIM Use: “Curated from reported C++ interview
+experiences and commonly tested C++ interview patterns.”
+
+Avoid: “100% real interview questions asked by every company.”

@@ -1,0 +1,5001 @@
+SPRING AI — DETAILED TOPIC NOTES
+================================
+
+Version basis:
+Spring AI 2.0.1 — stable reference documentation
+
+Purpose:
+These notes are an original, detailed study guide based on the official Spring AI
+reference documentation. The goal is to explain the concepts in clear, practical
+language rather than reproduce the documentation verbatim.
+
+The guide is organized as:
+    Concept -> Why it matters -> How it works -> Example -> Practical use -> Pitfalls
+
+============================================================
+TABLE OF CONTENTS
+============================================================
+
+PART I — SPRING AI FOUNDATIONS
+1. What Spring AI is
+2. Spring AI architecture and design philosophy
+3. Supported AI model types
+4. Provider portability
+5. Spring AI and Spring Boot
+6. Getting started and project setup
+7. Dependency management and BOM
+
+PART II — AI CONCEPTS
+8. AI models
+9. Prompts
+10. Prompt templates
+11. Messages and message roles
+12. Tokens and context windows
+13. Embeddings
+14. Structured output
+15. Bringing enterprise data and APIs to AI
+16. Fine-tuning vs prompt augmentation vs RAG
+17. Retrieval Augmented Generation
+18. Tool calling
+19. Evaluating AI responses
+
+PART III — CORE MODEL APIs
+20. Generic Model API
+21. Chat Model API
+22. ChatModel and StreamingChatModel
+23. Prompt, Message, ChatOptions and ChatResponse
+24. Chat model configuration
+25. Chat model provider portability
+26. Chat model comparison
+27. Embedding Model API
+28. Image Model API
+29. Audio Models
+30. Speech-to-Text
+31. Text-to-Speech
+32. Multimodality
+
+PART IV — CHAT APPLICATION DEVELOPMENT
+33. ChatClient API
+34. Creating ChatClient
+35. User and system messages
+36. Runtime prompt customization
+37. Synchronous calls
+38. Streaming responses
+39. Multiple chat models
+40. Chat memory
+41. Chat memory repositories
+42. RAG through ChatClient
+43. Logging and advisors
+
+PART V — PROMPT ENGINEERING AND STRUCTURED OUTPUT
+44. Prompt engineering fundamentals
+45. Prompt templates
+46. Structured output converters
+47. BeanOutputConverter
+48. MapOutputConverter
+49. ListOutputConverter
+50. Schema-oriented output
+51. Reliability considerations
+
+PART VI — ADVISORS
+52. Advisors API
+53. Advisor chain
+54. CallAdvisor
+55. StreamAdvisor
+56. Advisor ordering
+57. MessageChatMemoryAdvisor
+58. VectorStoreChatMemoryAdvisor
+59. QuestionAnswerAdvisor
+60. RetrievalAugmentationAdvisor
+61. ReReadingAdvisor
+62. ToolCallingAdvisor
+63. Custom advisors
+64. Advisor observability
+
+PART VII — TOOL CALLING AND AGENTIC APPLICATIONS
+65. What tool calling means
+66. Tool calling architecture
+67. Defining tools with @Tool
+68. @ToolParam
+69. MethodToolCallback
+70. FunctionToolCallback
+71. ToolCallback beans
+72. Passing tools to ChatClient
+73. Default tools vs per-call tools
+74. Tool calling loop
+75. Tool results and model iteration
+76. Security boundaries
+77. Tool calling with different models
+
+PART VIII — VECTOR STORES
+78. What a vector database is
+79. VectorStore abstraction
+80. Document model
+81. Adding documents
+82. Deleting documents
+83. Similarity search
+84. SearchRequest
+85. Metadata filtering
+86. Similarity and relevance
+87. Vector store selection
+88. Vector database implementations
+89. PostgreSQL/PGVector
+90. Redis
+91. Elasticsearch
+92. Cassandra
+93. MongoDB Atlas
+94. Neo4j
+95. OpenSearch
+96. Chroma
+97. Milvus
+98. Pinecone
+99. Qdrant
+100. Weaviate
+101. MariaDB
+102. Azure Vector Search
+103. Oracle
+104. GemFire
+105. Typesense
+106. S3 Vector Store
+
+PART IX — RAG AND DATA ENGINEERING
+107. RAG fundamentals
+108. RAG architecture
+109. Ingestion pipeline
+110. Document
+111. DocumentReader
+112. DocumentTransformer
+113. DocumentWriter
+114. ETL pipeline
+115. PDF document reading
+116. Text document reading
+117. HTML document reading
+118. Markdown document reading
+119. Document splitting
+120. TokenTextSplitter
+121. Metadata
+122. Vector storage
+123. Retrieval
+124. Context assembly
+125. QuestionAnswerAdvisor
+126. RetrievalAugmentationAdvisor
+127. RAG quality and failure modes
+
+PART X — MCP
+128. What MCP is
+129. MCP architecture
+130. MCP Java SDK
+131. MCP clients
+132. MCP servers
+133. MCP tools
+134. MCP resources
+135. MCP prompts
+136. MCP transports
+137. STDIO
+138. SSE
+139. Streamable HTTP
+140. Stateless Streamable HTTP
+141. MCP annotations
+142. MCP Boot Starters
+143. MCP client starter
+144. MCP server starter
+145. Security considerations
+146. MCP and Spring AI tools
+147. MCP application patterns
+
+PART XI — OBSERVABILITY AND EVALUATION
+148. Spring AI observability
+149. Metrics
+150. Tracing
+151. ChatClient observations
+152. Advisor observations
+153. ChatModel observations
+154. Tool observations
+155. Embedding observations
+156. Image model observations
+157. Prompt/completion logging
+158. Sensitive-data considerations
+159. Token usage metrics
+160. AI response evaluation
+161. Evaluator API
+162. Relevance, coherence and correctness
+163. Evaluation with reference data
+
+PART XII — SPRING BOOT INTEGRATION
+164. Auto-configuration
+165. Spring AI starters
+166. Configuration properties
+167. API keys and environment variables
+168. Model-specific configuration
+169. Runtime overrides
+170. Dependency version management
+171. Application architecture
+
+PART XIII — MODEL PROVIDER INTEGRATIONS
+172. OpenAI
+173. Anthropic
+174. Google GenAI
+175. Amazon Bedrock
+176. Mistral AI
+177. Ollama
+178. DeepSeek
+179. Groq
+180. NVIDIA
+181. MiniMax
+182. OpenAI-compatible providers
+183. Local model deployment
+
+PART XIV — IMAGE AND MULTIMODAL APPLICATIONS
+184. Image generation architecture
+185. ImagePrompt
+186. ImageResponse
+187. ImageGeneration
+188. OpenAI image generation
+189. Google GenAI image generation
+190. Stability AI image generation
+191. Multimodal messages
+192. Image input
+193. Audio input
+194. Video and document input
+195. Model capability differences
+
+PART XV — PRACTICAL APPLICATION PATTERNS
+196. Simple chatbot
+197. Streaming chatbot
+198. Stateful chatbot
+199. Documentation Q&A
+200. Semantic search
+201. Tool-enabled assistant
+202. Database-aware assistant
+203. Multimodal assistant
+204. RAG application
+205. MCP-enabled application
+206. Observable AI service
+207. Production architecture
+
+PART XVI — COMMON MISTAKES AND DESIGN GUIDANCE
+208. Choosing ChatModel vs ChatClient
+209. Confusing embeddings with chat generation
+210. Sending too much context
+211. Poor document chunking
+212. Weak metadata
+213. Missing tool descriptions
+214. Unsafe tools
+215. Logging sensitive prompts
+216. Ignoring token usage
+217. Ignoring model capability differences
+218. Treating generated JSON as guaranteed JSON
+219. Forgetting conversation identifiers
+220. Poor RAG retrieval
+221. Overusing default tools
+222. Mixing blocking and streaming incorrectly
+
+PART XVII — INTERVIEW AND REVISION
+223. Spring AI interview concepts
+224. Important comparisons
+225. End-to-end request flows
+226. Production checklist
+227. Quick revision checklist
+
+============================================================
+1. WHAT SPRING AI IS
+============================================================
+
+Spring AI is a Spring ecosystem project designed to make it easier for Java and
+Spring developers to build applications that use AI models.
+
+The central problem is not simply "how do I call an LLM?"
+
+A real application often needs to connect:
+
+    User
+      |
+      v
+    Spring application
+      |
+      +---- AI model
+      |
+      +---- company database
+      |
+      +---- APIs
+      |
+      +---- documents
+      |
+      +---- vector database
+      |
+      +---- tools and business services
+
+Spring AI provides abstractions so that application code does not have to be
+completely tied to one AI provider.
+
+For example, an application can use a ChatModel abstraction instead of directly
+building every integration around one vendor SDK.
+
+WHY THIS MATTERS
+
+Without an abstraction layer, an application can become tightly coupled to:
+
+    Provider-specific request classes
+    Provider-specific response classes
+    Provider-specific configuration
+    Provider-specific streaming APIs
+    Provider-specific tool-calling mechanisms
+
+Spring AI attempts to put a common Spring-friendly API in front of these
+capabilities.
+
+The official reference describes the project's central integration problem as:
+
+    Connecting enterprise data and APIs with AI models.
+
+IMPORTANT MINDSET
+
+Spring AI is not itself an AI model.
+
+It is an application framework and abstraction layer that helps Spring developers
+work with AI models and AI application patterns.
+
+============================================================
+2. SPRING AI ARCHITECTURE AND DESIGN PHILOSOPHY
+============================================================
+
+Spring AI follows several important design ideas.
+
+1. PORTABILITY
+
+The same conceptual API can be used with multiple model providers.
+
+Example:
+
+    ChatClient
+        |
+        v
+    ChatModel abstraction
+        |
+        +---- OpenAI
+        +---- Anthropic
+        +---- Google
+        +---- Mistral
+        +---- Ollama
+        +---- Bedrock
+        +---- other providers
+
+The exact model capabilities can differ, but the application can keep a
+provider-neutral programming model for common operations.
+
+2. COMPOSABILITY
+
+Spring AI features can be combined.
+
+A single application can use:
+
+    ChatClient
+        +
+    Chat memory
+        +
+    RAG
+        +
+    Tool calling
+        +
+    Observability
+
+3. SPRING BOOT INTEGRATION
+
+Configuration and dependency management follow familiar Spring Boot patterns.
+
+4. MODEL-SPECIFIC ESCAPE HATCHES
+
+Portability does not mean every provider-specific feature disappears.
+
+When an application needs provider-specific functionality, Spring AI allows
+developers to access model-specific options and capabilities.
+
+============================================================
+3. SUPPORTED AI MODEL TYPES
+============================================================
+
+Spring AI works with several categories of AI models.
+
+CHAT MODELS
+
+Input usually consists of messages or prompts.
+
+Output is generated conversational content.
+
+Typical use:
+
+    Question -> Chat model -> Answer
+
+EMBEDDING MODELS
+
+Input is converted into numerical vectors.
+
+Typical use:
+
+    Document -> embedding vector -> vector database
+
+IMAGE MODELS
+
+Generate images from prompts.
+
+Typical use:
+
+    Text description -> image model -> generated image
+
+TRANSCRIPTION MODELS
+
+Convert audio to text.
+
+Typical use:
+
+    Audio -> speech-to-text model -> text
+
+TEXT-TO-SPEECH MODELS
+
+Convert text to spoken audio.
+
+Typical use:
+
+    Text -> TTS model -> audio
+
+MODERATION MODELS
+
+Can be used to assess generated or submitted content according to a model's
+moderation capabilities.
+
+============================================================
+4. PROVIDER PORTABILITY
+============================================================
+
+A major Spring AI idea is to separate:
+
+    Application-level AI logic
+from
+    Provider-specific implementation.
+
+Suppose an application has:
+
+    String answer = chatClient.prompt()
+        .user("Explain dependency injection")
+        .call()
+        .content();
+
+The application is expressing what it wants to do.
+
+The actual model provider can be configured separately.
+
+This makes it easier to:
+
+    - switch models
+    - compare providers
+    - use different models for different tasks
+    - implement fallback strategies
+    - test against local models
+    - reduce vendor lock-in
+
+PORTABILITY HAS LIMITS
+
+Different models support different capabilities.
+
+For example:
+
+    Model A -> text only
+    Model B -> text + image
+    Model C -> text + image + audio
+    Model D -> local execution
+
+Therefore, portable application code should rely on capabilities common to the
+chosen models, while provider-specific features should be isolated.
+
+============================================================
+5. SPRING AI AND SPRING BOOT
+============================================================
+
+Spring AI is designed to fit naturally into Spring Boot applications.
+
+Typical application:
+
+    Spring Boot application
+          |
+          +---- Controller
+          |
+          +---- Service
+          |
+          +---- ChatClient
+          |
+          +---- ChatModel
+          |
+          +---- VectorStore
+          |
+          +---- database
+          |
+          +---- external AI provider
+
+Spring Boot auto-configuration can create required infrastructure when the
+appropriate Spring AI dependencies and configuration are present.
+
+============================================================
+6. GETTING STARTED
+============================================================
+
+The official documentation currently describes Spring AI 2.0.x as supporting
+Spring Boot 4.0.x and 4.1.x.
+
+A typical project can be created through Spring Initializr.
+
+General flow:
+
+    1. Create a Spring Boot project.
+    2. Select the desired Spring AI model or vector-store dependencies.
+    3. Configure credentials.
+    4. Create application components.
+    5. Inject ChatClient or another Spring AI abstraction.
+    6. Call the AI service.
+
+============================================================
+7. DEPENDENCY MANAGEMENT AND BOM
+============================================================
+
+Spring AI provides a Bill of Materials (BOM).
+
+The purpose of a BOM is to keep compatible versions of Spring AI modules aligned.
+
+Conceptually:
+
+    spring-ai-bom
+         |
+         +---- model module
+         +---- vector store module
+         +---- supporting modules
+
+Using the BOM avoids manually assigning unrelated versions to every Spring AI
+dependency.
+
+For production projects, version management should be deliberate and consistent.
+
+============================================================
+8. AI MODELS
+============================================================
+
+An AI model is a computational system trained to recognize patterns and generate
+or transform information.
+
+For application developers, the important question is not only:
+
+    "Which model is smartest?"
+
+It is:
+
+    "Which model is appropriate for this workload?"
+
+Consider:
+
+    - input modality
+    - output modality
+    - reasoning quality
+    - latency
+    - cost
+    - context window
+    - tool support
+    - structured output support
+    - streaming
+    - deployment model
+    - privacy requirements
+
+============================================================
+9. PROMPTS
+============================================================
+
+A prompt is the input given to an AI model.
+
+A prompt can contain more than one piece of text.
+
+Common message roles include:
+
+    System
+    User
+    Assistant
+    Tool-related messages
+
+SYSTEM MESSAGE
+
+Defines behavior or context.
+
+Example:
+
+    You are a Java expert.
+    Explain concepts using simple examples.
+
+USER MESSAGE
+
+Contains the user's actual request.
+
+Example:
+
+    Explain dependency injection.
+
+The model combines these messages according to the provider's API semantics.
+
+============================================================
+10. PROMPT TEMPLATES
+============================================================
+
+Prompt templates allow dynamic values to be inserted into reusable instructions.
+
+Example:
+
+    "Explain {topic} for a {experienceLevel} developer."
+
+Runtime values:
+
+    topic = "Spring Security"
+    experienceLevel = "beginner"
+
+Rendered prompt:
+
+    Explain Spring Security for a beginner developer.
+
+Spring AI uses StringTemplate for prompt template functionality.
+
+WHY TEMPLATES HELP
+
+Without templates, applications often create strings manually.
+
+With templates:
+
+    fixed instruction
+        +
+    runtime variables
+        =
+    consistent prompt
+
+This improves maintainability and makes prompts easier to reuse.
+
+============================================================
+11. MESSAGES AND MESSAGE ROLES
+============================================================
+
+Spring AI represents model input using messages.
+
+A message contains content and a role/type.
+
+The role tells the model how the message should be interpreted.
+
+For example:
+
+    System:
+        You are a helpful Java assistant.
+
+    User:
+        Explain Spring AI.
+
+    Assistant:
+        Previous generated response.
+
+This structure becomes particularly important for:
+
+    - conversation history
+    - multimodal input
+    - tool calling
+    - chat memory
+    - RAG
+
+============================================================
+12. TOKENS AND CONTEXT WINDOWS
+============================================================
+
+AI models process tokens rather than raw human words.
+
+A token can represent part of a word, a complete word, punctuation, or another
+piece of text depending on the tokenizer.
+
+TOKEN USAGE MATTERS FOR THREE REASONS
+
+1. Cost
+
+Many hosted models charge according to input/output token usage.
+
+2. Context limits
+
+A model can process only a bounded amount of context per request.
+
+3. Performance
+
+Very large prompts can increase latency and processing cost.
+
+Example:
+
+    User question
+        +
+    system instructions
+        +
+    chat history
+        +
+    retrieved documents
+        +
+    tool results
+        =
+    total context
+
+If everything is included blindly, the application can exceed the model's
+context window.
+
+This is one reason RAG retrieval and document chunking are important.
+
+============================================================
+13. EMBEDDINGS
+============================================================
+
+An embedding is a numerical representation of information.
+
+Example:
+
+    "Spring Boot is a Java framework."
+
+might be transformed conceptually into:
+
+    [0.12, -0.48, 0.91, ... ]
+
+The vector itself is not meant to be read by humans.
+
+Its purpose is to represent semantic characteristics in a mathematical space.
+
+SIMILARITY
+
+Suppose:
+
+    Document A = "Spring Boot REST API"
+    Query      = "How do I create REST endpoints?"
+
+Their embeddings may be relatively close because their meanings are related.
+
+This enables semantic search.
+
+EMBEDDING DIMENSION
+
+The number of values in the vector is its dimensionality.
+
+Example:
+
+    [0.1, 0.4, -0.2, ...]
+     <---- many dimensions ---->
+
+The dimensionality must be compatible with the vector-store configuration.
+
+IMPORTANT
+
+An embedding model is not the same as a chat model.
+
+Chat model:
+
+    prompt -> generated response
+
+Embedding model:
+
+    text/document -> vector
+
+============================================================
+14. STRUCTURED OUTPUT
+============================================================
+
+AI models commonly return text.
+
+But applications often need an actual Java object.
+
+Example desired result:
+
+    class Product {
+        String name;
+        double price;
+    }
+
+A model might return:
+
+    {
+      "name": "Laptop",
+      "price": 999.0
+    }
+
+That response is initially text.
+
+The application still needs to convert it into:
+
+    Product
+
+Spring AI provides structured output converters for this purpose.
+
+Important implementations include:
+
+    BeanOutputConverter
+    MapOutputConverter
+    ListOutputConverter
+
+STRUCTURED OUTPUT IS NOT MAGIC
+
+A model can still generate malformed or unexpected output.
+
+Therefore applications should consider:
+
+    - schema constraints
+    - validation
+    - conversion failures
+    - retries
+    - model support
+    - error handling
+
+============================================================
+15. BRINGING YOUR DATA AND APIS TO AI
+============================================================
+
+A pretrained model does not automatically know the current contents of your
+private database.
+
+For example:
+
+    Company database
+        |
+        X
+        |
+    Public model knowledge
+
+The application must explicitly provide access.
+
+Three broad strategies are:
+
+    1. Fine-tuning
+    2. Prompt augmentation / context injection
+    3. Tool calling
+
+Fine-tuning changes model behavior through additional training.
+
+Prompt augmentation supplies relevant data as context.
+
+Tool calling allows the model to request application-controlled operations.
+
+============================================================
+16. FINE-TUNING VS PROMPT AUGMENTATION VS RAG
+============================================================
+
+FINE-TUNING
+
+Use when changing model behavior or specialization is the objective.
+
+It is not simply a database lookup mechanism.
+
+PROMPT AUGMENTATION
+
+Place relevant information into the model's context.
+
+Problem:
+
+    Context windows are limited.
+
+RAG
+
+Retrieve only relevant pieces of information and place them into the prompt.
+
+This is often much more practical for frequently changing business knowledge.
+
+============================================================
+17. RETRIEVAL AUGMENTED GENERATION
+============================================================
+
+RAG stands for Retrieval Augmented Generation.
+
+Basic flow:
+
+    Documents
+       |
+       v
+    Read
+       |
+       v
+    Split
+       |
+       v
+    Embed
+       |
+       v
+    Vector Store
+       |
+       |  similarity search
+       v
+    Relevant documents
+       |
+       v
+    Prompt + context
+       |
+       v
+    Chat Model
+       |
+       v
+    Answer
+
+The model generates the answer using retrieved context.
+
+WHY RAG WORKS
+
+Instead of giving the model an entire document collection, retrieve the pieces
+that are most relevant to the user's question.
+
+============================================================
+18. TOOL CALLING
+============================================================
+
+Tool calling allows an AI model to request application-defined operations.
+
+Examples:
+
+    getWeather(city)
+    findCustomer(id)
+    getAccountBalance(id)
+    searchProducts(query)
+    sendEmail(to, body)
+
+The model does not directly receive unrestricted access to the underlying API.
+
+The application owns tool execution.
+
+Typical flow:
+
+    User request
+       |
+       v
+    ChatClient
+       |
+       v
+    AI model
+       |
+       | "I need tool X with arguments Y"
+       v
+    Spring AI tool mechanism
+       |
+       v
+    Application function
+       |
+       v
+    Tool result
+       |
+       v
+    AI model
+       |
+       v
+    Final response
+
+This pattern is a foundation for agentic applications.
+
+============================================================
+19. EVALUATING AI RESPONSES
+============================================================
+
+An AI application should not assume every generated response is correct.
+
+Evaluation can consider:
+
+    - relevance
+    - coherence
+    - factual correctness
+    - alignment with the user's request
+    - grounding in supplied data
+
+Spring AI provides an Evaluator API for response evaluation strategies.
+
+Evaluation becomes particularly important for:
+
+    - RAG
+    - customer-facing assistants
+    - document Q&A
+    - compliance-sensitive systems
+    - production AI systems
+
+============================================================
+20. GENERIC MODEL API
+============================================================
+
+Spring AI builds specialized model APIs on top of generic model abstractions.
+
+The important design idea is:
+
+    common model contract
+          |
+          +---- Chat
+          +---- Embedding
+          +---- Image
+          +---- other model types
+
+This allows common application patterns while still supporting model-specific
+implementations.
+
+============================================================
+21. CHAT MODEL API
+============================================================
+
+The Chat Model API provides a portable abstraction for chat completion.
+
+Core concepts include:
+
+    ChatModel
+    StreamingChatModel
+    Prompt
+    Message
+    ChatOptions
+    ChatResponse
+    Generation
+
+Basic conceptual flow:
+
+    Prompt
+      |
+      v
+    ChatModel
+      |
+      v
+    ChatResponse
+      |
+      v
+    Generation
+      |
+      v
+    AssistantMessage
+
+============================================================
+22. CHATMODEL AND STREAMINGCHATMODEL
+============================================================
+
+ChatModel supports normal completion requests.
+
+Conceptually:
+
+    ChatResponse response = chatModel.call(prompt);
+
+StreamingChatModel supports responses delivered progressively.
+
+Streaming is useful for interactive applications where users should see output
+as it is generated rather than waiting for the complete response.
+
+============================================================
+23. PROMPT, MESSAGE, CHATOPTIONS AND CHATRESPONSE
+============================================================
+
+PROMPT
+
+Represents the model input.
+
+It contains messages and optional chat options.
+
+MESSAGE
+
+Represents one unit of conversational input/output.
+
+CHATOPTIONS
+
+Contains portable generation parameters such as:
+
+    model
+    temperature
+    max tokens
+    top-p
+    top-k
+    stop sequences
+    frequency penalty
+    presence penalty
+
+Not every provider necessarily implements every option identically.
+
+CHATRESPONSE
+
+Represents the standardized model response.
+
+It can contain one or more generations and metadata.
+
+============================================================
+24. CHAT MODEL CONFIGURATION
+============================================================
+
+Spring AI allows defaults to be configured when the application starts.
+
+Runtime requests can then override appropriate options.
+
+Think of this as:
+
+    startup defaults
+         +
+    request-specific customization
+
+This is useful when most requests use the same model configuration but a few
+requests require different behavior.
+
+============================================================
+25. CHAT MODEL PROVIDER PORTABILITY
+============================================================
+
+The official comparison documentation tracks capabilities such as:
+
+    Multimodality
+    Tool/function calling
+    Streaming
+    Retry
+    Observability
+    Built-in JSON
+    Local deployment
+    OpenAI API compatibility
+
+This comparison is important because "supports ChatModel" does not mean all
+providers have identical features.
+
+Always check capability requirements before selecting a provider.
+
+============================================================
+26. CHAT MODEL COMPARISON — CURRENT REFERENCE
+============================================================
+
+The current stable documentation lists providers/integrations including:
+
+    Anthropic Claude
+    DeepSeek
+    Google GenAI
+    Groq
+    Mistral AI
+    MiniMax
+    NVIDIA
+    Ollama
+    OpenAI
+
+Amazon Bedrock also provides access to supported models through its integration.
+
+Capabilities vary by provider and model.
+
+Examples of questions to ask:
+
+    Does the model support images?
+    Does it support tool calling?
+    Does it support streaming?
+    Does it support structured JSON?
+    Can it run locally?
+    Is it OpenAI API compatible?
+    Does Spring AI expose observability for it?
+
+============================================================
+27. EMBEDDING MODEL API
+============================================================
+
+The EmbeddingModel abstraction provides a portable interface for turning text
+or document content into vectors.
+
+Important operations conceptually include:
+
+    embed(String)
+    embed(Document)
+    embedForResponse(...)
+    dimensions()
+
+The API wraps embedding input and output in:
+
+    EmbeddingRequest
+    EmbeddingResponse
+    Embedding
+
+The result is typically a floating-point vector.
+
+============================================================
+28. IMAGE MODEL API
+============================================================
+
+The Image Model API provides a portable interface for image generation.
+
+Important concepts:
+
+    ImageModel
+    ImagePrompt
+    ImageResponse
+    ImageGeneration
+    Image metadata
+
+ImageResponse can contain multiple generated images.
+
+The abstraction allows applications to work with different image model
+implementations using a common API.
+
+Available implementations in the current documentation include:
+
+    OpenAI Image Generation
+    Stability AI Image Generation
+    Google GenAI Image Generation
+
+============================================================
+29. AUDIO MODELS
+============================================================
+
+Spring AI supports two important audio categories:
+
+    Speech-to-Text
+    Text-to-Speech
+
+Speech-to-Text:
+
+    Audio -> text
+
+Text-to-Speech:
+
+    Text -> audio
+
+These capabilities can be combined with chat models to build voice-oriented
+applications.
+
+============================================================
+30. SPEECH-TO-TEXT
+============================================================
+
+Speech-to-Text, also called transcription, converts spoken audio into text.
+
+Typical architecture:
+
+    microphone/file
+        |
+        v
+    transcription model
+        |
+        v
+    text
+        |
+        v
+    ChatClient
+        |
+        v
+    response
+
+The text can then be stored, searched, summarized, or sent to another model.
+
+============================================================
+31. TEXT-TO-SPEECH
+============================================================
+
+Text-to-Speech converts generated text into spoken audio.
+
+Typical flow:
+
+    User
+      |
+      v
+    Chat model
+      |
+      v
+    Text response
+      |
+      v
+    TTS model
+      |
+      v
+    Audio
+
+This enables voice assistants and accessibility-oriented applications.
+
+============================================================
+32. MULTIMODALITY
+============================================================
+
+Multimodal AI means an AI model can work with multiple input modalities.
+
+Examples:
+
+    text
+    image
+    audio
+    video
+    documents
+
+Spring AI's Message API supports media content.
+
+Conceptually:
+
+    UserMessage
+        |
+        +---- text
+        |
+        +---- media
+                 |
+                 +---- image
+                 +---- audio
+                 +---- video
+                 +---- other supported media
+
+Example:
+
+    User asks:
+        "Explain this image."
+
+    Message:
+        text = "Explain this image"
+        media = image.png
+
+Not every model supports every modality.
+
+Always check provider/model capability.
+
+============================================================
+33. CHATCLIENT API
+============================================================
+
+ChatClient is a higher-level, fluent API for communicating with chat models.
+
+It is intentionally similar in style to Spring developers' experience with
+WebClient or RestClient.
+
+Simple example:
+
+    @RestController
+    class AiController {
+
+        private final ChatClient chatClient;
+
+        AiController(ChatClient.Builder builder) {
+            this.chatClient = builder.build();
+        }
+
+        @GetMapping("/ai")
+        String ask(String question) {
+            return chatClient.prompt()
+                    .user(question)
+                    .call()
+                    .content();
+        }
+    }
+
+This is one of the most useful entry points for normal Spring AI applications.
+
+============================================================
+34. CREATING CHATCLIENT
+============================================================
+
+Spring Boot can auto-configure a ChatClient.Builder when the required model
+integration is present.
+
+You can then build:
+
+    ChatClient client = builder.build();
+
+The client can also be created programmatically when more control is needed.
+
+============================================================
+35. USER AND SYSTEM MESSAGES
+============================================================
+
+ChatClient supports structured prompt construction.
+
+Example:
+
+    chatClient.prompt()
+        .system("You are a Java expert.")
+        .user("Explain Spring AI.")
+        .call()
+        .content();
+
+The system message establishes behavior.
+
+The user message supplies the task.
+
+============================================================
+36. RUNTIME PROMPT CUSTOMIZATION
+============================================================
+
+A reusable client can have default configuration.
+
+Individual calls can add or override:
+
+    system instructions
+    user content
+    advisor parameters
+    tools
+    model options
+
+This is useful for applications serving many different request types.
+
+============================================================
+37. SYNCHRONOUS CALLS
+============================================================
+
+The normal synchronous pattern is:
+
+    .call()
+    .content()
+
+The application waits for the model response and then continues.
+
+This is simple and suitable for:
+
+    REST endpoints
+    background jobs
+    command-line applications
+    non-streaming workflows
+
+============================================================
+38. STREAMING RESPONSES
+============================================================
+
+Streaming returns generated content progressively.
+
+This is useful for:
+
+    chat interfaces
+    long answers
+    interactive assistants
+
+Conceptually:
+
+    request
+      |
+      v
+    model
+      |
+      +--> token/content chunk
+      +--> token/content chunk
+      +--> token/content chunk
+      +--> ...
+      |
+      v
+    complete response
+
+============================================================
+39. MULTIPLE CHAT MODELS
+============================================================
+
+An application may need several models.
+
+Examples:
+
+    Model A -> complex reasoning
+    Model B -> inexpensive classification
+    Model C -> fast response
+    Model D -> specialized coding
+
+Use cases include:
+
+    - task-based routing
+    - fallback
+    - A/B testing
+    - user-selected models
+    - specialized workloads
+
+The application should make model selection explicit rather than assuming every
+model has identical capabilities.
+
+============================================================
+40. CHAT MEMORY
+============================================================
+
+Chat memory stores conversation history.
+
+Without memory:
+
+    User: My name is Alex.
+    Assistant: Nice to meet you.
+    User: What is my name?
+
+The model may not know the previous message unless history is supplied.
+
+With memory:
+
+    conversation id
+        |
+        v
+    stored messages
+        |
+        v
+    current request
+        |
+        v
+    model
+
+Spring AI provides ChatMemory abstractions.
+
+============================================================
+41. CHAT MEMORY REPOSITORIES
+============================================================
+
+The current documentation describes MessageWindowChatMemory as a built-in
+implementation.
+
+It maintains a bounded message window.
+
+The memory repository abstraction can be backed by different storage mechanisms,
+including implementations for:
+
+    In-memory
+    JDBC
+    Cassandra
+    Neo4j
+    MongoDB
+    Redis
+
+The choice depends on whether memory should survive application restarts and
+whether the application is distributed.
+
+============================================================
+42. RAG THROUGH CHATCLIENT
+============================================================
+
+ChatClient can combine advisors for memory and RAG.
+
+Conceptual example:
+
+    ChatClient
+       |
+       +---- MessageChatMemoryAdvisor
+       |
+       +---- QuestionAnswerAdvisor
+       |
+       +---- ChatModel
+
+The memory advisor can supply conversation context.
+
+The RAG advisor can retrieve relevant documents.
+
+The model then receives a richer prompt.
+
+============================================================
+43. LOGGING AND ADVISORS
+============================================================
+
+Advisors can be used to observe or transform requests.
+
+A logging advisor can help inspect:
+
+    request
+    response
+
+However, production logging must be designed carefully because prompts and
+responses can contain sensitive information.
+
+============================================================
+44. PROMPT ENGINEERING FUNDAMENTALS
+============================================================
+
+Prompt engineering means designing model instructions intentionally.
+
+Good prompts generally provide:
+
+    context
+    task
+    constraints
+    expected output
+    relevant data
+
+Weak:
+
+    "Explain Java."
+
+Better:
+
+    "Explain Java dependency injection to a developer with two years of
+     experience. Use one simple example, one production example, and list
+     three common mistakes."
+
+The goal is not merely making prompts longer.
+
+The goal is making them clearer and more useful.
+
+============================================================
+45. PROMPT TEMPLATES
+============================================================
+
+Templates separate stable instructions from changing values.
+
+Example:
+
+    Explain {topic} for a {level} developer.
+
+This allows one template to serve:
+
+    Java / beginner
+    Spring AI / intermediate
+    RAG / advanced
+
+============================================================
+46. STRUCTURED OUTPUT CONVERTERS
+============================================================
+
+Structured output converters help transform model-generated text into useful
+application structures.
+
+Available converter concepts include:
+
+    BeanOutputConverter
+    MapOutputConverter
+    ListOutputConverter
+
+A converter typically combines:
+
+    output-format instructions
+       +
+    model response
+       +
+    conversion logic
+
+============================================================
+47. BEANOUTPUTCONVERTER
+============================================================
+
+BeanOutputConverter targets a Java type.
+
+Example:
+
+    class Movie {
+        String title;
+        int year;
+    }
+
+The converter can provide format instructions based on the target structure
+and convert compatible model output into a Java object.
+
+This is useful when AI output feeds directly into business logic.
+
+============================================================
+48. MAPOUTPUTCONVERTER
+============================================================
+
+MapOutputConverter is useful when the application wants structured key/value
+data rather than a fixed Java class.
+
+Conceptually:
+
+    model text
+       |
+       v
+    JSON object
+       |
+       v
+    Map<String, Object>
+
+============================================================
+49. LISTOUTPUTCONVERTER
+============================================================
+
+ListOutputConverter is useful when the model should produce a list.
+
+Example request:
+
+    "Return five Java topics."
+
+Desired application representation:
+
+    List<String>
+
+The application still needs to handle conversion failures.
+
+============================================================
+50. SCHEMA-ORIENTED OUTPUT
+============================================================
+
+When structured data is required, applications should think in terms of a
+contract.
+
+For example:
+
+    Product:
+        name: string
+        price: number
+        available: boolean
+
+This is more reliable than simply telling the model:
+
+    "Give me JSON."
+
+Structured output mechanisms can provide stronger formatting guidance, but
+model output should still be validated.
+
+============================================================
+51. RELIABILITY CONSIDERATIONS
+============================================================
+
+Never assume generated output is automatically trustworthy.
+
+Possible failures:
+
+    malformed JSON
+    missing field
+    wrong type
+    extra field
+    hallucinated value
+    incomplete response
+
+Production applications should validate structured results before using them.
+
+============================================================
+52. ADVISORS API
+============================================================
+
+Advisors are reusable components that can inspect and modify AI requests and
+responses.
+
+They are useful for implementing recurring AI application patterns.
+
+Examples:
+
+    memory
+    RAG
+    logging
+    tool calling
+    prompt transformation
+    reasoning strategies
+
+Instead of putting all logic inside a controller, advisors let the behavior
+be composed around the model interaction.
+
+============================================================
+53. ADVISOR CHAIN
+============================================================
+
+Multiple advisors can form a chain.
+
+Conceptually:
+
+    Request
+      |
+      v
+    Advisor A
+      |
+      v
+    Advisor B
+      |
+      v
+    Advisor C
+      |
+      v
+    Chat model
+      |
+      v
+    Response
+      |
+      v
+    Advisor C
+      |
+      v
+    Advisor B
+      |
+      v
+    Advisor A
+      |
+      v
+    Caller
+
+Order matters.
+
+For example, memory may need to execute before RAG retrieval.
+
+============================================================
+54. CALLADVISOR
+============================================================
+
+CallAdvisor is used for non-streaming calls.
+
+The advisor can:
+
+    inspect request
+    modify request
+    invoke the next advisor
+    inspect response
+    transform response
+    stop or reject processing
+
+============================================================
+55. STREAMADVISOR
+============================================================
+
+StreamAdvisor handles streaming interactions.
+
+It allows reusable logic to participate in streaming request/response flows.
+
+============================================================
+56. ADVISOR ORDERING
+============================================================
+
+Advisor ordering controls execution sequence.
+
+Example:
+
+    Memory
+      |
+      v
+    RAG
+      |
+      v
+    Tool calling
+      |
+      v
+    Model
+
+Changing the order can change application behavior.
+
+Always document important advisor ordering decisions.
+
+============================================================
+57. MESSAGECHATMEMORYADVISOR
+============================================================
+
+This advisor retrieves conversation history and adds it to the prompt.
+
+It is useful for conversational applications.
+
+Important detail:
+
+A conversation identifier is needed to know which memory belongs to the
+current conversation.
+
+============================================================
+58. VECTORSTORECHATMEMORYADVISOR
+============================================================
+
+This advisor uses a vector store as a memory mechanism.
+
+Instead of simply keeping a sequential message window, the system can retrieve
+relevant historical information through vector search.
+
+This is useful when the conversation history becomes large and relevance-based
+retrieval is more useful than simply keeping the newest messages.
+
+============================================================
+59. QUESTIONANSWERADVISOR
+============================================================
+
+QuestionAnswerAdvisor provides a straightforward RAG pattern.
+
+Typical flow:
+
+    user question
+       |
+       v
+    vector similarity search
+       |
+       v
+    relevant documents
+       |
+       v
+    augmented prompt
+       |
+       v
+    chat model
+
+============================================================
+60. RETRIEVALAUGMENTATIONADVISOR
+============================================================
+
+RetrievalAugmentationAdvisor supports more modular RAG flows.
+
+It is useful when the application needs greater control over:
+
+    query transformation
+    retrieval
+    post-processing
+    context selection
+    prompt augmentation
+
+This is preferable when a simple similarity-search advisor is not sufficient.
+
+============================================================
+61. REREADINGADVISOR
+============================================================
+
+ReReadingAdvisor implements a re-reading strategy intended to improve reasoning
+by having the model reconsider the input.
+
+It is an example of an advisor that modifies the interaction pattern rather
+than simply retrieving data.
+
+============================================================
+62. TOOLCALLINGADVISOR
+============================================================
+
+ToolCallingAdvisor manages the tool-calling loop in the ChatClient architecture.
+
+The high-level flow is:
+
+    request
+      |
+      v
+    model
+      |
+      | tool call?
+      v
+    ToolCallingManager
+      |
+      v
+    ToolCallback
+      |
+      v
+    tool result
+      |
+      v
+    model
+      |
+      v
+    final response
+
+============================================================
+63. CUSTOM ADVISORS
+============================================================
+
+A custom advisor can implement application-specific behavior.
+
+Possible examples:
+
+    Add tenant information
+    Add security context
+    Rewrite a prompt
+    Record business metrics
+    Add custom retrieval
+    Enforce request policies
+    Remove sensitive fields
+
+A custom advisor should have one clear responsibility.
+
+============================================================
+64. ADVISOR OBSERVABILITY
+============================================================
+
+Advisors participate in Spring AI observability.
+
+This allows teams to understand:
+
+    how long an advisor took
+    which advisor executed
+    ordering
+    related tracing information
+
+This becomes important when a request passes through many AI processing steps.
+
+============================================================
+65. WHAT TOOL CALLING MEANS
+============================================================
+
+Tool calling allows a model to request application-defined functions.
+
+It changes the application from:
+
+    "AI only generates text"
+
+to:
+
+    "AI can request controlled operations."
+
+Examples:
+
+    Query a database
+    Search a product catalog
+    Check weather
+    Create an order
+    Retrieve account information
+
+The application remains responsible for execution.
+
+============================================================
+66. TOOL CALLING ARCHITECTURE
+============================================================
+
+Spring AI 2.x makes the tool-calling loop a first-class component of the
+ChatClient advisor chain.
+
+High-level flow:
+
+    1. Define tools.
+    2. Register tools with ChatClient.
+    3. Send request.
+    4. Model decides whether to call a tool.
+    5. ToolCallingManager executes the selected callback.
+    6. Tool result is added to the conversation.
+    7. Model receives the result.
+    8. Loop continues until no more tool calls are requested.
+
+============================================================
+67. DEFINING TOOLS WITH @TOOL
+============================================================
+
+A method can be exposed as a tool using @Tool.
+
+Example:
+
+    class WeatherTools {
+
+        @Tool(description = "Get current weather for a city")
+        public String getWeather(String city) {
+            return weatherService.fetch(city);
+        }
+    }
+
+The description is important.
+
+The model uses the description to understand when the tool should be called.
+
+============================================================
+68. @TOOLPARAM
+============================================================
+
+Tool parameters should also be described when necessary.
+
+Example:
+
+    @Tool(description = "Get weather for a city")
+    public String getWeather(
+        @ToolParam(description = "City name") String city) {
+
+        return weatherService.fetch(city);
+    }
+
+A well-described parameter helps the model construct correct tool arguments.
+
+============================================================
+69. METHODTOOLCALLBACK
+============================================================
+
+MethodToolCallback provides programmatic control over method-backed tools.
+
+It is useful when:
+
+    - the source method is not yours
+    - registration is dynamic
+    - tool definitions need to be constructed at runtime
+
+============================================================
+70. FUNCTIONTOOLCALLBACK
+============================================================
+
+FunctionToolCallback can expose:
+
+    Function
+    Supplier
+    Consumer
+    BiFunction
+    lambdas
+    method references
+
+Example concept:
+
+    FunctionToolCallback.builder(
+        "currentWeather",
+        weatherService::getWeather
+    )
+    .description("Get the weather")
+    .inputType(WeatherRequest.class)
+    .build();
+
+============================================================
+71. TOOLCALLBACK BEANS
+============================================================
+
+ToolCallback objects can be Spring beans.
+
+This allows normal Spring dependency injection and configuration.
+
+The tool can then be explicitly supplied to ChatClient.
+
+============================================================
+72. PASSING TOOLS TO CHATCLIENT
+============================================================
+
+Tools can be supplied for one request:
+
+    chatClient.prompt(...)
+        .tools(weatherTools)
+        .call();
+
+Or configured as defaults:
+
+    ChatClient.builder(chatModel)
+        .defaultTools(weatherTools)
+        .build();
+
+Per-call tools are useful when only certain operations should be available for
+a specific request.
+
+============================================================
+73. DEFAULT TOOLS VS PER-CALL TOOLS
+============================================================
+
+Default tools are available to every request created from that client.
+
+This is convenient for safe, frequently needed tools.
+
+However, destructive or high-risk operations should generally not be globally
+available.
+
+Examples of high-risk operations:
+
+    deleteCustomer()
+    transferMoney()
+    cancelOrder()
+    sendExternalEmail()
+
+These should have explicit authorization and careful registration.
+
+============================================================
+74. TOOL CALLING LOOP
+============================================================
+
+The loop is:
+
+    Request
+       |
+       v
+    Model
+       |
+       +---- normal response ----> finish
+       |
+       +---- tool request
+                |
+                v
+           execute tool
+                |
+                v
+           tool result
+                |
+                v
+              model
+                |
+             repeat
+
+This loop can continue more than once.
+
+============================================================
+75. TOOL RESULTS AND MODEL ITERATION
+============================================================
+
+The model receives the tool result as additional conversation context.
+
+It can then:
+
+    - answer the user
+    - call another tool
+    - revise the reasoning
+    - request additional information
+
+This is the basis of multi-step agentic behavior.
+
+============================================================
+76. SECURITY BOUNDARIES
+============================================================
+
+A critical security principle:
+
+The model does not receive unrestricted access to your application APIs.
+
+The application owns the execution mechanism.
+
+Still, the application must validate:
+
+    tool arguments
+    authorization
+    tenant boundaries
+    user permissions
+    destructive actions
+    external side effects
+
+Never assume that because a model requested a tool, the action is automatically
+authorized.
+
+============================================================
+77. TOOL CALLING WITH DIFFERENT MODELS
+============================================================
+
+Tool calling support varies by provider and model.
+
+Before enabling tools, verify:
+
+    tool/function support
+    input schema support
+    streaming behavior
+    structured output behavior
+    model-specific limitations
+
+============================================================
+78. WHAT A VECTOR DATABASE IS
+============================================================
+
+A vector database stores vector representations and supports similarity search.
+
+Traditional database query:
+
+    WHERE name = 'Spring'
+
+Vector search:
+
+    Find vectors most similar to the query vector.
+
+This is useful when exact keyword matching is insufficient.
+
+============================================================
+79. VECTORSTORE ABSTRACTION
+============================================================
+
+Spring AI provides the VectorStore abstraction.
+
+Conceptual operations:
+
+    add(documents)
+    delete(ids)
+    delete(filter)
+    similaritySearch(query)
+    similaritySearch(searchRequest)
+
+This allows application code to use different vector database implementations
+with a consistent API.
+
+============================================================
+80. DOCUMENT MODEL
+============================================================
+
+A Document represents retrievable content.
+
+Conceptually it contains:
+
+    id
+    text/content
+    metadata
+    optional media information
+
+Metadata can contain useful information such as:
+
+    source
+    page
+    category
+    tenant
+    author
+    timestamp
+
+============================================================
+81. ADDING DOCUMENTS
+============================================================
+
+The ingestion pipeline typically creates Documents and stores them.
+
+Flow:
+
+    raw content
+       |
+       v
+    Document
+       |
+       v
+    embedding
+       |
+       v
+    vector store
+
+============================================================
+82. DELETING DOCUMENTS
+============================================================
+
+Documents can be removed by identifiers or filters.
+
+Deletion is important when source information changes.
+
+For example:
+
+    Old policy document
+        |
+        X
+    remove from vector store
+        |
+        v
+    New policy document
+        |
+        v
+    ingest
+
+============================================================
+83. SIMILARITY SEARCH
+============================================================
+
+A similarity search takes a query and returns relevant documents.
+
+Example:
+
+    Query:
+        "How do I configure Redis caching?"
+
+Vector store:
+
+    [document about Redis configuration]
+    [document about Spring caching]
+    [document about unrelated Kafka]
+    ...
+
+Similarity ranking attempts to return the most relevant content.
+
+============================================================
+84. SEARCHREQUEST
+============================================================
+
+SearchRequest provides structured control over similarity search.
+
+Applications can use it to express:
+
+    query
+    top-K
+    similarity threshold
+    metadata filter
+
+This is more flexible than a simple string query.
+
+============================================================
+85. METADATA FILTERING
+============================================================
+
+Metadata filters allow retrieval to be restricted.
+
+Example:
+
+    category = "spring-security"
+
+Then a query for:
+
+    "authentication"
+
+can be restricted to security documents.
+
+This is extremely useful in multi-tenant or multi-domain applications.
+
+============================================================
+86. SIMILARITY AND RELEVANCE
+============================================================
+
+A vector search does not guarantee that every returned document is useful.
+
+Applications can improve retrieval through:
+
+    top-K tuning
+    similarity thresholds
+    metadata filters
+    better chunking
+    better embeddings
+    query transformation
+    reranking strategies
+
+============================================================
+87. VECTOR STORE SELECTION
+============================================================
+
+Choose a vector store based on:
+
+    existing infrastructure
+    scale
+    latency
+    operational expertise
+    cloud environment
+    filtering needs
+    cost
+    transactional requirements
+
+There is no universal best vector database.
+
+============================================================
+88. VECTOR DATABASE IMPLEMENTATIONS
+============================================================
+
+The current Spring AI documentation lists integrations including:
+
+    Apache Cassandra
+    Azure Vector Search
+    Chroma
+    Elasticsearch
+    GemFire
+    MariaDB
+    Milvus
+    MongoDB Atlas
+    Neo4j
+    OpenSearch
+    Oracle
+    PostgreSQL / PGVector
+    Pinecone
+    Qdrant
+    Redis
+    Typesense
+    Weaviate
+    AWS S3 Vector Store
+
+Each implementation has its own setup and provider-specific properties.
+
+============================================================
+89. POSTGRESQL / PGVECTOR
+============================================================
+
+PGVector adds vector capabilities to PostgreSQL.
+
+This is attractive when an organization already uses PostgreSQL.
+
+Typical architecture:
+
+    Spring AI
+       |
+       v
+    PgVectorStore
+       |
+       v
+    PostgreSQL + vector extension
+
+The database can store:
+
+    document content
+    metadata
+    embeddings
+
+The vector dimension must match the embedding model.
+
+============================================================
+90. REDIS VECTOR STORE
+============================================================
+
+Redis can store and search vectors alongside application data.
+
+Important configuration concepts include:
+
+    distance metric
+    vector algorithm
+    HNSW parameters
+    index name
+    key prefix
+
+Redis can be useful when the application already relies heavily on Redis.
+
+============================================================
+91. ELASTICSEARCH
+============================================================
+
+Elasticsearch is a search and analytics platform with vector search capabilities.
+
+It can be useful when an application already needs:
+
+    full-text search
+    filtering
+    analytics
+    vector search
+
+This allows hybrid search architectures.
+
+============================================================
+92. APACHE CASSANDRA
+============================================================
+
+Cassandra provides distributed storage and vector similarity capabilities.
+
+It can be useful for systems requiring:
+
+    high availability
+    distributed operation
+    large-scale data
+
+Spring AI provides a Cassandra VectorStore implementation.
+
+============================================================
+93. MONGODB ATLAS
+============================================================
+
+MongoDB Atlas can store document-oriented application data and vector data.
+
+This is useful when the application's existing domain data is already stored
+in MongoDB.
+
+============================================================
+94. NEO4J
+============================================================
+
+Neo4j is a graph database.
+
+Its combination with vector search can be useful when applications need both:
+
+    semantic similarity
+    graph relationships
+
+Examples:
+
+    recommendation systems
+    knowledge graphs
+    relationship-aware retrieval
+
+============================================================
+95. OPENSEARCH
+============================================================
+
+OpenSearch provides search capabilities and vector search.
+
+It can be a useful choice for applications already using OpenSearch for
+traditional search.
+
+============================================================
+96. CHROMA
+============================================================
+
+Chroma is commonly used for AI-oriented vector storage and experimentation.
+
+It can be appropriate for development and smaller application architectures.
+
+============================================================
+97. MILVUS
+============================================================
+
+Milvus is a vector database designed specifically for vector search workloads.
+
+It is useful when vector search is a primary data requirement.
+
+============================================================
+98. PINECONE
+============================================================
+
+Pinecone is a managed vector database service.
+
+A managed vector store can reduce the operational work required to run the
+vector infrastructure yourself.
+
+============================================================
+99. QDRANT
+============================================================
+
+Qdrant is a vector search engine focused on similarity search and metadata
+filtering.
+
+It is commonly used for semantic retrieval workloads.
+
+============================================================
+100. WEAVIATE
+============================================================
+
+Weaviate is a vector database that supports semantic retrieval and related
+AI-oriented search capabilities.
+
+============================================================
+101. MARIADB
+============================================================
+
+MariaDB can provide vector capabilities while allowing organizations to
+continue using a familiar relational database ecosystem.
+
+============================================================
+102. AZURE VECTOR SEARCH
+============================================================
+
+Azure Vector Search is useful for applications already operating within the
+Azure ecosystem.
+
+Consider:
+
+    cloud identity
+    Azure networking
+    managed infrastructure
+    integration with existing Azure services
+
+============================================================
+103. ORACLE
+============================================================
+
+Oracle's vector capabilities allow vector data and similarity search to be
+used alongside Oracle database infrastructure.
+
+This can be valuable in enterprise environments already standardized on Oracle.
+
+============================================================
+104. GEMFIRE
+============================================================
+
+GemFire is a distributed in-memory data platform.
+
+Its vector capabilities allow vector similarity search while retaining the
+distributed characteristics of GemFire.
+
+============================================================
+105. TYPESENSE
+============================================================
+
+Typesense is a search engine optimized for fast search experiences and also
+provides vector search.
+
+It can be useful when traditional search and vector search need to coexist.
+
+============================================================
+106. S3 VECTOR STORE
+============================================================
+
+AWS S3 Vector Store provides a serverless approach to storing and querying
+vectors at scale.
+
+The integration can store vectors and associated metadata and perform vector
+searches.
+
+============================================================
+107. RAG FUNDAMENTALS
+============================================================
+
+RAG combines retrieval with generation.
+
+Without RAG:
+
+    User question
+       |
+       v
+    Model
+       |
+       v
+    Answer
+
+With RAG:
+
+    User question
+       |
+       v
+    Retrieve relevant data
+       |
+       v
+    Add context
+       |
+       v
+    Model
+       |
+       v
+    Grounded answer
+
+============================================================
+108. RAG ARCHITECTURE
+============================================================
+
+A complete RAG system has two major phases.
+
+OFFLINE / INGESTION:
+
+    documents
+       |
+       v
+    readers
+       |
+       v
+    transformers
+       |
+       v
+    chunks
+       |
+       v
+    embeddings
+       |
+       v
+    vector store
+
+ONLINE / QUERY:
+
+    user question
+       |
+       v
+    embedding/search
+       |
+       v
+    relevant chunks
+       |
+       v
+    prompt augmentation
+       |
+       v
+    chat model
+       |
+       v
+    answer
+
+============================================================
+109. INGESTION PIPELINE
+============================================================
+
+Ingestion converts raw information into retrievable documents.
+
+Typical stages:
+
+    Read
+    Transform
+    Write
+
+This is the ETL pattern.
+
+============================================================
+110. DOCUMENT
+============================================================
+
+A Document is the core unit moving through the ETL pipeline.
+
+It can contain:
+
+    text
+    metadata
+    media
+
+Metadata is especially important because retrieval often needs filters.
+
+============================================================
+111. DOCUMENTREADER
+============================================================
+
+DocumentReader obtains Documents from an external source.
+
+Conceptually:
+
+    source
+       |
+       v
+    DocumentReader
+       |
+       v
+    List<Document>
+
+Examples include readers for:
+
+    PDF
+    text
+    HTML
+    Markdown
+    web resources
+    other supported formats
+
+============================================================
+112. DOCUMENTTRANSFORMER
+============================================================
+
+A DocumentTransformer changes documents before storage.
+
+Typical transformations:
+
+    splitting
+    cleanup
+    normalization
+    metadata enrichment
+    chunking
+
+============================================================
+113. DOCUMENTWRITER
+============================================================
+
+DocumentWriter represents the final stage.
+
+Typical writer:
+
+    VectorStore
+
+Flow:
+
+    Document
+       |
+       v
+    embedding
+       |
+       v
+    VectorStore
+
+============================================================
+114. ETL PIPELINE
+============================================================
+
+Spring AI's ETL framework provides:
+
+    DocumentReader
+    DocumentTransformer
+    DocumentWriter
+
+A simple conceptual pipeline is:
+
+    writer.write(
+        transformer.transform(
+            reader.read()
+        )
+    );
+
+This separation makes ingestion components reusable.
+
+============================================================
+115. PDF DOCUMENT READING
+============================================================
+
+PDF readers can convert document pages/content into Spring AI Documents.
+
+A common RAG workflow is:
+
+    PDF
+      |
+      v
+    PagePdfDocumentReader
+      |
+      v
+    Documents
+      |
+      v
+    splitter
+      |
+      v
+    VectorStore
+
+============================================================
+116. TEXT DOCUMENT READING
+============================================================
+
+Text readers can turn a text resource into a Document.
+
+Important consideration:
+
+Reading an entire large file into one Document may not be appropriate for
+retrieval.
+
+Use a splitter when the content needs to be divided.
+
+============================================================
+117. HTML DOCUMENT READING
+============================================================
+
+HTML readers can extract content according to selectors and configuration.
+
+Useful metadata can include:
+
+    title
+    source URL
+    links
+    selected element information
+
+HTML cleanup is important because navigation, advertisements, scripts, and
+layout elements can otherwise become retrieval noise.
+
+============================================================
+118. MARKDOWN DOCUMENT READING
+============================================================
+
+Markdown readers convert Markdown content into Documents.
+
+Markdown is useful for:
+
+    documentation
+    README files
+    technical knowledge bases
+
+============================================================
+119. DOCUMENT SPLITTING
+============================================================
+
+Chunking is one of the most important RAG decisions.
+
+Bad:
+
+    split randomly in the middle of a paragraph
+    split in the middle of code
+    split tables incorrectly
+
+Better:
+
+    preserve semantic boundaries first
+    then enforce manageable chunk sizes
+
+The goal is:
+
+    enough context
+    without wasting tokens
+
+============================================================
+120. TOKENTEXTSPLITTER
+============================================================
+
+TokenTextSplitter is a transformer designed to split content according to
+token-oriented limits.
+
+Conceptually:
+
+    large document
+       |
+       v
+    TokenTextSplitter
+       |
+       +---- chunk 1
+       +---- chunk 2
+       +---- chunk 3
+       +---- ...
+
+The exact chunking configuration should be tuned to the model and content.
+
+============================================================
+121. METADATA
+============================================================
+
+Metadata is additional information associated with a document.
+
+Examples:
+
+    source = handbook.pdf
+    page = 12
+    department = finance
+    tenant = companyA
+    category = security
+
+Metadata supports:
+
+    filtering
+    debugging
+    citations
+    authorization
+    document management
+
+============================================================
+122. VECTOR STORAGE
+============================================================
+
+After splitting:
+
+    chunk
+       |
+       v
+    embedding
+       |
+       v
+    vector store
+
+Each stored record typically associates:
+
+    vector
+    text/content
+    metadata
+    identifier
+
+============================================================
+123. RETRIEVAL
+============================================================
+
+At query time:
+
+    question
+       |
+       v
+    embedding / search
+       |
+       v
+    top relevant documents
+
+The retrieval stage should be measured separately from generation.
+
+If the correct document is never retrieved, even a powerful model may produce
+a poor answer.
+
+============================================================
+124. CONTEXT ASSEMBLY
+============================================================
+
+Retrieved documents are assembled into model context.
+
+Conceptually:
+
+    System instructions
+       +
+    conversation history
+       +
+    user question
+       +
+    retrieved context
+       =
+    model prompt
+
+Too much context can hurt performance and increase cost.
+
+============================================================
+125. QUESTIONANSWERADVISOR
+============================================================
+
+QuestionAnswerAdvisor is a convenient RAG advisor.
+
+It uses a vector store to retrieve relevant information and augment the model
+interaction.
+
+It is useful for straightforward documentation Q&A.
+
+============================================================
+126. RETRIEVALAUGMENTATIONADVISOR
+============================================================
+
+RetrievalAugmentationAdvisor is more modular.
+
+It is appropriate when the application needs a configurable retrieval pipeline.
+
+Potential stages include:
+
+    query transformation
+    retrieval
+    document post-processing
+    context selection
+    prompt augmentation
+
+============================================================
+127. RAG QUALITY AND FAILURE MODES
+============================================================
+
+Common RAG failures:
+
+1. Wrong chunk size
+2. Poor embedding model
+3. Missing metadata
+4. Incorrect similarity threshold
+5. Too many retrieved documents
+6. Too few retrieved documents
+7. Duplicate chunks
+8. Stale documents
+9. Query wording mismatch
+10. Poor source cleanup
+
+RAG quality is therefore an engineering problem, not just a model-selection
+problem.
+
+============================================================
+128. WHAT MCP IS
+============================================================
+
+MCP stands for Model Context Protocol.
+
+It standardizes how AI applications interact with external tools and resources.
+
+Think of MCP as a protocol boundary between:
+
+    AI application
+        |
+        v
+    standardized MCP interface
+        |
+        +---- tools
+        +---- resources
+        +---- prompts
+        |
+        v
+    external system
+
+Spring AI supports both consuming MCP servers and exposing Spring services
+through MCP.
+
+============================================================
+129. MCP ARCHITECTURE
+============================================================
+
+MCP commonly has:
+
+    Client
+      |
+      v
+    Session / protocol
+      |
+      v
+    Server
+      |
+      +---- Tools
+      +---- Resources
+      +---- Prompts
+
+The MCP Java SDK provides the Java implementation used by Spring AI.
+
+============================================================
+130. MCP JAVA SDK
+============================================================
+
+The MCP Java implementation separates responsibilities into layers.
+
+Important capabilities include:
+
+    tool discovery
+    tool execution
+    resource access
+    prompt interaction
+    capability negotiation
+    notifications
+    synchronous operations
+    asynchronous operations
+
+============================================================
+131. MCP CLIENTS
+============================================================
+
+An MCP client connects an AI application to one or more MCP servers.
+
+The client can discover tools and other capabilities exposed by the server.
+
+Spring AI provides Boot integration to simplify this configuration.
+
+============================================================
+132. MCP SERVERS
+============================================================
+
+An MCP server exposes capabilities to clients.
+
+A server can expose:
+
+    tools
+    resources
+    prompts
+
+Example:
+
+    Weather MCP server
+        |
+        +---- getWeather
+        +---- getForecast
+
+============================================================
+133. MCP TOOLS
+============================================================
+
+MCP tools are executable operations.
+
+They allow an AI application to request actions or retrieve information through
+a standardized protocol.
+
+============================================================
+134. MCP RESOURCES
+============================================================
+
+Resources represent data accessible through the MCP protocol.
+
+Examples can include:
+
+    files
+    documents
+    database-backed resources
+    other application information
+
+============================================================
+135. MCP PROMPTS
+============================================================
+
+MCP servers can expose reusable prompt templates.
+
+This allows prompt behavior to be shared through the protocol.
+
+============================================================
+136. MCP TRANSPORTS
+============================================================
+
+The current Spring AI MCP support includes multiple transport approaches.
+
+Important options include:
+
+    STDIO
+    SSE
+    Streamable HTTP
+    Stateless Streamable HTTP
+
+Transport selection depends on deployment architecture.
+
+============================================================
+137. STDIO
+============================================================
+
+STDIO is process-based communication.
+
+It is useful for local MCP servers that run alongside or are launched by a
+client process.
+
+Because it is not network-accessible in the same way as an HTTP endpoint,
+its security model differs from network transports.
+
+============================================================
+138. SSE
+============================================================
+
+Server-Sent Events can be used for HTTP-based MCP communication.
+
+The current Spring AI documentation notes that SSE-based server configuration
+has been superseded in some 2.0 server scenarios by Streamable HTTP.
+
+============================================================
+139. STREAMABLE HTTP
+============================================================
+
+Streamable HTTP provides an HTTP-based MCP transport suitable for networked
+applications.
+
+Spring AI supports it through WebMVC and WebFlux starter configurations.
+
+============================================================
+140. STATELESS STREAMABLE HTTP
+============================================================
+
+Stateless transport is useful when the server architecture should avoid
+maintaining protocol session state in the same way as a stateful server.
+
+============================================================
+141. MCP ANNOTATIONS
+============================================================
+
+Spring AI provides annotation-based MCP development.
+
+Important server-side annotations include:
+
+    @McpTool
+    @McpResource
+    @McpPrompt
+    @McpComplete
+
+Client-side annotations include capabilities such as:
+
+    @McpLogging
+    @McpSampling
+    @McpElicitation
+    @McpProgress
+
+Annotations reduce boilerplate and support declarative MCP application design.
+
+============================================================
+142. MCP BOOT STARTERS
+============================================================
+
+Spring AI provides Boot starters for MCP clients and servers.
+
+The goal is to integrate MCP with normal Spring Boot auto-configuration.
+
+============================================================
+143. MCP CLIENT STARTER
+============================================================
+
+The MCP client starter supports:
+
+    multiple client instances
+    automatic initialization
+    STDIO
+    HTTP/SSE
+    Streamable HTTP
+    tool filtering
+    tool-name prefixing
+    lifecycle management
+    custom client creation
+
+============================================================
+144. MCP SERVER STARTER
+============================================================
+
+The server starter supports:
+
+    tools
+    resources
+    prompts
+    different transports
+    synchronous operation
+    asynchronous operation
+    annotation scanning
+
+============================================================
+145. MCP SECURITY CONSIDERATIONS
+============================================================
+
+A network-exposed MCP server can expose powerful capabilities.
+
+The current documentation warns that HTTP-based MCP server transports can
+expose JSON-RPC endpoints without authentication/authorization by default.
+
+Therefore:
+
+    localhost-only
+        is not the same as
+    public production endpoint
+
+Before exposing an MCP server externally, place an appropriate security
+boundary in front of it.
+
+============================================================
+146. MCP AND SPRING AI TOOLS
+============================================================
+
+Spring AI can bridge MCP tools into its tool execution framework.
+
+Conceptually:
+
+    MCP server
+       |
+       v
+    MCP client
+       |
+       v
+    ToolCallback
+       |
+       v
+    ChatClient
+       |
+       v
+    AI model
+
+This lets MCP capabilities participate in normal Spring AI tool calling.
+
+============================================================
+147. MCP APPLICATION PATTERNS
+============================================================
+
+Useful MCP patterns include:
+
+    AI assistant + weather server
+    AI assistant + filesystem server
+    AI assistant + database server
+    AI assistant + enterprise APIs
+    AI assistant + search service
+
+The advantage is standardization of the integration boundary.
+
+============================================================
+148. SPRING AI OBSERVABILITY
+============================================================
+
+Spring AI integrates with Spring observability mechanisms.
+
+Core components can expose metrics and tracing information for:
+
+    ChatClient
+    Advisors
+    ChatModel
+    EmbeddingModel
+    ImageModel
+    VectorStore
+    Tool calling
+
+============================================================
+149. METRICS
+============================================================
+
+Metrics help answer questions such as:
+
+    How many model calls occurred?
+    How many tokens were consumed?
+    How long did requests take?
+    Which model is used most?
+    How often are tools called?
+
+Token usage is especially important because AI costs are often correlated with
+input and output token volume.
+
+============================================================
+150. TRACING
+============================================================
+
+Tracing connects related operations.
+
+Example:
+
+    HTTP request
+       |
+       v
+    Controller
+       |
+       v
+    ChatClient
+       |
+       v
+    Advisor
+       |
+       v
+    ChatModel
+       |
+       v
+    Tool
+       |
+       v
+    Database
+
+Distributed tracing can make this chain easier to debug.
+
+============================================================
+151. CHATCLIENT OBSERVATIONS
+============================================================
+
+ChatClient observations can measure invocation time and propagate tracing
+information.
+
+Additional contextual information can include:
+
+    streaming status
+    advisors
+    conversation ID
+    tool names
+
+============================================================
+152. ADVISOR OBSERVATIONS
+============================================================
+
+Advisor observations track execution of advisors.
+
+This is useful for understanding:
+
+    advisor latency
+    chain order
+    slow retrieval
+    slow custom logic
+
+============================================================
+153. CHATMODEL OBSERVATIONS
+============================================================
+
+ChatModel observations can capture:
+
+    model
+    provider
+    request options
+    response model
+    token usage
+    finish reason
+
+These measurements are valuable for production monitoring.
+
+============================================================
+154. TOOL OBSERVATIONS
+============================================================
+
+Tool observations can record:
+
+    tool name
+    tool type
+    tool call ID
+    execution timing
+
+Tool arguments/results are not exported by default because they may contain
+sensitive information.
+
+============================================================
+155. EMBEDDING OBSERVATIONS
+============================================================
+
+Embedding operations can expose model and token usage observations.
+
+The current documentation notes provider-specific observability support for
+certain embedding implementations.
+
+============================================================
+156. IMAGE MODEL OBSERVATIONS
+============================================================
+
+Image model operations can also participate in observability.
+
+The current documentation notes provider-specific support.
+
+============================================================
+157. PROMPT/COMPLETION LOGGING
+============================================================
+
+Prompt and completion data can be large and sensitive.
+
+Logging them can help debugging, but should be disabled unless there is a
+clear reason and an appropriate data-protection strategy.
+
+============================================================
+158. SENSITIVE-DATA CONSIDERATIONS
+============================================================
+
+AI prompts may contain:
+
+    passwords
+    customer data
+    financial information
+    private documents
+    internal business information
+
+Never enable verbose prompt logging in production without understanding the
+privacy and security implications.
+
+============================================================
+159. TOKEN USAGE METRICS
+============================================================
+
+Useful token metrics include:
+
+    input tokens
+    output tokens
+    total tokens
+
+Token monitoring helps control:
+
+    cost
+    latency
+    context usage
+
+============================================================
+160. AI RESPONSE EVALUATION
+============================================================
+
+AI output should be evaluated according to application requirements.
+
+Useful dimensions:
+
+    relevance
+    coherence
+    factual correctness
+    groundedness
+    alignment with source data
+
+============================================================
+161. EVALUATOR API
+============================================================
+
+Spring AI provides an Evaluator API for response evaluation.
+
+An evaluator can receive:
+
+    user input
+    generated response
+    reference/context
+
+and produce an assessment.
+
+============================================================
+162. RELEVANCE, COHERENCE AND CORRECTNESS
+============================================================
+
+RELEVANCE
+
+Does the response answer the question?
+
+COHERENCE
+
+Is the answer internally understandable and consistent?
+
+FACTUAL CORRECTNESS
+
+Is the information correct?
+
+GROUNDEDNESS
+
+For RAG systems, is the answer supported by retrieved information?
+
+============================================================
+163. EVALUATION WITH REFERENCE DATA
+============================================================
+
+A useful evaluation approach is:
+
+    Question
+       +
+    Generated answer
+       +
+    reference context
+       |
+       v
+    evaluator
+       |
+       v
+    score / assessment
+
+This can help detect hallucinated or irrelevant answers.
+
+============================================================
+164. AUTO-CONFIGURATION
+============================================================
+
+Spring AI uses Spring Boot auto-configuration to simplify setup.
+
+When the appropriate dependency and configuration are present, Spring Boot can
+create the required model/vector infrastructure.
+
+This is similar to the normal Spring Boot development model:
+
+    dependency
+       +
+    properties
+       =
+    configured bean
+
+============================================================
+165. SPRING AI STARTERS
+============================================================
+
+Starters simplify dependency selection.
+
+Examples conceptually include starters for:
+
+    chat models
+    embeddings
+    image models
+    vector stores
+    MCP
+    other AI components
+
+The exact artifact names depend on the current Spring AI release and integration.
+
+============================================================
+166. CONFIGURATION PROPERTIES
+============================================================
+
+Spring AI configuration typically uses Spring Boot properties.
+
+Example concept:
+
+    spring.ai.<provider>.<component>....
+
+Configuration can include:
+
+    API keys
+    base URLs
+    model names
+    timeouts
+    default generation options
+    vector store settings
+
+============================================================
+167. API KEYS AND ENVIRONMENT VARIABLES
+============================================================
+
+API keys should not be hard-coded in source code.
+
+Prefer:
+
+    environment variables
+    secret managers
+    secure configuration systems
+
+Example:
+
+    spring:
+      ai:
+        openai:
+          api-key: ${OPENAI_API_KEY}
+
+This keeps credentials outside source code.
+
+============================================================
+168. MODEL-SPECIFIC CONFIGURATION
+============================================================
+
+Provider-specific configuration may include:
+
+    model
+    temperature
+    max tokens
+    base URL
+    organization/project information
+    provider-specific features
+
+Keep provider-specific configuration isolated when portability matters.
+
+============================================================
+169. RUNTIME OVERRIDES
+============================================================
+
+Startup defaults can be overridden at runtime.
+
+This is useful for:
+
+    different temperatures
+    model routing
+    task-specific settings
+    user-selected models
+
+============================================================
+170. DEPENDENCY VERSION MANAGEMENT
+============================================================
+
+Use the Spring AI BOM to keep modules aligned.
+
+Avoid mixing arbitrary versions of Spring AI modules.
+
+When upgrading:
+
+    check migration notes
+    check renamed starters
+    check deprecated APIs
+    check provider changes
+    run integration tests
+
+============================================================
+171. APPLICATION ARCHITECTURE
+============================================================
+
+A production Spring AI application can use layers such as:
+
+    Controller
+        |
+        v
+    AI Application Service
+        |
+        +---- ChatClient
+        |
+        +---- Advisors
+        |
+        +---- Tools
+        |
+        +---- VectorStore
+        |
+        +---- domain services
+        |
+        +---- databases
+
+Keep AI integration code separate from core business logic where practical.
+
+============================================================
+172. OPENAI
+============================================================
+
+OpenAI integration supports chat models and other AI capabilities.
+
+The current documentation includes support for:
+
+    text
+    vision
+    audio
+    tool calling
+    streaming
+    structured output capabilities
+
+OpenAI image generation is also supported.
+
+Credentials should be provided securely through configuration.
+
+============================================================
+173. ANTHROPIC
+============================================================
+
+Anthropic Claude models can be integrated through Spring AI.
+
+The current comparison documents multimodal input such as text, PDF and image
+for supported Claude models, along with tool calling and streaming.
+
+Always verify the exact model capability before relying on it.
+
+============================================================
+174. GOOGLE GENAI
+============================================================
+
+Google GenAI integration supports Gemini-family model capabilities.
+
+The documentation describes multimodal input including:
+
+    text
+    PDF
+    image
+    audio
+    video
+
+Google GenAI also has image-generation integration.
+
+============================================================
+175. AMAZON BEDROCK
+============================================================
+
+Amazon Bedrock provides access to multiple foundation models through AWS.
+
+Spring AI provides Bedrock integrations, including Converse API support.
+
+This is useful for organizations already using AWS infrastructure, identity,
+networking, and governance.
+
+============================================================
+176. MISTRAL AI
+============================================================
+
+Spring AI provides Mistral integrations.
+
+The current comparison describes support for text/image/audio multimodality
+for supported models, tool calling, streaming and OpenAI-compatible behavior
+where applicable.
+
+============================================================
+177. OLLAMA
+============================================================
+
+Ollama enables local model execution.
+
+This can be valuable for:
+
+    development
+    privacy-sensitive workloads
+    offline environments
+    experimentation
+
+Local execution does not automatically mean unlimited performance.
+
+Hardware capacity still matters.
+
+============================================================
+178. DEEPSEEK
+============================================================
+
+The current comparison includes DeepSeek through an OpenAI-compatible integration
+pattern.
+
+This makes it possible to use compatible request semantics while retaining the
+Spring AI abstraction.
+
+============================================================
+179. GROQ
+============================================================
+
+Groq is represented in the current comparison as an OpenAI-compatible provider.
+
+It can be useful when low-latency inference is a priority.
+
+============================================================
+180. NVIDIA
+============================================================
+
+NVIDIA integration is represented through an OpenAI-compatible pattern for
+supported services/models.
+
+============================================================
+181. MINIMAX
+============================================================
+
+The current Spring AI comparison includes MiniMax through an
+Anthropic-compatible integration pattern.
+
+Capability support should be checked against the exact model.
+
+============================================================
+182. OPENAI-COMPATIBLE PROVIDERS
+============================================================
+
+Some providers expose APIs compatible with OpenAI request/response patterns.
+
+This can reduce integration effort.
+
+However:
+
+    API compatibility != identical model behavior
+
+Always verify:
+
+    tool calling
+    streaming
+    JSON
+    multimodality
+    error semantics
+    model options
+
+============================================================
+183. LOCAL MODEL DEPLOYMENT
+============================================================
+
+Local deployment is useful when:
+
+    privacy is important
+    internet access is restricted
+    predictable infrastructure is required
+    experimentation is needed
+
+Ollama is one of the integrations listed for local deployment.
+
+============================================================
+184. IMAGE GENERATION ARCHITECTURE
+============================================================
+
+Image generation has its own model abstraction.
+
+Conceptually:
+
+    ImagePrompt
+       |
+       v
+    ImageModel
+       |
+       v
+    ImageResponse
+       |
+       v
+    ImageGeneration
+
+============================================================
+185. IMAGEPROMPT
+============================================================
+
+ImagePrompt carries the image-generation request.
+
+It can include prompt text and image-specific options.
+
+============================================================
+186. IMAGERESPONSE
+============================================================
+
+ImageResponse contains generated image results and response metadata.
+
+It may contain multiple ImageGeneration results.
+
+============================================================
+187. IMAGEGENERATION
+============================================================
+
+ImageGeneration represents an individual generated image plus related metadata.
+
+============================================================
+188. OPENAI IMAGE GENERATION
+============================================================
+
+Spring AI supports OpenAI image generation.
+
+Configuration includes secure API-key management and the OpenAI image model
+starter.
+
+============================================================
+189. GOOGLE GENAI IMAGE GENERATION
+============================================================
+
+Google GenAI provides image generation capabilities through Gemini image models.
+
+Authentication can use Google AI developer credentials or Vertex AI depending
+on the deployment approach.
+
+============================================================
+190. STABILITY AI IMAGE GENERATION
+============================================================
+
+Spring AI also provides an ImageModel implementation for Stability AI image
+generation.
+
+============================================================
+191. MULTIMODAL MESSAGES
+============================================================
+
+A multimodal UserMessage can contain:
+
+    text
+    media
+
+Media can represent supported:
+
+    image
+    audio
+    video
+
+The exact capabilities depend on the model provider.
+
+============================================================
+192. IMAGE INPUT
+============================================================
+
+A typical image question:
+
+    text:
+        "What is shown in this image?"
+
+    media:
+        image.png
+
+The model can combine the text instruction with the image input.
+
+============================================================
+193. AUDIO INPUT
+============================================================
+
+Supported multimodal models can accept audio where the provider exposes that
+capability.
+
+Audio may also be processed separately through transcription models.
+
+============================================================
+194. VIDEO AND DOCUMENT INPUT
+============================================================
+
+Some modern multimodal providers support video and document-style inputs.
+
+Spring AI exposes media abstractions, but actual support depends on the model.
+
+============================================================
+195. MODEL CAPABILITY DIFFERENCES
+============================================================
+
+Do not design an application around a modality without checking support.
+
+Example:
+
+    Model A:
+        text only
+
+    Model B:
+        text + image
+
+    Model C:
+        text + image + audio + video
+
+Portable application architecture should account for these differences.
+
+============================================================
+196. SIMPLE CHATBOT
+============================================================
+
+A minimal chatbot can use:
+
+    Controller
+       |
+       v
+    ChatClient
+       |
+       v
+    ChatModel
+
+Example:
+
+    @GetMapping("/chat")
+    String chat(String message) {
+        return chatClient.prompt()
+            .user(message)
+            .call()
+            .content();
+    }
+
+============================================================
+197. STREAMING CHATBOT
+============================================================
+
+For a better user experience, use streaming.
+
+Flow:
+
+    user
+      |
+      v
+    ChatClient
+      |
+      v
+    stream response
+      |
+      +--> partial content
+      +--> partial content
+      +--> partial content
+
+============================================================
+198. STATEFUL CHATBOT
+============================================================
+
+Add chat memory.
+
+Flow:
+
+    user
+      |
+      v
+    memory retrieval
+      |
+      v
+    current question
+      |
+      v
+    model
+      |
+      v
+    save conversation
+
+Use a conversation ID to separate users/conversations.
+
+============================================================
+199. DOCUMENTATION Q&A
+============================================================
+
+Use:
+
+    documents
+       |
+       v
+    ETL
+       |
+       v
+    VectorStore
+       |
+       v
+    QuestionAnswerAdvisor
+       |
+       v
+    ChatClient
+       |
+       v
+    answer
+
+This is one of the core RAG use cases described by Spring AI.
+
+============================================================
+200. SEMANTIC SEARCH
+============================================================
+
+Semantic search does not require a generative answer.
+
+Flow:
+
+    user query
+       |
+       v
+    embedding
+       |
+       v
+    vector similarity search
+       |
+       v
+    ranked documents
+
+This can be useful for:
+
+    document search
+    product search
+    knowledge discovery
+
+============================================================
+201. TOOL-ENABLED ASSISTANT
+============================================================
+
+Example:
+
+    User:
+        "What is the weather in Delhi?"
+
+    Model:
+        calls getWeather("Delhi")
+
+    Tool:
+        returns weather
+
+    Model:
+        creates final answer
+
+The tool is controlled by the application.
+
+============================================================
+202. DATABASE-AWARE ASSISTANT
+============================================================
+
+A tool can call a business service.
+
+Example:
+
+    @Tool
+    public Customer getCustomer(String id) {
+        return customerService.find(id);
+    }
+
+The model should never be allowed to bypass normal authorization and data
+access controls.
+
+============================================================
+203. MULTIMODAL ASSISTANT
+============================================================
+
+A multimodal assistant can combine:
+
+    text question
+    +
+    image
+    +
+    model
+
+Example:
+
+    "Analyze this invoice image and identify the total."
+
+This requires a model with the necessary vision capabilities.
+
+============================================================
+204. RAG APPLICATION
+============================================================
+
+A complete RAG application usually has:
+
+    ingestion application
+        |
+        v
+    vector database
+
+and:
+
+    query application
+        |
+        v
+    retrieval
+        |
+        v
+    ChatClient
+        |
+        v
+    model
+
+For large systems, ingestion and query processing may be separate services.
+
+============================================================
+205. MCP-ENABLED APPLICATION
+============================================================
+
+An application can connect to MCP servers and make their tools available to
+the AI model.
+
+Example:
+
+    Spring AI application
+          |
+          v
+    MCP client
+          |
+          v
+    Weather MCP server
+          |
+          v
+    weather API
+
+============================================================
+206. OBSERVABLE AI SERVICE
+============================================================
+
+A production AI service should measure:
+
+    request count
+    latency
+    model
+    token usage
+    tool usage
+    errors
+    retrieval performance
+
+Tracing should connect the complete operation.
+
+============================================================
+207. PRODUCTION ARCHITECTURE
+============================================================
+
+A production system can look like:
+
+    Client
+      |
+      v
+    API Gateway
+      |
+      v
+    Spring Boot AI service
+      |
+      +---- ChatClient
+      |
+      +---- Advisors
+      |       |
+      |       +---- Memory
+      |       +---- RAG
+      |       +---- Tool calling
+      |
+      +---- VectorStore
+      |
+      +---- Business tools
+      |
+      +---- Database
+      |
+      +---- External AI provider
+      |
+      +---- Observability
+      |
+      +---- Security
+
+============================================================
+208. CHOOSING CHATMODEL VS CHATCLIENT
+============================================================
+
+Use ChatClient when:
+
+    fluent application development is desired
+    advisors are needed
+    tools are needed
+    memory is needed
+    application code should be concise
+
+Use ChatModel directly when:
+
+    lower-level control is needed
+    implementing custom infrastructure
+    integrating with specialized model logic
+
+For most normal Spring application code, ChatClient is the more convenient
+high-level abstraction.
+
+============================================================
+209. CONFUSING EMBEDDINGS WITH CHAT GENERATION
+============================================================
+
+Wrong mental model:
+
+    embedding model = generates human answer
+
+Correct:
+
+    embedding model = creates vectors
+
+    chat model = generates conversational content
+
+============================================================
+210. SENDING TOO MUCH CONTEXT
+============================================================
+
+More context is not automatically better.
+
+Too much context can cause:
+
+    high cost
+    high latency
+    context overflow
+    irrelevant information
+    reduced answer quality
+
+Retrieve only what is useful.
+
+============================================================
+211. POOR DOCUMENT CHUNKING
+============================================================
+
+Bad chunking can destroy meaning.
+
+Examples:
+
+    split in middle of method
+    split table rows
+    split heading from explanation
+    split code blocks
+
+Preserve semantic boundaries.
+
+============================================================
+212. WEAK METADATA
+============================================================
+
+Without metadata, it becomes harder to:
+
+    filter
+    identify sources
+    enforce tenants
+    debug retrieval
+
+Add useful metadata during ingestion.
+
+============================================================
+213. MISSING TOOL DESCRIPTIONS
+============================================================
+
+A tool description tells the model:
+
+    what the tool does
+    when to use it
+
+Weak:
+
+    @Tool
+    public String getData(...) ...
+
+Better:
+
+    @Tool(description =
+        "Retrieve the current order status for a customer order ID")
+
+============================================================
+214. UNSAFE TOOLS
+============================================================
+
+Never expose powerful destructive operations without authorization.
+
+AI tool request:
+
+    "delete all users"
+
+must still pass through:
+
+    authentication
+    authorization
+    validation
+    business rules
+
+============================================================
+215. LOGGING SENSITIVE PROMPTS
+============================================================
+
+Prompt logs may contain private information.
+
+Before enabling prompt/completion logging:
+
+    classify data
+    redact secrets
+    restrict access
+    define retention
+    monitor exposure
+
+============================================================
+216. IGNORING TOKEN USAGE
+============================================================
+
+Track:
+
+    input tokens
+    output tokens
+    total tokens
+
+Use metrics to identify expensive requests.
+
+============================================================
+217. IGNORING MODEL CAPABILITY DIFFERENCES
+============================================================
+
+Do not assume:
+
+    every model supports images
+    every model supports tools
+    every model supports streaming
+    every model supports JSON
+    every model supports local deployment
+
+Use the model comparison information when designing provider-neutral systems.
+
+============================================================
+218. TREATING GENERATED JSON AS GUARANTEED JSON
+============================================================
+
+"Return JSON" does not make the model output a trusted Java object.
+
+Use structured output mechanisms and validation.
+
+============================================================
+219. FORGETTING CONVERSATION IDENTIFIERS
+============================================================
+
+Memory-based applications need a stable conversation identifier.
+
+Otherwise messages from different conversations can be mixed or the required
+memory cannot be located.
+
+============================================================
+220. POOR RAG RETRIEVAL
+============================================================
+
+If the correct chunk is not retrieved:
+
+    good model + wrong context
+        =
+    potentially wrong answer
+
+Improve:
+
+    chunking
+    embeddings
+    metadata
+    filters
+    top-K
+    threshold
+    retrieval strategy
+
+============================================================
+221. OVERUSING DEFAULT TOOLS
+============================================================
+
+Default tools are available across requests.
+
+Do not make sensitive operations globally available when they only apply to
+one workflow.
+
+Prefer per-request registration for risky tools.
+
+============================================================
+222. MIXING BLOCKING AND STREAMING INCORRECTLY
+============================================================
+
+Streaming and imperative operations have different execution behavior.
+
+Choose one programming style for the relevant path and understand how advisors,
+observability, and provider SDKs behave around asynchronous boundaries.
+
+============================================================
+223. SPRING AI INTERVIEW CONCEPTS
+============================================================
+
+Q: What is Spring AI?
+
+A:
+Spring AI is a Spring ecosystem project that provides abstractions and
+integrations for building AI applications with models, vector stores, tools,
+RAG, memory, observability and related capabilities.
+
+Q: What is ChatClient?
+
+A:
+A fluent higher-level API for interacting with chat models.
+
+Q: ChatClient vs ChatModel?
+
+A:
+ChatModel is a lower-level model abstraction. ChatClient provides a more
+convenient application-level fluent API and integrates naturally with advisors,
+tools and memory.
+
+Q: What is an embedding?
+
+A:
+A numerical vector representation used to capture semantic relationships.
+
+Q: Why is a vector database used in RAG?
+
+A:
+It allows similarity-based retrieval of relevant document chunks.
+
+Q: What is RAG?
+
+A:
+Retrieval Augmented Generation retrieves relevant external information and
+adds it to the model context before generation.
+
+Q: What is tool calling?
+
+A:
+A mechanism where a model requests application-defined functions and the
+application executes them and returns the results.
+
+Q: Does the model directly execute a Java method?
+
+A:
+No. The application owns tool execution. The model requests a tool call and
+the application executes the corresponding tool.
+
+Q: What is an Advisor?
+
+A:
+A reusable component that can inspect, transform or augment AI requests and
+responses.
+
+Q: What is MCP?
+
+A:
+A standardized protocol for connecting AI applications with external tools,
+resources and prompts.
+
+Q: Why is chunking important in RAG?
+
+A:
+Because retrieval operates on stored document pieces. Poor chunks can lose
+meaning or return irrelevant context.
+
+============================================================
+224. IMPORTANT COMPARISONS
+============================================================
+
+CHATMODEL vs CHATCLIENT
+
+ChatModel:
+    lower-level
+    direct model interaction
+    more control
+
+ChatClient:
+    fluent API
+    higher-level application abstraction
+    easy advisor/tool/memory integration
+
+CHAT MODEL vs EMBEDDING MODEL
+
+Chat:
+    generates responses
+
+Embedding:
+    generates vectors
+
+RAG vs FINE-TUNING
+
+RAG:
+    retrieves external/current information at request time
+
+Fine-tuning:
+    changes model behavior/weights through additional training
+
+VECTOR DATABASE vs RELATIONAL DATABASE
+
+Vector database:
+    similarity-oriented retrieval
+
+Relational database:
+    structured transactional/query-oriented storage
+
+TOOL CALLING vs RAG
+
+RAG:
+    retrieves information
+
+Tool calling:
+    executes application operations or retrieves dynamic data
+
+MEMORY vs RAG
+
+Memory:
+    preserves conversation context
+
+RAG:
+    retrieves external knowledge
+
+MCP vs TOOL CALLBACK
+
+ToolCallback:
+    Spring AI's application-level tool execution abstraction
+
+MCP:
+    standardized protocol for exposing/consuming tools and resources across
+    application boundaries
+
+============================================================
+225. END-TO-END REQUEST FLOWS
+============================================================
+
+SIMPLE CHAT
+
+    HTTP request
+       |
+       v
+    Controller
+       |
+       v
+    ChatClient
+       |
+       v
+    ChatModel
+       |
+       v
+    response
+
+CHAT + MEMORY
+
+    HTTP request
+       |
+       v
+    ChatClient
+       |
+       v
+    Memory Advisor
+       |
+       v
+    ChatModel
+       |
+       v
+    save memory
+       |
+       v
+    response
+
+CHAT + RAG
+
+    HTTP request
+       |
+       v
+    ChatClient
+       |
+       v
+    QuestionAnswerAdvisor
+       |
+       v
+    VectorStore
+       |
+       v
+    relevant documents
+       |
+       v
+    ChatModel
+       |
+       v
+    answer
+
+CHAT + TOOL
+
+    HTTP request
+       |
+       v
+    ChatClient
+       |
+       v
+    ChatModel
+       |
+       v
+    ToolCallingAdvisor
+       |
+       v
+    Tool
+       |
+       v
+    Tool result
+       |
+       v
+    ChatModel
+       |
+       v
+    answer
+
+CHAT + MEMORY + RAG + TOOLS
+
+    User
+      |
+      v
+    ChatClient
+      |
+      +--> Memory
+      |
+      +--> RAG
+      |
+      +--> Tool calling
+      |
+      v
+    ChatModel
+      |
+      v
+    answer
+
+============================================================
+226. PRODUCTION CHECKLIST
+============================================================
+
+MODEL
+
+    [ ] Correct model selected
+    [ ] Capability compatibility verified
+    [ ] Timeout configured
+    [ ] Retry strategy considered
+    [ ] Cost monitored
+
+SECURITY
+
+    [ ] API keys stored securely
+    [ ] Tool authorization implemented
+    [ ] Sensitive prompts protected
+    [ ] Prompt logs reviewed
+    [ ] MCP endpoints secured
+    [ ] Tenant isolation enforced
+
+RAG
+
+    [ ] Document sources identified
+    [ ] Chunking strategy tested
+    [ ] Metadata defined
+    [ ] Embedding model selected
+    [ ] Vector store selected
+    [ ] Retrieval quality measured
+    [ ] Stale documents handled
+
+TOOLS
+
+    [ ] Descriptions are clear
+    [ ] Arguments validated
+    [ ] Authorization checked
+    [ ] Dangerous actions protected
+    [ ] Tool latency measured
+
+OBSERVABILITY
+
+    [ ] Metrics enabled
+    [ ] Tracing enabled
+    [ ] Token usage monitored
+    [ ] Errors monitored
+    [ ] Model latency monitored
+    [ ] Tool execution monitored
+
+OUTPUT
+
+    [ ] Structured output validated
+    [ ] Conversion errors handled
+    [ ] Model failures handled
+    [ ] Fallback behavior defined
+
+============================================================
+227. QUICK REVISION CHECKLIST
+============================================================
+
+SPRING AI BASICS
+
+    [ ] What is Spring AI?
+    [ ] Why use abstractions?
+    [ ] What is provider portability?
+    [ ] What does Spring Boot auto-configuration do?
+
+AI CONCEPTS
+
+    [ ] Model
+    [ ] Prompt
+    [ ] Message
+    [ ] Token
+    [ ] Context window
+    [ ] Embedding
+    [ ] Structured output
+    [ ] RAG
+    [ ] Tool calling
+    [ ] Evaluation
+
+CORE APIS
+
+    [ ] ChatModel
+    [ ] StreamingChatModel
+    [ ] ChatClient
+    [ ] EmbeddingModel
+    [ ] ImageModel
+    [ ] Audio models
+    [ ] VectorStore
+
+CHATCLIENT
+
+    [ ] prompt()
+    [ ] user()
+    [ ] system()
+    [ ] call()
+    [ ] stream()
+    [ ] content()
+    [ ] advisors()
+    [ ] tools()
+    [ ] defaultTools()
+    [ ] memory
+
+ADVISORS
+
+    [ ] Advisor chain
+    [ ] Ordering
+    [ ] Memory advisor
+    [ ] QuestionAnswerAdvisor
+    [ ] RetrievalAugmentationAdvisor
+    [ ] ReReadingAdvisor
+    [ ] ToolCallingAdvisor
+    [ ] Custom advisor
+
+RAG
+
+    [ ] Document
+    [ ] Reader
+    [ ] Transformer
+    [ ] Writer
+    [ ] Chunking
+    [ ] Embedding
+    [ ] VectorStore
+    [ ] Similarity search
+    [ ] Metadata filter
+    [ ] Context assembly
+
+TOOLS
+
+    [ ] @Tool
+    [ ] @ToolParam
+    [ ] MethodToolCallback
+    [ ] FunctionToolCallback
+    [ ] ToolCallback
+    [ ] ToolCallingAdvisor
+    [ ] Security validation
+
+MCP
+
+    [ ] Client
+    [ ] Server
+    [ ] Tools
+    [ ] Resources
+    [ ] Prompts
+    [ ] STDIO
+    [ ] SSE
+    [ ] Streamable HTTP
+    [ ] Annotations
+    [ ] Boot starters
+    [ ] Security
+
+OBSERVABILITY
+
+    [ ] Metrics
+    [ ] Tracing
+    [ ] Token usage
+    [ ] Tool observations
+    [ ] Prompt logging
+    [ ] Sensitive data
+
+PRODUCTION
+
+    [ ] Security
+    [ ] Cost
+    [ ] Latency
+    [ ] Reliability
+    [ ] Retrieval quality
+    [ ] Model capability
+    [ ] Monitoring
+    [ ] Evaluation
+
+============================================================
+FINAL MENTAL MODEL
+============================================================
+
+The easiest way to understand Spring AI is to see it as a collection of layers.
+
+LAYER 1 — MODEL
+
+    Chat
+    Embedding
+    Image
+    Audio
+
+LAYER 2 — APPLICATION API
+
+    ChatClient
+    Prompt
+    Message
+    Options
+    Response
+
+LAYER 3 — CONTEXT
+
+    Memory
+    RAG
+    VectorStore
+    Advisors
+
+LAYER 4 — ACTIONS
+
+    Tools
+    Tool calling
+    MCP
+
+LAYER 5 — DATA ENGINEERING
+
+    DocumentReader
+    DocumentTransformer
+    DocumentWriter
+    ETL
+    Chunking
+    Embeddings
+    Vector storage
+
+LAYER 6 — OPERATIONS
+
+    Observability
+    Metrics
+    Tracing
+    Evaluation
+    Security
+
+The complete picture is:
+
+    USER
+      |
+      v
+    SPRING BOOT APPLICATION
+      |
+      v
+    CHATCLIENT
+      |
+      +-------------------+
+      |                   |
+      v                   v
+    ADVISORS            TOOLS
+      |                   |
+      +----+--------------+
+           |
+           v
+        CONTEXT
+        /     \
+     MEMORY    RAG
+                |
+                v
+           VECTOR STORE
+                |
+                v
+          RETRIEVED DATA
+                |
+                v
+           CHAT MODEL
+                |
+                v
+             ANSWER
+
+And when the model needs to perform an action:
+
+    CHAT MODEL
+        |
+        v
+    TOOL CALL
+        |
+        v
+    APPLICATION
+        |
+        v
+    EXTERNAL API / DATABASE / SERVICE
+        |
+        v
+    TOOL RESULT
+        |
+        v
+    CHAT MODEL
+        |
+        v
+    FINAL ANSWER
+
+The central engineering principle is:
+
+    The model generates intelligence,
+    the application controls the system,
+    retrieval supplies knowledge,
+    tools provide actions,
+    memory supplies conversation context,
+    and observability/evaluation make the system measurable and safer.
+
+============================================================
+SOURCE BASIS
+============================================================
+
+Primary source:
+Official Spring AI Reference Documentation
+
+Stable documentation version used for this guide:
+Spring AI 2.0.1
+
+Reference:
+https://docs.spring.io/spring-ai/reference/
+
+This document is an original explanatory study guide. It does not reproduce
+the reference documentation verbatim. Provider-specific pages and configuration
+details can change between Spring AI releases, so always verify exact
+dependency names, properties, and model capabilities against the current
+official reference before using them in production.

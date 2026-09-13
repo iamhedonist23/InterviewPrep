@@ -1,0 +1,372 @@
+DSA REAL INTERVIEW QUESTIONS — EVIDENCE-BASED BANK
+
+Definition
+
+This file contains DSA/coding questions that are explicitly described in
+published candidate interview experiences.
+
+This is deliberately NOT a generic AI-generated question list.
+
+Evidence labels
+
+[REPORTED] = The candidate explicitly reported being asked the
+problem/topic. [REPEATED] = The same problem/topic is reported in
+multiple interview experiences. [VARIANT] = A reported interview problem
+that is a variation of a known problem.
+
+Important: The wording below may be normalized for readability. It
+should not be described as a verbatim transcript unless the cited source
+uses exactly that wording.
+
+==================================================== 1. LINKED LISTS
+====================================================
+
+1.  [REPEATED] Reverse a singly linked list. Reported by: Amazon SDE1;
+    Microsoft SDE; Samsung Bangalore; other reports. Evidence: Amazon
+    explicitly reported “Reverse a linked list”; Microsoft reported the
+    same problem; Samsung reported reverse a linked list. Sources:
+
+    -   LeetCode Microsoft SDE interview experience
+    -   LeetCode Amazon SDE1 onsite experience
+    -   GeeksforGeeks Samsung Bangalore internship experience
+
+2.  [REPORTED] Reverse a linked list in groups of a given size. Reported
+    by: Amazon SDE1; GeeksforGeeks SDE interview. Source:
+
+    -   GeeksforGeeks Amazon SDE-1 interview experience
+    -   GeeksforGeeks SDE Android Team interview experience
+
+3.  [REPORTED] Reverse a linked list in groups of three nodes. Reported
+    by: Snapdeal Java interview experience. Source: GeeksforGeeks
+    Snapdeal Interview Experience Set 3.
+
+4.  [REPORTED] Reverse a linked list between positions L and R. Reported
+    by: Amazon SDE1 onsite interview. Source: LeetCode Amazon SDE1
+    Seattle interview experience.
+
+5.  [REPORTED] Determine whether a linked list containing characters is
+    a palindrome. Reported by: Amazon interview experience. Source:
+    GeeksforGeeks Amazon Interview Experience Set 250.
+
+6.  [REPORTED] Find the path / process associated with a linked-list
+    problem involving multiple lists and intersections. Reported by:
+    Flipkart SDE II. Source: GeeksforGeeks Flipkart Interview Set 7.
+
+7.  [REPORTED] Solve linked-list coding questions with linear time
+    complexity. Reported by: GeeksforGeeks SDE interview experience.
+    Source: GeeksforGeeks SDE Android Team interview experience.
+
+==================================================== 2. LRU CACHE /
+HASHING ====================================================
+
+8.  [REPEATED] Implement an LRU cache. Reported by: Amazon, Microsoft,
+    Joveo, OnlineSales AI, Flipkart, OLX Groups and other interview
+    experiences. Sources:
+
+    -   LeetCode Amazon SDE1 onsite
+    -   LeetCode Microsoft SDE
+    -   LeetCode Joveo SDE1
+    -   LeetCode OnlineSales AI SDE2
+    -   GeeksforGeeks Flipkart SDE II
+    -   GeeksforGeeks OLX Groups
+
+9.  [REPORTED] Implement an LRU cache with get/put operations in O(1).
+    Reported by: Joveo SDE1. Source: LeetCode Joveo SDE1 interview
+    experience.
+
+10. [REPORTED] Implement an LRU cache using a doubly linked list and
+    hash map. Reported by: Microsoft, OnlineSales AI and other
+    interviews. Sources: LeetCode Microsoft and OnlineSales AI interview
+    experiences.
+
+11. [REPORTED] Modify an LRU cache to support TTL/expiration. Reported
+    by: Microsoft Senior Software Engineer. Source: LeetCode Microsoft
+    Senior SE interview experience, March 2026.
+
+12. [REPORTED] Discuss concurrency/thread safety for an LRU cache.
+    Reported by: Microsoft Senior Software Engineer. Source: LeetCode
+    Microsoft Senior SE interview experience, March 2026.
+
+13. [REPORTED] Design a cache with an LRU eviction policy. Reported by:
+    Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida interview
+    experience.
+
+14. [REPORTED] Implement LRU cache on paper. Reported by: OLX Groups.
+    Source: GeeksforGeeks OLX Groups Interview Experience.
+
+==================================================== 3. ARRAYS
+====================================================
+
+15. [REPORTED] Find the smallest positive missing number in an array.
+    Reported by: Amazon SDE1. Source: GeeksforGeeks Amazon Interview
+    Experience SDE-1.
+
+16. [REPORTED] Find the largest number that can be formed by
+    concatenating an array of numbers. Reported by: Amazon interview
+    experience. Source: GeeksforGeeks Amazon Interview Experience Set
+    250.
+
+17. [REPORTED] Find the maximum path/subsequence-style sum. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+18. [REPORTED] Solve the Trapping Rain Water problem. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+19. [REPORTED] Solve a subarray-related DSA problem. Reported by:
+    Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview
+    experience.
+
+20. [REPORTED] Solve a string/array problem involving two pointers.
+    Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida
+    interview experience.
+
+21. [REPORTED] Solve a permutation-in-string problem. Reported by:
+    Microsoft SDE2 India. Source: LeetCode Microsoft SDE2 India
+    interview experience.
+
+22. [REPORTED] Solve Spiral Matrix. Reported by: Joveo SDE1. Source:
+    LeetCode Joveo SDE1 interview experience.
+
+23. [REPORTED] Solve Next Permutation. Reported by: Amazon SDE1. Source:
+    LeetCode interview experience by candidate reporting Amazon SDE1.
+
+24. [REPORTED] Solve House Robber. Reported by: Amazon SDE1. Source:
+    LeetCode interview experience by candidate reporting Amazon SDE1.
+
+==================================================== 4. STRINGS
+====================================================
+
+25. [REPORTED] Find the longest palindrome in a string. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+26. [REPORTED] Find the longest palindromic substring. Reported by:
+    Amazon interview experience. Source: GeeksforGeeks Amazon Interview
+    Experience Set 250.
+
+27. [REPORTED] Find whether a string/linked-list sequence is a
+    palindrome. Reported by: Amazon. Source: GeeksforGeeks Amazon
+    Interview Experience Set 250.
+
+28. [REPORTED] Solve Permutation in String. Reported by: Microsoft SDE2
+    India. Source: LeetCode Microsoft SDE2 India interview experience.
+
+29. [REPORTED] Solve a string matching problem using two pointers.
+    Reported by: Microsoft SDE1. Source: LeetCode Microsoft SDE1 Noida
+    interview experience.
+
+30. [REPORTED] Process a string containing lowercase letters and blocker
+    characters to find the longest safe path. Reported by: Microsoft
+    SDE1. Source: LeetCode Microsoft SDE1 Noida interview experience.
+
+==================================================== 5. STACKS / QUEUES
+====================================================
+
+31. [REPORTED] Reverse a stack using recursion. Reported by: PharmEasy
+    SDE1. Source: LeetCode candidate interview experience.
+
+32. [REPORTED] Solve a stack-based coding problem. Reported by:
+    GeeksforGeeks SDE interview. Source: GeeksforGeeks SDE Android Team
+    interview experience.
+
+33. [REPORTED] Design a stack that supports getMin in O(1). Reported by:
+    OLX Groups. Source: GeeksforGeeks OLX Groups Interview Experience.
+
+34. [REPORTED] Implement a queue/cache-like structure using appropriate
+    linked data structures. Reported across coding interviews. Use only
+    when the exact company/source is cited on the website.
+
+==================================================== 6. TREES
+====================================================
+
+35. [REPORTED] Find the bottom view of a binary tree. Reported by:
+    Amazon. Source: GeeksforGeeks Amazon Interview Experience Set 250.
+
+36. [REPORTED] Find the top view of a binary tree. Reported by: Amazon
+    SDE1. Source: GeeksforGeeks Amazon Interview Experience SDE-1.
+
+37. [REPORTED] Find the maximum path sum in a binary tree. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+38. [REPORTED] Find the difference between maximum and minimum values in
+    a binary tree. Reported by: Samsung Bangalore internship. Source:
+    GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+
+39. [REPORTED] Find a value related to GCD across values in a binary
+    tree. Reported by: Samsung Bangalore internship. Source:
+    GeeksforGeeks Samsung Bangalore SRIB Internship Experience.
+
+40. [REPORTED] Find nodes at distance K from a given binary-tree node.
+    Reported by: Flipkart SDE II. Source: GeeksforGeeks Flipkart
+    Interview Set 7.
+
+41. [REPORTED] Mirror a binary tree. Reported by: Snapdeal. Source:
+    GeeksforGeeks Snapdeal Interview Experience Set 3.
+
+42. [REPORTED] Transform a binary tree into a sum tree. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+43. [REPORTED] Determine whether a binary tree satisfies a specified
+    property through traversal. Reported in multiple company
+    experiences. Exact variant should be attributed to its source.
+
+==================================================== 7. GRAPHS /
+BACKTRACKING ====================================================
+
+44. [REPORTED] Solve a graph-based problem in an Amazon DSA round.
+    Reported by: Amazon SDE1. Source: LeetCode candidate interview
+    experience.
+
+45. [REPORTED] Solve a backtracking problem based on N-Queens. Reported
+    by: PharmEasy SDE1. Source: LeetCode candidate interview experience.
+
+46. [REPORTED] Solve a graph problem in an online assessment. Reported
+    by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview
+    experience.
+
+47. [REPORTED] Design Git using a graph-based approach. Reported by:
+    Samsung Bangalore internship. Source: GeeksforGeeks Samsung
+    Bangalore SRIB Internship Experience.
+
+48. [REPORTED] Use graph concepts for a tree/data-structure problem.
+    Reported by: Samsung Bangalore internship. Source: GeeksforGeeks
+    Samsung Bangalore SRIB Internship Experience.
+
+==================================================== 8. DYNAMIC
+PROGRAMMING / GREEDY
+====================================================
+
+49. [REPORTED] Solve House Robber. Reported by: Amazon SDE1. Source:
+    LeetCode candidate Amazon interview experience.
+
+50. [REPORTED] Solve a dynamic-programming problem in an online
+    assessment. Reported by: Microsoft SDE2. Source: LeetCode Microsoft
+    L61/L62 interview experience.
+
+51. [REPORTED] Solve a greedy problem in an online assessment. Reported
+    by: Microsoft SDE2. Source: LeetCode Microsoft L61/L62 interview
+    experience.
+
+52. [REPORTED] Solve a Building Bridges problem. Reported by: Amazon.
+    Source: GeeksforGeeks Amazon Interview Experience Set 250.
+
+53. [REPORTED] Solve a maximum-sum-subsequence variant. Reported by:
+    Amazon SDE1. Source: GeeksforGeeks Amazon Interview Experience
+    SDE-1.
+
+==================================================== 9. HEAPS / OTHER
+DATA STRUCTURES ====================================================
+
+54. [REPORTED] Solve a hard heap-related problem in an online
+    assessment. Reported by: Microsoft SDE1 Noida. Source: LeetCode
+    Microsoft SDE1 Noida interview experience.
+
+55. [REPORTED] Find the maximum/minimum-related values in a binary tree.
+    Reported by: Samsung Bangalore internship. Source: GeeksforGeeks
+    Samsung Bangalore SRIB Internship Experience.
+
+==================================================== 10. REPEATED /
+HIGH-PRIORITY VERIFIED TOPICS
+====================================================
+
+The following have particularly strong evidence because they appear in
+multiple candidate reports:
+
+56. [REPEATED] Reverse a linked list.
+
+57. [REPEATED] Reverse a linked list in groups.
+
+58. [REPEATED] Implement an LRU cache.
+
+59. [REPEATED] Implement LRU cache using a hash map and doubly linked
+    list.
+
+60. [REPEATED] Palindrome-related string/linked-list problem.
+
+61. [REPEATED] Binary-tree traversal/view/path problems.
+
+62. [REPEATED] Graph/graph-like coding problems.
+
+63. [REPEATED] Dynamic programming problems.
+
+64. [REPEATED] Sliding-window/string-matching style problems.
+
+65. [REPEATED] Heap-based problems.
+
+==================================================== 11. SOURCE BASIS
+====================================================
+
+Primary sources checked for this evidence-based version:
+
+1.  Microsoft Senior SE (L63/L64) Interview Experience — LeetCode
+    Reported: LRU cache with TTL and concurrency.
+
+2.  Microsoft SDE-2 India Interview Experience — LeetCode Reported:
+    Permutation in String and LRU-style IP management.
+
+3.  Microsoft SDE1 Noida Interview Experience — LeetCode Reported:
+    string/two-pointer problem, cache design/LRU, heap-related OA.
+
+4.  Microsoft L61/L62 Interview Experience — LeetCode Reported: graph,
+    greedy, DP, linked-list, subarray and LRU-related work.
+
+5.  Amazon SDE1 Seattle Interview Experience — LeetCode Reported: LRU
+    cache, reverse linked list, reverse linked list II, Next
+    Permutation, House Robber, graph problem.
+
+6.  PharmEasy SDE1 Interview Experience — LeetCode Reported: reverse
+    stack using recursion, reverse linked list in groups, N-Queens
+    variation.
+
+7.  Joveo SDE1 Interview Experience — LeetCode Reported: LRU cache with
+    O(1) get/put and Spiral Matrix.
+
+8.  GeeksforGeeks Amazon Interview Experience SDE-1 Reported: Longest
+    Palindrome, Transform to Sum Tree, reverse linked list in groups,
+    Trapping Rain Water, Top View, LRU Cache, smallest positive missing
+    number, maximum path sum.
+
+9.  GeeksforGeeks Amazon Interview Experience Set 250 Reported:
+    linked-list palindrome, Building Bridges, bottom view, LRU cache,
+    largest concatenated number, longest palindromic substring.
+
+10. GeeksforGeeks Samsung Bangalore SRIB Internship Reported:
+    binary-tree problems, reverse linked list, stack/string problem,
+    Singleton, graph-based Design Git.
+
+11. GeeksforGeeks Flipkart Interview Set 7 Reported: nodes at distance K
+    in binary tree, LRU cache, linked-list maximum-sum path variant,
+    scalable contact list.
+
+12. GeeksforGeeks OLX Groups Interview Experience Reported: getMin stack
+    and LRU cache.
+
+13. GeeksforGeeks Snapdeal Interview Experience Set 3 Reported: mirror
+    binary tree and reverse linked list in groups.
+
+==================================================== 12. WEBSITE USAGE
+====================================================
+
+Recommended page title: “DSA Interview Questions Actually Reported in
+Interviews”
+
+Recommended description: “Practice DSA problems reported by candidates
+in real technical interviews. Each question includes its
+company/interview source where available.”
+
+Recommended labels: [REPORTED] = directly reported by a candidate
+[REPEATED] = independently reported multiple times [VARIANT] = reported
+variation of a known problem
+
+Do NOT claim: - Every question is asked by every company. - The wording
+is always verbatim. - These questions guarantee an interview result. -
+All 65 questions were asked in one interview.
+
+This distinction is important for accuracy and trust.
+
+==================================================== END
+====================================================

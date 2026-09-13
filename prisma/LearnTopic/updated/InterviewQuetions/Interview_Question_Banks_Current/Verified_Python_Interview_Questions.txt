@@ -1,0 +1,88 @@
+PYTHON INTERVIEW QUESTIONS — VERIFIED + HIGH-CONFIDENCE SET
+
+PURPOSE This is a high-confidence interview bank. It separates questions
+explicitly reported in published interview-experience reports from
+recurring/common interview questions.
+
+LABELS [REPORTED] = a published interview experience explicitly
+describes the question or task. Wording is lightly normalized and is not
+presented as a verbatim quotation. [COMMON] = a recurring interview
+question supported by current interview-question references and multiple
+interview patterns; it is not claimed to be tied to one specific
+interview.
+
+IMPORTANT Do not market this file as ‘questions guaranteed to be asked’.
+Interview questions vary by company, role, seniority, resume and
+interviewer. Recommended website wording: ‘Curated interview questions
+based on reported interview experiences and commonly tested interview
+patterns.’
+
+============================================================ REPORTED
+INTERVIEW QUESTIONS
+============================================================
+
+============================================================ COMMON /
+HIGH-FREQUENCY INTERVIEW QUESTIONS
+============================================================ [COMMON]
+What is the difference between a list and a tuple? [COMMON] What does
+dynamically typed mean in Python? [COMMON] Is Python compiled,
+interpreted, or both? [COMMON] == vs is in Python? [COMMON] How does
+Python pass arguments to functions? [COMMON] What are mutable and
+immutable objects? [COMMON] Why are default mutable arguments dangerous?
+[COMMON] *args vs **kwargs? [COMMON] How do list comprehensions work?
+[COMMON] Generator expression vs list comprehension? [COMMON] Iterator
+vs iterable? [COMMON] What does yield do? [COMMON] How would you read a
+large file without loading it into memory? [COMMON] Shallow copy vs deep
+copy? [COMMON] How does Python garbage collection work? [COMMON] What is
+reference counting? [COMMON] What is the GIL? [COMMON] How does the GIL
+affect CPU-bound threads? [COMMON] When would you use multiprocessing?
+[COMMON] Threading vs multiprocessing vs asyncio? [COMMON] What is a
+decorator? [COMMON] How do you write a decorator that accepts arguments?
+[COMMON] What is a context manager? [COMMON] How does the with statement
+work? [COMMON] How would you define and raise a custom exception?
+[COMMON] How should exceptions be handled in production code? [COMMON]
+dict vs defaultdict vs Counter? [COMMON] How do sets remove duplicates?
+[COMMON] How would you sort a dictionary by value? [COMMON] append() vs
+extend()? [COMMON] How would you reverse a string? [COMMON] How would
+you find duplicate values in a list? [COMMON] How would you find the
+first non-repeating character? [COMMON] How would you implement binary
+search? [COMMON] How would you merge two sorted lists? [COMMON] How
+would you count word frequencies in a large text file? [COMMON] How
+would you remove duplicates while preserving order? [COMMON] How would
+you find the second-largest number? [COMMON] How would you detect a
+cycle in a linked list? [COMMON] How does asyncio work? [COMMON] async
+def vs normal def? [COMMON] await vs create_task()? [COMMON] When is
+asyncio a bad fit? [COMMON] How would you debug a slow Python service?
+[COMMON] How would you profile Python code? [COMMON] What is the
+difference between time complexity and actual performance? [COMMON] How
+can excessive object creation affect Python performance? [COMMON] How
+would you optimize a slow loop? [COMMON] How do generators help with
+memory usage? [COMMON] How would you write a thread-safe Singleton if a
+Singleton were actually required? [COMMON] What are Python dataclasses?
+[COMMON] How does inheritance work in Python? [COMMON] classmethod vs
+staticmethod? [COMMON] What is method resolution order (MRO)? [COMMON]
+What are dunder methods? [COMMON] How does eq relate to object equality?
+[COMMON] How do you make an object hashable? [COMMON] How would you
+safely manage database connections? [COMMON] How do parameterized SQL
+queries prevent injection? [COMMON] How would you design a Python REST
+API? [COMMON] How would you validate request data? [COMMON] How would
+you structure a production Python project? [COMMON] How would you write
+unit tests with pytest? [COMMON] Mocking vs integration testing?
+[COMMON] How would you diagnose a memory leak in a Python service?
+[COMMON] How would you handle retries when calling an external API?
+[COMMON] How would you prevent duplicate processing of the same request?
+[COMMON] How would you process a CSV file containing tens of millions of
+rows? [COMMON] How would you make a Python job idempotent? [COMMON] How
+would you handle concurrent updates to shared state? [COMMON] How would
+you choose between threads and asyncio for an I/O-heavy service?
+[COMMON] How would you investigate high CPU in a Python process?
+[COMMON] How would you investigate increasing latency after a
+deployment?
+
+============================================================ SOURCE
+BASIS ============================================================ 1.
+Microchip interview experience — GeeksforGeeks: Python file access,
+pattern search, dictionaries and sorting. 2. Modak Analytics interview
+experience — GeeksforGeeks: Python kwargs/args, append/extend,
+list/tuple and Python functions. 3. Current Python interview-question
+reference — GeeksforGeeks.

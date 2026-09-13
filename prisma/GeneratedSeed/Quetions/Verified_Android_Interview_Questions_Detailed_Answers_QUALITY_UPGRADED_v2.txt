@@ -1,0 +1,2808 @@
+QUALITY-UPGRADED INTERVIEW CONTENT — REVIEWED FOR SPECIFICITY, ACCURACY, AND USER VALUE
+VERIFIED ANDROID INTERVIEW QUESTIONS — COMPREHENSIVE DETAILED ANSWERS & PRACTICAL EXAMPLES
+
+Source classification preserved: [REPORTED] and [REPORTED TOPIC]. The supplied source states that questions were selected from publicly reported Android interview experiences and that [REPORTED TOPIC] does not preserve exact interviewer wording. No question is presented as guaranteed.
+
+Answer format: 
+- Question & Level
+- Detailed Technical Answer
+- Concrete Production-Grade Kotlin / Android Example
+- Interview Tip
+- What Interviewer Is Testing
+- Key Points to Remember
+- Common Follow-up Questions & Deep Answers
+- Common Mistakes & Antipatterns
+- Source Evidence
+
+==============================================================================
+JUNIOR / ENTRY-LEVEL
+==============================================================================
+
+1. [REPORTED] Question : How do you retain the selected state when an Activity is recreated after a configuration change?
+   Level : Junior / Entry-Level
+
+Detailed Technical Answer :
+When an Activity undergoes a runtime configuration change (such as device screen rotation, theme switching between dark/light mode, locale change, or multi-window resizing), Android destroys the current Activity instance (calling onPause, onStop, onDestroy) and instantiates a brand new one. Any state stored exclusively in View properties or Activity instance fields is lost.
+
+To retain state effectively, Android provides three complementary tiers:
+1. ViewModel: Survives configuration changes because its lifecycle is scoped to the `ViewModelStoreOwner` (which retains the ViewModel across Activity recreate events until the Activity is permanently finished). Ideal for UI state, cached data, and active business operations.
+2. SavedStateHandle / onSaveInstanceState: Survives both configuration changes and OS-initiated System-Initiated Process Death (when the OS kills the process in the background to reclaim RAM). It serializes small data (< 500KB - 1MB transaction buffer limit) into a `Bundle`.
+3. Persistent Storage (Room / DataStore / Preferences): Survives app restarts, process death, and full device reboots.
+
+For retaining an in-memory selection (like a selected sector/tab/item):
+- Store the state in a `StateFlow` inside a `ViewModel`.
+- Injected with `SavedStateHandle` so that if Android kills the background process due to low memory, the selected item key is restored seamlessly when the user returns.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. ViewModel managing state backed by SavedStateHandle (survives both config change & process death)
+class SectorSelectionViewModel(
+    private val savedStateHandle: SavedStateHandle
+) : ViewModel() {
+
+    companion object {
+        private const val KEY_SELECTED_SECTOR = "key_selected_sector"
+    }
+
+    // SavedStateHandle provides a StateFlow that automatically persists to and restores from Bundle
+    val selectedSector: StateFlow<String?> = savedStateHandle.getStateFlow(KEY_SELECTED_SECTOR, null)
+
+    fun selectSector(sectorId: String) {
+        savedStateHandle[KEY_SELECTED_SECTOR] = sectorId
+    }
+}
+
+// 2. Activity observing the StateFlow safely across lifecycle states
+class SectorActivity : AppCompatActivity() {
+
+    private val viewModel: SectorSelectionViewModel by viewModels()
+    private lateinit var binding: ActivitySectorBinding
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivitySectorBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+
+        setupSectorButtons()
+        observeState()
+    }
+
+    private fun setupSectorButtons() {
+        binding.btnFintech.setOnClickListener { viewModel.selectSector("FINTECH") }
+        binding.btnHealthCare.setOnClickListener { viewModel.selectSector("HEALTHCARE") }
+    }
+
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.selectedSector.collect { sector ->
+                    binding.tvSelectedStatus.text = "Selected: ${sector ?: "None"}"
+                    highlightSelectedButton(sector)
+                }
+            }
+        }
+    }
+
+    private fun highlightSelectedButton(sector: String?) {
+        binding.btnFintech.isSelected = (sector == "FINTECH")
+        binding.btnHealthCare.isSelected = (sector == "HEALTHCARE")
+    }
+}
+```
+
+Interview Tip :
+State the hierarchy clearly: "For configuration changes, ViewModel is the standard in-memory solution. However, production apps must also handle low-memory process death, which is why combining ViewModel with `SavedStateHandle` is the Google-recommended best practice."
+
+What Interviewer Is Testing :
+- Do you know the difference between configuration change (recreation in memory) and process death (OS killing the process)?
+- Do you understand memory constraints (Bundle size limits and `TransactionTooLargeException`)?
+- Do you observe state lifecycle-safely using `repeatOnLifecycle`?
+
+Key Points to Remember :
+- ViewModel survives configuration change, but NOT process death without `SavedStateHandle`.
+- `onSaveInstanceState` / `SavedStateHandle` survives process death, but size must be minimal (< 50KB recommended to avoid IPC transaction crashes).
+- Database/DataStore survives app cold starts and phone restarts.
+
+Common Follow-up Questions :
+- Q: What happens if you put a 2MB Bitmap in `onSaveInstanceState`?
+  A: It throws `TransactionTooLargeException` because the Binder transaction buffer for the entire process is capped at 1MB shared across all active binder transactions.
+- Q: How do you simulate process death during development?
+  A: Background the app with the Home button, then run `adb shell am kill <package-name>` or enable "Don't keep activities" in Developer Options.
+
+Common Mistakes :
+- Putting large objects or domain entities in `Bundle`.
+- Relying solely on `ViewModel` and failing process death verification.
+- Overriding `android:configChanges="orientation|screenSize"` in AndroidManifest as a quick hack to avoid dealing with lifecycles.
+
+Source Evidence :
+Interview report: Snapmint, SDE-1 Android, July 2026. Candidate asked how to retain selected sector across configuration changes.
+
+------------------------------------------------------------------------
+
+2. [REPORTED] Question : How do Fragment lifecycle transitions work across different navigation scenarios?
+   Level : Junior / Entry-Level
+
+Detailed Technical Answer :
+A Fragment has two intertwined lifecycles:
+1. Fragment Lifecycle: Tracks the Fragment object itself (from `onAttach`, `onCreate`, down to `onDestroy`, `onDetach`).
+2. Fragment View Lifecycle: Tracks the active View hierarchy created in `onCreateView` and destroyed in `onDestroyView`.
+
+Crucial architectural distinction:
+When a Fragment transaction is replaced and added to the back stack (`addToBackStack(null)`), the Fragment instance remains in memory on the back stack, but its View is completely destroyed. Therefore:
+- Fragment enters: `onDestroyView()`, but NOT `onDestroy()`.
+- When popped back from back stack: `onCreateView()` and `onViewCreated()` are called again, but `onCreate()` is NOT called again.
+- Memory Leak Risk: Any reference to Views or ViewBinding held in the Fragment instance after `onDestroyView()` causes a severe memory leak. ViewBinding must be nulled out in `onDestroyView()`.
+- Coroutine / Observer Scope: Observers must ALWAYS observe using `viewLifecycleOwner` inside `onViewCreated()`, NEVER `this` (the Fragment instance). Observing with `this` leads to duplicate observers every time the Fragment returns from the back stack.
+
+Navigation Scenarios:
+- Fragment A replaces Fragment B (without Back Stack): A -> onAttach..onResume. B -> onPause..onDestroy..onDetach.
+- Fragment A replaces Fragment B (WITH Back Stack): B -> onPause, onStop, onDestroyView (B stays alive in memory). A -> onAttach..onResume.
+- User presses Back (Pop back stack): A -> onPause, onStop, onDestroyView, onDestroy, onDetach. B -> onCreateView, onViewCreated, onStart, onResume.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+class ProductDetailsFragment : Fragment(R.layout.fragment_product_details) {
+
+    // ViewBinding backing property idiom to prevent memory leaks
+    private var _binding: FragmentProductDetailsBinding? = null
+    private val binding get() = _binding!!
+
+    private val viewModel: ProductDetailsViewModel by viewModels()
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        _binding = FragmentProductDetailsBinding.bind(view)
+
+        // ALWAYS use viewLifecycleOwner for UI observations
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    render(state)
+                }
+            }
+        }
+    }
+
+    private fun render(state: ProductUiState) {
+        binding.tvTitle.text = state.title
+        binding.tvPrice.text = state.priceFormatted
+        binding.progressBar.isVisible = state.isLoading
+    }
+
+    // MANDATORY: Null out view binding to avoid leaking View hierarchy on back stack
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+}
+```
+
+Interview Tip :
+Immediately emphasize: "The #1 trap with Fragments is confusing the Fragment object lifecycle with its View lifecycle when transactions are added to the back stack."
+
+What Interviewer Is Testing :
+- Awareness of View leaks when using ViewBinding or listeners.
+- Correct usage of `viewLifecycleOwner` vs `this`.
+- Understanding back-stack mechanics and fragment replacement.
+
+Key Points to Remember :
+- Back stack = View destroyed (`onDestroyView`), Fragment preserved (`onDestroy` NOT called).
+- Always clean up ViewBinding, RecyclerView adapters, and View references in `onDestroyView()`.
+- Collect flows / observe LiveData with `viewLifecycleOwner`.
+
+Common Follow-up Questions :
+- Q: What happens if you collect a Flow in `lifecycleScope` instead of `viewLifecycleOwner.lifecycleScope`?
+  A: If the fragment is placed on the back stack, the coroutine keeps running and collecting events against a dead View, causing NullPointerExceptions or massive memory leaks.
+
+Common Mistakes :
+- Storing `binding` as a non-nullable property without setting it to null in `onDestroyView()`.
+- Initializing UI observations in `onCreate()` instead of `onViewCreated()`.
+- Passing `this` as the `LifecycleOwner` when observing UI streams.
+
+Source Evidence :
+Interview report: Snapmint, SDE-1 Android, July 2026. Explicit question on Fragment lifecycle transitions in navigation.
+
+------------------------------------------------------------------------
+
+3. [REPORTED TOPIC] Question : Explain Kotlin fundamentals and Android components.
+   Level : Junior / Entry-Level
+
+Detailed Technical Answer :
+1. Kotlin Fundamentals for Android:
+- Null Safety: Non-nullable (`String`) vs Nullable (`String?`), Safe call (`?.`), Elvis operator (`?:`), and Safe Cast (`as?`). Eliminates `NullPointerException` at compile time.
+- Data Classes: Automatically generates `equals()`, `hashCode()`, `toString()`, `copy()`, and component functions. Perfect for immutability and MVI/MVVM UI states.
+- Sealed Classes & Sealed Interfaces: Restricted class hierarchies where all subclasses are known at compile time. Essential for modeling exhaustive UI states (Loading, Success, Error) with `when` statements without requiring an `else` branch.
+- Extension Functions: Enables extending third-party or platform classes (e.g., `Context`, `View`) without inheritance.
+- Coroutines: Lightweight cooperative multitasking threads for asynchronous, non-blocking I/O.
+- Scope Functions: `let`, `apply`, `run`, `also`, `with` for cleaner object initialization and transformations.
+
+2. Android Core Components:
+- Activity: Single focused UI window for user interaction.
+- Service: Background execution component without UI (Foreground Service with persistent notification, or background work via WorkManager).
+- BroadcastReceiver: Inter-app and system-wide asynchronous event receiver (e.g., battery low, airplane mode, custom app broadcasts).
+- ContentProvider: Manages structured access to a shared relational repository of data across application boundaries (e.g., Contacts, MediaStore).
+
+Modern Android also relies on Jetpack Architecture Components (ViewModel, Room, Navigation, Jetpack Compose) to build reactive, lifecycle-safe architectures.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. Sealed Interface modeling complete UI State exhaustively
+sealed interface UserUiState {
+    object Loading : UserUiState
+    data class Success(val user: UserProfile) : UserUiState
+    data class Error(val message: String) : UserUiState
+}
+
+// 2. Immutable Data Class
+data class UserProfile(
+    val id: String,
+    val name: String,
+    val email: String? // Nullable field
+)
+
+// 3. Extension function utilizing Elvis operator and Safe calls
+fun Context.showToast(message: String, duration: Int = Toast.LENGTH_SHORT) {
+    Toast.makeText(this, message, duration).show()
+}
+
+// 4. Activity utilizing Kotlin features to render state exhaustively
+class UserProfileActivity : AppCompatActivity() {
+
+    fun render(state: UserUiState) {
+        // Compiler enforces handling all sealed subclasses without needing an 'else' branch
+        when (state) {
+            is UserUiState.Loading -> {
+                showLoading(true)
+            }
+            is UserUiState.Success -> {
+                showLoading(false)
+                val displayName = state.user.name.ifBlank { "Anonymous" }
+                val contactEmail = state.user.email ?: "No email provided"
+                showToast("Welcome $displayName ($contactEmail)")
+            }
+            is UserUiState.Error -> {
+                showLoading(false)
+                showToast("Error: ${state.message}")
+            }
+        }
+    }
+
+    private fun showLoading(active: Boolean) { /* update UI */ }
+}
+```
+
+Interview Tip :
+Do not just recite syntax. Connect each Kotlin feature directly to an Android pain point it solves: "Data classes + Sealed classes eliminate boilerplate in MVI/MVVM state modeling, and compile-time null safety prevents runtime crashes."
+
+What Interviewer Is Testing :
+- Mastery of Kotlin language features and idioms.
+- Understanding of the 4 Android building blocks and when to use which component.
+
+Key Points to Remember :
+- Four core components must be registered in `AndroidManifest.xml` (except dynamically registered BroadcastReceivers).
+- Sealed classes enable exhaustive pattern matching.
+- Data class `copy()` enables unidirectional, immutable state updates.
+
+Common Follow-up Questions :
+- Q: What is the difference between a Sealed Class and an Enum?
+  A: Enums have a single instance per value and cannot hold changing instance state; sealed classes can have multiple instances with distinct constructor arguments and mutable/immutable properties.
+
+Common Mistakes :
+- Doing disk/network I/O inside a BroadcastReceiver's `onReceive()` (which runs on the main thread and has an execution timeout of ~10 seconds).
+- Using `!!` (double bang) in Kotlin production code instead of safe handling.
+
+Source Evidence :
+Interview report: Glassdoor Android Developer interview. Core Kotlin & Android building blocks.
+
+------------------------------------------------------------------------
+
+4. [REPORTED TOPIC] Question : Explain the Activity/Fragment lifecycle and related Android fundamentals.
+   Level : Junior / Entry-Level
+
+Detailed Technical Answer :
+The Android lifecycle is a state machine managed by the OS to optimize memory and battery usage.
+
+Activity Lifecycle States & Callbacks:
+- `onCreate()`: UI initialized, View binding inflated, ViewModel attached. Activity is NOT visible yet.
+- `onStart()`: Activity becomes visible to user.
+- `onResume()`: Activity enters foreground and has user input focus.
+- `onPause()`: Activity partially obscured (e.g., multi-window mode, dialog popup, permission dialog) or about to transition to background. Stop animations and release exclusive camera/sensor locks.
+- `onStop()`: Activity is completely hidden from view. Heavy work, UI updates, and location updates must pause.
+- `onDestroy()`: Final callback before Activity is destroyed due to `finish()` or system recreation.
+
+Fragment Lifecycle & Two-tier Architecture:
+- `onAttach()` -> `onCreate()` -> `onCreateView()` (view inflated) -> `onViewCreated()` (binding set, views wired) -> `onStart()` -> `onResume()`.
+- Reverse: `onPause()` -> `onStop()` -> `onDestroyView()` (Views torn down) -> `onDestroy()` -> `onDetach()`.
+
+Modern Lifecycle-Aware APIs:
+Instead of manual cleanup in `onStop()`/`onDestroy()`, modern Android uses `LifecycleObserver`, `DefaultLifecycleObserver`, and `repeatOnLifecycle`.
+- `repeatOnLifecycle(Lifecycle.State.STARTED)`: Automatically starts collecting coroutines when the UI reaches `onStart()` and cancels the coroutine when the UI drops below `onStop()`, avoiding background resource consumption and UI updates when invisible.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// Production Lifecycle Observer decoupling business logic from Activity callbacks
+class CameraLocationTracker(
+    private val context: Context,
+    lifecycle: Lifecycle
+) : DefaultLifecycleObserver {
+
+    init {
+        lifecycle.addObserver(this)
+    }
+
+    override fun onStart(owner: LifecycleOwner) {
+        // Start listening to GPS updates when UI is visible
+        startLocationUpdates()
+    }
+
+    override fun onStop(owner: LifecycleOwner) {
+        // Stop listening to GPS updates immediately when Activity is hidden
+        stopLocationUpdates()
+    }
+
+    override fun onDestroy(owner: LifecycleOwner) {
+        // Clean up references and remove observer
+        owner.lifecycle.removeObserver(this)
+    }
+
+    private fun startLocationUpdates() { /* Register location listeners */ }
+    private fun stopLocationUpdates() { /* Unregister location listeners */ }
+}
+
+// In Activity:
+class MainActivity : AppCompatActivity() {
+    private lateinit var locationTracker: CameraLocationTracker
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        locationTracker = CameraLocationTracker(this, lifecycle)
+    }
+}
+```
+
+Interview Tip :
+Highlight how `repeatOnLifecycle` or `DefaultLifecycleObserver` replaces error-prone manual boilerplate in `onStart`/`onStop`.
+
+What Interviewer Is Testing :
+- Clear mental model of visibility vs focus (`onStart` vs `onResume`).
+- Memory leak prevention and resource management.
+
+Key Points to Remember :
+- Visible: `onStart()` to `onStop()`.
+- Interactive (has focus): `onResume()` to `onPause()`.
+- Stop background coroutine UI collection in `onStop()`.
+
+Common Follow-up Questions :
+- Q: If Activity A launches Activity B, what is the exact order of callbacks?
+  A: 1. A.onPause() -> 2. B.onCreate() -> 3. B.onStart() -> 4. B.onResume() -> 5. A.onStop() (A is only stopped after B is fully visible and resumed).
+
+Common Mistakes :
+- Starting heavy I/O in `onResume()`.
+- Forgetting that an Activity in `onStop()` can be killed by the OS without calling `onDestroy()`.
+
+Source Evidence :
+Interview report: Fincart, Mobile Applications Developer, 2026. Focus on Activity/Fragment lifecycles.
+
+------------------------------------------------------------------------
+
+5. [REPORTED TOPIC] Question : What Android technologies have you used to build modern Android applications?
+   Level : Junior / Entry-Level
+
+Detailed Technical Answer :
+A modern production Android application leverages the official Jetpack Modern Android Development (MAD) ecosystem, centered around Clean Architecture and Unidirectional Data Flow (UDF):
+
+1. UI Layer:
+- Jetpack Compose: Modern declarative UI framework replacing imperative XML layouts. Enables reusable, reactive composables.
+- Material 3: Adaptive theming, dynamic color, and accessibility-first design systems.
+- Navigation Compose: Type-safe screen navigation and deep linking.
+
+2. State & Concurrency:
+- Kotlin Coroutines: Lightweight concurrency for asynchronous tasks.
+- Kotlin Flow (`StateFlow`, `SharedFlow`): Asynchronous reactive streams supporting UDF.
+- Architecture Components (`ViewModel`, `SavedStateHandle`): Separating business state from UI lifecycles.
+
+3. Data & Networking Layer:
+- Retrofit + OkHttp: Type-safe REST client with interceptors for authentication, logging, and retries.
+- KotlinX Serialization / Moshi: Fast, reflection-less JSON parsing.
+- Room Database: Robust SQLite object mapping with Flow/Paging 3 support.
+- Jetpack DataStore (Preferences / Proto): Modern, thread-safe asynchronous replacement for `SharedPreferences`.
+
+4. Dependency Injection:
+- Hilt (Dagger): Standardized compile-time dependency injection across Android components (`@AndroidEntryPoint`, `@HiltViewModel`).
+
+5. Asynchronous Work & Quality:
+- WorkManager: Guaranteed, deferrable background tasks with constraint management (battery, network).
+- Testing: JUnit 5, MockK, Turbine (for Flow testing), and Compose UI Test Framework.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// Modern stack integration: Hilt + Compose + ViewModel + StateFlow + Repository
+
+// 1. Domain/UI State
+data class UserFeedUiState(
+    val items: List<String> = emptyList(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)
+
+// 2. Hilt ViewModel with StateFlow
+@HiltViewModel
+class FeedViewModel @Inject constructor(
+    private val userRepository: UserRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(UserFeedUiState(isLoading = true))
+    val uiState: StateFlow<UserFeedUiState> = _uiState.asStateFlow()
+
+    init {
+        loadFeed()
+    }
+
+    fun loadFeed() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
+            userRepository.getFeed()
+                .onSuccess { data -> _uiState.update { it.copy(items = data, isLoading = false) } }
+                .onFailure { err -> _uiState.update { it.copy(errorMessage = err.localizedMessage, isLoading = false) } }
+        }
+    }
+}
+
+// 3. Declarative Jetpack Compose UI
+@Composable
+fun FeedScreen(
+    viewModel: FeedViewModel = hiltViewModel()
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        when {
+            state.isLoading -> CircularProgressIndicator()
+            state.errorMessage != null -> Text(text = state.errorMessage!!, color = MaterialTheme.colorScheme.error)
+            else -> LazyColumn(modifier = Modifier.fillMaxSize()) {
+                items(state.items) { item ->
+                    Text(text = item, modifier = Modifier.padding(16.dp))
+                }
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Structure your answer around problems solved: "Instead of SharedPreferences, which blocks the UI thread with synchronous disk I/O, I use DataStore. Instead of XML ViewHolders, I use Jetpack Compose for declarative, testable UI."
+
+What Interviewer Is Testing :
+- Familiarity with the current industry standard stack versus legacy approaches (AsyncTask, Java, XML).
+- Architectural maturity (Clean Architecture, DI, UDF).
+
+Key Points to Remember :
+- Compose + Kotlin Coroutines + Flow + Hilt + Room/Retrofit represents the current Google benchmark.
+- Explain why a tool was chosen over its predecessor.
+
+Common Follow-up Questions :
+- Q: Why choose DataStore over SharedPreferences?
+  A: DataStore uses Kotlin Coroutines and Flow, performs asynchronous disk I/O off the main thread, and handles runtime parsing errors safely without throwing runtime crashes.
+
+Common Mistakes :
+- Listing libraries without knowing their purpose or trade-offs.
+- Mentioning deprecated libraries like AsyncTask, Volley, or synthetics.
+
+Source Evidence :
+Interview report: CloudThat, Android Developer, April 2026. Candidate asked about modern Android application stack.
+
+==============================================================================
+MID-LEVEL — REPORTED
+==============================================================================
+
+------------------------------------------------------------------------
+
+6. [REPORTED] Question : What does the suspend keyword/operator mean in Kotlin?
+   Level : Mid-Level
+
+Detailed Technical Answer :
+The `suspend` keyword indicates that a function can pause its execution and later resume without blocking the thread it is executing on.
+
+Under the Hood (Continuation Passing Style & State Machine):
+1. Continuation Passing Style (CPS): At compile time, the Kotlin compiler transforms every `suspend` function by adding an extra hidden parameter: `Continuation<T>`.
+   - `suspend fun fetchData(): String` becomes `fun fetchData(continuation: Continuation<String>): Any?`
+2. State Machine: The compiler decomposes the function body into a state machine. Each suspension point (e.g., `delay()`, network call, database read) represents a distinct state (label).
+3. Suspension: When a suspend function reaches a suspension point that cannot complete immediately, it returns the sentinel object `COROUTINE_SUSPENDED`. The underlying OS thread is completely freed to execute other tasks (e.g., rendering UI frames on the Main thread).
+4. Resumption: When the background I/O or timer completes, the framework calls `continuation.resumeWith(result)`. The state machine resumes right where it left off, on whichever thread dispatcher is configured.
+
+Crucial distinction: `suspend` does NOT automatically mean background thread. Calling a suspend function that performs a heavy computation on `Dispatchers.Main` without `withContext(Dispatchers.Default)` WILL freeze the Main thread and cause an ANR.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+class ProfileRepository(
+    private val apiService: UserApiService,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+
+    // suspend function that switches context safely using withContext
+    suspend fun fetchUserProfile(userId: String): Result<UserProfile> {
+        // withContext suspends the caller and switches execution to a thread from the IO pool
+        return withContext(ioDispatcher) {
+            try {
+                val response = apiService.getUser(userId) // Network call suspends here
+                Result.success(response.toDomain())
+            } catch (e: IOException) {
+                Result.failure(e)
+            }
+        }
+    }
+}
+
+// In ViewModel:
+class ProfileViewModel(private val repository: ProfileRepository) : ViewModel() {
+
+    fun loadProfile() {
+        // viewModelScope runs on Dispatchers.Main.immediate by default
+        viewModelScope.launch {
+            // UI thread is NOT blocked while fetchUserProfile waits for network
+            val result = repository.fetchUserProfile("123")
+            result.onSuccess { user ->
+                // Directly update UI on the Main thread
+                updateUiWithUser(user)
+            }
+        }
+    }
+
+    private fun updateUiWithUser(user: UserProfile) { /* update UI */ }
+}
+```
+
+Interview Tip :
+Explain the compilation mechanism: "The Kotlin compiler turns suspend functions into a state machine using Continuation-Passing Style (CPS), passing a `Continuation` callback that resumes execution."
+
+What Interviewer Is Testing :
+- Difference between thread blocking and coroutine suspension.
+- Deep understanding of Kotlin compiler internals (CPS, state machines).
+- Knowledge of dispatchers and main-safety.
+
+Key Points to Remember :
+- Suspend = can pause and resume without blocking thread.
+- Suspend does NOT mean background thread; execution stays on current dispatcher unless shifted with `withContext`.
+- Always make suspend functions "main-safe" (callers on the main thread shouldn't need to worry about blocking).
+
+Common Follow-up Questions :
+- Q: How does the compiler know where to resume in a suspend function with multiple suspension points?
+  A: It creates an internal state machine class extending `ContinuationImpl` with a label field (0, 1, 2...). Each suspension point updates the label.
+
+Common Mistakes :
+- Confusing coroutine suspension with launching a new thread.
+- Performing long-running CPU calculations inside a suspend function without switching dispatchers.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Candidate asked what the `suspend` keyword really means.
+
+------------------------------------------------------------------------
+
+7. [REPORTED] Question : How would you solve a state-related bug in an Android application?
+   Level : Mid-Level
+
+Detailed Technical Answer :
+State-related bugs (e.g., race conditions, stale data, duplicate triggers, flickering UI, UI desync) almost always stem from two root causes:
+1. Multiple sources of truth competing with each other.
+2. Uncontrolled state mutation from asynchronous callbacks out of sync with the lifecycle.
+
+Systematic Diagnostic & Resolution Process:
+1. Identify the Single Source of Truth (SSOT): Ensure state is strictly held in one place (usually a `ViewModel` or local Room database). Views and Composables must be dumb renderers.
+2. Trace State Mutations: Use Kotlin `StateFlow` with atomic updates via `.update { it.copy(...) }` to prevent concurrent write race conditions.
+3. Verify Lifecycle Safety: Check whether collectors are running while the app is in the background. Use `repeatOnLifecycle` or Compose's `collectAsStateWithLifecycle`.
+4. Prevent Event Re-execution: Distinguish persistent state (like list of items) from one-time events (like navigation or Snackbars).
+5. Add Logging/Debugging: Attach log interceptors or wrap state changes with a debug logger to record every state transition.
+6. Write Deterministic Unit Tests: Use Turbine and `StandardTestDispatcher` to assert sequential state transitions.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// Problematic Code (Buggy):
+// Multiple mutable variables mutated concurrently from different threads
+class BuggyViewModel : ViewModel() {
+    var isLoading = false // race condition!
+    var items = mutableListOf<String>() // not thread-safe!
+}
+
+// RESOLUTION: Single Source of Truth with Atomic State Updates & MVI / UDF
+data class ProductListUiState(
+    val items: List<String> = emptyList(),
+    val isLoading: Boolean = false,
+    val selectedId: String? = null,
+    val errorMessage: String? = null
+)
+
+class RobustProductViewModel(
+    private val repository: ProductRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(ProductListUiState())
+    val uiState: StateFlow<ProductListUiState> = _uiState.asStateFlow()
+
+    fun selectProduct(id: String) {
+        // Atomic update prevents race conditions when rapid clicks occur
+        _uiState.update { currentState ->
+            currentState.copy(selectedId = id)
+        }
+    }
+
+    fun loadProducts() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            try {
+                val data = repository.getProducts()
+                _uiState.update { it.copy(items = data, isLoading = false) }
+            } catch (e: Exception) {
+                _uiState.update { it.copy(errorMessage = e.message, isLoading = false) }
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Walk the interviewer through your structured debugging methodology:
+"1. Isolate SSOT -> 2. Inspect thread concurrency & race conditions -> 3. Check lifecycle observation scopes -> 4. Write a unit test replicating the race condition -> 5. Fix with atomic StateFlow updates."
+
+What Interviewer Is Testing :
+- Debugging maturity and root-cause analysis.
+- Understanding of Unidirectional Data Flow (UDF) and immutability.
+- Thread-safety awareness in reactive state pipelines.
+
+Key Points to Remember :
+- Immutability + SSOT eliminates 90% of state bugs.
+- Always use `MutableStateFlow.update { }` instead of `_state.value = _state.value.copy(...)` to prevent concurrent write loss.
+
+Common Follow-up Questions :
+- Q: Why is `_state.value = _state.value.copy(...)` dangerous under high concurrency?
+  A: It reads and writes in two distinct operations. If two threads read the same state before either writes, the second write will overwrite and erase the first thread's mutation. `.update { }` uses an atomic Compare-And-Set (CAS) loop.
+
+Common Mistakes :
+- Mutating state inside UI/Composable components.
+- Having both Room and an in-memory list act as independent sources of truth without synchronization.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Candidate solved case-study with injected state bugs.
+
+------------------------------------------------------------------------
+
+8. [REPORTED] Question : How would you reason about Kotlin Coroutines and Jetpack Compose in an Android application?
+   Level : Mid-Level
+
+Detailed Technical Answer :
+Jetpack Compose is a declarative UI toolkit where UI is a pure function of State (`UI = f(State)`). Composables can recompose frequently and unpredictably across any thread. Because of this, coroutines within Compose must be strictly lifecycle-governed and side-effect controlled.
+
+Core Principles:
+1. Composables must be side-effect free: Launching coroutines directly inside the body of a Composable is a critical bug because recomposition will trigger duplicate, runaway coroutine executions.
+2. Effect Handlers for Coroutines:
+   - `LaunchedEffect(key)`: Launches a coroutine scoped to the Composable's lifecycle. Runs when entering composition; cancels and relaunches whenever `key` changes; cancels when leaving composition.
+   - `rememberCoroutineScope()`: Creates a coroutine scope bound to the composition lifecycle, used specifically inside event callbacks (like `onClick`) where composable functions cannot be called directly.
+3. Separation of Concerns:
+   - Long-running business operations, network calls, and data caching belong in `viewModelScope`.
+   - UI-only animations (like scrolling a list to top or showing a snackbar) belong in Compose coroutine scopes (`rememberCoroutineScope` or `LaunchedEffect`).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+@Composable
+fun UserSearchScreen(
+    query: String,
+    viewModel: UserSearchViewModel = viewModel()
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope() // Bound to composition lifecycle for UI events
+
+    // 1. LaunchedEffect: Relaunches debounced search whenever 'query' changes
+    LaunchedEffect(query) {
+        viewModel.onQueryChanged(query)
+    }
+
+    // 2. LaunchedEffect for single-shot UI events (e.g. Error snackbar)
+    LaunchedEffect(uiState.errorMessage) {
+        uiState.errorMessage?.let { errorText ->
+            snackbarHostState.showSnackbar(errorText)
+            viewModel.dismissError()
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(modifier = Modifier.padding(paddingValues)) {
+            // UI rendering based on state
+            if (uiState.isLoading) {
+                CircularProgressIndicator()
+            } else {
+                UserList(
+                    users = uiState.users,
+                    onItemClick = { userId ->
+                        // 3. rememberCoroutineScope used inside non-composable callback
+                        scope.launch {
+                            snackbarHostState.showSnackbar("Clicked user: $userId")
+                        }
+                    }
+                )
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Make the distinction clear: "Use `viewModelScope` for data loading and business logic so it survives recomposition and screen rotation. Use `LaunchedEffect` and `rememberCoroutineScope` strictly for UI-level side effects."
+
+What Interviewer Is Testing :
+- Knowledge of Compose recomposition behavior and thread safety.
+- Proper use of `LaunchedEffect` vs `rememberCoroutineScope`.
+- Preventing memory leaks and duplicate asynchronous calls.
+
+Key Points to Remember :
+- Never call coroutines directly in the Composable body without an Effect handler.
+- Always provide appropriate keys to `LaunchedEffect` to avoid accidental infinite cancellation/relaunch loops.
+
+Common Follow-up Questions :
+- Q: What happens if you pass `Unit` or `true` as the key to `LaunchedEffect`?
+  A: It runs exactly once when the Composable enters composition and cancels only when the Composable leaves composition.
+
+Common Mistakes :
+- Launching coroutines in `onClick` using `GlobalScope` or `CoroutineScope(Dispatchers.Main)` instead of `rememberCoroutineScope()`.
+- Putting data fetching inside `LaunchedEffect(Unit)` instead of doing it inside the `ViewModel.init` or via reactive Flow pipelines.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Technical discussion on Coroutines with Jetpack Compose.
+
+------------------------------------------------------------------------
+
+9. [REPORTED TOPIC] Question : How do you handle networking issues in an Android application?
+   Level : Mid-Level
+
+Detailed Technical Answer :
+Robust networking in Android requires handling transient failures (poor connectivity, timeouts), protocol failures (HTTP 4xx/5xx), connectivity switches (WiFi to Cellular), and parsing errors gracefully.
+
+Architectural Strategy:
+1. Transport Layer (OkHttp):
+   - Configure reasonable timeouts (Connect: 15s, Read: 20s, Write: 20s).
+   - Add Retry Interceptors for idempotent operations (GET requests on 503/socket timeouts with exponential backoff).
+   - Connection Pooling and HTTP/2 multiplexing.
+2. Network Connectivity Monitoring:
+   - Use `ConnectivityManager.NetworkCallback` via a Flow to proactively listen to network capability changes (validate `NET_CAPABILITY_INTERNET` and `NET_CAPABILITY_VALIDATED`).
+3. Domain Error Mapping:
+   - Never expose raw HTTP exceptions (`HttpException`, `SocketTimeoutException`) to the UI layer.
+   - Map exceptions into structured domain errors (`NetworkError.NoInternet`, `NetworkError.ServerError(code)`, `NetworkError.Timeout`).
+4. Offline Support & Caching:
+   - Cache-First architecture using Room database: UI observes Room Flow; network worker syncs data into Room.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. Domain Error Abstraction
+sealed interface AppResult<out T> {
+    data class Success<out T>(val data: T) : AppResult<T>
+    data class Failure(val error: DomainNetworkError) : AppResult<Nothing>
+}
+
+sealed interface DomainNetworkError {
+    object NoInternet : DomainNetworkError
+    object Timeout : DomainNetworkError
+    data class ServerError(val code: Int, val message: String?) : DomainNetworkError
+    data class Unknown(val throwable: Throwable) : DomainNetworkError
+}
+
+// 2. Safe API Call Utility Function
+suspend fun <T> safeApiCall(apiCall: suspend () -> T): AppResult<T> {
+    return try {
+        AppResult.Success(apiCall())
+    } catch (e: UnknownHostException) {
+        AppResult.Failure(DomainNetworkError.NoInternet)
+    } catch (e: SocketTimeoutException) {
+        AppResult.Failure(DomainNetworkError.Timeout)
+    } catch (e: HttpException) {
+        AppResult.Failure(DomainNetworkError.ServerError(e.code(), e.message()))
+    } catch (e: Exception) {
+        if (e is CancellationException) throw e // MUST rethrow cancellation for coroutines!
+        AppResult.Failure(DomainNetworkError.Unknown(e))
+    }
+}
+
+// 3. Network Repository Implementation
+class OrdersRepository(
+    private val ordersApi: OrdersApiService
+) {
+    suspend fun getOrders(): AppResult<List<Order>> {
+        return safeApiCall {
+            ordersApi.fetchOrders().map { it.toDomain() }
+        }
+    }
+}
+```
+
+Interview Tip :
+Crucial detail to mention: "When catching `Exception` in coroutine networking code, you MUST rethrow `CancellationException`; otherwise, you break Kotlin's structured concurrency and coroutine cancellation!"
+
+What Interviewer Is Testing :
+- Handling real-world flaky mobile connectivity.
+- Architecture separation (raw networking vs domain error models).
+- Knowledge of Coroutine `CancellationException` propagation.
+
+Key Points to Remember :
+- Map network errors into domain models.
+- Always check network validation, not just connectivity.
+- Catch `CancellationException` and rethrow it.
+
+Common Follow-up Questions :
+- Q: Why is `ConnectivityManager.getActiveNetworkInfo()` deprecated?
+  A: It only tells you if a physical network interface is active, not whether the network has real internet access. Modern apps use `registerNetworkCallback` with `NetworkCapabilities`.
+
+Common Mistakes :
+- Showing raw stack traces or "HTTP 500" errors directly to users.
+- Catching `Throwable` or `Exception` without rethrowing `CancellationException`.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Networking troubleshooting in Android.
+
+------------------------------------------------------------------------
+
+10. [REPORTED TOPIC] Question : What are log interceptors and how would you use them in an Android networking stack?
+    Level : Mid-Level
+
+Detailed Technical Answer :
+A Log Interceptor is an OkHttp middleware component that intercepts outgoing HTTP requests before they hit the wire and incoming HTTP responses before they are returned to application code. It sits in OkHttp’s chain of responsibility (`Interceptor.Chain`).
+
+Use Cases:
+1. Observability & Debugging: Logging request URLs, HTTP methods, headers, payload bodies, HTTP status codes, and execution latency.
+2. Security & Compliance (Crucial): Redacting sensitive authentication headers (`Authorization: Bearer ***`), cookies, API tokens, passwords, and Personal Identifiable Information (PII) like credit cards or SSNs.
+3. Performance Monitoring: Calculating request duration to identify slow endpoints.
+4. Conditional Environments: Activating verbose network logging (`HttpLoggingInterceptor.Level.BODY`) in Debug builds while completely disabling or stripping body logging in Release/Production builds to prevent memory bloat and security leaks.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+class NetworkModule {
+
+    fun createOkHttpClient(isDebug: Boolean): OkHttpClient {
+        val builder = OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+
+        // 1. Custom Logging & Redaction Interceptor
+        val customLoggingInterceptor = Interceptor { chain ->
+            val request = chain.request()
+            val startTime = System.nanoTime()
+
+            // Proceed with network call
+            val response = try {
+                chain.proceed(request)
+            } catch (e: Exception) {
+                Log.e("NetworkLog", "Request failed: ${request.method} ${request.url}", e)
+                throw e
+            }
+
+            val tookMs = TimeUnit.NANOSECONDS.toMillis(System.nanoTime() - startTime)
+
+            if (isDebug) {
+                val sanitizedHeaders = request.headers.names().joinToString { name ->
+                    val value = if (name.equals("Authorization", ignoreCase = true)) "REDACTED" else request.header(name)
+                    "$name: $value"
+                }
+                Log.d("NetworkLog", "--> ${request.method} ${request.url} ($sanitizedHeaders)")
+                Log.d("NetworkLog", "<-- ${response.code} ${response.message} in ${tookMs}ms")
+            }
+
+            response
+        }
+
+        builder.addInterceptor(customLoggingInterceptor)
+
+        // 2. Standard HttpLoggingInterceptor with redacted headers
+        if (isDebug) {
+            val logging = HttpLoggingInterceptor { message ->
+                Log.d("OkHttp", message)
+            }.apply {
+                level = HttpLoggingInterceptor.Level.BODY
+                redactHeader("Authorization")
+                redactHeader("Cookie")
+                redactHeader("X-Api-Key")
+            }
+            builder.addInterceptor(logging)
+        }
+
+        return builder.build()
+    }
+}
+```
+
+Interview Tip :
+Immediately bring up security: "In production, logging interceptors must redact Authorization headers, tokens, and PII. Leaving full body logging in release builds poses serious GDPR/data leakage risks and degrades performance."
+
+What Interviewer Is Testing :
+- Understanding OkHttp architecture and the interceptor chain.
+- Security awareness regarding logging sensitive user data.
+- Knowledge of difference between Application Interceptors and Network Interceptors.
+
+Key Points to Remember :
+- Application Interceptors: Run first, can observe redirects, called once per request.
+- Network Interceptors: Run closest to the wire, observe retries and intermediate responses, cannot observe cached responses.
+
+Common Follow-up Questions :
+- Q: What is the difference between `addInterceptor` and `addNetworkInterceptor`?
+  A: Application interceptors run first even if response comes from OkHttp cache. Network interceptors run right before data hits the socket and do not run if a request is served from the cache.
+
+Common Mistakes :
+- Shipping `Level.BODY` in production, which causes memory spikes when downloading large payloads and leaks user passwords.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Specific inquiry into log interceptors and networking.
+
+------------------------------------------------------------------------
+
+11. [REPORTED] Question : Given coroutine code using launch, delay, and Thread.sleep, what output will it produce and in what order?
+    Level : Mid-Level
+
+Detailed Technical Answer :
+To determine execution order, apply the fundamental rules of coroutine scheduling:
+1. `launch` schedules a new coroutine on the designated dispatcher. It does NOT immediately execute inline unless using an unconfined or immediate dispatcher; on standard dispatchers, it yields execution to let the calling block proceed until the next suspension or thread release point.
+2. `delay()` suspends the current coroutine without blocking the underlying thread, releasing the thread to run other scheduled coroutines.
+3. `Thread.sleep()` blocks the entire operating system thread. No other coroutine assigned to that thread can execute while it is sleeping.
+4. `runBlocking` blocks the calling thread until all coroutines launched within its scope have completed.
+
+Code Analysis Scenario:
+```kotlin
+fun main() = runBlocking {
+    launch {
+        delay(100)
+        println("A")
+    }
+    launch {
+        Thread.sleep(50)
+        println("B")
+    }
+    println("C")
+}
+```
+
+Step-by-Step Execution Trace:
+1. `runBlocking` starts executing on the Main thread.
+2. `launch { delay(100); println("A") }` schedules Coroutine 1 into the `runBlocking` event loop queue.
+3. `launch { Thread.sleep(50); println("B") }` schedules Coroutine 2 into the event loop queue.
+4. The main thread continues running sequentially and reaches `println("C")`. Therefore, **C** is printed first!
+5. The main block finishes its initial pass and checks the event loop queue. It picks up Coroutine 1.
+6. Coroutine 1 calls `delay(100)`. It suspends and schedules its resumption in 100ms, immediately freeing the Main thread!
+7. The Main thread immediately picks up Coroutine 2 from the queue.
+8. Coroutine 2 calls `Thread.sleep(50)`. It blocks the Main thread for 50ms.
+9. After 50ms, Coroutine 2 wakes up, executes `println("B")`. Therefore, **B** is printed second!
+10. Coroutine 2 completes. Meanwhile, 50ms have elapsed. The thread waits the remaining ~50ms for Coroutine 1's timer.
+11. Coroutine 1 resumes and executes `println("A")`. Therefore, **A** is printed third!
+
+Final Output Sequence:
+```
+C
+B
+A
+```
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+import kotlinx.coroutines.*
+
+fun main() = runBlocking {
+    println("Start")
+
+    launch {
+        println("Coroutine 1 started")
+        delay(100) // Suspends: releases thread
+        println("A")
+    }
+
+    launch {
+        println("Coroutine 2 started")
+        Thread.sleep(50) // Blocks thread: nothing else can run on this thread
+        println("B")
+    }
+
+    println("C")
+    println("End of main block")
+}
+// Guaranteed Output:
+// Start
+// C
+// End of main block
+// Coroutine 1 started
+// Coroutine 2 started
+// B
+// A
+```
+
+Interview Tip :
+Do not guess! Verbalize your reasoning step-by-step: "First, identify which thread the dispatcher is running on. Second, check if `launch` yields. Third, identify whether an operation is suspending (`delay`) or thread-blocking (`Thread.sleep`)."
+
+What Interviewer Is Testing :
+- Concurrency and scheduling comprehension.
+- Ability to distinguish between coroutine suspension (cooperative) and thread blocking (preemptive).
+
+Key Points to Remember :
+- Sequential code in the caller runs before queued child coroutines on the same thread dispatcher.
+- `delay()` yields the thread; `Thread.sleep()` starves all other coroutines on that thread.
+
+Common Follow-up Questions :
+- Q: What happens if Coroutine 2 had `delay(50)` instead of `Thread.sleep(50)`?
+  A: The output would still be C, B, A, but during the 50ms sleep, other tasks on the thread wouldn't be starved.
+- Q: What if Coroutine 2 used `Thread.sleep(150)`?
+  A: Output would be C, B, A because Coroutine 1's 100ms delay would expire while the thread was blocked by Coroutine 2, so when Coroutine 2 finished at 150ms and printed B, Coroutine 1 would immediately run and print A.
+
+Common Mistakes :
+- Assuming `launch` executes immediately like a standard function call.
+- Believing that `Thread.sleep` suspends a coroutine.
+
+Source Evidence :
+Interview report: JioCinema, SDE-2 Android, June 2026. Candidate asked output tracing with launch, delay, and Thread.sleep.
+
+------------------------------------------------------------------------
+
+12. [REPORTED] Question : How would you write a suspend function that makes multiple API calls and returns the required results, while failing if either call fails?
+    Level : Mid-Level
+
+Detailed Technical Answer :
+When making multiple concurrent API calls where all results are mandatory:
+1. Concurrency: The calls should execute concurrently (in parallel) using `async` rather than sequentially to minimize overall network latency ($T = \max(t_1, t_2)$ instead of $t_1 + t_2$).
+2. Structured Concurrency & Failure Propagation:
+   - Use `coroutineScope { }` as the scoping function.
+   - In `coroutineScope`, if any child coroutine launched with `async` throws an exception, the scope fails immediately.
+   - It automatically cancels all other running sibling `async` jobs (saving device battery, memory, and backend bandwidth) and rethrows the exception to the caller.
+   - Do NOT use `supervisorScope` here because `supervisorScope` isolates child failures (allowing siblings to continue).
+   - Do NOT launch coroutines in `GlobalScope` or unbounded external scopes.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+data class UserDashboard(
+    val profile: UserProfile,
+    val orders: List<Order>
+)
+
+class DashboardRepository(
+    private val userApi: UserApiService,
+    private val ordersApi: OrdersApiService,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+
+    // Suspend function making concurrent calls; fails fast if either call fails
+    suspend fun getDashboardData(userId: String): UserDashboard = withContext(ioDispatcher) {
+        // coroutineScope enforces that if either deferred call fails, the other is cancelled immediately
+        coroutineScope {
+            val profileDeferred: Deferred<UserProfile> = async {
+                userApi.fetchUserProfile(userId)
+            }
+
+            val ordersDeferred: Deferred<List<Order>> = async {
+                ordersApi.fetchUserOrders(userId)
+            }
+
+            // Await both results concurrently
+            UserDashboard(
+                profile = profileDeferred.await(),
+                orders = ordersDeferred.await()
+            )
+        }
+    }
+}
+
+// ViewModel consuming the repository safely:
+class DashboardViewModel(
+    private val repository: DashboardRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow<DashboardUiState>(DashboardUiState.Loading)
+    val uiState: StateFlow<DashboardUiState> = _uiState.asStateFlow()
+
+    fun loadDashboard(userId: String) {
+        viewModelScope.launch {
+            _uiState.value = DashboardUiState.Loading
+            try {
+                val dashboard = repository.getDashboardData(userId)
+                _uiState.value = DashboardUiState.Success(dashboard)
+            } catch (e: Exception) {
+                // If userApi OR ordersApi throws an error, it is caught here
+                _uiState.value = DashboardUiState.Error(e.message ?: "Failed to load dashboard")
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Explicitly contrast `coroutineScope` with `supervisorScope`: "Because the requirement states 'fail if either call fails', `coroutineScope` is mandatory. If the requirement was 'show profile even if orders fail', we would use `supervisorScope`."
+
+What Interviewer Is Testing :
+- Knowledge of parallel decomposition using `async` / `await`.
+- Mastery of Kotlin structured concurrency and failure propagation.
+- Resource optimization (cancelling orphaned network calls).
+
+Key Points to Remember :
+- `coroutineScope` cancels all siblings when one child fails.
+- `async` must be wrapped inside `coroutineScope` to prevent uncaught exceptions escaping structured concurrency.
+
+Common Follow-up Questions :
+- Q: What happens if `ordersApi` throws an exception while `userApi` is still waiting for network response?
+  A: `coroutineScope` immediately cancels the `userApi` coroutine and propagates the exception to the caller.
+
+Common Mistakes :
+- Running calls sequentially (`val profile = api1(); val orders = api2()`), doubling total latency.
+- Catching exceptions inside `async` without propagating them, masking failure.
+
+Source Evidence :
+Interview report: JioCinema, SDE-2 Android, June 2026. Practical coding problem requiring concurrent API calls with fail-fast semantics.
+
+------------------------------------------------------------------------
+
+13. [REPORTED] Question : How do Kotlin Coroutines work, and how would you reason about structured concurrency?
+    Level : Mid-Level
+
+Detailed Technical Answer :
+Kotlin Coroutines provide structured asynchronous programming. Unlike unmanaged threads, coroutines are organized in a strict parent-child hierarchy governed by three pillars:
+1. `CoroutineScope`: Defines the lifecycle boundary of coroutines.
+2. `CoroutineContext`: A collection of elements, primarily:
+   - `Job`: Controls coroutine lifecycle, cancellation, and hierarchy.
+   - `CoroutineDispatcher`: Specifies which thread pool executes the code (`Main`, `IO`, `Default`).
+   - `CoroutineExceptionHandler`: Handles uncaught exceptions.
+   - `CoroutineName`: Useful for debugging.
+
+Structured Concurrency Principles:
+1. Hierarchy & Lifetime: Every child coroutine launched within a scope is attached to the parent Job. The parent scope does not complete until all its children have completed.
+2. Cancellation Propagation: If a parent coroutine is cancelled, all child coroutines are recursively cancelled.
+3. Failure Propagation: By default (standard `Job`), if a child coroutine fails with an uncaught exception, it cancels its parent, which in turn cancels all other siblings.
+4. Leak Prevention: No coroutine can run untracked. In Android, when a `ViewModel` clears (`onCleared()`), `viewModelScope` cancels all running child jobs, terminating network requests and computations automatically.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+class StructuredConcurrencyDemoViewModel : ViewModel() {
+
+    fun executeStructuredTask() {
+        // viewModelScope provides structured concurrency tied to ViewModel lifecycle
+        viewModelScope.launch {
+            println("Parent started")
+
+            // Child 1: Simulating background calculation
+            launch(Dispatchers.Default) {
+                while (isActive) { // Respects cancellation cooperatively
+                    // Do work...
+                }
+            }
+
+            // Child 2: Network operation
+            launch(Dispatchers.IO) {
+                // If this throws an exception, Parent is notified and Child 1 is cancelled!
+            }
+
+            // Creating a bounded child scope using coroutineScope
+            coroutineScope {
+                val data1 = async { fetchPart1() }
+                val data2 = async { fetchPart2() }
+                combine(data1.await(), data2.await())
+            }
+        }
+    }
+
+    private suspend fun fetchPart1(): String = "Data1"
+    private suspend fun fetchPart2(): String = "Data2"
+    private fun combine(a: String, b: String) {}
+}
+```
+
+Interview Tip :
+Summarize with the core definition: "Structured concurrency guarantees that when a scope terminates or fails, all asynchronous work launched inside it is either completed or cancelled—guaranteeing no orphaned coroutines or memory leaks."
+
+What Interviewer Is Testing :
+- Comprehension of `Job` hierarchies and lifecycle scoping.
+- Understanding how cancellation and exceptions propagate.
+
+Key Points to Remember :
+- Parent waits for children.
+- Parent cancellation cancels children.
+- Child failure cancels parent and siblings (unless `SupervisorJob` is used).
+
+Common Follow-up Questions :
+- Q: What makes a coroutine cooperative with cancellation?
+  A: Suspending functions from `kotlinx.coroutines` (like `delay`, `yield`) check for cancellation automatically. In CPU-heavy loops, developers must explicitly check `isActive` or call `ensureActive()`.
+
+Common Mistakes :
+- Using `GlobalScope.launch` which breaks structured concurrency and leaks memory.
+
+Source Evidence :
+Interview report: Snapmint, SDE-1 Android, July 2026. Detailed round on Coroutines and structured concurrency.
+
+------------------------------------------------------------------------
+
+14. [REPORTED] Question : Given a multithreading/coroutine code snippet, determine the execution order and explain why it happens.
+    Level : Mid-Level
+
+Detailed Technical Answer :
+Multithreading and coroutine execution order questions evaluate your understanding of:
+1. Thread scheduling & dispatcher queues (`Dispatchers.Main`, `Dispatchers.Default`, `Dispatchers.Unconfined`).
+2. Immediate vs standard dispatchers (`Dispatchers.Main` vs `Dispatchers.Main.immediate`).
+3. Suspension points (`yield()`, `delay()`) vs blocking calls (`join()`, `runBlocking()`).
+
+Example Code Snippet Analysis:
+```kotlin
+fun main() = runBlocking {
+    println("1")
+    val job = launch {
+        println("2")
+        yield()
+        println("3")
+    }
+    println("4")
+    job.join()
+    println("5")
+}
+```
+
+Execution Walkthrough:
+1. `runBlocking` initiates on the current thread.
+2. `println("1")` runs immediately -> Output: `1`.
+3. `launch` is called on the default dispatcher of `runBlocking`. The child coroutine is queued in the event loop, but the current block does NOT pause yet.
+4. `println("4")` executes immediately -> Output: `4`.
+5. `job.join()` is called. This is a suspension point! The parent coroutine suspends until `job` completes, yielding the thread back to the event loop.
+6. The event loop picks up the queued child coroutine.
+7. The child coroutine executes `println("2")` -> Output: `2`.
+8. The child coroutine calls `yield()`. It yields execution and puts itself back at the end of the dispatcher's queue.
+9. Since no other work is waiting in the event loop queue, the child coroutine is immediately resumed.
+10. `println("3")` executes -> Output: `3`.
+11. The child coroutine completes.
+12. `job.join()` resumes in the parent coroutine.
+13. `println("5")` executes -> Output: `5`.
+
+Final Output:
+```
+1
+4
+2
+3
+5
+```
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+import kotlinx.coroutines.*
+
+fun main() = runBlocking {
+    println("1 - Main starts")
+
+    val job = launch {
+        println("2 - Inside child coroutine before yield")
+        yield() // Cooperatively yields thread
+        println("3 - Inside child coroutine after yield")
+    }
+
+    println("4 - Main after launching child")
+    job.join() // Suspend until child completes
+    println("5 - Main finishes after child join")
+}
+```
+
+Interview Tip :
+Always check whether `join()` or `await()` is called. Without `join()`, the parent could finish before the child. With `join()`, execution is guaranteed to await the child's completion before proceeding.
+
+What Interviewer Is Testing :
+- Deep understanding of event loops, coroutine queues, and cooperative multitasking via `yield()`.
+
+Key Points to Remember :
+- Standard `launch` schedules work on the dispatcher; it does not jump into the block immediately.
+- `yield()` pauses the coroutine and allows other queued tasks on the same dispatcher to run.
+- `join()` suspends until the target job completes.
+
+Common Follow-up Questions :
+- Q: What would happen if `launch(Dispatchers.Unconfined)` was used instead?
+  A: `Dispatchers.Unconfined` executes immediately on the caller thread until the first suspension point. The order would become: 1 -> 2 -> 4 -> 3 -> 5.
+
+Common Mistakes :
+- Assuming `launch` executes immediately before line "4" runs.
+
+Source Evidence :
+Interview report: Snapmint, SDE-1 Android, July 2026. Multithreading execution order tracing.
+
+------------------------------------------------------------------------
+
+15. [REPORTED TOPIC] Question : Explain Kotlin and Jetpack Compose fundamentals.
+   Level : Mid-Level
+
+Detailed Technical Answer :
+Jetpack Compose is a modern, fully declarative UI toolkit. In Compose, you describe your UI as a series of composable functions (`@Composable`) that convert application state into UI elements.
+
+Key Fundamentals:
+1. Recomposition:
+   - When observed state changes, Compose re-executes only the composable functions that depend on that specific state, skipping unaffected parts of the UI tree.
+   - Recomposition is intelligent, concurrent, and can be cancelled mid-flight if state changes again before composition finishes.
+2. State Hoisting:
+   - A design pattern where state is moved up to make a composable stateless.
+   - A stateless composable takes state as a parameter (`value: T`) and emits events via lambdas (`onValueChange: (T) -> Unit`). This maximizes reusability, testability, and previews.
+3. Positional Memoization & `remember`:
+   - Composables execute repeatedly. To prevent expensive recalculations or re-instantiations during recomposition, use `remember { ... }`.
+   - To survive configuration changes (rotation), use `rememberSaveable { ... }`.
+4. Layout Phases:
+   - 1. Composition (What to show) -> 2. Layout/Measure/Place (Where to show) -> 3. Drawing (How to render).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. Stateless Composable (State Hoisted) - Highly reusable & testable
+@Composable
+fun CounterWidget(
+    count: Int,
+    onIncrement: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(modifier = modifier.padding(8.dp)) {
+        Row(
+            modifier = Modifier.padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(text = "Count: $count", style = MaterialTheme.typography.titleMedium)
+            Spacer(modifier = Modifier.width(16.dp))
+            Button(onClick = onIncrement) {
+                Text("+1")
+            }
+        }
+    }
+}
+
+// 2. Stateful Composable holding state using rememberSaveable
+@Composable
+fun CounterContainer() {
+    // Survives screen rotation and process recreation
+    var count by rememberSaveable { mutableIntStateOf(0) }
+
+    CounterWidget(
+        count = count,
+        onIncrement = { count++ }
+    )
+}
+```
+
+Interview Tip :
+Emphasize State Hoisting: "In Jetpack Compose, the golden architectural pattern is State Hoisting: state flows DOWN, and events flow UP."
+
+What Interviewer Is Testing :
+- Core principles of declarative UI vs imperative UI (View/XML).
+- Understanding recomposition skipping and state hoisting.
+- Proper use of `remember` vs `rememberSaveable`.
+
+Key Points to Remember :
+- Recomposition can run on any thread.
+- Composable functions must be idempotent and pure (free from side effects).
+- Hoist state to make composables stateless.
+
+Common Follow-up Questions :
+- Q: What makes a parameter "Stable" in Compose recomposition skipping?
+  A: Types where `equals` always returns the same result for the same two instances, and all public properties are immutable (primitive types, Strings, `@Immutable` / `@Stable` data classes).
+
+Common Mistakes :
+- Using standard `remember` for user input and wondering why it gets wiped on screen rotation (must use `rememberSaveable`).
+- Performing database or network calls directly inside a composable function.
+
+Source Evidence :
+Interview report: Snapmint, SDE-1 Android, July 2026. Kotlin and Jetpack Compose core fundamentals.
+
+------------------------------------------------------------------------
+
+16. [REPORTED TOPIC] Question : Explain the technical decisions you made in your previous Android projects.
+   Level : Mid-Level
+
+Detailed Technical Answer :
+When explaining technical decisions, use the **STAR + Trade-off Framework** (Situation, Task, Decision, Trade-offs Considered, Measurable Impact):
+
+Example Structure:
+1. Context & Problem: Describe the real business or engineering problem (e.g., slow build times, UI state bugs, bad crash rates).
+2. Architectural Decision:
+   - Declarative UI: Migrated from XML/ViewBinding to Jetpack Compose.
+   - Concurrency & Reactive Streams: Standardized on Kotlin Coroutines and StateFlow over RxJava/LiveData.
+   - Persistence: Replaced SharedPreferences with Proto DataStore for type safety and thread safety.
+   - Dependency Injection: Adopted Hilt for compile-time verified modular dependency injection.
+3. Trade-offs Evaluated:
+   - Example: Migrating to Jetpack Compose increased initial compiler build times and required teaching the team declarative patterns, but reduced boilerplate code by 40% and virtually eliminated UI synchronization bugs.
+4. Measurable Outcome:
+   - Reduced crash-free users from 97.5% to 99.8%.
+   - Cut feature development cycle time from 2 sprints to 1 sprint.
+
+Concrete Production-Grade Architecture Walkthrough :
+```kotlin
+// Example Decision: Migrating from LiveData & XML to StateFlow & Compose
+
+// BEFORE (Legacy LiveData in ViewModel):
+// class LegacyViewModel : ViewModel() {
+//     val user = MutableLiveData<User>() // Allows arbitrary postValue from anywhere, lifecycle-bound to UI
+// }
+
+// AFTER (Modern Technical Choice):
+// Unidirectional Data Flow with Immutable UI State
+data class CartUiState(
+    val items: List<CartItem> = emptyList(),
+    val subtotal: Double = 0.0,
+    val isCheckingOut: Boolean = false
+)
+
+@HiltViewModel
+class CartViewModel @Inject constructor(
+    private val getCartUseCase: GetCartUseCase,
+    private val checkoutUseCase: CheckoutUseCase
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(CartUiState())
+    val uiState: StateFlow<CartUiState> = _uiState.asStateFlow()
+
+    fun onCheckoutClicked() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isCheckingOut = true) }
+            checkoutUseCase()
+            _uiState.update { it.copy(isCheckingOut = false) }
+        }
+    }
+}
+```
+
+Interview Tip :
+Never say "We chose it because it was the newest library." Always justify with: "We chose X over Y because of criteria A (testability), criteria B (type-safety), and criteria C (memory footprint)."
+
+What Interviewer Is Testing :
+- Senior engineering judgment and pragmatism.
+- Ability to weigh pros and cons of technology stacks.
+- Communication of architectural impact.
+
+Key Points to Remember :
+- Every technical decision involves trade-offs.
+- Highlight metrics: build time, APK size, crash-free rates, developer velocity.
+
+Common Follow-up Questions :
+- Q: If you had to redo that project today, what would you do differently?
+  A: Prepare a reflective answer showing continuous learning (e.g., modularize earlier by feature rather than layer, establish UI test automation sooner).
+
+Common Mistakes :
+- Complaining about previous company management or legacy code without explaining how you improved it.
+- Presenting technology choices as flawless silver bullets.
+
+Source Evidence :
+Interview report: Snapmint, SDE-1 Android, July 2026. Discussion of architectural decisions in past projects.
+
+------------------------------------------------------------------------
+
+17. [REPORTED TOPIC] Question : Explain the Android architecture choices you made in your project.
+   Level : Mid-Level
+
+Detailed Technical Answer :
+Modern Android architecture follows Google’s Guide to App Architecture, adhering to Separation of Concerns and Unidirectional Data Flow (UDF):
+
+1. UI Layer (Presentation):
+   - Jetpack Compose: Renders UI based on state.
+   - ViewModel: Holds immutable `StateFlow<UiState>`, survives configuration changes, handles user interactions.
+2. Domain Layer (Optional but recommended for complex apps):
+   - Use Cases / Interactors: Encapsulates single units of business logic (e.g., `ValidateCheckoutUseCase`, `GetPersonalizedFeedUseCase`). Reusable across multiple ViewModels and keeps ViewModels clean.
+3. Data Layer:
+   - Repositories: Single source of truth. Coordinates data between remote network APIs and local databases (Room / DataStore).
+   - Data Sources: RemoteDataSource (Retrofit) and LocalDataSource (Room DAO).
+4. Cross-Cutting Concerns:
+   - Dependency Injection (Hilt): Provides loose coupling and seamless mockability for unit testing.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. Data Layer: Repository implementing Single Source of Truth
+class OfflineFirstArticleRepository @Inject constructor(
+    private val localDao: ArticleDao,
+    private val remoteApi: ArticleApiService
+) : ArticleRepository {
+
+    override fun getArticles(): Flow<List<Article>> = flow {
+        // Step 1: Emit cached articles from local database immediately
+        val cached = localDao.getAllArticles().map { it.toDomain() }
+        emit(cached)
+
+        // Step 2: Fetch latest from network and update cache
+        try {
+            val remoteArticles = remoteApi.fetchTopHeadlines()
+            localDao.insertArticles(remoteArticles.map { it.toEntity() })
+            // Step 3: Emit updated cached articles
+            emit(localDao.getAllArticles().map { it.toDomain() })
+        } catch (e: Exception) {
+            // Network failed, but user still sees cached data!
+        }
+    }
+}
+
+// 2. Domain Layer: Use Case with single responsibility
+class FormatArticleTitleUseCase @Inject constructor() {
+    operator fun invoke(article: Article): Article {
+        return article.copy(title = article.title.trim().replaceFirstChar { it.uppercase() })
+    }
+}
+
+// 3. UI Layer: ViewModel consuming Domain/Data
+@HiltViewModel
+class NewsViewModel @Inject constructor(
+    private val repository: ArticleRepository,
+    private val formatTitle: FormatArticleTitleUseCase
+) : ViewModel() {
+
+    val uiState: StateFlow<List<Article>> = repository.getArticles()
+        .map { list -> list.map { formatTitle(it) } }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+}
+```
+
+Interview Tip :
+Mention `SharingStarted.WhileSubscribed(5000)`: Explain that the 5000ms delay keeps the flow active during quick configuration changes (rotations) but cancels the upstream data collection when the app is backgrounded.
+
+What Interviewer Is Testing :
+- Mastery of Multi-tier Clean Architecture (UI -> Domain -> Data).
+- Offline-first design patterns.
+- Proper scoping and modularity.
+
+Key Points to Remember :
+- Single Source of Truth: Data flows from Repository -> ViewModel -> UI.
+- Use cases are pure Kotlin classes with no Android framework dependencies.
+
+Common Follow-up Questions :
+- Q: When should you NOT create a Use Case?
+  A: For simple CRUD screens where the ViewModel only passes data directly to and from the Repository without any domain business logic. Creating pass-through Use Cases creates useless boilerplate.
+
+Common Mistakes :
+- Passing Android Context or Views into Repositories or ViewModels.
+- Leaking Room Entities or Retrofit DTOs into the UI layer instead of mapping to clean Domain models.
+
+Source Evidence :
+Interview report: Fincart, Mobile Applications Developer, 2026. Architecture choices in production Android systems.
+
+------------------------------------------------------------------------
+
+18. [REPORTED TOPIC] Question : Explain how you solved ANRs in a previous Android project.
+   Level : Mid-Level
+
+Detailed Technical Answer :
+An Application Not Responding (ANR) occurs when the Android main (UI) thread is blocked and unable to process incoming input events or lifecycle callbacks:
+- Input event dispatch timeout: UI does not respond to key or touch events within 5 seconds.
+- BroadcastReceiver execution timeout: `BroadcastReceiver` does not finish within 10–20 seconds.
+- Service execution timeout: Foreground Service start not completed within time limits.
+
+Root Causes:
+1. Performing disk I/O (Room, SharedPreferences, file writing) on `Dispatchers.Main`.
+2. Synchronous network calls or heavy JSON serialization on Main thread.
+3. Lock contention: Main thread waiting for a lock held by a background thread.
+4. Heavy view inflation or deep view hierarchy traversal.
+
+Systematic Solution:
+1. Diagnosis:
+   - Extract `/data/anr/traces.txt` via `adb bugreport` or inspect Android Vitals in Google Play Console.
+   - Trace the `main` thread stack trace to locate the exact blocked line.
+   - Use Android Studio Profiler (CPU trace / System Trace) to detect long frames.
+   - Enable `StrictMode` in debug builds (`detectDiskReads()`, `detectDiskWrites()`, `detectNetwork()`).
+2. Resolution:
+   - Offload heavy operations to background threads using Coroutines (`Dispatchers.IO` for I/O, `Dispatchers.Default` for CPU-heavy tasks).
+   - Replace `SharedPreferences.apply()` / `commit()` with Jetpack DataStore.
+   - Ensure main-safety in all repositories.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. StrictMode setup in Application class for early development ANR detection
+class App : Application() {
+    override fun onCreate() {
+        super.onCreate()
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()
+                    .penaltyLog()
+                    .penaltyDeath() // Crash early in development when Main thread is abused!
+                    .build()
+            )
+        }
+    }
+}
+
+// 2. Offloading blocking I/O to Dispatchers.IO
+class ContactSyncRepository(
+    private val context: Context,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+
+    // Main-safe suspend function: safe to call from Dispatchers.Main
+    suspend fun parseAndSaveLargeVCard(uri: Uri): Int = withContext(ioDispatcher) {
+        // Disk I/O executed safely on IO thread pool, preventing ANR
+        context.contentResolver.openInputStream(uri)?.use { stream ->
+            val contacts = parseStream(stream)
+            saveToRoomDatabase(contacts)
+            contacts.size
+        } ?: 0
+    }
+
+    private fun parseStream(stream: InputStream): List<String> = emptyList()
+    private fun saveToRoomDatabase(items: List<String>) {}
+}
+```
+
+Interview Tip :
+Emphasize prevention: "I diagnose ANRs using Android Studio System Trace and `/data/anr/traces.txt`, and prevent them at develop time using `StrictMode` and making all repository suspend functions strictly main-safe."
+
+What Interviewer Is Testing :
+- Deep understanding of Android's UI threading model (Looper, MessageQueue).
+- Practical experience with profiling tools and crash diagnostics.
+
+Key Points to Remember :
+- Main thread must NEVER do disk I/O, networking, or heavy CPU parsing.
+- Use `StrictMode` in debug builds.
+- Check lock contention between threads.
+
+Common Follow-up Questions :
+- Q: Can SharedPreferences cause an ANR?
+  A: Yes! `SharedPreferences.apply()` writes asynchronously to disk in the background, but when an Activity pauses or stops, Android forces all pending `apply()` disk writes to block the main thread, frequently causing ANRs during screen transitions.
+
+Common Mistakes :
+- Assuming `apply()` in SharedPreferences is completely ANR-proof.
+- Looking only at crashes instead of monitoring ANR rates in Google Play Console.
+
+Source Evidence :
+Interview report: Fincart, Mobile Applications Developer, 2026. Practical case study on solving ANRs.
+
+------------------------------------------------------------------------
+
+19. [REPORTED TOPIC] Question : Explain Kotlin Coroutines, Flow, Jetpack Compose and MVVM.
+   Level : Mid-Level
+
+Detailed Technical Answer :
+Modern Android architecture combines these four technologies to form a reactive, unidirectional system:
+1. Kotlin Coroutines: Concurrency engine for executing one-shot asynchronous tasks without blocking threads.
+2. Kotlin Flow: Reactive data stream engine for asynchronous sequences of data over time (cold streams like Room database emissions, hot streams like `StateFlow`).
+3. Jetpack Compose: Declarative UI engine that observes reactive state and draws UI without XML.
+4. MVVM (Model-View-ViewModel): Architectural separation where:
+   - Model (Data Layer): Exposes data streams via Flow.
+   - ViewModel: Collects Model streams, handles business events, and exposes an immutable `StateFlow<UiState>`.
+   - View (Compose): Observes `StateFlow` via `collectAsStateWithLifecycle()` and renders UI.
+
+Data and Event Flow:
+- User interacts with Compose UI -> Triggers lambda event in ViewModel -> ViewModel runs Coroutine -> Updates StateFlow -> Compose UI recomposes automatically.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// MODEL
+data class CryptoPrice(val symbol: String, val price: Double)
+
+class CryptoRepository @Inject constructor() {
+    // Flow emitting live price updates every 2 seconds
+    fun getLivePrices(): Flow<List<CryptoPrice>> = flow {
+        while (true) {
+            emit(fetchFromNetwork())
+            delay(2000)
+        }
+    }.flowOn(Dispatchers.IO)
+
+    private fun fetchFromNetwork(): List<CryptoPrice> = listOf(CryptoPrice("BTC", 65000.0))
+}
+
+// VIEWMODEL
+data class CryptoUiState(
+    val prices: List<CryptoPrice> = emptyList(),
+    val isLoading: Boolean = false
+)
+
+@HiltViewModel
+class CryptoViewModel @Inject constructor(
+    private val repository: CryptoRepository
+) : ViewModel() {
+
+    val uiState: StateFlow<CryptoUiState> = repository.getLivePrices()
+        .map { CryptoUiState(prices = it, isLoading = false) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = CryptoUiState(isLoading = true)
+        )
+}
+
+// COMPOSE VIEW
+@Composable
+fun CryptoPriceScreen(viewModel: CryptoViewModel = hiltViewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    if (state.isLoading) {
+        CircularProgressIndicator()
+    } else {
+        LazyColumn {
+            items(state.prices) { crypto ->
+                Text("${crypto.symbol}: $${crypto.price}", modifier = Modifier.padding(16.dp))
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Show how they fit together: "Coroutines handle the async work, Flow streams the updates, MVVM separates the concerns, and Compose reacts to the state changes."
+
+What Interviewer Is Testing :
+- End-to-end architectural fluency in the modern Android stack.
+- Correct integration of Flow with Compose lifecycle.
+
+Key Points to Remember :
+- Unidirectional Data Flow (UDF): Events up, State down.
+- Always collect in Compose using `collectAsStateWithLifecycle()`.
+
+Common Follow-up Questions :
+- Q: Why is `collectAsStateWithLifecycle()` preferred over `collectAsState()` in Compose?
+  A: `collectAsState()` keeps collecting in the background even when the app is minimized, wasting CPU and network. `collectAsStateWithLifecycle()` stops collection when the Activity/Fragment lifecycle drops below the specified minimum state (default `STARTED`).
+
+Common Mistakes :
+- Emitting state from ViewModel using Channel when StateFlow is appropriate.
+- Launching long-running coroutines in Composable functions instead of ViewModel.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Comprehensive discussion on Coroutines, Flow, Compose, and MVVM.
+
+------------------------------------------------------------------------
+
+20. [REPORTED TOPIC] Question : How do you use StateFlow and SharedFlow, and why would you choose one over the other?
+   Level : Mid-Level
+
+Detailed Technical Answer :
+Both `StateFlow` and `SharedFlow` are "Hot" flows (they emit data regardless of whether collectors are active), but they serve fundamentally different architectural roles:
+
+1. StateFlow:
+- Purpose: Represents persistent UI State (e.g., loading state, user profile, list of products).
+- Characteristics:
+  - Always holds a current `.value`.
+  - Conflated: If state updates rapidly (e.g., 1 -> 2 -> 3), a slow collector may skip intermediate values and receive only the latest value (3).
+  - Replay Cache = 1: Any new collector immediately receives the current latest state upon subscribing.
+  - Equality check: `StateFlow` checks `Any.equals()`. Emitting the identical value consecutively does NOT trigger collectors.
+
+2. SharedFlow:
+- Purpose: Represents Broadcast Events or one-off actions (e.g., navigation events, showing a temporary Toast/Snackbar, triggering an analytics beacon).
+- Characteristics:
+  - Does NOT require an initial value.
+  - Configurable `replay`: Can be set to 0 (new subscribers only receive events emitted *after* they subscribed).
+  - Buffer overflow strategies: `BufferOverflow.DROP_OLDEST`, `DROP_LATEST`, or `SUSPEND`.
+  - Emits all events: No conflation by default; every emission is delivered.
+
+Decision Matrix:
+- Screen State -> Use `StateFlow`.
+- Navigation / Transient Notification -> Use `SharedFlow` (with `replay = 0`) or Channel.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+sealed interface NavigationEvent {
+    data class NavigateToDetails(val productId: String) : NavigationEvent
+}
+
+data class ShopUiState(
+    val items: List<String> = emptyList(),
+    val isLoading: Boolean = false
+)
+
+class ShopViewModel : ViewModel() {
+
+    // 1. StateFlow for persistent UI state
+    private val _uiState = MutableStateFlow(ShopUiState(isLoading = true))
+    val uiState: StateFlow<ShopUiState> = _uiState.asStateFlow()
+
+    // 2. SharedFlow for one-time broadcast events (replay = 0 ensures no repeat on config change)
+    private val _eventFlow = MutableSharedFlow<NavigationEvent>(replay = 0)
+    val eventFlow: SharedFlow<NavigationEvent> = _eventFlow.asSharedFlow()
+
+    fun onProductClicked(id: String) {
+        viewModelScope.launch {
+            // Emits navigation event to collector
+            _eventFlow.emit(NavigationEvent.NavigateToDetails(id))
+        }
+    }
+}
+
+// In Fragment/Activity:
+class ShopActivity : AppCompatActivity() {
+    private val viewModel: ShopViewModel by viewModels()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        // Collecting Events
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.eventFlow.collect { event ->
+                    when (event) {
+                        is NavigationEvent.NavigateToDetails -> {
+                            // Navigate to details screen once!
+                            openDetails(event.productId)
+                        }
+                    }
+                }
+            }
+        }
+    }
+    private fun openDetails(id: String) {}
+}
+```
+
+Interview Tip :
+Summarize clearly: "`StateFlow` is for State (retained, conflated, has current value). `SharedFlow` is for Events (transient, configurable replay, no initial value needed)."
+
+What Interviewer Is Testing :
+- Distinguishing between State and Events.
+- Preventing the "re-executed event on rotation" bug.
+
+Key Points to Remember :
+- StateFlow replay = 1 and conflates.
+- SharedFlow replay can be 0.
+- StateFlow `equals` check avoids duplicate state emissions.
+
+Common Follow-up Questions :
+- Q: Why shouldn't you use `StateFlow` for navigation events?
+  A: Because StateFlow retains its latest value. If the user navigates, rotates the screen, and the Activity recreates, the collector will re-receive the navigation state and trigger the navigation a second time!
+
+Common Mistakes :
+- Setting `replay = 1` on `SharedFlow` for single-shot events, causing duplicate alerts on configuration changes.
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interviews, 2026. Deep dive comparison between StateFlow and SharedFlow.
+
+==============================================================================
+SENIOR / ADVANCED — REPORTED
+==============================================================================
+
+------------------------------------------------------------------------
+
+21. [REPORTED] Question : What are the four Compose side-effect APIs?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+In Jetpack Compose, composable functions should ideally be pure and side-effect free. A Side-Effect is any operation that escapes the scope of a composable and affects external state (e.g., updating database, logging analytics, triggering network calls, starting a timer).
+
+The 4 primary Compose Side-Effect APIs:
+
+1. `LaunchedEffect(keys...)`:
+   - Purpose: Running suspend functions tied to the composition lifecycle.
+   - Behavior: Launches a coroutine when entering composition. If any `key` changes during recomposition, the existing coroutine is cancelled and a new one is launched. When leaving composition, the coroutine is cancelled.
+
+2. `DisposableEffect(keys...)`:
+   - Purpose: Side-effects requiring cleanup (registering/unregistering broadcast receivers, observers, sensors, or callbacks).
+   - Behavior: Runs when entered/keys change. Must provide an `onDispose { ... }` block that executes when the keys change or when the composable leaves composition.
+
+3. `SideEffect`:
+   - Purpose: Publishing Compose state changes to non-Compose objects (e.g., analytics trackers, external libraries).
+   - Behavior: Runs on *every* successful recomposition. It does NOT take keys and does not launch coroutines.
+
+4. `rememberCoroutineScope()`:
+   - Purpose: Obtaining a coroutine scope tied to composition to launch coroutines from within non-composable UI callbacks (such as `Button(onClick = { scope.launch { ... } })`).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+@Composable
+fun AdvancedSideEffectsDemo(
+    userId: String,
+    analytics: FirebaseAnalytics,
+    context: Context
+) {
+    // 1. rememberCoroutineScope: Scoped to composition, used in UI event handlers
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // 2. LaunchedEffect: Runs suspend work; re-triggered if userId changes
+    LaunchedEffect(userId) {
+        // Loads user data asynchronously
+        Log.d("Compose", "Loading data for user: $userId")
+    }
+
+    // 3. DisposableEffect: Clean registration and unregistration of listeners
+    DisposableEffect(context) {
+        val receiver = object : BroadcastReceiver() {
+            override fun onReceive(c: Context?, intent: Intent?) {
+                Log.d("Compose", "Connectivity changed")
+            }
+        }
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        context.registerReceiver(receiver, filter)
+
+        // Mandatory cleanup when leaving composition
+        onDispose {
+            context.unregisterReceiver(receiver)
+        }
+    }
+
+    // 4. SideEffect: Executed after EVERY successful recomposition to sync external state
+    SideEffect {
+        analytics.setUserProperty("current_user_id", userId)
+    }
+
+    Button(onClick = {
+        scope.launch {
+            snackbarHostState.showSnackbar("Action executed")
+        }
+    }) {
+        Text("Trigger Event")
+    }
+}
+```
+
+Interview Tip :
+Categorize them clearly by use case:
+- Suspend work -> `LaunchedEffect`
+- Cleanup required -> `DisposableEffect`
+- Non-coroutine sync after every recomposition -> `SideEffect`
+- Coroutines in UI event callbacks -> `rememberCoroutineScope`
+
+What Interviewer Is Testing :
+- Thorough mastery of Compose lifecycle and side-effect management.
+- Preventing memory leaks and unintended side effects during recomposition.
+
+Key Points to Remember :
+- Never launch coroutines directly in a Composable body without an effect wrapper.
+- `DisposableEffect` must always include `onDispose`.
+
+Common Follow-up Questions :
+- Q: What is the difference between `LaunchedEffect` and `rememberCoroutineScope`?
+  A: `LaunchedEffect` is itself a Composable and launches coroutines automatically upon entering composition. `rememberCoroutineScope` is a function that returns a `CoroutineScope` so you can launch coroutines manually inside callbacks like `onClick`.
+
+Common Mistakes :
+- Forgetting that `SideEffect` runs on EVERY recomposition, leading to spamming analytics if placed inappropriately.
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interview, 2026. The 4 Compose side-effect APIs.
+
+------------------------------------------------------------------------
+
+22. [REPORTED] Question : If a ViewModel uses SupervisorJob, how do failures propagate?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+In Kotlin Coroutines, the choice between a regular `Job` and a `SupervisorJob` completely alters failure propagation in the coroutine hierarchy:
+
+1. Standard `Job`:
+   - Two-way failure propagation (Bi-directional).
+   - If one child coroutine fails with an uncaught exception, it immediately cancels its parent Job.
+   - The parent Job then cancels all other running sibling coroutines.
+   - The entire coroutine tree collapses.
+
+2. `SupervisorJob`:
+   - One-way failure propagation (Uni-directional down only).
+   - If one child coroutine fails with an uncaught exception, it does NOT cancel its parent `SupervisorJob`.
+   - Consequently, sibling coroutines continue executing undisturbed.
+   - Cancellation from parent to children still works: If the parent `SupervisorJob` itself is cancelled (e.g., when the ViewModel is destroyed), all children are cancelled.
+
+Why `viewModelScope` uses `SupervisorJob`:
+Inside an Android `ViewModel`, multiple independent user operations occur concurrently (e.g., fetching profile data and fetching notification badges). If fetching notification badges fails with a network exception, we do NOT want that to cancel the active profile data download. Therefore, `viewModelScope` is internally configured with `SupervisorJob() + Dispatchers.Main.immediate`.
+
+Crucial Exception Handling Gotcha:
+A `SupervisorJob` only isolates failure; it does NOT suppress or swallow exceptions! An uncaught exception in a child `launch` will still reach the thread's default UncaughtExceptionHandler and CRASH the app unless caught with `try-catch` or a `CoroutineExceptionHandler`.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+class SupervisorJobDemoViewModel : ViewModel() {
+
+    // Custom scope demonstration showing SupervisorJob mechanics
+    private val customScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
+    fun executeIndependentTasks() {
+        // Child 1: Fails with RuntimeException
+        customScope.launch {
+            println("Child 1 started")
+            throw RuntimeException("Child 1 failed!")
+            // Child 1 dies, but does NOT cancel customScope or Child 2
+        }
+
+        // Child 2: Sibling task
+        customScope.launch {
+            println("Child 2 started")
+            delay(1000)
+            println("Child 2 completed successfully!") // WILL execute!
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        customScope.cancel() // Cancels all children when ViewModel is destroyed
+    }
+}
+```
+
+Interview Tip :
+State this critical nuance: "A `SupervisorJob` prevents sibling cancellation, but it does NOT catch exceptions. If you don't handle the child exception, the application will still crash via the thread's `UncaughtExceptionHandler`."
+
+What Interviewer Is Testing :
+- Deep mechanics of Kotlin Coroutine hierarchy and exception propagation.
+- Why Android architecture components are designed with `SupervisorJob`.
+
+Key Points to Remember :
+- Standard Job: Child fails -> Parent fails -> All siblings cancelled.
+- SupervisorJob: Child fails -> Parent unaffected -> Siblings unaffected.
+- SupervisorJob does not catch or handle exceptions; it only alters propagation.
+
+Common Follow-up Questions :
+- Q: What happens if you do: `coroutineScope { launch { throw Exception() } }` vs `supervisorScope { launch { throw Exception() } }`?
+  A: In `coroutineScope`, the failing launch cancels all other siblings in the scope and rethrows. In `supervisorScope`, siblings are not cancelled.
+
+Common Mistakes :
+- Believing `SupervisorJob()` prevents crashes without implementing exception handling.
+- Passing `SupervisorJob()` as a parameter to `launch(SupervisorJob())` — this creates an orphaned job that breaks structured cancellation!
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interview, 2026. SupervisorJob failure propagation mechanics.
+
+------------------------------------------------------------------------
+
+23. [REPORTED] Question : How would you create your own CoroutineScope inside an Android Service?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+An Android `Service` is a lifecycle-governed component that runs on the **Main thread** by default. To execute asynchronous background tasks safely inside a Service without memory leaks or orphaned threads, you must manage a custom `CoroutineScope` following structured concurrency.
+
+Architecture Requirements:
+1. Lifecycle-bound Scope: The scope must be created with a `SupervisorJob()` so individual task failures don't kill the entire Service prematurely.
+2. Context Composition: Combine `SupervisorJob()` with an appropriate dispatcher (e.g., `Dispatchers.Default` or `Dispatchers.IO`).
+3. Explicit Cancellation: When the Service is destroyed (`onDestroy()`), you MUST call `serviceScope.cancel()` to cleanly terminate all background jobs, preventing leaks of Service context.
+4. For Foreground Services: If doing long-running user-critical tasks (uploading, media playback, location tracking), show a persistent Notification and call `startForeground()` within Android OS time limits (under 10s on Android 12+).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+class FileSyncService : Service() {
+
+    // 1. Create lifecycle-bound CoroutineScope
+    private val serviceJob = SupervisorJob()
+    private val serviceScope = CoroutineScope(serviceJob + Dispatchers.IO)
+
+    override fun onBind(intent: Intent?): IBinder? = null
+
+    override fun onCreate() {
+        super.onCreate()
+        Log.d("FileSyncService", "Service created")
+    }
+
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        val fileUrl = intent?.getStringExtra("FILE_URL") ?: return START_NOT_STICKY
+
+        // 2. Launch background work in managed scope
+        serviceScope.launch {
+            try {
+                performDownload(fileUrl)
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                Log.e("FileSyncService", "Download failed", e)
+            } finally {
+                // Stop service once task finishes (if appropriate)
+                stopSelf(startId)
+            }
+        }
+
+        return START_NOT_STICKY
+    }
+
+    private suspend fun performDownload(url: String) {
+        // Simulating heavy download
+        delay(3000)
+        Log.d("FileSyncService", "Downloaded $url")
+    }
+
+    // 3. MANDATORY: Clean up and cancel all coroutines when Service is destroyed
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel() // Cancels all child coroutines immediately!
+        Log.d("FileSyncService", "Service destroyed and scope cancelled")
+    }
+}
+```
+
+Interview Tip :
+Highlight cleanup: "The most important detail is overriding `onDestroy()` and calling `serviceScope.cancel()`. Failing to do so leaks the Service context and leaves background coroutines running forever."
+
+What Interviewer Is Testing :
+- Background processing fundamentals in Android.
+- Lifecycle management outside of Activity/Fragment (Services).
+- Preventing memory leaks in headless components.
+
+Key Points to Remember :
+- Services run on the Main thread by default.
+- Always cancel custom scopes in `onDestroy()`.
+- Use `SupervisorJob` so one failed file sync doesn't crash other pending syncs.
+
+Common Follow-up Questions :
+- Q: When should you use WorkManager instead of a Service with a CoroutineScope?
+  A: Use `WorkManager` for all deferrable background work that must survive app death or device reboots. Use a Foreground Service only for immediate, user-facing active tasks like audio playback, navigation, or active camera streaming.
+
+Common Mistakes :
+- Doing synchronous blocking operations directly in `onStartCommand()`, causing an ANR.
+- Using `GlobalScope.launch` inside a Service.
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interview, 2026. Custom CoroutineScope implementation in Android Service.
+
+------------------------------------------------------------------------
+
+24. [REPORTED] Question : How would you pass data from one Composable to another without parameter drilling?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+"Parameter drilling" occurs when intermediate composables must accept and pass down properties that only a deeply nested child needs, cluttering function signatures and tightly coupling components.
+
+Senior-Level Strategies to Avoid Parameter Drilling:
+
+1. Shared ViewModel (Recommended for Feature Screens):
+   - Scope a ViewModel to the parent navigation graph or host Activity using Jetpack Navigation Compose.
+   - Deeply nested child composables retrieve the same ViewModel instance via `hiltViewModel()` or `viewModel(viewModelStoreOwner)`.
+
+2. CompositionLocal (For Ambient, Cross-Cutting Dependencies):
+   - `CompositionLocal` allows data to be passed implicitly down the composition tree without explicit parameters.
+   - Use `staticCompositionLocalOf` (rarely changing data like Themes, Design tokens) or `compositionLocalOf` (changing data).
+   - Standard examples: `LocalContext`, `LocalColorScheme`, `LocalContentColor`.
+   - Caution: Do not abuse for ordinary business state; it hides dependencies and makes previewing difficult.
+
+3. Slot APIs & Component Composition (Clean UI Pattern):
+   - Instead of passing raw data down through multiple containers, use Slot APIs (`content: @Composable () -> Unit`). The parent configures the child directly, eliminating intermediate parameter passing.
+
+4. State Holders / Scoped UI State:
+   - Encapsulate related UI parameters into a dedicated state holder class (`rememberMyScreenState()`).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// --- SOLUTION 1: CompositionLocal for Ambient Data ---
+data class AppUserPermissions(val canEdit: Boolean, val canDelete: Boolean)
+
+// Define CompositionLocal
+val LocalUserPermissions = staticCompositionLocalOf<AppUserPermissions> {
+    error("No permissions provided")
+}
+
+@Composable
+fun MainAppScreen() {
+    val permissions = remember { AppUserPermissions(canEdit = true, canDelete = false) }
+
+    // Provide the value down the tree implicitly
+    CompositionLocalProvider(LocalUserPermissions provides permissions) {
+        DeepContainer()
+    }
+}
+
+@Composable
+fun DeepContainer() {
+    // Notice: DeepContainer does NOT need to accept permissions as a parameter!
+    DeepNestedChild()
+}
+
+@Composable
+fun DeepNestedChild() {
+    // Consume implicitly
+    val permissions = LocalUserPermissions.current
+
+    if (permissions.canEdit) {
+        Button(onClick = { /* edit */ }) { Text("Edit Item") }
+    }
+}
+
+// --- SOLUTION 2: Slot API Pattern (Decoupled Layouts) ---
+@Composable
+fun PageLayout(
+    header: @Composable () -> Unit,
+    content: @Composable () -> Unit
+) {
+    Column {
+        header()
+        content()
+    }
+}
+```
+
+Interview Tip :
+Advise caution: "While `CompositionLocal` solves parameter drilling, Google recommends using it only for truly ambient data (theming, analytics, permissions). For feature state, prefer Shared ViewModels or Slot APIs to keep dependencies explicit."
+
+What Interviewer Is Testing :
+- Compose architectural patterns and component composition.
+- Knowledge of `CompositionLocal` and its trade-offs.
+- API design skills (Slot pattern).
+
+Key Points to Remember :
+- Slot APIs allow parents to pass UI blocks directly.
+- `CompositionLocalProvider` supplies ambient variables.
+- Shared ViewModels scoped to `NavBackStackEntry` coordinate screens.
+
+Common Follow-up Questions :
+- Q: What is the difference between `compositionLocalOf` and `staticCompositionLocalOf`?
+  A: Changing a value in `staticCompositionLocalOf` causes the *entire* content tree beneath the provider to recompose. In `compositionLocalOf`, only the composables that explicitly read `.current` are recomposed.
+
+Common Mistakes :
+- Using `CompositionLocal` for business state, turning Compose into a tangled mess of implicit globals.
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interview, 2026. Passing data in Compose without parameter drilling.
+
+------------------------------------------------------------------------
+
+25. [REPORTED] Question : How does data flow through a Jetpack Compose application?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+Jetpack Compose is built on the strict architectural principle of **Unidirectional Data Flow (UDF)**. In UDF, state flows in only one direction (down), and events flow in the opposite direction (up).
+
+The 4-Step Cycle of UDF in Compose:
+1. State Flow Down: The State Holder (usually a ViewModel) manages the single source of truth and exposes an immutable UI state (`StateFlow<UiState>`). This state flows downward into composable functions as function arguments.
+2. Rendering: Composables convert the received state into UI elements on the screen.
+3. Event Flow Up: User actions (button clicks, gestures, text input) are captured by the Composable and immediately emitted upward as lambdas/events (`onNameChanged`, `onItemClicked`) to the ViewModel.
+4. State Mutation: The ViewModel processes the event, executes business logic/use cases, and updates the `MutableStateFlow`. This emits a new immutable state, triggering intelligent Recomposition of only the affected composables.
+
+Why UDF is Essential:
+- Testability: ViewModels can be tested purely with unit tests without UI frameworks.
+- State Consistency: Eliminates synchronization bugs since there is only one source of truth.
+- Decoupling: Composables remain stateless, reusable, and previewable.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// 1. Immutable State
+data class TaskListUiState(
+    val tasks: List<String> = emptyList(),
+    val newTaskInput: String = ""
+)
+
+// 2. ViewModel managing State and handling Events
+class TaskViewModel : ViewModel() {
+    private val _uiState = MutableStateFlow(TaskListUiState())
+    val uiState: StateFlow<TaskListUiState> = _uiState.asStateFlow()
+
+    fun onInputChanged(newText: String) {
+        _uiState.update { it.copy(newTaskInput = newText) }
+    }
+
+    fun onAddTask() {
+        _uiState.update { current ->
+            if (current.newTaskInput.isNotBlank()) {
+                current.copy(
+                    tasks = current.tasks + current.newTaskInput,
+                    newTaskInput = ""
+                )
+            } else current
+        }
+    }
+}
+
+// 3. UI Layer (State flows DOWN, Events flow UP)
+@Composable
+fun TaskScreen(viewModel: TaskViewModel = viewModel()) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    TaskContent(
+        state = state,
+        onInputChange = viewModel::onInputChanged, // Event UP
+        onAddTask = viewModel::onAddTask           // Event UP
+    )
+}
+
+// Stateless Composable
+@Composable
+fun TaskContent(
+    state: TaskListUiState,                     // State DOWN
+    onInputChange: (String) -> Unit,           // Event UP
+    onAddTask: () -> Unit                      // Event UP
+) {
+    Column(modifier = Modifier.padding(16.dp)) {
+        OutlinedTextField(
+            value = state.newTaskInput,
+            onValueChange = onInputChange,
+            label = { Text("New Task") }
+        )
+        Button(onClick = onAddTask) {
+            Text("Add")
+        }
+        LazyColumn {
+            items(state.tasks) { task ->
+                Text(text = task, modifier = Modifier.padding(8.dp))
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Draw or verbalize the loop clearly: "State flows DOWN from ViewModel to UI; Events flow UP from UI to ViewModel. UI never directly mutates state."
+
+What Interviewer Is Testing :
+- Deep understanding of Unidirectional Data Flow (UDF).
+- Separation of UI from state logic.
+- Idiomatic Compose architecture.
+
+Key Points to Remember :
+- UI is a projection of State: `UI = f(State)`.
+- Composables are listeners for State and emitters of Events.
+
+Common Follow-up Questions :
+- Q: What happens if a Composable directly modifies a list property passed to it?
+  A: Compose won't detect the internal mutation of a mutable list, so recomposition won't trigger. State must always be updated immutably using new instance copies.
+
+Common Mistakes :
+- Passing `MutableStateFlow` directly into composable functions instead of immutable state and callback lambdas.
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interview, 2026. Data flow patterns in Jetpack Compose.
+
+------------------------------------------------------------------------
+
+26. [REPORTED] Question : Why would you choose Coroutines over AsyncTask/asynchronous task-based approaches?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+`AsyncTask` was introduced in Android 1.5 and officially deprecated in Android 11 (API 30). Comparing Coroutines to `AsyncTask` highlights the evolution of modern concurrency in Android.
+
+Flaws of AsyncTask:
+1. Severe Memory Leaks: `AsyncTask` was typically defined as an inner class of an Activity/Fragment, implicitly holding a strong reference to the Activity. If an orientation change occurred during execution, the destroyed Activity remained leaked in memory.
+2. Lifecycle Disconnect: `AsyncTask` had no native understanding of Android lifecycles. It would continue executing even after the host Activity was destroyed.
+3. Thread Pool Starvation: By default (from Android 3.2 onward), `AsyncTask` executed tasks on a single static `SERIAL_EXECUTOR`. One long-running or stalled task blocked all other `AsyncTasks` in the entire application!
+4. Boilerplate & Callback Hell: Required implementing `doInBackground`, `onProgressUpdate`, `onPostExecute`, resulting in fragmented, hard-to-read code.
+
+Why Coroutines Are Superior:
+1. Structured Concurrency: Coroutines are bound to explicit lifecycles (`viewModelScope`, `lifecycleScope`). Cancellation is automatic and hierarchical.
+2. Lightweight: Coroutines are cooperative user-space abstractions. Thousands of coroutines can run concurrently on a tiny pool of underlying OS threads without thread creation overhead.
+3. Sequential, Readable Code: Asynchronous suspend functions look and read like synchronous imperative code, eliminating nested callbacks.
+4. Robust Cancellation: Built-in cooperative cancellation mechanism propagates through the entire job tree.
+5. First-Class Testing: Full test control via `TestDispatcher` and virtual time control (`advanceUntilIdle`).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// The Modern Coroutine Approach vs AsyncTask
+
+class UserRepository(
+    private val api: UserApiService,
+    private val db: UserDao,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+
+    // Clean, readable, sequential async code with zero memory leaks
+    suspend fun loadUserData(userId: String): UserProfile = withContext(ioDispatcher) {
+        // Step 1: Query local DB
+        val localUser = db.getUser(userId)
+        if (localUser != null) return@withContext localUser.toDomain()
+
+        // Step 2: Fetch from network
+        val remoteUser = api.fetchUser(userId)
+
+        // Step 3: Save to DB
+        db.insertUser(remoteUser.toEntity())
+
+        remoteUser.toDomain()
+    }
+}
+
+// In ViewModel:
+class UserViewModel(private val repo: UserRepository) : ViewModel() {
+
+    fun fetchUser(id: String) {
+        // Tied to ViewModel lifecycle: Automatically cancelled if user leaves screen!
+        viewModelScope.launch {
+            try {
+                val profile = repo.loadUserData(id)
+                // Update UI state safely
+            } catch (e: Exception) {
+                // Handle failure
+            }
+        }
+    }
+}
+```
+
+Interview Tip :
+Summarize with the 3 major wins: "1. Structured concurrency prevents memory leaks. 2. Suspension eliminates thread-pool exhaustion. 3. Sequential code style eliminates callback hell."
+
+What Interviewer Is Testing :
+- Historical context of Android development.
+- Understanding of concurrency pitfalls (thread starvation, memory leaks).
+- Advantages of Kotlin Coroutines.
+
+Key Points to Remember :
+- AsyncTask leaked activities and starved threads with its serial executor.
+- Coroutines use cooperative suspension and automatic lifecycle scoping.
+
+Common Follow-up Questions :
+- Q: What replaced `AsyncTaskLoader`?
+  A: ViewModel combined with Coroutines / Flow.
+
+Common Mistakes :
+- Stating merely that "Coroutines are faster threads" (Coroutines are NOT threads; they are tasks scheduled on thread pools).
+
+Source Evidence :
+Interview report: Glassdoor Senior Android Developer interview, 2026. Deep comparison of Coroutines vs AsyncTask.
+
+------------------------------------------------------------------------
+
+27. [REPORTED TOPIC] Question : Solve Android programming problems as part of the technical interview.
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+Senior Android live coding interviews typically test three dimensions:
+1. Functional Kotlin transformations (Collections, sequence manipulation, grouping).
+2. Concurrency handling (Coroutines, Debouncing, Parallel async, Mutex).
+3. Defensive production design (Error handling, immutability, thread-safety).
+
+Common Senior Coding Problem Pattern:
+"Implement an in-memory caching repository with a debounce search mechanism that makes concurrent network calls, merges results, and handles thread-safe cache updates."
+
+Key Senior Coding Habits to Demonstrate:
+- Clarify edge cases before writing code (null values, network failures, empty queries).
+- Use `StateFlow` / `Flow` with operators like `debounce()`, `distinctUntilChanged()`, and `flatMapLatest()`.
+- Use `Mutex` or atomic references if synchronization is required.
+- Ensure proper dispatcher management (`Dispatchers.IO`).
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// Problem: Build a Thread-Safe Search Repository with Debounce and In-Memory Cache
+
+data class SearchResult(val query: String, val results: List<String>)
+
+interface SearchApi {
+    suspend fun search(query: String): List<String>
+}
+
+class SearchRepository(
+    private val api: SearchApi,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
+) {
+    // Thread-safe in-memory cache protected by Mutex
+    private val cache = mutableMapOf<String, List<String>>()
+    private val mutex = Mutex()
+
+    suspend fun search(query: String): List<String> = withContext(ioDispatcher) {
+        val trimmedQuery = query.trim()
+        if (trimmedQuery.isEmpty()) return@withContext emptyList()
+
+        // 1. Check cache with thread-safe lock
+        mutex.withLock {
+            cache[trimmedQuery]?.let {
+                return@withContext it
+            }
+        }
+
+        // 2. Fetch from network
+        val networkResults = api.search(trimmedQuery)
+
+        // 3. Update cache thread-safely
+        mutex.withLock {
+            cache[trimmedQuery] = networkResults
+        }
+
+        networkResults
+    }
+}
+
+// In ViewModel: Reactive debounce pipeline
+class SearchViewModel(
+    private val repository: SearchRepository
+) : ViewModel() {
+
+    private val searchQuery = MutableStateFlow("")
+
+    val searchResults: StateFlow<List<String>> = searchQuery
+        .debounce(300) // Wait 300ms after user stops typing
+        .filter { it.isNotBlank() }
+        .distinctUntilChanged() // Ignore if same query emitted
+        .flatMapLatest { query ->
+            flow {
+                emit(repository.search(query))
+            }
+        }
+        .flowOn(Dispatchers.IO)
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
+    fun onQueryChanged(newQuery: String) {
+        searchQuery.value = newQuery
+    }
+}
+```
+
+Interview Tip :
+When live coding: Always explain your reasoning out loud. Mention `flatMapLatest` to explain how stale network requests from older keystrokes are automatically cancelled when a new keystroke arrives!
+
+What Interviewer Is Testing :
+- Live problem solving under pressure.
+- Knowledge of advanced Flow operators (`debounce`, `distinctUntilChanged`, `flatMapLatest`).
+- Concurrency and thread safety (`Mutex`).
+
+Key Points to Remember :
+- `flatMapLatest` cancels the previous upstream request when a new item arrives.
+- `Mutex` is non-blocking coroutine-safe synchronization (replaces Java `synchronized`).
+
+Common Follow-up Questions :
+- Q: Why use `Mutex` instead of Java's `synchronized` keyword in coroutines?
+  A: `synchronized` blocks the underlying OS thread, whereas `Mutex.withLock` suspends the coroutine, freeing the thread to perform other work.
+
+Common Mistakes :
+- Using `synchronized` inside suspend functions.
+- Forgetting to handle empty/blank query edge cases.
+
+Source Evidence :
+Interview report: Ascendion, Senior Android Developer, June 2026. Practical programming round covering data transformation and concurrency.
+
+------------------------------------------------------------------------
+
+28. [REPORTED TOPIC] Question : Explain the latest Android technology stack you have worked with.
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+For a Senior Android Developer in 2026, the discussion of the "latest stack" must center on production scalability, modularization, build performance, and cross-platform readiness.
+
+Comprehensive Modern Stack Breakdown:
+1. UI & Design System:
+   - Jetpack Compose with Material 3 (Material You Dynamic Color).
+   - Compose Multiplatform (CMP) readiness for shared UI code.
+   - Compose Destinations or Type-Safe Jetpack Navigation.
+2. Architecture & Concurrency:
+   - Clean Architecture with feature-based multi-module setup (`:core:network`, `:core:database`, `:feature:auth`, `:feature:feed`).
+   - Kotlin Coroutines & Flow for end-to-end reactive pipelines.
+3. Dependency Injection:
+   - Hilt / Dagger 2 with Assisted Injection for ViewModels (`@AssistedInject`).
+4. Networking & Persistence:
+   - Ktor Client or Retrofit with KotlinX Serialization (eliminates reflection overhead).
+   - Room 2.6+ with SQLite KMP support.
+   - DataStore Preferences/Proto for settings.
+5. Quality, CI/CD & Observability:
+   - Gradle Version Catalogs (`libs.versions.toml`) with convention plugins.
+   - Baseline Profiles for 30%+ faster app startup and smooth frame rendering.
+   - LeakCanary for memory leak detection, Firebase Crashlytics & Performance Monitoring.
+
+Concrete Production-Grade Multi-Module Gradle Example :
+```toml
+# Gradle Version Catalog: gradle/libs.versions.toml
+[versions]
+kotlin = "2.0.0"
+agp = "8.5.0"
+composeBom = "2024.06.00"
+hilt = "2.51.1"
+room = "2.6.1"
+
+[libraries]
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3" }
+hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hilt" }
+room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
+room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
+
+[plugins]
+android-application = { id = "com.android.application", version.ref = "agp" }
+kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
+```
+
+```kotlin
+// Production Baseline Profile Generator Class
+class BaselineProfileGenerator {
+    @get:Rule
+    val baselineProfileRule = BaselineProfileRule()
+
+    @Test
+    fun generateBaselineProfile() = baselineProfileRule.collect(
+        packageName = "com.example.app"
+    ) {
+        pressHome()
+        startActivityAndWait()
+        // Simulate critical user journey to pre-compile DEX bytecode
+        device.waitForIdle()
+    }
+}
+```
+
+Interview Tip :
+Stand out by mentioning **Baseline Profiles**: "We added Baseline Profiles to our build pipeline, which pre-compiles ART bytecode for critical user journeys, reducing cold app startup time by 35%."
+
+What Interviewer Is Testing :
+- Broad industry awareness and modern tooling expertise.
+- Understanding of build performance (Gradle Version Catalogs, convention plugins).
+- Scalability through modularization.
+
+Key Points to Remember :
+- Modularization by feature isolates build changes and speeds up parallel compilation.
+- Baseline Profiles improve app startup and scroll performance.
+
+Common Follow-up Questions :
+- Q: How does Kotlin 2.0 change Jetpack Compose builds?
+  A: Kotlin 2.0 integrates the Compose Compiler directly into the main Kotlin compiler repository, eliminating version mismatch issues between Kotlin and Compose.
+
+Common Mistakes :
+- Listing popular libraries without understanding how they fit into a modular architecture.
+
+Source Evidence :
+Interview report: Brillio, Senior Android Developer, June 2026. Discussion on the latest Android tech stack and architecture.
+
+------------------------------------------------------------------------
+
+29. [REPORTED TOPIC] Question : How would you handle a state-related bug in a Compose/MVVM application?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+In a Senior interview, resolving a state bug requires demonstrating an understanding of Compose’s snapshot state system and recomposition mechanics:
+
+Common Advanced Compose State Bugs:
+1. Recomposition Loops: Writing to a state inside a Composable without wrapping it in an effect, triggering an infinite recomposition loop.
+2. Lost Updates / Stale Closures: Capturing an unstable variable inside a long-running coroutine or lambda without updating the reference.
+3. Unstable Class Recompositions: Compose re-evaluating composables that should have been skipped because a parameter class is inferred as `unstable` (e.g., standard `List<T>` from `java.util`).
+
+Resolution Protocol:
+1. Inspect Layout Inspector: Use Android Studio Layout Inspector with Recomposition Counters to find which composable is recomposing continuously.
+2. Run Compose Compiler Metrics: Generate stability reports (`-Pmyapp.enableComposeCompilerReports=true`) to inspect which UI classes are marked as unstable.
+3. Mark Classes Stable: Wrap domain models with `@Immutable` or `@Stable`, or use KotlinX Immutable Collections (`ImmutableList<T>`).
+4. Enforce MVI / Unidirectional State: Ensure ViewModel exposes a single, atomically updated data class.
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// Problem: Standard List causes Compose to re-run recomposition on every parent recompose
+// because standard Kotlin List is an interface that cannot guarantee immutability to the compiler.
+
+// 1. Mark State Immutable or use ImmutableList
+@Immutable
+data class OrderHistoryUiState(
+    val orders: ImmutableList<OrderModel> = persistentListOf(),
+    val isLoading: Boolean = false
+)
+
+@HiltViewModel
+class OrderHistoryViewModel @Inject constructor(
+    private val repository: OrderRepository
+) : ViewModel() {
+
+    private val _uiState = MutableStateFlow(OrderHistoryUiState(isLoading = true))
+    val uiState: StateFlow<OrderHistoryUiState> = _uiState.asStateFlow()
+
+    init {
+        loadOrders()
+    }
+
+    private fun loadOrders() {
+        viewModelScope.launch {
+            repository.getOrders()
+                .collect { orderList ->
+                    // Atomic update using immutable collections
+                    _uiState.update {
+                        it.copy(
+                            orders = orderList.toImmutableList(),
+                            isLoading = false
+                        )
+                    }
+                }
+        }
+    }
+}
+
+// 2. Composable that properly skips recomposition when orders have not changed
+@Composable
+fun OrderHistoryList(
+    state: OrderHistoryUiState,
+    onOrderClick: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(modifier = modifier) {
+        items(
+            items = state.orders,
+            key = { it.id } // ALWAYS supply key for lazy lists to prevent re-drawing
+        ) { order ->
+            OrderItemRow(order = order, onClick = onOrderClick)
+        }
+    }
+}
+```
+
+Interview Tip :
+Mention Compose Stability: "When diagnosing unexpected recompositions, I run the Compose Compiler Metrics report to check if my data models are flagged as Unstable due to standard `List` interfaces, and fix it using `@Immutable` or `ImmutableList`."
+
+What Interviewer Is Testing :
+- Advanced mastery of the Compose Compiler and Snapshot State system.
+- Recomposition debugging skills using Layout Inspector and Compiler Metrics.
+
+Key Points to Remember :
+- Always supply unique `key` parameters in `LazyColumn` items.
+- Standard `List` is considered unstable by default in Compose; use `@Immutable` or KotlinX Immutable Collections.
+
+Common Follow-up Questions :
+- Q: What makes a function "skippable" in Compose?
+  A: A composable function is skippable if all its parameters are stable and it has a restartable scope.
+
+Common Mistakes :
+- Forgetting item keys in `LazyColumn`, causing the entire list to re-render when an item is inserted or removed.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Case-study debugging of Compose/MVVM state issues.
+
+------------------------------------------------------------------------
+
+30. [REPORTED TOPIC] Question : How would you review or reason about networking code and logging in an Android application?
+   Level : Senior / Advanced
+
+Detailed Technical Answer :
+A Senior Android Developer reviewing networking and logging pull requests evaluates the code across five critical pillars:
+
+1. Architecture & Thread Safety:
+   - Is networking isolated in a Remote Data Source?
+   - Are suspend functions main-safe (e.g., using `Dispatchers.IO` or relying on Retrofit’s native suspend execution)?
+   - Are domain models separated from network DTOs?
+
+2. Security & Compliance (Non-negotiable):
+   - Certificate Pinning: Is `CertificatePinner` configured for sensitive payment/auth endpoints?
+   - Cleartext Traffic: Is HTTP strictly banned in `network_security_config.xml`?
+   - Log Redaction: Are headers (`Authorization`, `Cookie`, `X-Auth-Token`) and sensitive fields (passwords, card CVVs) completely redacted in logs?
+   - Release Builds: Are logging interceptors strictly disabled or limited to error status codes in Release builds?
+
+3. Resilience & Failure Modes:
+   - Are timeouts configured properly (Connect, Read, Write)?
+   - Does error handling respect Coroutines cancellation (`CancellationException` must be rethrown)?
+   - Is there backoff on retries to avoid overwhelming backends during outages?
+
+4. Bandwidth & Performance:
+   - Is HTTP response caching enabled with `Cache-Control`?
+   - Are large payloads compressed using GZIP?
+
+Concrete Production-Grade Kotlin Example :
+```kotlin
+// Production Code Review Standard: Secure, Resilient OkHttpClient Setup
+
+class NetworkReviewStandards {
+
+    fun provideSecureOkHttpClient(
+        context: Context,
+        isDebug: Boolean
+    ): OkHttpClient {
+        val cacheSize = 10L * 1024 * 1024 // 10 MB Cache
+        val cache = Cache(File(context.cacheDir, "http_cache"), cacheSize)
+
+        return OkHttpClient.Builder()
+            .cache(cache)
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .writeTimeout(20, TimeUnit.SECONDS)
+            // 1. Certificate Pinning for sensitive banking/auth APIs
+            .certificatePinner(
+                CertificatePinner.Builder()
+                    .add("api.example.com", "sha256/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=")
+                    .build()
+            )
+            // 2. Auth Interceptor adding tokens
+            .addInterceptor { chain ->
+                val original = chain.request()
+                val request = original.newBuilder()
+                    .header("Accept", "application/json")
+                    .header("User-Agent", "Android-App-1.0")
+                    .build()
+                chain.proceed(request)
+            }
+            // 3. Security-Compliant Logging Interceptor
+            .apply {
+                if (isDebug) {
+                    val loggingInterceptor = HttpLoggingInterceptor().apply {
+                        level = HttpLoggingInterceptor.Level.BODY
+                        redactHeader("Authorization")
+                        redactHeader("Cookie")
+                        redactHeader("Set-Cookie")
+                    }
+                    addInterceptor(loggingInterceptor)
+                }
+            }
+            .build()
+    }
+}
+```
+
+Interview Tip :
+Structure your code review framework into 3 clear buckets: "1. Security (Cert pinning, log redaction), 2. Resilience (timeouts, CancellationException propagation), 3. Architecture (main-safety, DTO separation)."
+
+What Interviewer Is Testing :
+- Senior code review standards and engineering rigor.
+- Security vulnerability awareness (OWASP Mobile Top 10).
+- Network resilience and performance optimization.
+
+Key Points to Remember :
+- Always redact sensitive headers and body data in log interceptors.
+- Never swallow `CancellationException`.
+- Use Certificate Pinning for sensitive endpoints.
+
+Common Follow-up Questions :
+- Q: What are the risks of Certificate Pinning and how do you mitigate them?
+  A: If a pinned server certificate expires or is revoked and the app does not have backup pins, all network calls will fail until the app is updated. Mitigation: Always include backup pins and support dynamic pin updates.
+
+Common Mistakes :
+- Approving PRs that catch `Exception` around network calls without rethrowing `CancellationException`.
+- Leaving unredacted `HttpLoggingInterceptor.Level.BODY` active in production release builds.
+
+Source Evidence :
+Interview report: Target, Software Engineer - Android. Code review standards for networking and logging interceptors.
+
+==============================================================================
+END OF VERIFIED ANDROID INTERVIEW QUESTIONS & COMPREHENSIVE ANSWERS
+==============================================================================

@@ -1,0 +1,396 @@
+Q1: What is Git and how does it differ from other version control systems?
+Q2: What is the difference between Git and GitHub?
+Q3: What is a Git repository?
+Q4: What is the difference between a local and a remote repository?
+Q5: What is a commit in Git?
+Q6: How do you create a new Git repository?
+Q7: What is a branch in Git?
+Q8: How do you create a new branch?
+Q9: What is the `HEAD` in Git?
+Q10: How do you check the status of your Git repository?
+Q11: What does `git add` do?
+Q12: What does `git commit` do?
+Q13: How do you view the commit history?
+Q14: What is the difference between `git log` and `git reflog`?
+Q15: How do you undo changes in Git?
+Q16: What is the difference between `git reset` and `git revert`?
+Q17: How do you delete a file from Git?
+Q18: What is a `.gitignore` file?
+Q19: How do you clone a repository?
+Q20: What is the difference between `git clone` and `git fork`?
+Q21: What is a remote in Git?
+Q22: How do you add a remote repository?
+Q23: What does `git push` do?
+Q24: What does `git pull` do?
+Q25: What is the difference between `git pull` and `git fetch`?
+Q26: How do you merge two branches?
+Q27: What is a fast-forward merge?
+Q28: What is a three-way merge?
+Q29: What is a merge conflict and how do you resolve it?
+Q30: How do you resolve a merge conflict manually?
+Q31: What is `git rebase` and when would you use it?
+Q32: What is an interactive rebase?
+Q33: How do you squash commits using rebase?
+Q34: What is a pull request (PR) in GitHub?
+Q35: What is the difference between a pull request and a merge request?
+Q36: What is the difference between a merge commit and a squash merge in GitHub?
+Q37: What is a detached HEAD state?
+Q38: How do you recover lost commits in Git?
+Q39: What is a tag in Git and how is it different from a branch?
+Q40: What are lightweight and annotated tags?
+Q41: How do you create a tag and push it to a remote?
+Q42: What is `git stash` and when would you use it?
+Q43: What is the difference between `git stash pop` and `git stash apply`?
+Q44: What is `git cherry-pick`?
+Q45: What is `git bisect` and how do you use it?
+Q46: What is `git blame`?
+Q47: What is a submodule? How do you add one?
+Q48: What is the difference between a submodule and a subtree?
+Q49: What is a Git hook? Name a few examples.
+Q50: What is the difference between `git merge --no-ff` and `git merge --ff-only`?
+Q51: What is the purpose of `git rm --cached`?
+Q52: How do you rename a branch in Git?
+Q53: What is the `git clean` command?
+Q54: How do you change the last commit message?
+Q55: How do you protect a branch in GitHub?
+Q56: What is the difference between `origin` and `upstream` in Git?
+Q57: How do you sync a forked repository with the original?
+Q58: What is a fork vs. a branch in GitHub?
+Q59: How do you submit a contribution to an open-source project on GitHub?
+Q60: What is the difference between a draft pull request and a regular pull request?
+Q61: You accidentally committed sensitive information (e.g., password) to a public repository. How do you fix it?
+Q62: How do you revert a commit that is already pushed?
+Q63: How do you undo a commit locally but keep the changes?
+Q64: How do you change a commit that is not the latest?
+Q65: What should you do if you encounter a 'merge conflict' during a rebase?
+Q66: How do you force push after a rebase?
+Q67: What is the difference between `git push --force` and `git push --force-with-lease`?
+Q68: How do you find out who deleted a file or a line?
+Q69: You have a large repository and want to clone it faster. What can you do?
+Q70: What is a shallow clone and when would you use it?
+Q71: What is a sparse checkout and how does it help?
+Q72: What is a partial clone?
+Q73: What is `git filter-repo` and how is it used?
+Q74: What is Git LFS (Large File Storage) and when would you use it?
+Q75: What is the Git object model? Name the four types of objects.
+Q76: What is a SHA-1 hash and how is it used in Git?
+Q77: How does Git store commits internally?
+Q78: What is the index (staging area) in Git?
+Q79: Explain the difference between a blob and a tree object.
+Q80: How do you create a GitHub Action that runs on push to the main branch?
+Q81: What are GitHub Workflow triggers (events)? Name a few.
+Q82: What is a GitHub Actions matrix strategy?
+Q83: How do you create a release in GitHub from a tag?
+Q84: How do you manage environment-specific secrets in GitHub Actions?
+Q85: How would you handle a situation where two developers have diverged branches and you need to get them back in sync?
+Q86: You need to include a hotfix directly into the main branch without waiting for a PR. How do you do it safely?
+Q87: How do you handle a situation where a PR is submitted with many commits but you want to clean it up before merging?
+Q88: How do you find and delete all branches that have been merged into main?
+Q89: How do you recover a deleted branch that hasn't been merged?
+Q90: What is the difference between a local branch and a remote-tracking branch?
+Q91: How do you set up Git to ignore a specific directory globally?
+Q92: How do you change the default branch from `master` to `main`?
+Q93: What is the purpose of `git show`?
+Q94: How do you create a merge commit even if a fast-forward is possible?
+Q95: What are the key steps in the recruitment process?
+Q96: What is the difference between direct sourcing and recruitment agencies?
+Q97: What is an employer brand and why is it important?
+Q98: How do you measure recruitment effectiveness?
+Q99: What is a recruitment funnel and how do you optimize it?
+Q100: What are the advantages and disadvantages of internal vs. external hiring?
+Q101: What is a structured interview and why is it more effective than unstructured?
+Q102: What is behavioral interviewing? Give an example of a behavioral question.
+Q103: What is a competency-based interview?
+Q104: How do you assess cultural fit during an interview?
+Q105: What is the role of HR in workforce planning?
+Q106: What are the different types of recruitment sources and when to use each?
+Q107: How do you reduce unconscious bias in the hiring process?
+Q108: What is an offer negotiation and how do you handle it?
+Q109: What are the key components of a job description?
+Q110: How do you handle a candidate who is overqualified for the role?
+Q111: What is a talent pipeline and how do you build one?
+Q112: What is the difference between headhunting and traditional recruiting?
+Q113: How do you improve the candidate experience?
+Q114: What is a job analysis and why is it important?
+Q115: What are the legal considerations in recruitment?
+Q116: How do you handle a high-volume recruitment drive?
+Q117: What is a referral program and how does it benefit recruitment?
+Q118: How do you onboard a new employee effectively?
+Q119: What is employee engagement and why is it important?
+Q120: What are the key drivers of employee engagement?
+Q121: How do you measure employee engagement?
+Q122: What is the difference between employee satisfaction and engagement?
+Q123: How would you handle an employee relations issue (e.g., conflict between two employees)?
+Q124: What is the difference between a grievance and a complaint?
+Q125: How do you investigate a workplace harassment complaint?
+Q126: What is a performance improvement plan (PIP)?
+Q127: How do you handle an employee who is underperforming?
+Q128: What are the key elements of a positive work culture?
+Q129: How do you build trust between employees and management?
+Q130: How do you manage a remote or hybrid workforce effectively?
+Q131: What are the key principles of diversity, equity, and inclusion (DEI) in the workplace?
+Q132: What is the importance of exit interviews?
+Q133: How do you handle an employee who resigns?
+Q134: What are the key components of an employee retention strategy?
+Q135: What is performance management and why is it important?
+Q136: What is the difference between performance management and performance appraisal?
+Q137: What are the key steps in the performance management cycle?
+Q138: What is a SMART goal? Give an example.
+Q139: How do you conduct a performance appraisal effectively?
+Q140: What is the role of HR in performance management?
+Q141: What are the common pitfalls in performance management?
+Q142: How do you handle an employee who disagrees with their performance rating?
+Q143: What is the importance of calibration in performance management?
+Q144: How do you link performance management to compensation?
+Q145: What is a developmental goal versus a performance goal?
+Q146: What is the importance of continuous feedback in performance management?
+Q147: What is the role of self-assessments in performance reviews?
+Q148: What is the difference between salary, wages, and total compensation?
+Q149: What is the purpose of a job evaluation?
+Q150: What is a salary range and how do you establish it?
+Q151: What is the difference between base pay and variable pay?
+Q152: What are the key principles of a fair compensation system?
+Q153: What are the common types of employee benefits?
+Q154: What is the difference between a defined benefit and a defined contribution retirement plan?
+Q155: How do you calculate the cost of an employee beyond salary?
+Q156: What is a merit increase and how is it determined?
+Q157: What is a pay grade and how is it used?
+Q158: What is the purpose of employee training and development?
+Q159: What is the difference between training and development?
+Q160: What is a training needs analysis (TNA) and why is it important?
+Q161: What are the different methods of training delivery?
+Q162: How do you measure the effectiveness of training?
+Q163: What is the difference between onboarding and orientation?
+Q164: What is a career development plan and how do you create one?
+Q165: What is the role of HR in leadership development?
+Q166: What is the difference between coaching and mentoring?
+Q167: How do you manage mandatory compliance training?
+Q168: What is a learning management system (LMS) and what are its benefits?
+Q169: How do you encourage a culture of continuous learning?
+Q170: What is the difference between a skill gap and a competency gap?
+Q171: What is strategic HRM (Human Resource Management)?
+Q172: What is the difference between HR strategy and HR operations?
+Q173: What is HR analytics and how can it be used?
+Q174: What are some key HR metrics and how do they impact business?
+Q175: What is workforce planning and why is it important?
+Q176: How do you manage change in an organization?
+Q177: What is the role of HR in mergers and acquisitions (M&A)?
+Q178: How do you align HR goals with organizational goals?
+Q179: How do you measure the ROI of HR initiatives?
+Q180: What is the importance of employee data privacy and how do you ensure it?
+Q181: What are the key employment laws HR must comply with?
+Q182: What is the difference between exempt and non-exempt employees under FLSA?
+Q183: What is the difference between discrimination, harassment, and retaliation?
+Q184: What are the key considerations for employee termination to avoid legal issues?
+Q185: What is the difference between an independent contractor and an employee?
+Q186: How do you ensure data privacy in HR records?
+Q187: What is an HRIS and what are its key features?
+Q188: What are the benefits of implementing an applicant tracking system (ATS)?
+Q189: How do you evaluate and select an HRIS?
+Q190: How do you use social media for employer branding and recruitment?
+Q191: What is the role of AI in HR (e.g., chatbots, resume screening)?
+Q192: How do you ensure data integrity in an HRIS?
+Q193: What is organizational development (OD) and what are its goals?
+Q194: What is the difference between organizational culture and climate?
+Q195: How do you assess organizational culture?
+Q196: What is the role of HR in change management?
+Q197: What are the common barriers to organizational change and how do you overcome them?
+Q198: What is the importance of employee feedback in organizational development?
+Q199: How do you foster a diverse and inclusive culture?
+Q200: What is the difference between a learning culture and a performance culture?
+Q201: What is the role of HR in promoting employee well-being?
+Q202: What is the purpose of an employee handbook?
+Q203: How do you handle payroll processing accurately?
+Q204: What is the importance of an HR audit?
+Q205: How do you handle employee records retention?
+Q206: What are the key considerations for a successful remote onboarding?
+Q207: How do you manage employee benefits administration?
+Q208: What is the difference between HR policy and HR procedure?
+Q209: What is the role of HR in risk management?
+Q210: How do you handle employee complaints about management?
+Q211: How do you handle employee requests for accommodations?
+Q212: What is the role of HR in succession planning?
+Q213: How do you manage employee transfers and promotions?
+Q214: What is the employee experience (EX) and why is it important?
+Q215: How is remote work changing HR practices?
+Q216: How do you prepare for the skills gap in your workforce?
+Q217: What are the main principles of Object-Oriented Programming (OOP)?
+Q218: What is the difference between an abstract class and an interface?
+Q219: Explain the difference between `String`, `StringBuilder`, and `StringBuffer`.
+Q220: What is the difference between `==` and `.equals()` in Java?
+Q221: What is method overloading and method overriding?
+Q222: What is the `static` keyword in Java?
+Q223: Explain the `final` keyword in Java.
+Q224: What is the `super` keyword used for?
+Q225: What is a constructor in Java?
+Q226: Can a constructor be `private`? What is the use of a private constructor?
+Q227: What is a package in Java and why is it used?
+Q228: What are primitive data types in Java? List them.
+Q229: What is type casting in Java? Explain upcasting and downcasting.
+Q230: What is an array in Java and how is it different from an `ArrayList`?
+Q231: Explain the Single Responsibility Principle (SRP).
+Q232: Explain the Open/Closed Principle.
+Q233: Explain the Liskov Substitution Principle (LSP).
+Q234: Explain the Interface Segregation Principle (ISP).
+Q235: Explain the Dependency Inversion Principle (DIP).
+Q236: What is the difference between composition and inheritance?
+Q237: What is the `volatile` keyword?
+Q238: What is polymorphism? Provide a real-world example.
+Q239: What is the difference between checked and unchecked exceptions?
+Q240: What is the `finally` block and is it always executed?
+Q241: What is the difference between `throw` and `throws`?
+Q242: What is a custom exception and why would you create one?
+Q243: How does exception handling work in method overriding?
+Q244: What is the try-with-resources statement?
+Q245: What is the Java Collections Framework? Name its core interfaces.
+Q246: What is the difference between `ArrayList` and `LinkedList`?
+Q247: How does `HashMap` work internally?
+Q248: What is the difference between `HashMap` and `HashTable`?
+Q249: What is the difference between `HashSet` and `TreeSet`?
+Q250: What is a `ConcurrentHashMap` and how does it differ from `HashMap`?
+Q251: What is the `Comparable` and `Comparator` interface?
+Q252: What is `Collection` vs `Collections` in Java?
+Q253: What is a `TreeMap` and how does it work?
+Q254: What are the differences between `List`, `Set`, and `Map`?
+Q255: What are the main features introduced in Java 8?
+Q256: What is a lambda expression in Java?
+Q257: What is a functional interface? Name a few examples.
+Q258: What is the `Optional` class in Java 8?
+Q259: Explain the Stream API in Java 8.
+Q260: What is the difference between `map` and `flatMap` in Streams?
+Q261: What is method reference in Java 8? Explain different types.
+Q262: What is the `default` keyword in interfaces?
+Q263: What is the `java.time` API?
+Q264: Explain the difference between `Stream.findFirst()` and `Stream.findAny()`.
+Q265: What is a `Collector` in Streams? Name a few common ones.
+Q266: What is the `Predicate` functional interface?
+Q267: What is the `Consumer` functional interface?
+Q268: What are the different ways to create a thread in Java?
+Q269: What is the difference between `Runnable` and `Callable`?
+Q270: What is the lifecycle of a thread in Java?
+Q271: What is the `synchronized` keyword used for?
+Q272: What is a `deadlock` and how can you prevent it?
+Q273: What is the difference between `wait()` and `sleep()`?
+Q274: What is `notify()` and `notifyAll()`?
+Q275: What is the `ExecutorService`?
+Q276: What is a `Future` in Java concurrency?
+Q277: What is `CompletableFuture`?
+Q278: What is `ThreadLocal` and when would you use it?
+Q279: What is a `Semaphore`?
+Q280: What is the difference between `ReentrantLock` and `synchronized`?
+Q281: What is `CountDownLatch`?
+Q282: What is a `CyclicBarrier`?
+Q283: What is a `ReentrantReadWriteLock`?
+Q284: What is the architecture of the Java Virtual Machine (JVM)?
+Q285: Explain the Java Memory Model (JMM).
+Q286: What is the JIT compiler and how does it work?
+Q287: What is the difference between Heap and Stack memory?
+Q288: What is garbage collection in Java? How does it work?
+Q289: What are the different garbage collectors available in Java?
+Q290: What is the `Metaspace` and how is it different from `PermGen`?
+Q291: How do you diagnose a memory leak in Java?
+Q292: What are `soft`, `weak`, and `phantom` references?
+Q293: What is a `ClassNotFoundException` and how is it different from `NoClassDefFoundError`?
+Q294: What is the `-Xmx` and `-Xms` JVM parameters?
+Q295: What is Spring Framework?
+Q296: What is Dependency Injection (DI) and how does Spring implement it?
+Q297: What is the Spring IoC Container?
+Q298: What is `@Autowired` in Spring?
+Q299: Explain the `@Component`, `@Service`, `@Repository`, and `@Controller` annotations.
+Q300: What is the difference between `@Bean` and `@Component`?
+Q301: What is Spring Boot? How does it simplify Spring development?
+Q302: What is the purpose of `application.properties` or `application.yml` in Spring Boot?
+Q303: What is a `@RestController` in Spring Boot?
+Q304: What is Aspect-Oriented Programming (AOP) in Spring?
+Q305: What are Spring Profiles?
+Q306: How does Spring manage transactions?
+Q307: What is a Spring Boot Starter?
+Q308: Explain the difference between `@ComponentScan` and `@EnableAutoConfiguration`.
+Q309: What is the Spring `ApplicationContext`?
+Q310: What is Spring `@RequestMapping`? What are its variants?
+Q311: What are `Spring Boot Actuator` endpoints?
+Q312: What is the difference between `@PathVariable` and `@RequestParam`?
+Q313: How does Spring Security work at a high level?
+Q314: What is `@Async` in Spring?
+Q315: What is JPA and Hibernate?
+Q316: Explain the concept of ORM (Object-Relational Mapping).
+Q317: What is Spring Data JPA?
+Q318: What is the difference between `JpaRepository` and `CrudRepository`?
+Q319: What are the different fetch strategies in JPA? (`EAGER` vs `LAZY`)
+Q320: What is the difference between `@Entity` and `@Table`?
+Q321: What is `@Transactional` in Spring and how does it work?
+Q322: What is the persistence context in JPA?
+Q323: What is the difference between `save()` and `saveAndFlush()` in Spring Data JPA?
+Q324: How do you define a custom query in Spring Data JPA?
+Q325: What is JUnit and how is it used?
+Q326: What is Mockito and how does it help in testing?
+Q327: What is the difference between `@Before` and `@BeforeClass` (or `@BeforeEach` and `@BeforeAll`)?
+Q328: What is `@SpringBootTest` used for?
+Q329: What is the difference between unit testing and integration testing?
+Q330: What is REST? Explain the principles.
+Q331: What are Microservices? What are their advantages and disadvantages?
+Q332: What is a `Docker` container? How does it relate to Java?
+Q333: What is the difference between a `Maven` and `Gradle`?
+Q334: What is a `WebSocket` and how is it different from REST?
+Q335: What is an API Gateway? Why is it used in microservices?
+Q336: What is a distributed transaction? How do you handle it in microservices?
+Q337: How do you handle security (JWT/OAuth2) in a Java REST API?
+Q338: What are the considerations for high availability and scalability in a Java application?
+Q339: What is the `SLF4J` and why is it used?
+Q340: What is a `Virtual Thread` vs a `Platform Thread`?
+Q341: What is the Singleton design pattern? How do you implement it in Java?
+Q342: What is the Factory design pattern?
+Q343: What is the Observer design pattern?
+Q344: What is the Strategy design pattern?
+Q345: What is the Builder design pattern? Why is it useful?
+Q346: What is the Decorator design pattern?
+Q347: Explain the Time Complexity of different `List` implementations in Java.
+Q348: What is a `PriorityQueue` in Java and how does it work?
+Q349: Explain the `Map` interface and its common implementations.
+Q350: What is a `BlockingQueue` and its common implementations?
+Q351: How do you handle large numbers in Java (beyond 64-bit)?
+Q352: What is a `var` keyword introduced in Java 10?
+Q353: What are Java `Records` (Java 14/16)?
+Q354: What is the `Optional` class and its common pitfalls?
+Q355: What is Spring Cloud?
+Q356: What is a Circuit Breaker pattern and how is it implemented in Java?
+Q357: Explain the Hibernate `Session` and how it differs from `EntityManager`.
+Q358: What is the N+1 query problem in Hibernate and how do you solve it?
+Q359: What is the difference between `FetchType.LAZY` and `FetchType.EAGER` performance implications?
+Q360: How do you create a custom exception in Java?
+Q361: What is logging and why is it important? Compare Log4j and SLF4J.
+Q362: How do you profile a Java application for performance bottlenecks?
+Q363: What are `InputStream` and `OutputStream` in Java?
+Q364: What is the NIO (New I/O) package?
+Q365: Describe a challenging Java project you have worked on.
+Q366: How do you prioritize between performance and code readability?
+Q367: What is JavaScript and what are its main features?
+Q368: What is the difference between JavaScript and ECMAScript?
+Q369: What are the primitive data types in JavaScript?
+Q370: What is the difference between `null` and `undefined`?
+Q371: What is type coercion in JavaScript?
+Q372: What is the difference between `==` and `===`?
+Q373: What is the `typeof` operator?
+Q374: How do you declare variables in JavaScript?
+Q375: What is hoisting?
+Q376: What are the different ways to create objects?
+Q377: What is the `this` keyword?
+Q378: What are the different ways to handle `this`?
+Q379: What is a closure?
+Q380: What is the `scope` in JavaScript?
+Q381: What is the difference between function declaration and function expression?
+Q382: What is an arrow function?
+Q383: What are the differences between arrow functions and regular functions?
+Q384: What is an IIFE (Immediately Invoked Function Expression)?
+Q385: What is the `arguments` object?
+Q386: What are rest parameters and spread syntax?
+Q387: What is higher-order function?
+Q388: What are callbacks?
+Q389: What is the difference between synchronous and asynchronous code?
+Q390: What is a promise?
+Q391: What is the difference between a callback and a promise?
+Q392: What is `async/await`?
+Q393: What is the event loop?
+Q394: What are microtasks and macrotasks?
+Q395: What is the `setTimeout` function and how does it work?
+Q396: What is the `setInterval` function?

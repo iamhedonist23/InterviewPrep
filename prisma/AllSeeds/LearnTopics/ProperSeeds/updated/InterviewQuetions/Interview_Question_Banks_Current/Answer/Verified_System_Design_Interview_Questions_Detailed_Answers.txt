@@ -1,0 +1,3104 @@
+SYSTEM DESIGN INTERVIEW QUESTIONS — DETAILED INTERVIEW-READY ANSWERS
+
+Purpose
+
+The supplied file contains 71 level-wise system-design prompts grouped
+into Freshers/Junior, Mid-Level, and Advanced/Senior/Staff. The source
+describes them as realistic interview-style prompts and explicitly
+states that they are not guaranteed company questions. This version
+expands each supplied prompt without converting broad prompts into
+unsupported company-specific claims.
+
+Answer structure
+
+Each question includes: Answer, Example, Interview Tip, What Interviewer
+Is Testing, Key Points to Remember, Common Follow-up Questions, and
+Common Mistakes.
+
+==================================================================================
+
+1.  [TinyURL] Design a URL shortening service. What are the
+    requirements, data model, short-key generation strategy, and
+    redirect flow? Level: Freshers / Junior
+
+Answer: Design the service around a write path that creates a unique
+short key and a read path that resolves that key to the original URL.
+Store the mapping in a durable database, cache hot mappings, and put the
+redirect service behind load balancers. The short key can be generated
+from a unique numeric ID encoded with Base62. Define expiration, abuse
+protection, analytics requirements, and availability targets before
+choosing storage.
+
+Example: Example: POST /shorten with a long URL returns
+https://short.example/Ab3X9. GET /Ab3X9 looks up the key in cache first,
+then durable storage, and returns a redirect.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How would you generate IDs at multiple
+regions? How would you prevent abuse and malicious redirects?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+2.  [TinyURL] How would you generate unique short URLs using sequential
+    IDs, Base62, or hashing? What collision issues arise? Level:
+    Freshers / Junior
+
+Answer: A sequential numeric ID followed by Base62 encoding is simple
+and avoids collisions when the ID is unique. Hashing a long URL can
+create collisions unless the hash is sufficiently controlled and
+collision handling is added. Random keys also require uniqueness checks.
+In an interview, compare predictability, key length, coordination, and
+collision behavior rather than assuming hashing is automatically better.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How would you generate IDs at multiple
+regions? How would you prevent abuse and malicious redirects?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+3.  [TinyURL] A shortened URL becomes extremely popular. How would you
+    keep redirects fast and protect the database? Level: Freshers /
+    Junior
+
+Answer: Treat a viral URL as a hot key. Cache the short-key-to-long-URL
+mapping close to the redirect service, use CDN/edge caching where
+appropriate, and protect the database with cache-aside or read-through
+behavior. Replicas and horizontal scaling can absorb sustained load;
+request coalescing can reduce a thundering herd when a hot cache entry
+expires.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How would you generate IDs at multiple
+regions? How would you prevent abuse and malicious redirects?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+4.  [TinyURL] How would you handle duplicate long URLs, URL expiration,
+    and deletion? Level: Freshers / Junior
+
+Answer: Decide whether duplicate long URLs should return the same short
+key or receive separate keys. If deduplication is required, enforce it
+with a normalized URL representation plus a uniqueness constraint.
+Expiration can be represented by an expiry timestamp, while deletion
+should define whether the key is permanently invalid or reusable. Avoid
+reusing keys casually because stale caches and old links can create
+ambiguity.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How would you generate IDs at multiple
+regions? How would you prevent abuse and malicious redirects?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+5.  [Rate Limiter] Design a rate limiter for an HTTP API. What happens
+    when a client exceeds its limit? Level: Freshers / Junior
+
+Answer: The supplied question identifies the system-design topic but
+does not provide a complete company-specific interview transcript. A
+strong answer should begin with requirements and scale assumptions,
+define APIs/data model, propose the high-level architecture, identify
+bottlenecks and failure modes, then discuss scaling, consistency,
+availability, security, observability, and trade-offs.
+
+Example: Example: limit a user to 100 requests/minute. A token bucket
+with capacity 100 refills at roughly 1.67 tokens/second and can permit a
+short burst up to the bucket capacity.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+6.  [Rate Limiter] How does a token-bucket algorithm work, and how does
+    it handle bursts? Level: Freshers / Junior
+
+Answer: A token bucket has a maximum capacity and a refill rate. Each
+request consumes one or more tokens; if enough tokens exist, the request
+is allowed, otherwise it is rejected or delayed. Because tokens
+accumulate up to the bucket capacity, short bursts can be accepted while
+the long-term average remains bounded.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+7.  [Rate Limiter] Compare token bucket and leaky bucket. When would you
+    choose each? Level: Freshers / Junior
+
+Answer: Token bucket controls the allowed rate while permitting bounded
+bursts; leaky bucket models a queue drained at a relatively fixed rate,
+which smooths traffic. Choose token bucket when burst tolerance matters
+and leaky-bucket-style shaping when a steadier output rate is more
+important.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+8.  [Rate Limiter] How would you implement a distributed rate limiter
+    across multiple application servers? Level: Freshers / Junior
+
+Answer: Use a shared state store or an algorithm designed for
+distributed coordination so multiple application servers enforce the
+same logical quota. Redis is common because atomic commands/Lua scripts
+can update counters or token-bucket state. Define the consistency
+expectation and behavior when the shared limiter is unavailable: fail
+closed for sensitive APIs or fail open for lower-risk traffic.
+
+Example: Example: limit a user to 100 requests/minute. A token bucket
+with capacity 100 refills at roughly 1.67 tokens/second and can permit a
+short burst up to the bucket capacity.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+9.  [Rate Limiter] Why might Redis be used for distributed rate
+    limiting, and what happens if Redis is unavailable? Level: Freshers
+    / Junior
+
+Answer: Redis provides low-latency shared state and atomic operations
+suitable for counters, token buckets, and sliding windows. If Redis
+fails, the design needs an explicit policy: reject requests, temporarily
+use local limits, or allow traffic with reduced protection. The correct
+choice depends on the risk of abuse versus the risk of denying
+legitimate traffic.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+10. [Pastebin] Design a Pastebin-like service. What are the API, data
+    model, and storage choices? Level: Freshers / Junior
+
+Answer: Use an API that creates and retrieves pastes, a metadata store
+for IDs, owners, timestamps, visibility and expiration, and durable
+storage for content. A short random ID or encoded unique ID identifies
+each paste. Cache frequently read public pastes and enforce size, rate,
+retention, and abuse limits.
+
+Example: Example: POST /pastes stores metadata in SQL and a large paste
+body in object storage; GET /pastes/{id} reads metadata and content and
+rejects the request if expiresAt is in the past.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+11. [Pastebin] When would you store paste content in a database versus
+    object/blob storage? Level: Freshers / Junior
+
+Answer: Small, transactional metadata belongs naturally in a database;
+large immutable paste bodies are often better suited to object/blob
+storage. The application can keep metadata and a content object key
+together, while object storage handles large payload durability and
+scaling.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you rebalance? What happens when a
+shard or replica fails?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+12. [Pastebin] How would you implement paste expiration and automatic
+    cleanup? Level: Freshers / Junior
+
+Answer: Store an expiresAt timestamp and treat expired content as
+unavailable. A background worker can asynchronously delete or archive
+expired objects, while reads still enforce expiration immediately. For
+large systems, partition cleanup work by time ranges rather than
+scanning the entire dataset.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+13. [Pastebin] How would you prevent users from consuming unlimited
+    storage in Pastebin? Level: Freshers / Junior
+
+Answer: Use an API that creates and retrieves pastes, a metadata store
+for IDs, owners, timestamps, visibility and expiration, and durable
+storage for content. A short random ID or encoded unique ID identifies
+each paste. Cache frequently read public pastes and enforce size, rate,
+retention, and abuse limits.
+
+Example: Example: POST /pastes stores metadata in SQL and a large paste
+body in object storage; GET /pastes/{id} reads metadata and content and
+rejects the request if expiresAt is in the past.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+14. [CAP] Explain CAP theorem using a distributed database during a
+    network partition. Level: Freshers / Junior
+
+Answer: CAP states that when a network partition prevents nodes from
+communicating reliably, a distributed system cannot simultaneously
+guarantee both strong consistency and availability for every operation.
+During the partition, the design must choose which guarantee to
+sacrifice for the affected operation. CAP is about partitioned
+distributed systems; it is not simply a three-way feature checklist.
+
+Example: Example: during a partition between replicas, a banking-style
+balance update may reject writes rather than acknowledge conflicting
+balances.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you rebalance? What happens when a
+shard or replica fails?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+15. [CAP] Give an example where consistency is more important than
+    availability and explain why. Level: Freshers / Junior
+
+Answer: A financial balance or unique inventory allocation is a typical
+consistency-first example: returning stale state can cause an incorrect
+charge or oversell. The system may reject or delay operations during a
+partition rather than acknowledge conflicting writes.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+16. [Scaling] Explain vertical versus horizontal scaling and the main
+    limitations of each. Level: Freshers / Junior
+
+Answer: Vertical scaling increases the capacity of one machine;
+horizontal scaling adds machines. Vertical scaling is operationally
+simple but has hardware ceilings and can leave a large failure domain.
+Horizontal scaling provides more capacity and resilience but introduces
+distributed coordination, load balancing, data partitioning, and
+operational complexity.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+17. [Scaling] You have one backend server and traffic is growing. How
+    would you scale it? Level: Freshers / Junior
+
+Answer: First make the application stateless where practical, place it
+behind a load balancer, and run multiple instances. Then scale the
+database, introduce caching, move slow work to queues, add
+observability, and partition services only when there is a clear
+bottleneck. Scale based on measured CPU, memory, latency, database load,
+and traffic rather than adding components prematurely.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+18. [Load Balancing] What does a load balancer do when several
+    application servers handle the same API? Level: Freshers / Junior
+
+Answer: A load balancer distributes incoming requests across healthy
+backend instances using an algorithm such as round robin, least
+connections, or weighted routing. It can terminate TLS, perform health
+checks, support retries carefully, and route around unhealthy instances.
+Avoid blind retries for non-idempotent operations.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+19. [Load Balancing] How should a load balancer react when one backend
+    server becomes unhealthy? Level: Freshers / Junior
+
+Answer: First make the application stateless where practical, place it
+behind a load balancer, and run multiple instances. Then scale the
+database, introduce caching, move slow work to queues, add
+observability, and partition services only when there is a clear
+bottleneck. Scale based on measured CPU, memory, latency, database load,
+and traffic rather than adding components prematurely.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+20. [Caching] Where would you introduce caching in a simple web
+    application and what would you cache? Level: Freshers / Junior
+
+Answer: Cache expensive, frequently read, relatively stable data:
+product details, public profiles, configuration, computed results, or
+database query results. Define TTL, invalidation, cache-key design, and
+behavior on cache misses. Do not cache sensitive responses without
+considering authorization and isolation.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you invalidate entries? What happens
+on a cache miss or cache outage?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+21. [Databases] When would you choose SQL over NoSQL for a new system?
+    Level: Freshers / Junior
+
+Answer: Choose SQL when relational integrity, joins, transactions, and
+flexible querying are central. Choose a NoSQL model when the access
+pattern favors massive horizontal scale, simple key-based access,
+flexible schema, or specialized distribution characteristics. The
+decision should start from workload and consistency requirements, not
+from the popularity of a database brand.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+22. [Replication] Why replicate a database, and what problems can occur
+    when reads use replicas? Level: Freshers / Junior
+
+Answer: Replication improves read capacity and availability and can
+provide failover options. Read replicas can lag behind the primary,
+causing stale reads, read-after-write surprises, and inconsistent views
+across requests. Applications that require read-your-write semantics may
+route critical reads to the primary or use a consistency mechanism.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you rebalance? What happens when a
+shard or replica fails?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+23. [Consistency] Compare strong consistency and eventual consistency
+    with practical examples.
+    ========================================================================================
+    MID-LEVEL
+    ========================================================================================
+    Level: Freshers / Junior
+
+Answer: Strong consistency makes a read reflect the latest committed
+state according to the system’s consistency contract. Eventual
+consistency permits temporary divergence but converges if updates stop.
+A social-media like counter can often tolerate eventual consistency,
+while a financial authorization decision may require stronger
+guarantees.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+24. [Twitter/X Feed] Design a Twitter/X-style newsfeed for users
+    following thousands of accounts. Level: Mid-Level
+
+Answer: Use a post store, follow graph, feed-generation pipeline,
+ranking service, cache, and durable storage. A common baseline is
+fan-out-on-write for ordinary users and a hybrid strategy for
+high-follower accounts. Store feed entries by user and paginate with a
+cursor rather than repeatedly scanning all followed accounts.
+
+Example: Example: a normal user’s post is asynchronously fanned out to
+followers, while a celebrity’s post is merged at read time to avoid
+millions of write operations.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+25. [Twitter/X Feed] Compare fan-out-on-write and fan-out-on-read for a
+    social-media feed. Level: Mid-Level
+
+Answer: Fan-out-on-write creates feed entries when a post is published,
+making reads fast but making writes expensive for users with many
+followers. Fan-out-on-read computes the feed at request time, reducing
+write amplification but increasing read latency and query complexity. A
+hybrid design uses write fan-out for normal accounts and read-time
+merging for celebrities.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+26. [Twitter/X Feed] How would you handle a celebrity with tens of
+    millions of followers? Level: Mid-Level
+
+Answer: Do not synchronously copy one celebrity’s post into tens of
+millions of follower feeds. Keep the celebrity’s posts in a separate
+source and merge them into follower feeds at read time or through an
+asynchronous prioritized pipeline. Cache popular content and apply
+backpressure to fan-out workers.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+27. [Twitter/X Feed] How would you rank posts instead of simply showing
+    them chronologically? Level: Mid-Level
+
+Answer: Separate candidate generation from ranking. Candidate sources
+can include recent posts, followed accounts, and recommended content; a
+ranking stage scores candidates using freshness, relevance, engagement,
+relationship signals, and policy constraints. Paginate with a stable
+cursor and make ranking deterministic enough to avoid excessive
+reshuffling between requests.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+28. [Uber] Design the backend for a ride-hailing service that finds a
+    nearby available driver. Level: Mid-Level
+
+Answer: Model riders, drivers, trips, locations, and trip state
+separately. A location service maintains recent driver positions; a
+matching service finds nearby eligible drivers; a trip service owns the
+state machine; and asynchronous events handle notifications and
+analytics. Use geographic partitioning and a consistent source of truth
+for assignment.
+
+Example: Example: a rider in cell 8a2f searches that cell plus
+neighboring cells, finds available drivers, and atomically reserves the
+selected driver.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+29. [Uber] How would you find nearby drivers efficiently without
+    scanning every driver? Level: Mid-Level
+
+Answer: Index driver locations using geohash cells, an R-tree, S2 cells,
+or another spatial index. Search the rider’s cell and neighboring cells,
+then filter candidates by exact distance, availability, vehicle type,
+and other constraints. This avoids scanning every driver in the system.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+30. [Uber] How would you update driver locations in near real time?
+    Level: Mid-Level
+
+Answer: Drivers send periodic location updates over a persistent or
+efficient connection. A location service stores recent positions with
+short-lived state and publishes changes to matching consumers. Throttle
+updates based on movement and accuracy requirements, and expire stale
+driver locations so disconnected drivers are not offered rides.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+31. [Uber] Two riders request the same driver simultaneously. How do you
+    prevent double assignment? Level: Mid-Level
+
+Answer: Make driver assignment an atomic state transition. For example,
+change a driver from AVAILABLE to RESERVED only if the current state is
+still AVAILABLE, using a transactional conditional update or an
+equivalent coordination mechanism. The winning request gets the driver;
+competing requests retry matching.
+
+Example: Example: a rider in cell 8a2f searches that cell plus
+neighboring cells, finds available drivers, and atomically reserves the
+selected driver.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+32. [Uber] How would you partition a ride-sharing system geographically
+    at large scale? Level: Mid-Level
+
+Answer: Partition by geography so most matching traffic remains local.
+Each region can own a set of cells and maintain local driver state, with
+controlled handoff for boundary areas. Cross-region coordination should
+be minimized because it adds latency and failure coupling.
+
+Example: Example: a rider in cell 8a2f searches that cell plus
+neighboring cells, finds available drivers, and atomically reserves the
+selected driver.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+33. [WhatsApp/Messenger] Design one-to-one chat. How does a message
+    travel from sender to recipient? Level: Mid-Level
+
+Answer: Use a connection gateway for persistent client connections, a
+message service for validation and sequencing, durable message storage,
+and asynchronous delivery workers. The sender submits a message, the
+service assigns an ID/sequence, persists it, and routes it to the
+recipient’s active connection or offline queue.
+
+Example: Example: message M123 is persisted, delivered over the
+recipient’s WebSocket if online, and otherwise retained until the
+recipient reconnects.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+34. [WhatsApp/Messenger] Why use WebSockets or another persistent
+    connection for chat? Level: Mid-Level
+
+Answer: A persistent connection avoids repeatedly opening HTTP
+connections and allows the server to push messages immediately.
+WebSockets are a common choice, although other protocols can be
+appropriate. At scale, connection servers should be horizontally
+scalable and decoupled from durable message storage.
+
+Example: Example: message M123 is persisted, delivered over the
+recipient’s WebSocket if online, and otherwise retained until the
+recipient reconnects.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+35. [WhatsApp/Messenger] How do you deliver messages when the recipient
+    is offline? Level: Mid-Level
+
+Answer: Persist the message before acknowledging durable acceptance. If
+the recipient is offline, retain an undelivered state and deliver when
+the client reconnects. Use message IDs and acknowledgments so reconnects
+do not create duplicates.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+36. [WhatsApp/Messenger] How would you handle message ordering, retries,
+    and delivery status? Level: Mid-Level
+
+Answer: Assign a logical sequence or message ID per conversation and
+make consumers idempotent. Retries can produce duplicates, so the
+recipient should deduplicate by message ID. Define whether ordering is
+per conversation, per sender, or globally; global ordering is much more
+expensive.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+37. [WhatsApp/Messenger] How would you scale a very large group chat?
+    Level: Mid-Level
+
+Answer: Avoid creating an independent synchronous delivery operation for
+every member. Persist once, publish through a scalable fan-out
+mechanism, and deliver according to member presence and device state.
+For very large groups, separate message persistence from notification
+fan-out and use batching/backpressure.
+
+Example: Example: message M123 is persisted, delivered over the
+recipient’s WebSocket if online, and otherwise retained until the
+recipient reconnects.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+38. [Queues] Why introduce a message queue between services instead of
+    synchronous calls? Level: Mid-Level
+
+Answer: A queue decouples producers from consumers, absorbs traffic
+spikes, enables asynchronous processing, and provides retry/dead-letter
+behavior. It also introduces eventual processing, duplicate-delivery
+considerations, and operational complexity, so it should be used where
+asynchronous semantics are acceptable.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+39. [Queues] What is the difference between a task queue and an event
+    stream such as Kafka? Level: Mid-Level
+
+Answer: A task queue usually represents work that should be processed by
+workers, such as sending an email or resizing an image. An event stream
+represents an ordered, durable sequence of events that multiple
+consumers may independently replay or process. The distinction is
+conceptual rather than a claim that one specific product can only
+implement one model.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+40. [Distributed Systems] What is consistent hashing and why is it
+    useful when servers are added or removed? Level: Mid-Level
+
+Answer: A sequential numeric ID followed by Base62 encoding is simple
+and avoids collisions when the ID is unique. Hashing a long URL can
+create collisions unless the hash is sufficiently controlled and
+collision handling is added. Random keys also require uniqueness checks.
+In an interview, compare predictability, key length, coordination, and
+collision behavior rather than assuming hashing is automatically better.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+41. [Sharding] How would you shard a database and choose a shard key?
+    Level: Mid-Level
+
+Answer: Choose a shard key that distributes load evenly while keeping
+common queries targeted. Avoid monotonically hot keys and values that
+create one overloaded shard. Evaluate cardinality, query patterns,
+growth, rebalancing, and whether important transactions span shards.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you rebalance? What happens when a
+shard or replica fails?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+42. [Replication] What problems can replication lag create for an
+    application? Level: Mid-Level
+
+Answer: Lag can cause stale reads, read-after-write failures, incorrect
+decisions based on old data, and confusing user experiences when
+requests alternate between primary and replica. Mitigations include
+primary reads for critical paths, session consistency, bounded-staleness
+policies, or waiting until a replica catches up.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+43. [Resilience] How would you stop one slow downstream service from
+    blocking every incoming request? Level: Mid-Level
+
+Answer: Bound downstream work with timeouts, concurrency limits, circuit
+breakers, bulkheads, queues, and sensible retry policies. Without
+limits, blocked requests consume threads/connections, causing upstream
+queues to grow and eventually exhausting resources across the system.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+44. [Caching] What is a cache stampede and how would you prevent it?
+    Level: Mid-Level
+
+Answer: A cache stampede occurs when many requests miss or
+simultaneously refresh the same expired key. Use request
+coalescing/single-flight, jittered TTLs, stale-while-revalidate, early
+refresh, or a distributed lock when appropriate.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you invalidate entries? What happens
+on a cache miss or cache outage?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+45. [Caching] What is a cache avalanche and how can staggered TTLs help?
+    Level: Mid-Level
+
+Answer: A cache avalanche occurs when many cache entries expire or
+become unavailable around the same time, pushing a large load to the
+backend. Stagger TTLs with jitter, warm critical entries, use layered
+caches, and protect the origin with rate limits or circuit breakers.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you invalidate entries? What happens
+on a cache miss or cache outage?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+46. [API Gateway] What responsibilities would you put in an API gateway?
+    Level: Mid-Level
+
+Answer: An API gateway can centralize routing, authentication,
+authorization checks, rate limiting, request shaping, TLS termination,
+observability, and sometimes response aggregation. Keep business logic
+out of the gateway when possible so it does not become a monolithic
+bottleneck.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+47. [Reverse Proxy] What is a reverse proxy and what problems does it
+    solve?
+    ========================================================================================
+    ADVANCED / SENIOR / STAFF
+    ========================================================================================
+    Level: Mid-Level
+
+Answer: A reverse proxy sits in front of backend servers and receives
+client requests on their behalf. It can provide TLS termination,
+routing, caching, compression, load balancing, security filtering, and
+connection management. Unlike a forward proxy, it represents the server
+side to clients.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+48. [Video Streaming] Design a YouTube/Netflix-style video streaming
+    platform from upload through global playback. Level: Advanced /
+    Senior / Staff
+
+Answer: Separate upload, metadata, transcoding, packaging, object
+storage, CDN delivery, playback authorization, and analytics. Uploaded
+content is stored durably, transcoded asynchronously into multiple
+representations, packaged into streaming segments, and served through a
+CDN. The origin should not handle every playback byte directly.
+
+Example: Example: a 1080p upload is transcoded into 1080p/720p/480p
+representations, segmented, and served from a CDN based on the player’s
+current bandwidth.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+49. [Video Streaming] Why transcode one uploaded video into multiple
+    resolutions and bitrates? Level: Advanced / Senior / Staff
+
+Answer: Different devices and networks need different resolutions,
+codecs, bitrates, and frame characteristics. Multiple representations
+allow the player to select a suitable stream. Transcoding is CPU/GPU
+intensive, so it is normally asynchronous and backed by a durable job
+queue.
+
+Example: Example: a 1080p upload is transcoded into 1080p/720p/480p
+representations, segmented, and served from a CDN based on the player’s
+current bandwidth.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+50. [Video Streaming] How does a CDN reduce video latency and origin
+    load? Level: Advanced / Senior / Staff
+
+Answer: A CDN caches popular video segments at edge locations near
+viewers. Requests can be served without traveling to the origin,
+reducing latency, backbone traffic, and origin bandwidth. Cacheability
+works especially well for immutable video segments.
+
+Example: Example: a 1080p upload is transcoded into 1080p/720p/480p
+representations, segmented, and served from a CDN based on the player’s
+current bandwidth.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+51. [Video Streaming] How would adaptive bitrate streaming react to
+    changing network bandwidth? Level: Advanced / Senior / Staff
+
+Answer: The player measures throughput, buffer health, and sometimes
+latency, then switches between available bitrate representations. It
+should avoid selecting a bitrate that the current network cannot
+sustain, while also avoiding unnecessary quality oscillation.
+
+Example: Example: a 1080p upload is transcoded into 1080p/720p/480p
+representations, segmented, and served from a CDN based on the player’s
+current bandwidth.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+52. [Payments] Design a distributed payment-processing system and
+    prevent duplicate charges. Level: Advanced / Senior / Staff
+
+Answer: Separate the payment intent/order from the external provider
+call and maintain a durable transaction state machine. Use idempotency
+keys, unique transaction identifiers, durable event records,
+reconciliation, and an auditable ledger. Never rely solely on an HTTP
+timeout to conclude that a payment failed.
+
+Example: Example: client sends idempotency key K123. A timeout occurs
+after provider acceptance; reconciliation later confirms the provider
+transaction and the service records one successful payment instead of
+charging again.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you reconcile uncertain outcomes? How
+do you audit every state transition?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+53. [Payments] How do idempotency keys work in a payment API, and where
+    do you store the result? Level: Advanced / Senior / Staff
+
+Answer: An idempotency key lets repeated requests represent one logical
+operation. Persist the key with the request/result and return the same
+result for safe retries. The uniqueness constraint must be enforced
+durably, and the stored result should distinguish successful, failed,
+and in-progress states as required.
+
+Example: Example: client sends idempotency key K123. A timeout occurs
+after provider acceptance; reconciliation later confirms the provider
+transaction and the service records one successful payment instead of
+charging again.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you reconcile uncertain outcomes? How
+do you audit every state transition?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+54. [Payments] Payment succeeds at the provider but your service times
+    out. How do you reconcile the transaction? Level: Advanced / Senior
+    / Staff
+
+Answer: Treat the payment as UNKNOWN rather than automatically failed.
+Query the provider using a durable provider transaction ID or
+reconciliation API, and process asynchronous provider notifications
+where available. A reconciliation job should find transactions stuck in
+intermediate states and converge them to a final state.
+
+Example: Example: client sends idempotency key K123. A timeout occurs
+after provider acceptance; reconciliation later confirms the provider
+transaction and the service records one successful payment instead of
+charging again.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you reconcile uncertain outcomes? How
+do you audit every state transition?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+55. [Payments] How would payment, order creation, and notification
+    failures recover independently? Level: Advanced / Senior / Staff
+
+Answer: Use a durable state machine and asynchronous events so payment
+processing, order creation, and notification delivery can retry
+independently. Use an outbox/event mechanism so a committed state change
+is not lost before its event is published. Each consumer should be
+idempotent.
+
+Example: Example: client sends idempotency key K123. A timeout occurs
+after provider acceptance; reconciliation later confirms the provider
+transaction and the service records one successful payment instead of
+charging again.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you reconcile uncertain outcomes? How
+do you audit every state transition?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+56. [Payments] What consistency and durability requirements differ
+    between a payment ledger and notifications? Level: Advanced / Senior
+    / Staff
+
+Answer: A payment ledger requires strong integrity, durability,
+auditability, and carefully controlled updates. Notifications can
+usually tolerate retries, duplication with deduplication, and eventual
+delivery. Do not model a financial ledger as if it were an ordinary
+cache or transient message stream.
+
+Example: Example: client sends idempotency key K123. A timeout occurs
+after provider acceptance; reconciliation later confirms the provider
+transaction and the service records one successful payment instead of
+charging again.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you reconcile uncertain outcomes? How
+do you audit every state transition?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+57. [Collaborative Editing] Design a Google Docs-style collaborative
+    document editor. Level: Advanced / Senior / Staff
+
+Answer: Use a document service, persistent operation/history storage,
+and a real-time synchronization layer. Clients maintain local state and
+send operations to a server that orders or merges them. The system must
+define conflict resolution, reconnect behavior, authorization,
+versioning, and durable snapshots.
+
+Example: Example: Alice inserts ‘A’ while Bob inserts ‘B’ at the same
+document position. The synchronization algorithm orders/merges the
+concurrent operations so every replica converges to the same document
+state.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+58. [Collaborative Editing] What problem do Operational Transformation
+    and CRDTs solve? Level: Advanced / Senior / Staff
+
+Answer: Operational Transformation transforms concurrent operations so
+they can be applied against changing document states while preserving
+the intended collaborative result. CRDTs use data structures and merge
+rules designed so replicas can converge without a single central
+transformation step. Both address concurrent edits; their complexity,
+metadata costs, and implementation trade-offs differ.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+59. [Collaborative Editing] How do clients receive edits in real time,
+    and how do you handle reconnects? Level: Advanced / Senior / Staff
+
+Answer: Give each operation a durable sequence/version and let a
+reconnecting client identify the version it has seen. The server can
+then send missing operations or a snapshot plus later operations.
+Clients should retry safely and deduplicate acknowledged operations.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+60. [Collaborative Editing] How would you persist document state and
+    edit history efficiently? Level: Advanced / Senior / Staff
+
+Answer: Store periodic document snapshots plus compact edit operations
+rather than reconstructing every version from an unbounded log. Use
+asynchronous compaction and retain enough history to satisfy product
+requirements. Separate current-state reads from historical audit/version
+queries.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+61. [Consensus] Why do distributed systems need consensus algorithms
+    such as Raft or Paxos? Level: Advanced / Senior / Staff
+
+Answer: Consensus lets distributed nodes agree on a value or ordered log
+despite certain failures and message delays. Raft and Paxos are
+protocols for reaching agreement under defined failure assumptions. They
+are useful for replicated state machines, leader election, and metadata
+that must remain consistent across nodes.
+
+Example: Example: a replicated metadata cluster elects one leader;
+writes are committed only after the protocol reaches the required
+majority agreement.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+62. [Consensus] What problem does leader election solve? Level: Advanced
+    / Senior / Staff
+
+Answer: Leader election selects one node to coordinate writes or other
+serialized decisions. A robust protocol uses terms/epochs and
+majority-based agreement so an old leader cannot continue safely after
+losing authority. The exact mechanics depend on the consensus protocol.
+
+Example: Example: a replicated metadata cluster elects one leader;
+writes are committed only after the protocol reaches the required
+majority agreement.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+63. [Multi-Region] How would you design an active-active service across
+    two regions? Level: Advanced / Senior / Staff
+
+Answer: Both regions accept traffic, with global routing directing users
+to healthy regions. The design must specify data ownership, replication,
+conflict resolution, failover, and consistency guarantees. Stateless
+compute is straightforward to make active-active; multi-writer data is
+the difficult part.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+64. [Multi-Region] A network partition separates two active regions.
+    What behavior and consistency trade-off do you choose? Level:
+    Advanced / Senior / Staff
+
+Answer: First define which operations can continue independently and
+which require cross-region agreement. A consistency-first design may
+reject conflicting writes during the partition; an availability-first
+design may accept writes and reconcile conflicts later. The choice
+should be tied to business semantics rather than a generic preference.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+65. [Failure Isolation] How can one slow downstream service cause a
+    cascading failure? Level: Advanced / Senior / Staff
+
+Answer: Bound downstream work with timeouts, concurrency limits, circuit
+breakers, bulkheads, queues, and sensible retry policies. Without
+limits, blocked requests consume threads/connections, causing upstream
+queues to grow and eventually exhausting resources across the system.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+66. [Failure Isolation] How do timeouts, retries, circuit breakers,
+    bulkheads, and queues work together? Level: Advanced / Senior /
+    Staff
+
+Answer: Timeouts cap how long a caller waits. Retries can recover
+transient failures but amplify load, so they need bounded attempts and
+backoff with jitter. Circuit breakers stop repeated calls to an
+unhealthy dependency, bulkheads isolate resource pools, and queues move
+acceptable work out of the request path. Together they prevent a local
+slowdown from consuming the entire system.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+67. [Migration] How would you migrate a very large production database
+    without downtime? Level: Advanced / Senior / Staff
+
+Answer: Use an expand-and-contract migration: introduce
+backward-compatible schema changes, deploy code that can read/write both
+old and new representations, backfill incrementally, validate, switch
+reads/writes, and remove the old representation only after all old
+application versions are gone. Throttle backfills and monitor
+replication, locks, latency, and error rates.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: How do you rebalance? What happens when a
+shard or replica fails?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+68. [Migration] Why is expand-and-contract useful when old and new
+    application versions coexist? Level: Advanced / Senior / Staff
+
+Answer: Expand adds new schema/code paths while keeping old versions
+functional. Migrate or backfill data, switch traffic gradually, then
+contract by removing obsolete columns and code after compatibility is no
+longer required. This supports rolling deployments where old and new
+application instances coexist.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+69. [Distributed Storage] How would you design a highly available
+    distributed key-value store? Level: Advanced / Senior / Staff
+
+Answer: Partition keys across nodes, replicate data for availability,
+define read/write consistency, detect node failures, and rebalance
+ownership as membership changes. The core design needs a partitioning
+strategy, replication protocol, request routing, failure detection,
+repair/recovery, and durable storage.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+70. [Distributed Lock] When do you need a distributed lock, and what
+    failure modes must you handle? Level: Advanced / Senior / Staff
+
+Answer: Use a distributed lock only when mutual exclusion cannot be
+achieved more simply through an atomic database operation or idempotent
+workflow. A lock needs ownership, expiration/lease semantics, renewal,
+safe release, and protection against stale owners. Network partitions
+and process pauses can cause a client to believe it still owns a lock
+when it does not, so fencing tokens or equivalent safeguards may be
+necessary.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+71. [Observability] Design logging, metrics, tracing, and monitoring for
+    a large distributed system.
+    ========================================================================================
+    TOTAL: 71 QUESTIONS
+    ========================================================================================
+    Level: Advanced / Senior / Staff
+
+Answer: The supplied question identifies the system-design topic but
+does not provide a complete company-specific interview transcript. A
+strong answer should begin with requirements and scale assumptions,
+define APIs/data model, propose the high-level architecture, identify
+bottlenecks and failure modes, then discuss scaling, consistency,
+availability, security, observability, and trade-offs.
+
+Example: Example: define a small workload with concrete traffic, data
+size, latency, and failure assumptions before selecting components. Then
+walk one request through the proposed architecture.
+
+Interview Tip: Do not jump directly to technologies. Start with
+requirements, traffic/data estimates, APIs and core entities; then draw
+the simplest architecture that satisfies them. State assumptions
+explicitly, identify the first bottleneck, and explain trade-offs before
+adding complexity.
+
+What Interviewer Is Testing: Requirements clarification, capacity
+estimation, API and data-model thinking, component selection,
+scalability, reliability, consistency, failure handling, and the ability
+to explain trade-offs clearly.
+
+Key Points to Remember: • Start with functional and non-functional
+requirements. • Estimate scale before selecting architecture or storage.
+• Identify the source of truth for important state. • Define failure
+behavior, retries, timeouts, and idempotency where relevant. • State
+consistency, availability, latency, and durability trade-offs
+explicitly.
+
+Common Follow-up Questions: What are the bottlenecks? What happens when
+a dependency fails? What consistency and availability guarantees are
+required?
+
+Common Mistakes: • Listing technologies without explaining why they are
+needed. • Ignoring bottlenecks, failure modes, or operational limits. •
+Assuming every component is infinitely scalable. • Giving precise
+capacity numbers without stating assumptions. • Treating CAP, caching,
+replication, or consistency as slogans instead of design trade-offs.
+
+------------------------------------------------------------------------
+
+SOURCE ACCURACY NOTE
+
+The source states that these are realistic system-design prompts and are
+not claimed to be guaranteed questions from any company. That framing is
+preserved. The expanded answers provide system-design reasoning for the
+exact supplied prompts; where a prompt is broad, the answer does not
+invent a hidden original interview statement.
+
+END
