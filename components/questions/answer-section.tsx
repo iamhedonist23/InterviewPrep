@@ -121,7 +121,7 @@ export function AnswerSection({
                 ),
 
                 pre: ({ children }) => (
-                  <pre className="my-5 overflow-x-auto rounded-xl bg-ink p-4 text-sm leading-6 text-paper">
+                  <pre className="my-5 max-w-full overflow-x-auto overscroll-x-contain rounded-xl bg-ink p-3 text-xs leading-6 text-paper sm:p-4 sm:text-sm">
                     {children}
                   </pre>
                 ),
@@ -137,7 +137,7 @@ export function AnswerSection({
                     );
                   }
 
-                  return <code className={className}>{children}</code>;
+                  return <code className={`block min-w-max ${className}`}>{children}</code>;
                 },
               }}
             >
