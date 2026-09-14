@@ -6,8 +6,6 @@ import {
   CheckCircle2,
   ChevronDown,
   Clock3,
-  Sparkles,
-  Target,
 } from "lucide-react";
 import { QuestionCard } from "@/components/questions/question-card";
 import { RelatedQuestionsSection } from "@/components/questions/related-questions-section";
@@ -65,62 +63,6 @@ const formatMetadataValue = (value: string) =>
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(" ");
 
-const getApproachSteps = (question: {
-  category: { name: string };
-  interviewType: string;
-  question: string;
-}) => {
-  const text = normalizeQuestionText(question.question);
-
-  if (
-    question.interviewType === "BEHAVIORAL" ||
-    question.category.name.toLowerCase().includes("behavioral")
-  ) {
-    return [
-      "Situation: describe the context, the people involved, and the problem you were trying to solve.",
-      "Task: explain your responsibility and what success looked like.",
-      "Action: walk through the specific steps you took, decisions you made, and why they mattered.",
-      "Result: end with outcomes, measurable impact, and what you learned.",
-    ];
-  }
-
-  if (
-    text.includes("design") ||
-    text.includes("architecture") ||
-    question.category.name.toLowerCase().includes("system design")
-  ) {
-    return [
-      "Clarify functional requirements and the non-functional goals that matter most.",
-      "State your scale assumptions, request volumes, and latency expectations up front.",
-      "Define the high-level architecture and explain the data flow through it.",
-      "Call out the key bottlenecks, failure modes, and how the design handles them.",
-      "Discuss trade-offs such as consistency, availability, cost, and operational complexity.",
-      "Finish by describing how you would validate the design and what you would monitor in production.",
-    ];
-  }
-
-  if (
-    question.interviewType === "HR" ||
-    question.category.name.toLowerCase().includes("hr")
-  ) {
-    return [
-      "Start with the core message you want the interviewer to remember.",
-      "Give a concise example that proves your point with specific actions and outcomes.",
-      "Tie your answer back to the role, the team, and the business context.",
-      "End by showing self-awareness, reflection, and what you would do differently next time.",
-    ];
-  }
-
-  return [
-    "Clarify the problem and any assumptions before you answer.",
-    "Explain the core idea in plain language before you go deeper into details.",
-    "Walk through the solution step by step and show how each decision helps.",
-    "Discuss complexity, edge cases, and what changes when scale increases.",
-    "Mention trade-offs and production considerations that would affect real-world use.",
-    "Close by summarizing the most important takeaway in one or two sentences.",
-  ];
-};
-
 export default async function QuestionPage({ params }: Props) {
   const { slug } = await params;
   const question = await getQuestion(slug);
@@ -134,8 +76,6 @@ export default async function QuestionPage({ params }: Props) {
     getFollowUpQuestionLinks(followUps),
   ]);
   const keyPoints = list(question.keyPoints);
-  const mistakes = list(question.commonMistakes);
-  const approachSteps = getApproachSteps(question);
   const strongCandidateChecklist = keyPoints.length
     ? keyPoints.map(stripBullet)
     : [question.shortDescription];
@@ -284,72 +224,7 @@ export default async function QuestionPage({ params }: Props) {
                 </section>
               )}
 
-              {/* Related questions are rendered after the main content blocks */}
-
-              <details className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <Sparkles className="h-5 w-5 text-coral" />
-                    <h2 className="font-display text-xl font-bold sm:text-2xl">
-                      Why interviewers ask this
-                    </h2>
-                  </div>
-                  <ChevronDown size={18} className="shrink-0 text-ink/60" />
-                </summary>
-                <p className="mt-4 text-base leading-8 text-ink/70">
-                  {question.explanation}
-                </p>
-              </details>
-
-              <details className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <Target className="h-5 w-5 text-coral" />
-                    <h2 className="font-display text-xl font-bold sm:text-2xl">
-                      What the interviewer wants
-                    </h2>
-                  </div>
-                  <ChevronDown size={18} className="shrink-0 text-ink/60" />
-                </summary>
-                <ul className="mt-4 grid gap-3">
-                  {keyPoints.map((point) => (
-                    <li
-                      key={point}
-                      className="flex items-start gap-3 rounded-xl bg-ink/5 p-3 text-base leading-7 text-ink/70"
-                    >
-                      <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-coral" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-
-              <details className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <Target className="h-5 w-5 text-coral" />
-                    <h2 className="font-display text-xl font-bold sm:text-2xl">
-                      How to approach this question
-                    </h2>
-                  </div>
-                  <ChevronDown size={18} className="shrink-0 text-ink/60" />
-                </summary>
-                <ol className="mt-4 grid gap-3">
-                  {approachSteps.map((step, index) => (
-                    <li
-                      key={step}
-                      className="flex items-start gap-3 rounded-xl border border-ink/10 bg-ink/5 p-3 text-base leading-7 text-ink/70"
-                    >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-coral text-xs font-bold text-paper">
-                        {index + 1}
-                      </span>
-                      <span>{step}</span>
-                    </li>
-                  ))}
-                </ol>
-              </details>
-
-              <details className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
+              <details open className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
                   <div className="flex items-center gap-3">
                     <Clock3 className="h-5 w-5 text-coral" />
@@ -394,51 +269,6 @@ export default async function QuestionPage({ params }: Props) {
                   </div>
                 </div>
               </details>
-
-              <details className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-                <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
-                    <CheckCircle2 className="h-5 w-5 text-coral" />
-                    <h2 className="font-display text-xl font-bold sm:text-2xl">
-                      What a strong candidate should mention
-                    </h2>
-                  </div>
-                  <ChevronDown size={18} className="shrink-0 text-ink/60" />
-                </summary>
-                <ul className="mt-4 grid gap-3">
-                  {strongCandidateChecklist.map((item) => (
-                    <li
-                      key={item}
-                      className="flex items-start gap-3 rounded-xl bg-ink/5 p-3 text-base leading-7 text-ink/70"
-                    >
-                      <CheckCircle2 className="mt-1 h-4 w-4 shrink-0 text-coral" />
-                      <span>{item}</span>
-                    </li>
-                  ))}
-                </ul>
-              </details>
-
-              {mistakes.length > 0 && (
-                <details className="rounded-2xl border border-ink/10 bg-white/70 p-5 sm:p-6">
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-3">
-                    <h2 className="font-display text-xl font-bold sm:text-2xl">
-                      Common mistakes
-                    </h2>
-                    <ChevronDown size={18} className="shrink-0 text-ink/60" />
-                  </summary>
-                  <ul className="mt-4 grid gap-3">
-                    {mistakes.map((mistake) => (
-                      <li
-                        key={mistake}
-                        className="rounded-xl border border-coral/20 bg-coral/5 p-4 text-base leading-7 text-ink/70"
-                      >
-                        <span className="mr-2 font-bold text-coral">×</span>
-                        {mistake}
-                      </li>
-                    ))}
-                  </ul>
-                </details>
-              )}
 
               <OfficialSources category={question.category.name} />
 
@@ -486,31 +316,32 @@ export default async function QuestionPage({ params }: Props) {
         )}
         {learnTopics.length > 0 && (
           <section className="mt-20 max-w-5xl">
-            <h2 className="font-display text-3xl font-bold">Learn more about {question.category.name}</h2>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <h2 className="font-display text-3xl font-bold">Learn {question.category.name}</h2>
+            <p className="mt-3 max-w-2xl leading-7 text-ink/60">
+              Build the concepts behind this question with a focused learning topic.
+            </p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {learnTopics.map((topic) => (
                 <Link
                   key={topic.id}
                   href={`/learn/${topic.category.slug}/${topic.slug}`}
-                  className="rounded-full border border-ink/15 px-4 py-2 text-sm font-semibold hover:border-coral hover:text-coral"
+                  className="rounded-2xl border border-ink/10 bg-white/70 p-5 hover:border-coral"
                 >
-                  {topic.title}
+                  <span className="font-display text-lg font-bold">{topic.title}</span>
+                  <span className="mt-3 block text-sm font-bold text-coral">Open learning topic</span>
                 </Link>
               ))}
             </div>
+            {learnCategory && (
+              <p className="mt-5 text-sm text-ink/60">
+                Browse the full{" "}
+                <Link href={`/learn/${learnCategory.slug}`} className="font-bold text-coral hover:underline">
+                  {learnCategory.name} learning course
+                </Link>{" "}
+                for more topics.
+              </p>
+            )}
           </section>
-        )}
-        {learnCategory && (
-          <p className="mt-8 max-w-5xl text-sm text-ink/60">
-            Build the fundamentals in the{" "}
-            <Link
-              href={`/learn/${learnCategory.slug}`}
-              className="font-bold text-coral hover:underline"
-            >
-              {learnCategory.name} learning guide
-            </Link>{" "}
-            before practicing more {question.category.name} questions.
-          </p>
         )}
       </Container>
     </article>

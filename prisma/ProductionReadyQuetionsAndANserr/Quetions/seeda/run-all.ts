@@ -19,7 +19,7 @@ const seedFiles = [
   "Python.ts",
   "SystemDesign.ts",
   "DSA.ts",
-  "Java.ts",
+  "Java_metadata_fixed.ts",
 ];
 
 const projectRoot = process.cwd();

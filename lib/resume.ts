@@ -76,7 +76,7 @@ export const personalInfoSchema = z.object({
 
 export const educationSchema = z.object({
   id: z.string().cuid().optional(),
-  institution: z.string().trim().min(1).max(200),
+  institution: shortText(200),
   degree: shortText(150),
   fieldOfStudy: shortText(150),
   location: shortText(150),
@@ -89,8 +89,8 @@ export const educationSchema = z.object({
 
 export const experienceSchema = z.object({
   id: z.string().cuid().optional(),
-  company: z.string().trim().min(1).max(200),
-  jobTitle: z.string().trim().min(1).max(200),
+  company: shortText(200),
+  jobTitle: shortText(200),
   location: shortText(150),
   startDate: optionalDate,
   endDate: optionalDate,
@@ -102,7 +102,7 @@ export const experienceSchema = z.object({
 
 export const projectSchema = z.object({
   id: z.string().cuid().optional(),
-  name: z.string().trim().min(1).max(200),
+  name: shortText(200),
   description: shortText(2000),
   technologies: z.array(z.string().trim().max(60)).max(30).optional(),
   projectUrl: optionalUrl,
@@ -115,7 +115,7 @@ export const projectSchema = z.object({
 
 export const skillSchema = z.object({
   id: z.string().cuid().optional(),
-  name: z.string().trim().min(1).max(100),
+  name: shortText(100),
   category: shortText(100),
   level: z.enum(["BEGINNER", "INTERMEDIATE", "ADVANCED", "EXPERT"]).optional().nullable(),
   sortOrder,
@@ -123,7 +123,7 @@ export const skillSchema = z.object({
 
 export const certificationSchema = z.object({
   id: z.string().cuid().optional(),
-  name: z.string().trim().min(1).max(200),
+  name: shortText(200),
   organization: shortText(200),
   issueDate: optionalDate,
   expirationDate: optionalDate,
@@ -134,7 +134,7 @@ export const certificationSchema = z.object({
 
 export const achievementSchema = z.object({
   id: z.string().cuid().optional(),
-  title: z.string().trim().min(1).max(200),
+  title: shortText(200),
   description: shortText(1000),
   date: optionalDate,
   sortOrder,
@@ -142,14 +142,14 @@ export const achievementSchema = z.object({
 
 export const languageSchema = z.object({
   id: z.string().cuid().optional(),
-  name: z.string().trim().min(1).max(100),
+  name: shortText(100),
   proficiency: z.enum(["BASIC", "CONVERSATIONAL", "FLUENT", "NATIVE"]).default("CONVERSATIONAL"),
   sortOrder,
 });
 
 export const customSectionSchema = z.object({
   id: z.string().cuid().optional(),
-  title: z.string().trim().min(1).max(150),
+  title: shortText(150),
   content: shortText(5000),
   sortOrder,
 });
