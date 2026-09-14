@@ -118,26 +118,26 @@ export default async function QuestionPage({ params }: Props) {
   };
 
   return (
-    <article className="py-16 sm:py-20">
+    <article className="overflow-x-hidden py-16 sm:py-20">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumb) }}
       />
       <Container>
-        <nav aria-label="Breadcrumb" className="text-sm text-ink/55">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-x-2 text-sm text-ink/55">
           <Link href="/">Home</Link>
-          <span className="px-2">/</span>
+          <span>/</span>
           <Link href="/interview-questions">Interview questions</Link>
-          <span className="px-2">/</span>
+          <span>/</span>
           <Link href={`/interview-questions/${question.category.slug}`}>
             {question.category.name}
           </Link>
-          <span className="px-2">/</span>
+          <span>/</span>
           <span className="font-semibold text-ink">Question</span>
         </nav>
 
-        <div className="mt-12 max-w-5xl">
-          <header>
+        <div className="mt-12 max-w-5xl min-w-0">
+          <header className="min-w-0">
             <div className="flex flex-wrap gap-2">
               <span className="rounded-full bg-mint px-3 py-1 text-xs font-bold">
                 {question.category.name}
@@ -150,11 +150,11 @@ export default async function QuestionPage({ params }: Props) {
               </span>
             </div>
 
-            <h1 className="mt-6 max-w-4xl font-display text-3xl font-bold leading-tight sm:text-4xl lg:text-5xl">
+            <h1 className="mt-6 max-w-4xl break-words font-display text-3xl font-bold leading-[0.95] sm:text-4xl lg:text-5xl">
               {question.question}
             </h1>
 
-            <p className="mt-5 max-w-3xl text-base leading-7 text-ink/60 sm:text-lg">
+            <p className="mt-5 max-w-3xl break-words text-base leading-7 text-ink/60 sm:text-lg">
               {question.shortDescription}
             </p>
 
@@ -179,7 +179,7 @@ export default async function QuestionPage({ params }: Props) {
           </div>
 
           <div className="mt-12 grid max-w-5xl gap-10 lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-start">
-            <div className="space-y-8">
+            <div className="min-w-0 space-y-8">
               <AnswerSection
                 key={question.slug}
                 sampleAnswer={question.sampleAnswer}
@@ -203,17 +203,17 @@ export default async function QuestionPage({ params }: Props) {
                           {followUpSlug ? (
                             <Link
                               href={`/questions/${followUpSlug}`}
-                              className="flex items-center justify-between gap-3 p-4 text-base font-medium text-ink/75 hover:text-coral"
+                              className="flex min-w-0 items-center justify-between gap-3 p-4 text-base font-medium text-ink/75 hover:text-coral"
                             >
-                              <span>{followUp}</span>
+                              <span className="break-words">{followUp}</span>
                               <ArrowRight size={16} className="shrink-0 text-coral" />
                             </Link>
                           ) : (
                             <Link
                               href={`/search?q=${encodeURIComponent(followUp)}`}
-                              className="flex items-center justify-between gap-3 p-4 text-base font-medium text-ink/75 hover:text-coral"
+                              className="flex min-w-0 items-center justify-between gap-3 p-4 text-base font-medium text-ink/75 hover:text-coral"
                             >
-                              <span>{followUp}</span>
+                              <span className="break-words">{followUp}</span>
                               <ArrowRight size={16} className="shrink-0 text-coral" />
                             </Link>
                           )}

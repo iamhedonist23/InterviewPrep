@@ -9,12 +9,12 @@ export function ContentOwner({ publishedAt, updatedAt, showPolicyLink = true }: 
     : null;
 
   return (
-    <div className="not-prose border-y border-ink/10 py-4 text-sm text-ink/60">
-      <p><span className="font-semibold text-ink">Content owner:</span>{" "}<Link href="/author/suresh-mali" className="font-semibold text-coral hover:underline">Suresh Mali</Link> - InstantInterviewPrep</p>
-      <p className="mt-1">Suresh maintains the site and its interview-preparation content.</p>
-      {formattedPublishedDate && <p className="mt-1"><span className="font-semibold text-ink">Published:</span> {formattedPublishedDate}</p>}
-      {formattedUpdatedDate && <p className="mt-1"><span className="font-semibold text-ink">Last modified:</span> {formattedUpdatedDate}</p>}
-      {showPolicyLink && <p className="mt-2">Learn how this content is created and maintained in our <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">editorial policy</Link>, or <Link href="/contact" className="font-semibold text-coral hover:underline">report a correction</Link>.</p>}
+    <div className="not-prose min-w-0 break-words border-y border-ink/10 py-4 text-sm text-ink/60">
+      <p className="overflow-wrap-anywhere"><span className="font-semibold text-ink">Content owner:</span>{" "}<Link href="/author/suresh-mali" className="font-semibold text-coral hover:underline">Suresh Mali</Link> - InstantInterviewPrep</p>
+      <p className="mt-1 overflow-wrap-anywhere">Suresh maintains the site and its interview-preparation content.</p>
+      {formattedPublishedDate && <p className="mt-1 overflow-wrap-anywhere"><span className="font-semibold text-ink">Published:</span> {formattedPublishedDate}</p>}
+      {formattedUpdatedDate && <p className="mt-1 overflow-wrap-anywhere"><span className="font-semibold text-ink">Last modified:</span> {formattedUpdatedDate}</p>}
+      {showPolicyLink && <p className="mt-2 overflow-wrap-anywhere">Learn how this content is created and maintained in our <Link href="/editorial-policy" className="font-semibold text-coral hover:underline">editorial policy</Link>, or <Link href="/contact" className="font-semibold text-coral hover:underline">report a correction</Link>.</p>}
     </div>
   );
 }

@@ -38,7 +38,7 @@ export function AnswerSection({
   const answerToShow = normalizeAnswerLabels(detailedAnswer?.trim() || sampleAnswer);
 
   return (
-    <section className="rounded-2xl bg-mint/60 p-5 sm:p-6" aria-labelledby="sample-answer-heading">
+    <section className="min-w-0 overflow-hidden rounded-2xl bg-mint/60 p-5 sm:p-6" aria-labelledby="sample-answer-heading">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 id="sample-answer-heading" className="font-display text-xl font-bold sm:text-2xl">
           Sample answer
@@ -63,7 +63,7 @@ export function AnswerSection({
 
       {isExpanded && (
         <div id="sample-answer-content" className="mt-6 animate-in fade-in slide-in-from-top-2 duration-300">
-          <div className="text-base leading-8 text-ink/75">
+          <div className="min-w-0 break-words text-base leading-8 text-ink/75">
             <ReactMarkdown
               components={{
                 h1: ({ children }) => (
@@ -85,7 +85,7 @@ export function AnswerSection({
                 ),
 
                 p: ({ children }) => (
-                  <p className="mb-4 leading-8 text-ink/75">
+                  <p className="mb-4 overflow-wrap-anywhere leading-8 text-ink/75">
                     {children}
                   </p>
                 ),
@@ -103,7 +103,7 @@ export function AnswerSection({
                 ),
 
                 li: ({ children }) => (
-                  <li className="pl-1 leading-7 text-ink/75">
+                  <li className="overflow-wrap-anywhere pl-1 leading-7 text-ink/75">
                     {children}
                   </li>
                 ),
