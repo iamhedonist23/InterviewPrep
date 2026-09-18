@@ -2,6 +2,7 @@ import { getServerSession } from "next-auth";
 import { z } from "zod";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getQuestionById } from "@/lib/interview-data";
 import { rateLimit, requestSizeLimit, tooManyRequests } from "@/lib/request-security";
 
 const responseSchema = z.object({ questionId: z.string().min(1), answer: z.string().max(10000).optional().default(""), skipped: z.boolean(), score: z.number().int().min(0).max(100).nullable() });
@@ -16,8 +17,7 @@ export async function POST(request: Request) {
   if (!parsed.success) return Response.json({ error: "The practice session data is invalid." }, { status: 400 });
   const data = parsed.data;
   const questionIds = [...new Set(data.responses.map(response => response.questionId))];
-  const validQuestions = await prisma.interviewQuestion.findMany({ where: { id: { in: questionIds }, isPublished: true }, select: { id: true } });
-  if (validQuestions.length !== questionIds.length) return Response.json({ error: "One or more practice questions are unavailable." }, { status: 400 });
+  if (questionIds.some((questionId) => !getQuestionById(questionId))) return Response.json({ error: "One or more practice questions are unavailable." }, { status: 400 });
   const practiceSession = await prisma.practiceSession.create({ data: { userId: session.user.id, status: "COMPLETED", score: data.score, startedAt: new Date(data.startedAt), completedAt: new Date(data.completedAt), responses: { create: data.responses.map(response => ({ questionId: response.questionId, answer: response.answer, skipped: response.skipped, score: response.score })) } }, select: { id: true } });
   return Response.json({ saved: true, sessionId: practiceSession.id });
 }

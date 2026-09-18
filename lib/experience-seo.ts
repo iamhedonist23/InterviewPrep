@@ -1,12 +1,11 @@
-import { ExperienceLevel } from "@prisma/client";
 import { unstable_cache } from "next/cache";
-import { prisma } from "@/lib/prisma";
+import { getInterviewCategories, getInterviewExperienceData } from "@/lib/interview-data";
 
 export const EXPERIENCE_LANDING_LEVELS = {
-  freshers: { value: ExperienceLevel.FRESHER, label: "Freshers", singular: "fresher" },
-  internship: { value: ExperienceLevel.INTERNSHIP, label: "Internships", singular: "intern" },
-  "mid-level": { value: ExperienceLevel.MID_LEVEL, label: "Mid-Level Professionals", singular: "mid-level professional" },
-  experienced: { value: ExperienceLevel.EXPERIENCED, label: "Experienced Professionals", singular: "experienced professional" },
+  freshers: { value: "FRESHER", label: "Freshers", singular: "fresher" },
+  internship: { value: "INTERNSHIP", label: "Internships", singular: "intern" },
+  "mid-level": { value: "MID_LEVEL", label: "Mid-Level Professionals", singular: "mid-level professional" },
+  experienced: { value: "EXPERIENCED", label: "Experienced Professionals", singular: "experienced professional" },
 } as const;
 
 export type ExperienceSlug = keyof typeof EXPERIENCE_LANDING_LEVELS;
@@ -43,50 +42,20 @@ function learnMatches(categoryName: string, categorySlug: string, learnCategory:
 async function queryExperienceLanding(levelSlug: string, categorySlug?: string): Promise<ExperienceLandingData | null> {
   const level = getLevel(levelSlug);
   if (!level) return null;
-  const where = { isPublished: true, experienceLevel: level.value, ...(categorySlug ? { category: { slug: categorySlug } } : {}) };
-  const [total, questions, categories, learnCategories] = await Promise.all([
-    prisma.interviewQuestion.count({ where }),
-    prisma.interviewQuestion.findMany({
-      where,
-      orderBy: { createdAt: "desc" },
-      take: 12,
-      select: {
-        id: true,
-        slug: true,
-        question: true,
-        shortDescription: true,
-        difficulty: true,
-        category: { select: { name: true, slug: true } },
-      },
-    }),
-    prisma.category.findMany({
-      where: { questions: { some: where } },
-      orderBy: { name: "asc" },
-      take: 12,
-      select: {
-        id: true,
-        name: true,
-        slug: true,
-        _count: { select: { questions: { where } } },
-      },
-    }),
-    prisma.studyCategory.findMany({
-      where: { isPublished: true },
-      orderBy: { sortOrder: "asc" },
-      select: { id: true, name: true, slug: true, description: true },
-    }),
-  ]);
+  const jsonCategorySlug = categorySlug === "java-developer" ? "java" : categorySlug === "python-developer" ? "python" : categorySlug === "react-developer" ? "react" : categorySlug;
+  const data = getInterviewExperienceData(level.value, jsonCategorySlug);
+  if (!data) return null;
+  const total = data.total;
+  const questions = data.questions;
+  const categories = data.categories;
+  const learn: ExperienceLandingData["learnCategories"] = [];
   if (total < (categorySlug ? TECHNOLOGY_EXPERIENCE_PAGE_MINIMUM : EXPERIENCE_PAGE_MINIMUM)) return null;
-  const primaryName = categorySlug ? categories[0]?.name ?? categorySlug : "";
   return {
     level,
     total,
     questions,
-    categories: categories.map((category) => ({ id: category.id, name: category.name, slug: category.slug, count: category._count.questions })),
-    learnCategories: learnCategories
-      .filter((category) => !categorySlug || learnMatches(primaryName, categorySlug, category))
-      .slice(0, 4)
-      .map(({ id, name, slug, description }) => ({ id, name, slug, description })),
+    categories,
+    learnCategories: learn,
   };
 }
 
@@ -106,31 +75,20 @@ export async function resolveTechnologySlug(slug: string) {
     javascript: "javascript-developer",
   };
   const categorySlug = aliases[slug] ?? slug;
-  return prisma.category.findFirst({
-    where: { slug: categorySlug, questions: { some: { isPublished: true } } },
-    select: { name: true, slug: true },
-  });
+  const category = getInterviewCategories().find((item) => item.slug === categorySlug);
+  return category ? { name: category.name, slug: category.slug } : null;
 }
 
 export async function getEligibleExperienceSitemapPaths() {
   const levels = Object.entries(EXPERIENCE_LANDING_LEVELS) as Array<[ExperienceSlug, (typeof EXPERIENCE_LANDING_LEVELS)[ExperienceSlug]]>;
-  const counts = await prisma.interviewQuestion.groupBy({
-    by: ["categoryId", "experienceLevel"],
-    where: { isPublished: true },
-    _count: { _all: true },
-  });
-  const categoryIds = [...new Set(counts.map((entry) => entry.categoryId))];
-  const categories = await prisma.category.findMany({ where: { id: { in: categoryIds } }, select: { id: true, slug: true } });
-  const categoryById = new Map(categories.map((category) => [category.id, category.slug]));
   const technologySlugs: Record<string, string> = { "java-developer": "java", "python-developer": "python", sql: "sql", "react-developer": "react" };
   const paths: string[] = [];
   for (const [experience, level] of levels) {
-    const total = counts.filter((entry) => entry.experienceLevel === level.value).reduce((sum, entry) => sum + entry._count._all, 0);
+    const total = getInterviewExperienceData(level.value)?.total ?? 0;
     if (total >= EXPERIENCE_PAGE_MINIMUM) paths.push(`/interview-questions/${experience}`);
-    for (const entry of counts) {
-      const slug = categoryById.get(entry.categoryId);
-      const publicSlug = slug ? technologySlugs[slug] : undefined;
-      if (publicSlug && entry.experienceLevel === level.value && entry._count._all >= TECHNOLOGY_EXPERIENCE_PAGE_MINIMUM) paths.push(`/${publicSlug}-interview-questions/${experience}`);
+    for (const [technologySlug, publicSlug] of Object.entries(technologySlugs)) {
+      const count = getInterviewExperienceData(level.value, technologySlug)?.total ?? 0;
+      if (count >= TECHNOLOGY_EXPERIENCE_PAGE_MINIMUM) paths.push(`/${publicSlug}-interview-questions/${experience}`);
     }
   }
   return [...new Set(paths)];

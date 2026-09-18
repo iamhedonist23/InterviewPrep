@@ -1,18 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getServerSession } from "next-auth";
-import { authOptions } from "@/lib/auth";
 import { Container } from "@/components/ui/container";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StudyExercise } from "@/components/study/study-exercise";
 import { LearnMarkdown } from "@/components/learn/learn-markdown";
-import { TopicProgressActions } from "@/components/study/topic-progress-actions";
-import { SaveTopicButton } from "@/components/study/save-topic-button";
-import { getOwnedTopicProgress } from "@/lib/study";
 import { getPublishedTopic, getAdjacentTopics, getPublishedTopicLinks } from "@/lib/study-public";
 import { getRelatedInterviewCategory } from "@/lib/public-content";
-import { prisma } from "@/lib/prisma";
 import { siteUrl } from "@/lib/site";
 import { ContentOwner } from "@/components/editorial/content-owner";
 
@@ -46,19 +40,15 @@ export default async function LearnTopicPage({ params }: Props) {
   if (!item) notFound();
   const interviewCategory = await getRelatedInterviewCategory(item.category.name);
 
-  const session = await getServerSession(authOptions);
   const prerequisiteIds = Array.isArray(item.prerequisiteIds) ? item.prerequisiteIds.filter((id): id is string => typeof id === "string") : [];
   const relatedTopicIds = Array.isArray(item.relatedTopicIds) ? item.relatedTopicIds.filter((id): id is string => typeof id === "string") : [];
-  const [progress, savedTopic, adjacent, prerequisiteLinks, relatedTopicLinks] = await Promise.all([
-    session?.user?.id ? getOwnedTopicProgress(session.user.id, item.id) : Promise.resolve(null),
-    session?.user?.id ? prisma.savedStudyTopic.findUnique({ where: { userId_topicId: { userId: session.user.id, topicId: item.id } } }) : Promise.resolve(null),
+  const [adjacent, prerequisiteLinks, relatedTopicLinks] = await Promise.all([
     getAdjacentTopics(item.category.slug, item.id),
     getPublishedTopicLinks(prerequisiteIds),
     getPublishedTopicLinks(relatedTopicIds),
   ]);
   const prerequisites = prerequisiteLinks.sort((left, right) => prerequisiteIds.indexOf(left.id) - prerequisiteIds.indexOf(right.id));
   const relatedTopics = relatedTopicLinks.sort((left, right) => relatedTopicIds.indexOf(left.id) - relatedTopicIds.indexOf(right.id));
-  const progressStatus = progress?.status ?? "NOT_STARTED";
 
   const baseUrl = siteUrl;
   const breadcrumb = {
@@ -110,16 +100,6 @@ export default async function LearnTopicPage({ params }: Props) {
           <div className="mt-6 max-w-3xl">
             <ContentOwner updatedAt={item.updatedAt} />
           </div>
-          {session?.user?.id ? (
-            <div className="mt-6 flex flex-wrap items-center gap-3">
-              <TopicProgressActions topicId={item.id} initialStatus={progressStatus} />
-              <SaveTopicButton topicId={item.id} initialSaved={Boolean(savedTopic)} />
-            </div>
-          ) : (
-            <p className="mt-6 text-sm text-ink/50">
-              <Link href="/login?callbackUrl=/learn" className="font-bold text-coral">Log in</Link> to track your progress on this topic.
-            </p>
-          )}
           {interviewCategory && (
             <p className="mt-4 text-sm text-ink/50">
               Apply this lesson with <Link href={`/interview-questions/${interviewCategory.slug}`} className="font-bold text-coral hover:underline">{interviewCategory.name} interview questions</Link> or <Link href={`/practice?category=${interviewCategory.slug}`} className="font-bold text-coral hover:underline">practice by category</Link>.
@@ -268,24 +248,6 @@ export default async function LearnTopicPage({ params }: Props) {
                 </div>
               )}
             </div>
-
-            {/* Learning progress */}
-            {session?.user?.id && (
-              <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
-                <h3 className="font-semibold text-ink">Your progress</h3>
-                <div className="mt-4">
-                  <div className="text-sm text-ink/60">
-                    {progressStatus === "COMPLETED" ? (
-                      <p className="font-bold text-mint">✓ Completed</p>
-                    ) : progressStatus === "STARTED" ? (
-                      <p className="font-bold text-coral">In progress</p>
-                    ) : (
-                      <p>Not started</p>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
 
             {/* Info card */}
             <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">

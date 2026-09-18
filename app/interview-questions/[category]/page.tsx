@@ -6,12 +6,17 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { getCachedPublicQuestionCategory } from "@/lib/public-content";
 import { siteUrl } from "@/lib/site";
+import { getInterviewCategorySlugs } from "@/lib/interview-data";
 
 export const revalidate = 1800;
 type Props = {
   params: Promise<{ category: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export function generateStaticParams() {
+  return getInterviewCategorySlugs();
+}
 const EXPERIENCE_LEVELS = [
   ["FRESHER", "Freshers"],
   ["INTERNSHIP", "Internships"],

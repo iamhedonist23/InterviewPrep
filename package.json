@@ -4,7 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "generate:learn-data": "tsx scripts/generate-learn-json.ts",
+    "generate:article-data": "tsx scripts/generate-article-json.ts",
+    "generate:interview-data": "tsx scripts/generate-interview-json.ts --write",
+    "generate:interview-index": "tsx scripts/generate-interview-index.ts",
+    "validate:interview-data": "tsx scripts/validate-interview-data.ts",
+    "build": "npm run validate:interview-data && prisma generate && next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

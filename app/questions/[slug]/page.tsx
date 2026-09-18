@@ -14,14 +14,18 @@ import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { getFollowUpQuestionLinks, getQuestion, relatedQuestions } from "@/services/questions";
 import { siteUrl } from "@/lib/site";
-import { getPublishedTopicsForQuestion } from "@/lib/study-public";
 import { getRelatedInterviewCategory } from "@/lib/public-content";
 import { ContentOwner } from "@/components/editorial/content-owner";
 import { OfficialSources } from "@/components/editorial/official-sources";
+import { getInterviewQuestionSlugs } from "@/lib/interview-data";
 
 export const revalidate = 3600;
 
 type Props = { params: Promise<{ slug: string }> };
+
+export function generateStaticParams() {
+  return getInterviewQuestionSlugs();
+}
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
@@ -69,9 +73,9 @@ export default async function QuestionPage({ params }: Props) {
   if (!question) notFound();
 
   const followUps = list(question.followUpQuestions);
-  const [related, learnTopics, learnCategory, followUpQuestionRows] = await Promise.all([
+  const learnTopics: Array<{ id: string; slug: string; title: string; category: { slug: string } }> = [];
+  const [related, learnCategory, followUpQuestionRows] = await Promise.all([
     relatedQuestions(question),
-    getPublishedTopicsForQuestion(question.id),
     getRelatedInterviewCategory(question.category.name),
     getFollowUpQuestionLinks(followUps),
   ]);

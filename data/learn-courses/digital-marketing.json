@@ -1,0 +1,9 @@
+{
+  "name": "Digital Marketing",
+  "slug": "digital-marketing",
+  "description": "A structured learning path covering digital marketing strategy, customer journeys, content, advertising, social media, email, search, analytics, and conversion rate optimization.",
+  "icon": "📣",
+  "sortOrder": 1,
+  "paths": [],
+  "id": "learn-category-digital-marketing"
+}

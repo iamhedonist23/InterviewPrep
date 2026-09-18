@@ -10,6 +10,7 @@ import { CategoryCarousel } from "@/components/home/category-carousel";
 import { getCachedHomepagePublicContent } from "@/lib/public-content";
 
 export const revalidate = 1800;
+export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: { absolute: "Interview Questions & Answers for Every Career | InstantInterviewPrep" },
   description:

@@ -1,10 +1,5 @@
-import {
-  Difficulty,
-  ExperienceLevel,
-  InterviewType,
-  Prisma,
-} from "@prisma/client";
-import { prisma } from "@/lib/prisma";
+import { Difficulty, ExperienceLevel, InterviewType } from "@prisma/client";
+import { getQuestionBySlug, listInterviewQuestions } from "@/lib/interview-data";
 const enumValue = <T extends string>(value: string | null, values: T[]) =>
   value && values.includes(value as T) ? (value as T) : undefined;
 const enumValues = <T extends string>(values: string[], validValues: T[]) =>
@@ -20,12 +15,8 @@ function questionCount(value: string | null): number {
 }
 export async function GET(request: Request) {
   const url = new URL(request.url);
-  const where: Prisma.InterviewQuestionWhereInput = { isPublished: true };
   const category = url.searchParams.get("category");
   const questionSlug = url.searchParams.get("question");
-
-  if (category) where.category = { slug: category };
-  if (questionSlug) where.slug = questionSlug;
   const experience = enumValue(
     url.searchParams.get("experience"),
     Object.values(ExperienceLevel),
@@ -38,15 +29,15 @@ export async function GET(request: Request) {
     url.searchParams.getAll("type"),
     Object.values(InterviewType),
   );
-  if (experience) where.experienceLevel = experience;
-  if (difficulties.length) where.difficulty = { in: difficulties };
-  if (interviewTypes.length) where.interviewType = { in: interviewTypes };
-  const questions = await prisma.interviewQuestion.findMany({
-    where,
-    include: { category: { select: { name: true, slug: true } } },
-    orderBy: { createdAt: "desc" },
-    take: questionCount(url.searchParams.get("count")),
-  });
+  const questions = questionSlug
+    ? [getQuestionBySlug(questionSlug)].filter((question): question is NonNullable<typeof question> => Boolean(question))
+    : listInterviewQuestions({
+        category: category ?? undefined,
+        experience: experience ?? undefined,
+        difficulty: difficulties,
+        interviewType: interviewTypes,
+        pageSize: questionCount(url.searchParams.get("count")),
+      }).questions;
   return Response.json({
     questions: questions.map((question) => ({
       id: question.id,
