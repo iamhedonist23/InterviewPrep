@@ -8,7 +8,6 @@ import { LearnMarkdown } from "@/components/learn/learn-markdown";
 import { getPublishedTopic, getAdjacentTopics, getPublishedTopicLinks } from "@/lib/study-public";
 import { getRelatedInterviewCategory } from "@/lib/public-content";
 import { siteUrl } from "@/lib/site";
-import { ContentOwner } from "@/components/editorial/content-owner";
 import { LessonPageShell } from "@/components/learn/lesson-page-shell";
 
 export const dynamic = "force-dynamic";
@@ -104,9 +103,6 @@ export default async function LearnTopicPage({ params }: Props) {
           <p className="mt-5 text-lg leading-8 text-ink/60">
             {item.shortDescription ?? `Study ${item.title} through focused explanations, examples, and interview-relevant practice.`}
           </p>
-          <div className="mt-6 max-w-3xl">
-            <ContentOwner updatedAt={item.updatedAt} />
-          </div>
           {interviewCategory && (
             <p className="mt-4 text-sm text-ink/50">
               Apply this lesson with <Link href={`/interview-questions/${interviewCategory.slug}`} className="font-bold text-coral hover:underline">{interviewCategory.name} interview questions</Link> or <Link href={`/practice?category=${interviewCategory.slug}`} className="font-bold text-coral hover:underline">practice by category</Link>.
@@ -140,6 +136,7 @@ export default async function LearnTopicPage({ params }: Props) {
           contentsItems={contentsItems}
           difficulty={item.module.studyPath.level.toLowerCase().replace(/_/g, " ")}
           readingMinutes={item.estimatedMinutes ?? undefined}
+          updatedAt={new Date(item.updatedAt).toISOString()}
           sectionCount={item.sections.length}
           category={item.category.name}
         >

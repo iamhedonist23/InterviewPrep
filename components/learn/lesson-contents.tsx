@@ -12,9 +12,12 @@ export type ContentsItem = {
 type LessonContentsProps = {
   items: ContentsItem[];
   onDesktopOpenChange?: (open: boolean) => void;
+  desktopOpen?: boolean;
+  embedded?: boolean;
+  mobileOnly?: boolean;
 };
 
-export function LessonContents({ items, onDesktopOpenChange }: LessonContentsProps) {
+export function LessonContents({ items, onDesktopOpenChange, desktopOpen, embedded = false, mobileOnly = false }: LessonContentsProps) {
   const [open, setOpen] = useState(false);
   const [desktopHovered, setDesktopHovered] = useState(false);
   const [activeId, setActiveId] = useState(items[0]?.id ?? "");
@@ -58,7 +61,7 @@ export function LessonContents({ items, onDesktopOpenChange }: LessonContentsPro
     onDesktopOpenChange?.(false);
   }
 
-  const expanded = open || desktopHovered;
+  const expanded = desktopOpen ?? (open || desktopHovered);
 
   return (
     <>
@@ -87,23 +90,25 @@ export function LessonContents({ items, onDesktopOpenChange }: LessonContentsPro
             setDesktopHovered(false);
           }
         }}
-        className={`group/contents fixed right-0 top-[calc(50%-4rem)] z-50 -translate-y-1/2 transition-transform duration-300 ease-out lg:right-4 ${expanded ? "translate-x-0 lg:translate-x-0" : "translate-x-[calc(100%-2.75rem)] lg:translate-x-[calc(100%-2.75rem)]"}`}
+        className={`${embedded ? "relative block min-h-11 w-full" : `fixed right-0 top-[calc(50%-4rem)] z-50 -translate-y-1/2 ${mobileOnly ? "lg:hidden" : ""}`} ${embedded ? (expanded ? "z-20" : "z-10") : ""} group/contents transition-transform duration-300 ease-out ${embedded ? "" : expanded ? "translate-x-0" : "translate-x-[calc(100%-2.75rem)]"}`}
       >
-        <div className="relative flex w-[280px] max-w-[calc(100vw-1rem)] rounded-l-2xl border border-r-0 border-ink/10 bg-ink p-5 text-paper shadow-2xl shadow-ink/20 sm:p-6">
-          <button
-            type="button"
-            aria-label={open ? "Close contents" : "Open contents"}
-            aria-expanded={expanded}
-            aria-controls="lesson-contents-list"
-            onClick={() => {
-              setOpen(value => !value);
-              onDesktopOpenChange?.(!open);
-            }}
-            title="Contents"
-            className="absolute -left-11 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-l-xl bg-ink text-paper shadow-lg shadow-ink/15 transition-colors hover:text-coral focus-visible:text-coral"
-          >
-            {open ? <X size={18} aria-hidden="true" /> : <ListTree size={18} aria-hidden="true" />}
-          </button>
+        <button
+          type="button"
+          aria-label={open ? "Close contents" : "Open contents"}
+          aria-expanded={expanded}
+          aria-controls="lesson-contents-list"
+          onClick={() => {
+            const nextOpen = !expanded;
+            if (!embedded) setOpen(nextOpen);
+            onDesktopOpenChange?.(nextOpen);
+          }}
+          title="Contents"
+          className="absolute -left-11 top-0 z-10 flex h-11 w-11 items-center justify-center rounded-l-xl bg-ink text-paper shadow-lg shadow-ink/15 transition-colors hover:text-coral focus-visible:text-coral"
+        >
+          {open ? <X size={18} aria-hidden="true" /> : <ListTree size={18} aria-hidden="true" />}
+        </button>
+
+        <div className={`${embedded ? "absolute right-0 top-0" : "relative"} flex w-[280px] max-w-[calc(100vw-1rem)] rounded-l-2xl border border-r-0 border-ink/10 bg-ink p-5 text-paper shadow-2xl shadow-ink/20 transition-opacity duration-300 sm:p-6 ${expanded ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}>
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center justify-between gap-3">

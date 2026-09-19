@@ -21,6 +21,7 @@
 	--font-display: var(--font-space-grotesk);
 }
 * { box-sizing: border-box; }
+html, body { overflow-x: clip; }
 html { scroll-behavior: smooth; }
 body { margin: 0; background: rgb(var(--paper)); color: rgb(var(--ink)); font-family: var(--font-sans), sans-serif; }
 a { color: inherit; text-decoration: none; }
