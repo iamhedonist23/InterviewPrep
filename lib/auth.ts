@@ -1,5 +1,6 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { compare } from "bcryptjs";
+import { timingSafeEqual } from "node:crypto";
 import type { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
@@ -11,7 +12,38 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET ?? process.env.AUTH_SECRET,
   providers: [
     GoogleProvider({ clientId: process.env.GOOGLE_CLIENT_ID ?? "", clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "" }),
-    CredentialsProvider({ name: "Email and password", credentials: { email: { label: "Email", type: "email" }, password: { label: "Password", type: "password" } }, async authorize(credentials) { if (!credentials?.email || !credentials.password) return null; const user = await prisma.user.findUnique({ where: { email: credentials.email.toLowerCase().trim() } }); if (user?.isDisabled || !user?.passwordHash || !(await compare(credentials.password, user.passwordHash))) return null; return { id: user.id, email: user.email, name: user.name, role: user.role }; } }),
+    CredentialsProvider({
+      name: "Email and password",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" },
+        adminToken: { label: "Admin token", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials?.email) return null;
+
+        const configuredToken = process.env.ADMIN_TOKEN;
+        const suppliedToken = typeof credentials.adminToken === "string" ? credentials.adminToken : "";
+        const tokenMatches = configuredToken
+          ? suppliedToken.length === configuredToken.length && timingSafeEqual(Buffer.from(suppliedToken), Buffer.from(configuredToken))
+          : false;
+
+        if (tokenMatches) {
+          const configuredEmail = process.env.ADMIN_EMAIL?.toLowerCase().trim();
+          const suppliedEmail = credentials.email.toLowerCase().trim();
+          if (!configuredEmail || suppliedEmail !== configuredEmail) return null;
+          return { id: `env-admin:${configuredEmail}`, email: configuredEmail, name: "Administrator", role: "ADMIN" };
+        }
+
+        const user = await prisma.user.findUnique({ where: { email: credentials.email.toLowerCase().trim() } });
+        if (user?.isDisabled || user?.role !== "ADMIN") return null;
+
+        const passwordMatches = credentials.password && user.passwordHash ? await compare(credentials.password, user.passwordHash) : false;
+
+        if (!passwordMatches) return null;
+        return { id: user.id, email: user.email, name: user.name, role: user.role };
+      },
+    }),
   ],
   callbacks: { async jwt({ token, user }) { if (user) { token.id = user.id; token.role = user.role; } return token; }, async session({ session, token }) { if (session.user) { session.user.id = token.id as string; session.user.role = token.role as string; } return session; } },
   pages: { signIn: "/login" },

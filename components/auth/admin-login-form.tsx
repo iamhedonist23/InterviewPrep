@@ -11,9 +11,18 @@ export function AdminLoginForm() {
     setBusy(true);
     setError("");
 
+    const password = String(formData.get("password") ?? "");
+    const adminToken = String(formData.get("adminToken") ?? "");
+    if (!password && !adminToken) {
+      setError("Enter your password or admin token.");
+      setBusy(false);
+      return;
+    }
+
     const result = await signIn("credentials", {
       email: formData.get("email"),
-      password: formData.get("password"),
+      password,
+      adminToken,
       redirect: false,
     });
 
@@ -44,9 +53,16 @@ export function AdminLoginForm() {
         Email
         <input required name="email" type="email" autoComplete="email" className="mt-2 h-12 w-full rounded-xl border border-paper/20 bg-white/5 px-4 font-normal text-paper" />
       </label>
+      <div className="border-t border-paper/10 pt-5">
+        <label className="text-sm font-bold text-paper">
+          Admin token
+          <input name="adminToken" type="password" autoComplete="one-time-code" className="mt-2 h-12 w-full rounded-xl border border-paper/20 bg-white/5 px-4 font-normal text-paper" />
+        </label>
+        <p className="mt-2 text-xs text-paper/50">Use the configured admin token instead of a password.</p>
+      </div>
       <label className="text-sm font-bold text-paper">
         Password
-        <input required name="password" type="password" autoComplete="current-password" className="mt-2 h-12 w-full rounded-xl border border-paper/20 bg-white/5 px-4 font-normal text-paper" />
+        <input name="password" type="password" autoComplete="current-password" className="mt-2 h-12 w-full rounded-xl border border-paper/20 bg-white/5 px-4 font-normal text-paper" />
       </label>
       {error && <p role="alert" className="text-sm font-semibold text-coral">{error}</p>}
       <Button type="submit" disabled={busy} className="bg-coral hover:bg-white hover:text-ink">

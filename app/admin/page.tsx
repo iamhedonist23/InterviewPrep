@@ -10,17 +10,17 @@ export default async function AdminPage() {
   await requireAdmin();
 
   const [questions, categories, articles, faqs, users, contacts, studyCategories, studyTopics] = await Promise.all([
-    prisma.interviewQuestion.count(),
-    prisma.category.count(),
-    prisma.article.count(),
-    prisma.fAQ.count(),
-    prisma.user.count(),
-    prisma.contactMessage.count(),
-    prisma.studyCategory.count(),
-    prisma.studyTopic.count(),
+    prisma.interviewQuestion.count().catch(() => null),
+    prisma.category.count().catch(() => null),
+    prisma.article.count().catch(() => null),
+    prisma.fAQ.count().catch(() => null),
+    prisma.user.count().catch(() => null),
+    prisma.contactMessage.count().catch(() => null),
+    prisma.studyCategory.count().catch(() => null),
+    prisma.studyTopic.count().catch(() => null),
   ]);
 
-const cards: Array<[label: string, count: number, href: string]> = [
+const cards: Array<[label: string, count: number | null, href: string]> = [
   ["Interview Questions", questions, "/admin/questions"],
   ["Question Categories", categories, "/admin/categories"],
   ["Study Topics", studyTopics, "/admin/study/topics"],
@@ -37,6 +37,11 @@ const cards: Array<[label: string, count: number, href: string]> = [
         <p className="text-xs font-bold uppercase tracking-[.18em] text-coral">Restricted workspace</p>
         <h1 className="mt-3 font-display text-4xl font-bold">Admin dashboard</h1>
         <p className="mt-3 text-ink/60">Manage the content and accounts behind InstantInterviewPrep.</p>
+        {[questions, categories, articles, faqs, users, contacts, studyCategories, studyTopics].some(count => count === null) && (
+          <p className="mt-5 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            Database metrics are temporarily unavailable. You can still use the dashboard navigation once the database connection is restored.
+          </p>
+        )}
 
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/admin/questions/import" className="rounded-full bg-coral px-5 py-3 text-sm font-bold text-white">
@@ -59,7 +64,7 @@ const cards: Array<[label: string, count: number, href: string]> = [
               key={label}
             >
               <p className="text-sm text-ink/55">{label}</p>
-              <p className="mt-3 font-display text-4xl font-bold">{count}</p>
+              <p className="mt-3 font-display text-4xl font-bold">{count ?? "-"}</p>
               <p className="mt-5 text-sm font-bold text-coral">Manage {label} →</p>
             </Link>
           ))}
