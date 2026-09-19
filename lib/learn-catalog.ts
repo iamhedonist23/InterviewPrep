@@ -30,6 +30,13 @@ type LearnTopic = CatalogTopic & {
   module: { studyPath: Pick<CatalogPath, "name" | "level"> };
 };
 
+const legacyTopicAliases: Record<string, Record<string, string>> = {
+  "core-java": {
+    "core-java-java-overview-and-use-cases": "core-java-introduction-to-java",
+    "core-java-installing-java-and-checking-the-version": "core-java-jdk-jre-and-jvm",
+  },
+};
+
 const categoryLoaders: Record<string, () => Promise<CatalogCategory>> = {
   "data-structures-algorithms": async () => (await import("@/data/learn-courses/data-structures-algorithms.json")).default as CatalogCategory,
   "database-management-systems": async () => (await import("@/data/learn-courses/database-management-systems.json")).default as CatalogCategory,
@@ -79,7 +86,8 @@ function toLearnTopic(category: CatalogCategory, learnPath: CatalogPath, learnMo
 export async function getCatalogTopic(categorySlug: string, topicSlug: string) {
   const category = await getCategory(categorySlug);
   if (!category) return null;
-  const match = topics(category).find(({ topic }) => topic.slug === topicSlug);
+  const canonicalSlug = legacyTopicAliases[categorySlug]?.[topicSlug] ?? topicSlug;
+  const match = topics(category).find(({ topic }) => topic.slug === canonicalSlug);
   return match ? toLearnTopic(category, match.learnPath, match.learnModule, match.topic) : null;
 }
 

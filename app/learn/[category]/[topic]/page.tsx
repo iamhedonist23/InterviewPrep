@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { Container } from "@/components/ui/container";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { StudyExercise } from "@/components/study/study-exercise";
@@ -9,6 +9,7 @@ import { getPublishedTopic, getAdjacentTopics, getPublishedTopicLinks } from "@/
 import { getRelatedInterviewCategory } from "@/lib/public-content";
 import { siteUrl } from "@/lib/site";
 import { ContentOwner } from "@/components/editorial/content-owner";
+import { LessonPageShell } from "@/components/learn/lesson-page-shell";
 
 export const dynamic = "force-dynamic";
 type Props = { params: Promise<{ category: string; topic: string }> };
@@ -38,6 +39,7 @@ export default async function LearnTopicPage({ params }: Props) {
   const { category, topic } = await params;
   const item = await getPublishedTopic(category, topic);
   if (!item) notFound();
+  if (topic !== item.slug) permanentRedirect(`/learn/${item.category.slug}/${item.slug}`);
   const interviewCategory = await getRelatedInterviewCategory(item.category.name);
 
   const prerequisiteIds = Array.isArray(item.prerequisiteIds) ? item.prerequisiteIds.filter((id): id is string => typeof id === "string") : [];
@@ -49,6 +51,11 @@ export default async function LearnTopicPage({ params }: Props) {
   ]);
   const prerequisites = prerequisiteLinks.sort((left, right) => prerequisiteIds.indexOf(left.id) - prerequisiteIds.indexOf(right.id));
   const relatedTopics = relatedTopicLinks.sort((left, right) => relatedTopicIds.indexOf(left.id) - relatedTopicIds.indexOf(right.id));
+  const contentsItems = [
+    ...item.sections.map(section => ({ id: section.id, label: section.title })),
+    ...(item.examples.length > 0 ? [{ id: "examples", label: "Code examples", kind: "resource" as const }] : []),
+    ...(item.exercises.length > 0 ? [{ id: "exercises", label: "Knowledge check", kind: "resource" as const }] : []),
+  ];
 
   const baseUrl = siteUrl;
   const breadcrumb = {
@@ -129,7 +136,14 @@ export default async function LearnTopicPage({ params }: Props) {
           </div>
         )}
 
-        <div className="mt-14 grid gap-12 lg:grid-cols-[1fr_300px]">
+        <LessonPageShell
+          contentsItems={contentsItems}
+          difficulty={item.module.studyPath.level.toLowerCase().replace(/_/g, " ")}
+          readingMinutes={item.estimatedMinutes ?? undefined}
+          sectionCount={item.sections.length}
+          category={item.category.name}
+        >
+        <div className="mt-14">
           <article className="max-w-3xl space-y-12">
             {item.sections.map(section => (
               <div key={section.id} id={section.id}>
@@ -217,61 +231,6 @@ export default async function LearnTopicPage({ params }: Props) {
               </div>
             )}
           </article>
-
-          <aside className="space-y-6">
-            {/* Table of contents */}
-            <div className="h-fit rounded-2xl bg-ink p-6 text-paper lg:sticky lg:top-6">
-              <h2 className="font-display text-lg font-bold">Contents</h2>
-              <ul className="mt-4 space-y-2 text-sm text-paper/70">
-                {item.sections.map(section => (
-                  <li key={section.id} className="hover:text-coral">
-                    <a href={`#${section.id}`} className="block">
-                      {section.title}
-                    </a>
-                  </li>
-                ))}
-              </ul>
-
-              {item.examples.length > 0 && (
-                <div className="mt-4 border-t border-paper/20 pt-4">
-                  <a href="#examples" className="block text-sm text-paper/80 hover:text-coral">
-                    Code examples
-                  </a>
-                </div>
-              )}
-
-              {item.exercises.length > 0 && (
-                <div className="mt-2">
-                  <a href="#exercises" className="block text-sm text-paper/80 hover:text-coral">
-                    Knowledge check
-                  </a>
-                </div>
-              )}
-            </div>
-
-            {/* Info card */}
-            <div className="rounded-2xl border border-ink/10 bg-white/70 p-6">
-              <h3 className="text-xs font-bold uppercase tracking-widest text-ink/60">About this lesson</h3>
-              <dl className="mt-4 space-y-3 text-sm">
-                <div>
-                  <dt className="font-semibold text-ink/60">Difficulty</dt>
-                  <dd className="mt-1 font-bold capitalize text-ink">
-                    {item.module.studyPath.level.toLowerCase().replace(/_/g, ' ')}
-                  </dd>
-                </div>
-                {item.estimatedMinutes && (
-                  <div>
-                    <dt className="font-semibold text-ink/60">Reading time</dt>
-                    <dd className="mt-1 font-bold text-ink">{item.estimatedMinutes} minutes</dd>
-                  </div>
-                )}
-                <div>
-                  <dt className="font-semibold text-ink/60">Content sections</dt>
-                  <dd className="mt-1 font-bold text-ink">{item.sections.length}</dd>
-                </div>
-              </dl>
-            </div>
-          </aside>
         </div>
 
         <nav aria-label="Topic navigation" className="mt-14 flex max-w-3xl flex-col gap-3 border-t border-ink/10 pt-8 sm:flex-row sm:justify-between">
@@ -314,6 +273,7 @@ export default async function LearnTopicPage({ params }: Props) {
             </Link>
           )}
         </nav>
+        </LessonPageShell>
       </Container>
     </section>
   );
